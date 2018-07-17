@@ -19,6 +19,7 @@ djinni/varnames.djinni
 djinni/relative_paths.djinni
 djinni/array.djinni
 djinni/enum_flags.djinni
+djinni/constant_enum.djinni
 djinni/vendor/third-party/date.djinni
 djinni/vendor/third-party/date.yaml
 djinni/vendor/third-party/duration.djinni

@@ -12,8 +12,6 @@ namespace testsuite {
 
 
 
-constant_enum const Constants::CONST_ENUM = constant_enum::SOME_VALUE;
-
 std::experimental::optional<bool> const Constants::OPT_BOOL_CONSTANT = true;
 
 std::experimental::optional<int8_t> const Constants::OPT_I8_CONSTANT = 1;
