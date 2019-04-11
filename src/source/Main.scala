@@ -75,6 +75,7 @@ object Main {
     var objcSwiftBridgingHeaderName: Option[String] = None
     var objcGenProtocol: Boolean = false
     var objcDisableClassCtor: Boolean = false
+    var objcClosedEnums: Boolean = false
     var objcppIncludePrefix: String = ""
     var objcppIncludeCppPrefix: String = ""
     var objcppIncludeObjcPrefixOptional: Option[String] = None
@@ -187,6 +188,8 @@ object Main {
         .text("Generate Objective-C protocols for native (+c) only interfaces.")
       opt[Boolean]("objc-disable-class-ctor").valueName("<true/false>").foreach(x => objcDisableClassCtor = x)
         .text("Disable generating Objective-C class init helper method.")
+      opt[Boolean]("objc-closed-enums").valueName("<true/false>").foreach(x => objcClosedEnums = x)
+        .text("All generated Objective-C enums will be NS_CLOSED_ENUM (default: false). ")
       note("")
       opt[File]("objcpp-out").valueName("<out-folder>").foreach(x => objcppOutFolder = Some(x))
         .text("The output folder for private Objective-C++ files (Generator disabled if unspecified).")
@@ -381,6 +384,7 @@ object Main {
       objcSwiftBridgingHeaderName,
       objcGenProtocol,
       objcDisableClassCtor,
+      objcClosedEnums,
       outFileListWriter,
       skipGeneration,
       yamlOutFolder,

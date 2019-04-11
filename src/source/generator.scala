@@ -85,6 +85,7 @@ package object generatorTools {
                    objcSwiftBridgingHeaderName: Option[String],
                    objcGenProtocol: Boolean,
                    objcDisableClassCtor: Boolean,
+                   objcClosedEnums: Boolean,
                    outFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],
