@@ -132,6 +132,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
     })
     if (i.ext.cpp) {
       refs.java.add("java.util.concurrent.atomic.AtomicBoolean")
+      refs.java.add("com.snapchat.djinni.NativeObjectManager")
     }
 
     writeJavaFile(ident, origin, refs.java, w => {
@@ -176,18 +177,10 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
             w.wl
             w.wl(s"private CppProxy(long nativeRef)").braced {
               w.wl("if (nativeRef == 0) throw new RuntimeException(\"nativeRef is zero\");")
-              w.wl(s"this.nativeRef = nativeRef;")
+              w.wl("this.nativeRef = nativeRef;")
+              w.wl("NativeObjectManager.register(this, nativeRef);")
             }
-            w.wl
-            w.wl("private native void nativeDestroy(long nativeRef);")
-            w.wl("public void destroy()").braced {
-              w.wl("boolean destroyed = this.destroyed.getAndSet(true);")
-              w.wl("if (!destroyed) nativeDestroy(this.nativeRef);")
-            }
-            w.wl("protected void finalize() throws java.lang.Throwable").braced {
-              w.wl("destroy();")
-              w.wl("super.finalize();")
-            }
+            w.wl("public static native void nativeDestroy(long nativeRef);")
             for (m <- i.methods if !m.static) { // Static methods not in CppProxy
               val ret = marshal.returnType(m.ret)
               val returnStmt = m.ret.fold("")(_ => "return ")
