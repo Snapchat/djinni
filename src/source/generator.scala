@@ -61,6 +61,7 @@ package object generatorTools {
                    jniClassIdentStyle: IdentConverter,
                    jniFileIdentStyle: IdentConverter,
                    jniBaseLibIncludePrefix: String,
+                   jniUseOnLoad: Boolean,
                    cppExt: String,
                    cppHeaderExt: String,
                    objcOutFolder: Option[File],

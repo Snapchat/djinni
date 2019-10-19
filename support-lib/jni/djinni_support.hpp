@@ -43,6 +43,18 @@ void jniInit(JavaVM * jvm);
 void jniShutdown();
 
 /*
+ * Utilities for hooking up JNI_OnLoad
+ */
+void jniRegisterMethodRecords(const char* className, const JNINativeMethod* records, size_t size);
+
+struct JNIMethodLoadAutoRegister {
+    template<size_t N>
+    JNIMethodLoadAutoRegister(const char* className, const JNINativeMethod (&records)[N]) {
+        jniRegisterMethodRecords(className, records, N);
+    }
+};
+
+/*
  * Get the JNIEnv for the invoking thread. Should only be called on Java-created threads.
  */
 JNIEnv * jniGetThreadEnv();

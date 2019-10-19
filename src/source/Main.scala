@@ -16,7 +16,7 @@
 
 package djinni
 
-import java.io.{IOException, FileNotFoundException, FileInputStream, InputStreamReader, File, BufferedWriter, FileWriter}
+import java.io.{BufferedWriter, File, FileNotFoundException, FileWriter, IOException}
 
 import djinni.generatorTools._
 
@@ -55,6 +55,7 @@ object Main {
     var jniFileIdentStyleOptional: Option[IdentConverter] = None
     var jniBaseLibClassIdentStyleOptional: Option[IdentConverter] = None
     var jniBaseLibIncludePrefix: String = ""
+    var jniUseOnLoad: Boolean = false
     var cppHeaderOutFolderOptional: Option[File] = None
     var cppExt: String = "cpp"
     var cppHeaderExt: String = "hpp"
@@ -159,6 +160,8 @@ object Main {
         .text("The namespace name to use for generated JNI C++ classes.")
       opt[String]("jni-base-lib-include-prefix").valueName("...").foreach(x => jniBaseLibIncludePrefix = x)
         .text("The JNI base library's include path, relative to the JNI C++ classes.")
+      opt[Boolean]("jni-use-on-load-initializer").valueName("<true/false>").foreach(x => jniUseOnLoad = x)
+        .text("If true, djinni will use RegisterNativeMethods to bind JNI functions, instead of the Java_* style symbol exports")
       note("")
       opt[File]("objc-out").valueName("<out-folder>").foreach(x => objcOutFolder = Some(x))
         .text("The output folder for Objective-C files (Generator disabled if unspecified).")
@@ -330,6 +333,7 @@ object Main {
       jniClassIdentStyle,
       jniFileIdentStyle,
       jniBaseLibIncludePrefix,
+      jniUseOnLoad,
       cppExt,
       cppHeaderExt,
       objcOutFolder,

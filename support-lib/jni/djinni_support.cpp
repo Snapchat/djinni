@@ -51,8 +51,21 @@ JniClassInitializer::JniClassInitializer(std::function<void()> init) {
     get_vec().push_back(std::move(init));
 }
 
+static auto& getMethodRecords() {
+    static std::vector<std::tuple<const char*, const JNINativeMethod*, size_t>> methods;
+    return methods;
+}
+
 void jniInit(JavaVM * jvm) {
     g_cachedJVM = jvm;
+    auto env = jniGetThreadEnv();
+
+    for (const auto& record : getMethodRecords()) {
+        auto clazz = jniFindClass(std::get<0>(record));
+        if (env->RegisterNatives(clazz.get(), std::get<1>(record), std::get<2>(record))) {
+            return;
+        }
+    }
 
     try {
         for (const auto & initializer : JniClassInitializer::get_all()) {
@@ -67,6 +80,10 @@ void jniInit(JavaVM * jvm) {
 
 void jniShutdown() {
     g_cachedJVM = nullptr;
+}
+
+void jniRegisterMethodRecords(const char* className, const JNINativeMethod* records, size_t size) {
+    getMethodRecords().emplace_back(className, records, size);
 }
 
 JNIEnv * jniGetThreadEnv() {
