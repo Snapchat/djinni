@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)                                                                                                                                                    
+cmake_minimum_required(VERSION 2.8)
 project(djinni-test-suite C CXX)
 
 ##
@@ -37,14 +37,14 @@ file(
   ../generated-src/cpp/*.cpp
   ../handwritten-src/cpp/*.cpp)
 
-set(test_suite_common_flags "-g -Wall -Werror -std=c++14")
+set(test_suite_common_flags "-g -Wall -Werror -std=c++17")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${test_suite_common_flags}")
 if(UNIX OR APPLE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()
 
-set(test_lib_srcs ${support_srcs} ${test_suite_srcs}) 
+set(test_lib_srcs ${support_srcs} ${test_suite_srcs})
 
 add_library(DjinniTestNative SHARED ${test_lib_srcs})
 include_directories(
@@ -57,4 +57,3 @@ install(
   TARGETS DjinniTestNative
   ARCHIVE DESTINATION "${LIB_INSTALL_DIR}"
   LIBRARY DESTINATION "${LIB_INSTALL_DIR}")
-

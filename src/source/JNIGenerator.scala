@@ -389,7 +389,7 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
         def jniNativeMethod(javaMethodName: String, javaSignature: String, pointer: String) : String = {
           // this const cast is a hack because JNINativeMethod in openjdk8 I(chancila) used for testing
           // does not declare the members as const char*
-          s"(char*)${q(javaMethodName)}, (char*)${q(javaSignature)}, reinterpret_cast<void*>($pointer),"
+          s"const_cast<char*>(${q(javaMethodName)}), const_cast<char*>(${q(javaSignature)}), reinterpret_cast<void*>($pointer),"
         }
 
         def nativeMethodRecord(isStaticRecord: Boolean, proxyMethods: Seq[Interface.Method]): Unit = {

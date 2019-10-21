@@ -109,6 +109,7 @@ fi
     --cpp-extended-record-include-prefix "../../handwritten-src/cpp/" \
     \
     --jni-out "$temp_out_relative/jni" \
+    --jni-use-on-load-initializer false \
     --ident-jni-class NativeFooBar \
     --ident-jni-file NativeFooBar \
     \
@@ -141,6 +142,7 @@ cp "$base_dir/djinni/yaml-test.djinni" "$temp_out/yaml"
     --cpp-optional-header "\"../../handwritten-src/cpp/optional.hpp\"" \
     \
     --jni-out "$temp_out_relative/jni" \
+    --jni-use-on-load-initializer false \
     --ident-jni-class NativeFooBar \
     --ident-jni-file NativeFooBar \
     \

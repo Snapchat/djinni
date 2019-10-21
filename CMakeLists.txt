@@ -34,7 +34,7 @@ endif()
 source_group("" FILES ${SRC_SHARED})
 
 set_target_properties(djinni_support_lib PROPERTIES
-  CXX_STANDARD 11
+  CXX_STANDARD 17
   CXX_STANDARD_REQUIRED true
   CXX_EXTENSIONS false
 )

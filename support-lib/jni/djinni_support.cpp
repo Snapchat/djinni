@@ -61,8 +61,9 @@ void jniInit(JavaVM * jvm) {
     auto env = jniGetThreadEnv();
 
     for (const auto& record : getMethodRecords()) {
-        auto clazz = jniFindClass(std::get<0>(record));
-        if (env->RegisterNatives(clazz.get(), std::get<1>(record), std::get<2>(record))) {
+        auto [classString, nativeMethods, nativeMethodsSize] = record;
+        auto clazz = jniFindClass(classString);
+        if (env->RegisterNatives(clazz.get(), nativeMethods, nativeMethodsSize)) {
             return;
         }
     }
