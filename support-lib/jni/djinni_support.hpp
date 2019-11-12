@@ -46,6 +46,12 @@ void jniShutdown();
  * Utilities for hooking up JNI_OnLoad
  */
 void jniRegisterMethodRecords(const char* className, const JNINativeMethod* records, size_t size);
+void jniRegisterNatives(JNIEnv* env, const char* className, const JNINativeMethod* records, size_t size);
+
+template<size_t N>
+void jniRegisterNatives(JNIEnv* env, const char* className, const JNINativeMethod (&records)[N]) {
+    jniRegisterNatives(env, className, records, N);
+}
 
 struct JNIMethodLoadAutoRegister {
     template<size_t N>

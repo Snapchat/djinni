@@ -359,8 +359,8 @@ object Main {
       skipGeneration,
       yamlOutFolder,
       yamlOutFile,
-      yamlPrefix)
-
+      yamlPrefix,
+      idlFile.getName.stripSuffix(".djinni"))
 
     try {
       val r = generate(idl, outSpec)

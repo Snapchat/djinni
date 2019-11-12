@@ -84,7 +84,8 @@ package object generatorTools {
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],
                    yamlOutFile: Option[String],
-                   yamlPrefix: String)
+                   yamlPrefix: String,
+                   moduleName: String)
 
   def useProtocol(ext: Ext, spec: Spec) = ext.objc || spec.objcGenProtocol
 
@@ -109,7 +110,7 @@ package object generatorTools {
                             enum: IdentConverter, const: IdentConverter)
 
   object IdentStyle {
-    val camelUpper = (s: String) => s.split('_').map(firstUpper).mkString
+    val camelUpper = (s: String) => s.split("[-_]").map(firstUpper).mkString
     val camelLower = (s: String) => {
       val parts = s.split('_')
       parts.head + parts.tail.map(firstUpper).mkString
@@ -346,15 +347,18 @@ abstract class Generator(spec: Spec)
   }
 
   def generate(idl: Seq[TypeDecl]) {
-    for (td <- idl.collect { case itd: InternTypeDecl => itd }) td.body match {
+    val decls = idl.collect { case itd: InternTypeDecl => itd }
+    for (td <- decls) td.body match {
       case e: Enum =>
         assert(td.params.isEmpty)
         generateEnum(td.origin, td.ident, td.doc, e)
       case r: Record => generateRecord(td.origin, td.ident, td.doc, td.params, r)
       case i: Interface => generateInterface(td.origin, td.ident, td.doc, td.params, i)
     }
+    generateModule(decls.filter(td => td.body.isInstanceOf[Interface]))
   }
 
+  def generateModule(decls: Seq[InternTypeDecl]) {}
   def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum)
   def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: Record)
   def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface)

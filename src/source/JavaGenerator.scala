@@ -104,6 +104,23 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
+  private val moduleClass: String = spec.javaIdentStyle.ty(spec.moduleName) + "Module"
+
+  override def generateModule(decls: Seq[InternTypeDecl]) {
+    if (spec.jniUseOnLoad) {
+      writeJavaFile(moduleClass, s"${spec.moduleName} Module", List.empty, w => {
+        w.wl(s"public final class $moduleClass").braced {
+          w.wl("static").braced {
+            w.wl("Guard.initialize();")
+          }
+          w.wl("private static final class Guard").braced {
+            w.wl("private static native void initialize();")
+          }
+        }
+      })
+    }
+  }
+
   override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
     val refs = new JavaRefs()
 
@@ -135,6 +152,19 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
       refs.java.add("com.snapchat.djinni.NativeObjectManager")
     }
 
+    def writeModuleInitializer(w: IndentWriter) = {
+      if (spec.jniUseOnLoad) {
+        w.wl("static").braced {
+          w.wl("try").braced {
+            w.wl(s"Class.forName(${q(spec.javaPackage.getOrElse("") + "." + moduleClass)});")
+          }
+          w.wl("catch (ClassNotFoundException e)").braced {
+            w.wl(s"throw new IllegalStateException(${q("Failed to initialize djinni module")}, e);")
+          }
+        }
+      }
+    }
+
     writeJavaFile(ident, origin, refs.java, w => {
       val javaClass = marshal.typename(ident, i)
       val typeParamList = javaTypeParams(typeParams)
@@ -157,8 +187,16 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
           marshal.nullityAnnotation(m.ret).foreach(w.wl)
           w.wl("public abstract " + ret + " " + idJava.method(m.ident) + params.mkString("(", ", ", ")") + throwException + ";")
         }
-        for (m <- i.methods if m.static) {
-          skipFirst { w.wl }
+
+        val statics = i.methods.filter(m => m.static)
+
+        if (statics.nonEmpty) {
+          writeModuleInitializer(w)
+        }
+        for (m <- statics) {
+          skipFirst {
+            w.wl
+          }
           writeMethodDoc(w, m, idJava.local)
           val ret = marshal.returnType(m.ret)
           val params = m.params.map(p => {
@@ -166,12 +204,13 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
             nullityAnnotation + marshal.paramType(p.ty) + " " + idJava.local(p.ident)
           })
           marshal.nullityAnnotation(m.ret).foreach(w.wl)
-          w.wl("public static native "+ ret + " " + idJava.method(m.ident) + params.mkString("(", ", ", ")") + ";")
+          w.wl("public static native " + ret + " " + idJava.method(m.ident) + params.mkString("(", ", ", ")") + ";")
         }
         if (i.ext.cpp) {
           w.wl
           javaAnnotationHeader.foreach(w.wl)
           w.wl(s"private static final class CppProxy$typeParamList extends $javaClass$typeParamList").braced {
+            writeModuleInitializer(w)
             w.wl("private final long nativeRef;")
             w.wl("private final AtomicBoolean destroyed = new AtomicBoolean(false);")
             w.wl

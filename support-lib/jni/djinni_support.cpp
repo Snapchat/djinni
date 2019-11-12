@@ -87,6 +87,13 @@ void jniRegisterMethodRecords(const char* className, const JNINativeMethod* reco
     getMethodRecords().emplace_back(className, records, size);
 }
 
+void jniRegisterNatives(JNIEnv* env, const char* className, const JNINativeMethod* records, size_t size) {
+        auto clazz = jniFindClass(className);
+        if (env->RegisterNatives(clazz.get(), records, size)) {
+            return;
+        }
+}
+
 JNIEnv * jniGetThreadEnv() {
     assert(g_cachedJVM);
     JNIEnv * env = nullptr;

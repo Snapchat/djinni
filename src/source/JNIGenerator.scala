@@ -257,6 +257,14 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
           }
         }
       }
+
+      if (spec.jniUseOnLoad && i.ext.cpp) {
+        val (static, proxy) = i.methods.partition(m => m.static)
+        w.wl(s"extern const JNINativeMethod ${jniSelf}ProxyRecords[${proxy.size + 1}];")
+        if (static.nonEmpty) {
+          w.wl(s"extern const JNINativeMethod ${jniSelf}StaticRecords[${static.size}];")
+        }
+      }
     }
 
     def writeJniBody(w: IndentWriter) {
@@ -393,9 +401,9 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
         }
 
         def nativeMethodRecord(isStaticRecord: Boolean, proxyMethods: Seq[Interface.Method]): Unit = {
-          val identifier = if (isStaticRecord) "staticRecords" else "proxyRecords"
+          val identifier = jniSelf + (if (isStaticRecord) "Static" else "Proxy") + "Records"
 
-          w.wl(s"static const JNINativeMethod $identifier[] = ").bracedSemi {
+          w.wl(s"const JNINativeMethod $identifier[] = ").bracedSemi {
             if (!isStaticRecord) {
               w.bracedEnd(",") {
                 w.wl(jniNativeMethod("nativeDestroy", "(J)V", methodName("nativeDestroy", false)))
@@ -419,21 +427,51 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
         }
 
         if (spec.jniUseOnLoad) {
-          w.wl("namespace").braced {
-            val (staticMethods, proxyMethods) = i.methods.partition(x => x.static)
-            nativeMethodRecord(false, proxyMethods)
-            w.wl(s"static auto autoregister_proxy = djinni::JNIMethodLoadAutoRegister(${q(jniMarshal.undecoratedTypename(ident, i) + "$CppProxy")}, proxyRecords);")
-
-            if (staticMethods.nonEmpty) {
-              nativeMethodRecord(true, staticMethods)
-              w.wl(s"static auto autoregister_statics = djinni::JNIMethodLoadAutoRegister(${q(jniMarshal.undecoratedTypename(ident, i))}, staticRecords);")
-            }
+          val (staticMethods, proxyMethods) = i.methods.partition(x => x.static)
+          nativeMethodRecord(false, proxyMethods)
+          if (staticMethods.nonEmpty) {
+            nativeMethodRecord(true, staticMethods)
           }
         }
       }
     }
 
     writeJniFiles(origin, typeParams.nonEmpty, ident, refs, writeJniPrototype, writeJniBody)
+  }
+
+  override def generateModule(decls: Seq[InternTypeDecl]): Unit = {
+    if (!spec.jniUseOnLoad) {
+      return
+    }
+
+    val moduleName = spec.cppIdentStyle.ty(spec.moduleName + "Module")
+    val moduleNameJava = spec.javaIdentStyle.ty(spec.moduleName + "Module")
+
+    val includes = s"#include ${q(spec.jniBaseLibIncludePrefix + "djinni_support.hpp")}" :: decls.map(td => s"#include ${q(spec.jniFileIdentStyle(td.ident) + "." + spec.cppHeaderExt)}").toList
+
+    writeJniHppFile(moduleName, "MODULE", List.empty, List.empty, w => {
+    })
+    writeJniCppFile(moduleName, "MODULE", includes, w => {
+      w.wl("static void registerModuleNatives(JNIEnv* env, jclass clazz)").braced {
+        for (ty <- decls.filter(ty => ty.body.asInstanceOf[Interface].ext.cpp)) {
+          val i = ty.body.asInstanceOf[Interface]
+          val (statics, proxys) = i.methods.partition(i => i.static)
+
+          w.wl(s"djinni::jniRegisterNatives(env, ${q(jniMarshal.undecoratedTypename(ty.ident, ty.body) + "$CppProxy")}, ${jniMarshal.helperClass(ty.ident)}ProxyRecords);")
+          if (statics.nonEmpty) {
+            w.wl(s"djinni::jniRegisterNatives(env, ${q(jniMarshal.undecoratedTypename(ty.ident, ty.body))}, ${jniMarshal.helperClass(ty.ident)}StaticRecords);")
+          }
+        }
+      }
+      w.wl("static const JNINativeMethod moduleMethod[1] = ").bracedSemi {
+        w.braced {
+          w.wl((s"const_cast<char*>(${q("initialize")}), const_cast<char*>(${q("()V")}), reinterpret_cast<void*>(registerModuleNatives)"))
+        }
+      }
+      val guardName = moduleNameJava + "$Guard"
+      val moduleJavaFqn = spec.javaPackage.fold(guardName)(p => p.replaceAllLiterally(".", "/") + "/" + guardName)
+      w.wl(s"static djinni::JNIMethodLoadAutoRegister moduleLoader(${q(moduleJavaFqn)}, moduleMethod);")
+    })
   }
 
   def writeJniFiles(origin: String, allInHeader: Boolean, ident: Ident, refs: JNIRefs, writeProto: IndentWriter => Unit, writeBody: IndentWriter => Unit) {
