@@ -58,7 +58,7 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
         List(ImportRef(include(d.name)))
       case DInterface =>
         val ext = d.body.asInstanceOf[Interface].ext
-        if (!ext.objc) {
+        if (!useProtocol(ext, spec)) {
           List(ImportRef("<Foundation/Foundation.h>"), DeclRef(s"@class ${typename(d.name, d.body)};", None))
         }
         else {
@@ -73,6 +73,7 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
     case p: MParam => List()
   }
 
+  def implHeaderName(ident: String) = idObjc.ty(ident) + "+Impl." + spec.objcHeaderExt
   def headerName(ident: String) = idObjc.ty(ident) + "." + spec.objcHeaderExt
   def include(ident: String) = q(spec.objcIncludePrefix + headerName(ident))
 
@@ -119,13 +120,13 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
               case DRecord => (idObjc.ty(d.name), true)
               case DInterface =>
                 val ext = d.body.asInstanceOf[Interface].ext
-                if (!ext.objc)
+                if (!useProtocol(ext, spec))
                   (idObjc.ty(d.name), true)
                 else
                   (s"id<${idObjc.ty(d.name)}>", false)
             }
             case e: MExtern => e.body match {
-              case i: Interface => if(i.ext.objc) (s"id<${e.objc.typename}>", false) else (e.objc.typename, true)
+              case i: Interface => if(useProtocol(i.ext, spec)) (s"id<${e.objc.typename}>", false) else (e.objc.typename, true)
               case _ => if(needRef) (e.objc.boxed, true) else (e.objc.typename, e.objc.pointer)
             }
             case p: MParam => throw new AssertionError("Parameter should not happen at Obj-C top level")

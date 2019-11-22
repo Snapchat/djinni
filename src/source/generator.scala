@@ -79,11 +79,14 @@ package object generatorTools {
                    objcBaseLibIncludePrefix: String,
                    objcSwiftBridgingHeaderWriter: Option[Writer],
                    objcSwiftBridgingHeaderName: Option[String],
+                   objcGenProtocol: Boolean,
                    outFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],
                    yamlOutFile: Option[String],
                    yamlPrefix: String)
+
+  def useProtocol(ext: Ext, spec: Spec) = ext.objc || spec.objcGenProtocol
 
   def preComma(s: String) = {
     if (s.isEmpty) s else ", " + s

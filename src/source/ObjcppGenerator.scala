@@ -96,7 +96,7 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
     writeObjcFile(objcppMarshal.privateHeaderName(ident.name), origin, refs.privHeader, w => {
       arcAssert(w)
       w.wl
-      w.wl((if(i.ext.objc) "@protocol " else "@class ") + self + ";")
+      w.wl((if(useProtocol(i.ext, spec)) "@protocol " else "@class ") + self + ";")
       w.wl
       wrapNamespace(w, spec.objcppNamespace, w => {
         w.wl(s"class $helperClass").bracedSemi {
@@ -109,7 +109,7 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
               w.wl(s"using CppType = std::shared_ptr<$cppSelf>;")
               w.wl(s"using CppOptType = std::shared_ptr<$cppSelf>;")
           }
-          w.wl("using ObjcType = " + (if(i.ext.objc) s"id<$self>" else s"$self*") + ";");
+          w.wl("using ObjcType = " + (if(useProtocol(i.ext, spec)) s"id<$self>" else s"$self*") + ";");
           w.wl
           w.wl(s"using Boxed = $helperClass;")
           w.wl
@@ -124,11 +124,16 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       w.wl
     })
 
+    val hasStaticMethod = i.methods.exists(_.static);
+
     if (i.ext.cpp) {
       refs.body.add("#import " + q(spec.objcBaseLibIncludePrefix + "DJICppWrapperCache+Private.h"))
       refs.body.add("#include <utility>")
       refs.body.add("#import " + q(spec.objcBaseLibIncludePrefix + "DJIError.h"))
       refs.body.add("#include <exception>")
+
+      if (spec.objcGenProtocol && hasStaticMethod)
+        refs.body.add("#import " + q(spec.objcIncludePrefix + marshal.implHeaderName(ident)))
     }
     if (!spec.cppNnType.isEmpty || !spec.cppNnCheckExpression.nonEmpty) {
       refs.body.add("#include <stdexcept>")
@@ -150,6 +155,8 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       if (i.ext.cpp) {
         w.wl
         if (i.ext.objc)
+          w.wl(s"@interface $objcSelf : NSObject<$self>")
+        else if (spec.objcGenProtocol && !hasStaticMethod)
           w.wl(s"@interface $objcSelf : NSObject<$self>")
         else
           w.wl(s"@interface $objcSelf ()")
@@ -256,10 +263,16 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
             }
           }
           if (i.ext.cpp && !i.ext.objc) {
-            // C++ only. In this case we generate a class instead of a protocol, so
-            // we don't have to do any casting at all, just access cppRef directly.
-            w.wl("return " + nnCheck("objc->_cppRefHandle.get()") + ";")
-            //w.wl(s"return ${spec.cppNnCheckExpression.getOrElse("")}(objc->_cppRefHandle.get());")
+            if (!spec.objcGenProtocol) {
+              // C++ only. In this case we generate a class instead of a protocol, so
+              // we don't have to do any casting at all, just access cppRef directly.
+              w.wl("return " + nnCheck("objc->_cppRefHandle.get()") + ";")
+              //w.wl(s"return ${spec.cppNnCheckExpression.getOrElse("")}(objc->_cppRefHandle.get());")
+            } else {
+              // C++ only with protocol interface. Cast to interface type then access cppRef.
+              val getProxyExpr = s"(($objcSelf*)objc)->_cppRefHandle.get()"
+              w.wl(s"return ${nnCheck(getProxyExpr)};")
+            }
           } else if (i.ext.cpp || i.ext.objc) {
             // ObjC only, or ObjC and C++.
             if (i.ext.cpp) {

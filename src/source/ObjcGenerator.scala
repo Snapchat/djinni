@@ -94,6 +94,26 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       writeAlignedObjcCall(w, decl, method.params, "", p => (idObjc.field(p.ident), s"(${marshal.paramType(p.ty)})${idObjc.local(p.ident)}"))
     }
 
+    // Generate the header file for protocol implementation (--objc-gen-protocol = true)
+    if (!i.ext.objc && spec.objcGenProtocol) {
+      if(i.methods.exists(_.static)) {
+        val protocolHeader = "#import " + q(spec.objcIncludePrefix + marshal.headerName(ident))
+        writeObjcFile(marshal.implHeaderName(ident), origin, List(protocolHeader), w => {
+          w.wl(s"@interface $self : NSObject<$self>")
+          for (m <- i.methods) {
+            if (m.static) {
+              w.wl
+              writeMethodDoc(w, m, idObjc.local)
+              writeObjcFuncDecl(m, w)
+              w.wl(";")
+            }
+          }
+          w.wl
+          w.wl("@end")
+        })
+      }
+    }
+
     // Generate the header file for Interface
     writeObjcFile(marshal.headerName(ident), origin, refs.header, w => {
       for (c <- i.consts if marshal.canBeConstVariable(c)) {
@@ -102,14 +122,18 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
         writeObjcConstVariableDecl(w, c, self)
         w.wl(s";")
       }
+
       w.wl
       writeDoc(w, doc)
-      if (i.ext.objc) w.wl(s"@protocol $self") else w.wl(s"@interface $self : NSObject")
+      if (useProtocol(i.ext, spec)) w.wl(s"@protocol $self") else w.wl(s"@interface $self : NSObject")
+
       for (m <- i.methods) {
-        w.wl
-        writeMethodDoc(w, m, idObjc.local)
-        writeObjcFuncDecl(m, w)
-        w.wl(";")
+        if (!m.static) {
+          w.wl
+          writeMethodDoc(w, m, idObjc.local)
+          writeObjcFuncDecl(m, w)
+          w.wl(";")
+        }
       }
       for (c <- i.consts if !marshal.canBeConstVariable(c)) {
         w.wl

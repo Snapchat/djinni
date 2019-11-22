@@ -174,13 +174,11 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
     val skipFirst = SkipFirst()
     for (c <- consts) {
       skipFirst{ w.wl }
-      if (shouldConstexpr(c)){
-        w.w(s"${marshal.fieldType(c.ty)} const $selfName::${idCpp.const(c.ident)}")
-      } else {
+      if (!shouldConstexpr(c)){
         w.w(s"${marshal.fieldType(c.ty)} const $selfName::${idCpp.const(c.ident)} = ")
         writeCppConst(w, c.ty, c.value)
+        w.wl(";")
       }
-      w.wl(";")
     }
   }
 
