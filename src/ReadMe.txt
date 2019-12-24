@@ -15,7 +15,7 @@ Building
 
 To build once:
 
-    % ./build
+    % ./build.sh
 
 If you're building frequently, load up the build tool's REPL and run
 the "compile" command every time you want to compile it.
