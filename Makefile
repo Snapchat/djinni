@@ -32,7 +32,7 @@ clean: djinni_jar_clean
 	cd deps/gyp && git checkout -q 0bb67471bca068996e15b56738fa4824dfa19de0
 
 djinni:
-	cd src && ./build
+	cd src && ./build.sh
 
 $(OUTPUT_JAR):
 	cd src && sbt assembly
