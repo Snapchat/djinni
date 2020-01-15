@@ -47,7 +47,7 @@ elif [ $# -eq 1 ]; then
 fi
 
 # Build djinni
-"$base_dir/../src/build"
+"$base_dir/../src/build.sh"
 
 [ ! -e "$temp_out" ] || rm -r "$temp_out"
 "$base_dir/../src/run-assume-built" \
