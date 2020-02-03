@@ -111,7 +111,9 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
       writeJavaFile(moduleClass, s"${spec.moduleName} Module", List.empty, w => {
         w.wl(s"public final class $moduleClass").braced {
           w.wl("static").braced {
-            w.wl("Guard.initialize();")
+            w.wl("if (System.getProperty(\"java.vm.vendor\").equals(\"The Android Project\"))").braced {
+              w.wl("Guard.initialize();")
+            }
           }
           w.wl("private static final class Guard").braced {
             w.wl("private static native void initialize();")

@@ -58,7 +58,7 @@ elif [ $# -eq 1 ]; then
 fi
 
 # Build Djinni
-"$base_dir/../src/build"
+"$base_dir/../src/build.sh"
 
 # Run Djinni generation
 [ ! -e "$temp_out" ] || rm -r "$temp_out"
