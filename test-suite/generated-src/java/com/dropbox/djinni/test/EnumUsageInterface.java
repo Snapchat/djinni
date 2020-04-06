@@ -3,6 +3,7 @@
 
 package com.dropbox.djinni.test;
 
+import com.snapchat.djinni.NativeObjectManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,19 +36,9 @@ public abstract class EnumUsageInterface {
         {
             if (nativeRef == 0) throw new RuntimeException("nativeRef is zero");
             this.nativeRef = nativeRef;
+            NativeObjectManager.register(this, nativeRef);
         }
-
-        private native void nativeDestroy(long nativeRef);
-        public void destroy()
-        {
-            boolean destroyed = this.destroyed.getAndSet(true);
-            if (!destroyed) nativeDestroy(this.nativeRef);
-        }
-        protected void finalize() throws java.lang.Throwable
-        {
-            destroy();
-            super.finalize();
-        }
+        public static native void nativeDestroy(long nativeRef);
 
         @Override
         public Color e(Color e)

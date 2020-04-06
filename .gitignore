@@ -1,36 +1,10 @@
 .DS_Store
 
-**/.idea/workspace.xml
-**/.idea/tasks.xml
-
-# android makefiles
-GypAndroid.mk
-support/*.target.mk
-*.target.mk
-GypAndroid.mk
-
-# gyp
-deps/gyp
-
-# android build artifacts
-libs/
-obj/
-
-# ios build artifacts
-build/
-build_ios/
-
-# xcode stuff
-project.xcworkspace
-*.xccheckout
-DerivedData
-*.xcuserdatad/
+# bazel
+/bazel-*
 
 # djinni output directories
 djinni-output-temp/
 
-# intellij-plugin build artifact
-intellij-plugin/djinni.jar
-
-# profiling output
-callgrind.out.*
+# djinni generated files
+generated-src

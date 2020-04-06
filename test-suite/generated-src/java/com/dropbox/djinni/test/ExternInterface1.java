@@ -3,6 +3,7 @@
 
 package com.dropbox.djinni.test;
 
+import com.snapchat.djinni.NativeObjectManager;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class ExternInterface1 {
@@ -17,19 +18,9 @@ public abstract class ExternInterface1 {
         {
             if (nativeRef == 0) throw new RuntimeException("nativeRef is zero");
             this.nativeRef = nativeRef;
+            NativeObjectManager.register(this, nativeRef);
         }
-
-        private native void nativeDestroy(long nativeRef);
-        public void destroy()
-        {
-            boolean destroyed = this.destroyed.getAndSet(true);
-            if (!destroyed) nativeDestroy(this.nativeRef);
-        }
-        protected void finalize() throws java.lang.Throwable
-        {
-            destroy();
-            super.finalize();
-        }
+        public static native void nativeDestroy(long nativeRef);
 
         @Override
         public com.dropbox.djinni.test.ClientReturnedRecord foo(com.dropbox.djinni.test.ClientInterface i)

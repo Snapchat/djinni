@@ -5,19 +5,12 @@
 
 namespace testsuite {
 
-bool const Constants::BOOL_CONSTANT;
 
-int8_t const Constants::I8_CONSTANT;
 
-int16_t const Constants::I16_CONSTANT;
 
-int32_t const Constants::I32_CONSTANT;
 
-int64_t const Constants::I64_CONSTANT;
 
-float const Constants::F32_CONSTANT;
 
-double const Constants::F64_CONSTANT;
 
 constant_enum const Constants::CONST_ENUM = constant_enum::SOME_VALUE;
 
@@ -43,6 +36,5 @@ ConstantRecord const Constants::OBJECT_CONSTANT = ConstantRecord(
     Constants::I32_CONSTANT /* some_integer */ ,
     Constants::STRING_CONSTANT /* some_string */ );
 
-bool const Constants::DUMMY;
 
 }  // namespace testsuite
