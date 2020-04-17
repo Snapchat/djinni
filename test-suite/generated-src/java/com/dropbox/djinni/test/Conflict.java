@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
  */
 public abstract class Conflict {
 
-    private static final class CppProxy extends Conflict
+    public static final class CppProxy extends Conflict
     {
         private final long nativeRef;
         private final AtomicBoolean destroyed = new AtomicBoolean(false);

@@ -12,7 +12,7 @@ public abstract class UserToken {
     @Nonnull
     public abstract String whoami();
 
-    private static final class CppProxy extends UserToken
+    public static final class CppProxy extends UserToken
     {
         private final long nativeRef;
         private final AtomicBoolean destroyed = new AtomicBoolean(false);

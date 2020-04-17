@@ -20,7 +20,7 @@ public abstract class VarnameInterface {
     @CheckForNull
     public abstract VarnameInterface Imethod(@CheckForNull VarnameInterface IArg);
 
-    private static final class CppProxy extends VarnameInterface
+    public static final class CppProxy extends VarnameInterface
     {
         private final long nativeRef;
         private final AtomicBoolean destroyed = new AtomicBoolean(false);

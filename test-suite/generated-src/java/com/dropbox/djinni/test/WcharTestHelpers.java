@@ -19,7 +19,7 @@ public abstract class WcharTestHelpers {
 
     public static native boolean checkRecord(@Nonnull WcharTestRec rec);
 
-    private static final class CppProxy extends WcharTestHelpers
+    public static final class CppProxy extends WcharTestHelpers
     {
         private final long nativeRef;
         private final AtomicBoolean destroyed = new AtomicBoolean(false);

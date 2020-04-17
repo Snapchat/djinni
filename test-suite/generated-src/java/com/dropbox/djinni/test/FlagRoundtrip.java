@@ -22,7 +22,7 @@ public abstract class FlagRoundtrip {
     @CheckForNull
     public static native EnumSet<EmptyFlags> roundtripEmptyBoxed(@CheckForNull EnumSet<EmptyFlags> flag);
 
-    private static final class CppProxy extends FlagRoundtrip
+    public static final class CppProxy extends FlagRoundtrip
     {
         private final long nativeRef;
         private final AtomicBoolean destroyed = new AtomicBoolean(false);

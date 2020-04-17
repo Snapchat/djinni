@@ -15,7 +15,7 @@ public abstract class ConflictUser {
 
     public abstract boolean conflictArg(@Nonnull HashSet<Conflict> cs);
 
-    private static final class CppProxy extends ConflictUser
+    public static final class CppProxy extends ConflictUser
     {
         private final long nativeRef;
         private final AtomicBoolean destroyed = new AtomicBoolean(false);

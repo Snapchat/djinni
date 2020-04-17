@@ -27,7 +27,7 @@ public abstract class EnumUsageInterface {
     @Nonnull
     public abstract HashMap<Color, Color> m(@Nonnull HashMap<Color, Color> m);
 
-    private static final class CppProxy extends EnumUsageInterface
+    public static final class CppProxy extends EnumUsageInterface
     {
         private final long nativeRef;
         private final AtomicBoolean destroyed = new AtomicBoolean(false);

@@ -17,7 +17,7 @@ public abstract class InterfaceUsingExtendedRecord {
     @Nonnull
     public abstract ExtendedRecord meth(@Nonnull ExtendedRecord er);
 
-    private static final class CppProxy extends InterfaceUsingExtendedRecord
+    public static final class CppProxy extends InterfaceUsingExtendedRecord
     {
         private final long nativeRef;
         private final AtomicBoolean destroyed = new AtomicBoolean(false);

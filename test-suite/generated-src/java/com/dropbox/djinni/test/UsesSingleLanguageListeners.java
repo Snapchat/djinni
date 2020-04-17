@@ -23,7 +23,7 @@ public abstract class UsesSingleLanguageListeners {
     @CheckForNull
     public abstract JavaOnlyListener returnForJava();
 
-    private static final class CppProxy extends UsesSingleLanguageListeners
+    public static final class CppProxy extends UsesSingleLanguageListeners
     {
         private final long nativeRef;
         private final AtomicBoolean destroyed = new AtomicBoolean(false);
