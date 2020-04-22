@@ -5,7 +5,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.reflect.Method;
 
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -40,10 +39,10 @@ public class NativeObjectManager {
         private final long mNativeRef;
         private final Method mDestroyMethod;
 
-        NativeObjectWrapper(Object referent, long nativeRef, ReferenceQueue<? super Object> queue) throws NoSuchMethodException {
+        NativeObjectWrapper(Object referent, Class<?> clazz, long nativeRef, ReferenceQueue<? super Object> queue) throws NoSuchMethodException {
             super(referent, queue);
             mNativeRef = nativeRef;
-            mDestroyMethod = referent.getClass().getMethod("nativeDestroy", long.class);
+            mDestroyMethod = clazz.getMethod("nativeDestroy", long.class);
         }
 
         String getClassName() {
@@ -56,7 +55,7 @@ public class NativeObjectManager {
     }
 
     private final ReferenceQueue<Object> mReferenceQueue = new ReferenceQueue<>();
-    private final Set<NativeObjectWrapper> mReferences = ConcurrentHashMap.newKeySet();
+    private final ConcurrentHashMap<NativeObjectWrapper, Boolean> mReferences = new ConcurrentHashMap<>();
     private final Thread mThread;
 
     private NativeObjectManager() {
@@ -90,9 +89,13 @@ public class NativeObjectManager {
     // public ------------------------------------
 
     public static void register(Object o, long nativeRef) {
+        register(o, o.getClass(), nativeRef);
+    }
+
+    public static void register(Object o, Class<?> clazz, long nativeRef) {
         try {
-            NativeObjectWrapper wrapper = new NativeObjectWrapper(o, nativeRef, Holder.instance.mReferenceQueue);
-            Holder.instance.mReferences.add(wrapper);
+            NativeObjectWrapper wrapper = new NativeObjectWrapper(o, clazz, nativeRef, Holder.instance.mReferenceQueue);
+            Holder.instance.mReferences.put(wrapper, true);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("failed to register object of type " + o.getClass().getName() + " no static method nativeDestroy() found");
         }
