@@ -447,11 +447,11 @@ jstring jniStringFromWString(JNIEnv * env, const std::wstring & str) {
 std::wstring jniWStringFromString(JNIEnv * env, const jstring jstr) {
     DJINNI_ASSERT(jstr, env);
     auto length = env->GetStringLength(jstr);
-    const jchar* u16 = env->GetStringCritical(jstr, nullptr);
+    const jchar* u16 = env->GetStringChars(jstr, nullptr);
     const char* bytes = reinterpret_cast<const char*>(u16);
     auto byteLength = length * sizeof(jchar);
     std::wstring out = WcharConverter{}.from_bytes(bytes, bytes + byteLength);
-    env->ReleaseStringCritical(jstr, u16);
+    env->ReleaseStringChars(jstr, u16);
     return out;
 }
 
@@ -465,10 +465,10 @@ jstring jniStringFromUTF8(JNIEnv * env, const std::string & str) {
 std::string jniUTF8FromString(JNIEnv* env, const jstring jstr) {
     DJINNI_ASSERT(jstr, env);
     auto length = env->GetStringLength(jstr);
-    const jchar* u16 = env->GetStringCritical(jstr, nullptr);
+    const jchar* u16 = env->GetStringChars(jstr, nullptr);
     const char16_t* p = reinterpret_cast<const char16_t*>(u16);
     std::string out = Utf8Conveter{}.to_bytes(p, p + length);
-    env->ReleaseStringCritical(jstr, u16);
+    env->ReleaseStringChars(jstr, u16);
     return out;
 }
 
