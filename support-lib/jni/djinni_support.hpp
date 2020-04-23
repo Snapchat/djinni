@@ -90,6 +90,14 @@ public:
             static_cast<PointerType>(env->NewGlobalRef(localRef)),
             ::djinni::GlobalRefDeleter{}
         ) {}
+
+     GlobalRef& operator=(GlobalRef&& other) noexcept {
+         if (this != &other) {
+             this->reset(other.release());
+         }
+
+         return *this;
+     }
 };
 
 struct LocalRefDeleter { void operator() (jobject localRef) noexcept; };
@@ -192,19 +200,18 @@ class JniClassInitializer {
     static registration_vec get_all();
 
 private:
-
-    JniClassInitializer(std::function<void()> init);
-
     template <class C> friend class JniClass;
     friend void jniInit(JavaVM *);
 
     static registration_vec & get_vec();
     static std::mutex       & get_mutex();
+
+public:
+    JniClassInitializer(std::function<void()> init);
 };
 
 /*
- * Each instantiation of this template produces a singleton object of type C which
- * will be initialized by djinni::jniInit(). For example:
+ * Each instantiation of this template produces a singleton object of type C:
  *
  * struct JavaFooInfo {
  *     jmethodID foo;
@@ -214,37 +221,15 @@ private:
  * To use this in a JNI function or callback, invoke:
  *
  *     CallVoidMethod(object, JniClass<JavaFooInfo>::get().foo, ...);
- *
- * This uses C++'s template instantiation behavior to guarantee that any T for which
- * JniClass<T>::get() is *used* anywhere in the program will be *initialized* by init_all().
- * Therefore, it's always safe to compile in wrappers for all known Java types - the library
- * will only depend on the presence of those actually needed.
  */
 template <class C>
 class JniClass {
 public:
     static const C & get() {
-        (void)s_initializer; // ensure that initializer is actually instantiated
-        assert(s_singleton);
-        return *s_singleton;
-    }
-
-private:
-    static const JniClassInitializer s_initializer;
-    static std::unique_ptr<C> s_singleton;
-
-    static void allocate() {
-        // We can't use make_unique here, because C will have a private constructor and
-        // list JniClass as a friend; so we have to allocate it by hand.
-        s_singleton = std::unique_ptr<C>(new C());
+        static C singleton; // Thread-safe since C++11
+        return singleton;
     }
 };
-
-template <class C>
-const JniClassInitializer JniClass<C>::s_initializer ( allocate );
-
-template <class C>
-std::unique_ptr<C> JniClass<C>::s_singleton;
 
 /*
  * Exception-checking helpers. These will throw if an exception is pending.

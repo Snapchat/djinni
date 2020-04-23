@@ -20,13 +20,58 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
+#include <locale>
+#include <codecvt>
 
 static_assert(sizeof(jlong) >= sizeof(void*), "must be able to fit a void* into a jlong");
+ 
+#if defined(ANDROID) || defined(__ANDROID__)
+#define DJINNI_SYSTEM_ASSERT(path, line, message) __assert(path, line, message)
+#elif defined(__APPLE__)
+// Declaring a function from assert.h. It's hidden if NDEBUG is defined
+#if defined(NDEBUG)
+extern "C" void __assert_rtn(const char*, const char*, int, const char*);
+#endif
+// that -1 cast was copied from assert.h to suppress function name:
+#define DJINNI_SYSTEM_ASSERT(path, line, message) __assert_rtn(reinterpret_cast<const char*>(-1L), path, line, message)
+#elif defined(__GLIBC__)
+// Declaring a function from assert.h. It's hidden if NDEBUG is defined
+// NOLINTNEXTLINE(readability-identifier-naming)
+extern "C" void __assert(const char* assertion, const char* file, int line);
+#define DJINNI_SYSTEM_ASSERT(path, line, message) __assert(message, path, line)
+#else
+#define DJINNI_SYSTEM_ASSERT(...) [&] { ::abort(); }()
+#endif
+
+/*
+ * Assert macro for expressions that don't contain JVM calls. Here we don't check for exceptions
+ * thus saving some cycles.
+ */
+#define DJINNI_ASSERT_NO_EXC_CHECK_MSG(check, message) \
+    do { \
+        const bool check__res = bool(check); \
+        if (!check__res) { \
+            DJINNI_SYSTEM_ASSERT(__FILE__, __LINE__, message); \
+        } \
+    } while(false)
+#define DJINNI_ASSERT_NO_EXC_CHECK(check) DJINNI_ASSERT_NO_EXC_CHECK_MSG(check, #check)
 
 namespace djinni {
 
 // Set only once from JNI_OnLoad before any other JNI calls, so no lock needed.
 static JavaVM * g_cachedJVM;
+
+static pthread_key_t threadExitCallbackKey;
+
+void onThreadExit(void*)
+{
+    g_cachedJVM->DetachCurrentThread();
+}
+
+void createThreadDetachCallbackKey()
+{
+    pthread_key_create(&threadExitCallbackKey, onThreadExit);
+}
 
 /*static*/
 JniClassInitializer::registration_vec & JniClassInitializer::get_vec() {
@@ -51,6 +96,9 @@ JniClassInitializer::JniClassInitializer(std::function<void()> init) {
     get_vec().push_back(std::move(init));
 }
 
+static jobject g_ourClassLoader;
+static jmethodID g_findClassMethodID;
+
 static auto& getMethodRecords() {
     static std::vector<std::tuple<const char*, const JNINativeMethod*, size_t>> methods;
     return methods;
@@ -58,15 +106,37 @@ static auto& getMethodRecords() {
 
 void jniInit(JavaVM * jvm) {
     g_cachedJVM = jvm;
+
     auto env = jniGetThreadEnv();
+
+        // References:
+    // https://docs.oracle.com/javase/7/docs/technotes/guides/jni/spec/functions.html#wp16027
+    // https://developer.android.com/training/articles/perf-jni
+    // - FAQ: Why didn't FindClass find my class?
+
+    // Cache class loader for our classes for use in non-Java threads
+    jclass ourClass = env->FindClass("com/snapchat/djinni/NativeObjectManager");
+    jclass classClass = env->GetObjectClass(ourClass);
+    jmethodID getClassLoaderMethod = env->GetMethodID(classClass, "getClassLoader", "()Ljava/lang/ClassLoader;");
+    jobject tmp = env->CallObjectMethod(ourClass, getClassLoaderMethod);
+    g_ourClassLoader = (jobject)env->NewGlobalRef(tmp);
+
+    jclass classLoaderClass = env->FindClass("java/lang/ClassLoader");
+    g_findClassMethodID = env->GetMethodID(classLoaderClass, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
 
     for (const auto& record : getMethodRecords()) {
         auto [classString, nativeMethods, nativeMethodsSize] = record;
-        auto clazz = jniFindClass(classString);
-        if (env->RegisterNatives(clazz.get(), nativeMethods, nativeMethodsSize)) {
-            return;
+        try {
+            auto clazz = jniFindClass(classString);
+            if (env->RegisterNatives(clazz.get(), nativeMethods, nativeMethodsSize)) {
+                return;
+            }
+        } catch (jni_exception& e) {
+            // Experimental java classes are not included in the build
         }
     }
+
+    createThreadDetachCallbackKey();
 
     try {
         for (const auto & initializer : JniClassInitializer::get_all()) {
@@ -79,25 +149,31 @@ void jniInit(JavaVM * jvm) {
     }
 }
 
-void jniShutdown() {
-    g_cachedJVM = nullptr;
-}
-
 void jniRegisterMethodRecords(const char* className, const JNINativeMethod* records, size_t size) {
     getMethodRecords().emplace_back(className, records, size);
 }
 
 void jniRegisterNatives(JNIEnv* env, const char* className, const JNINativeMethod* records, size_t size) {
         auto clazz = jniFindClass(className);
-        if (env->RegisterNatives(clazz.get(), records, size)) {
-            return;
-        }
+        env->RegisterNatives(clazz.get(), records, size);
+}
+
+void jniShutdown() {
+    g_cachedJVM = nullptr;
 }
 
 JNIEnv * jniGetThreadEnv() {
     assert(g_cachedJVM);
     JNIEnv * env = nullptr;
-    const jint get_res = g_cachedJVM->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6);
+    jint get_res = g_cachedJVM->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6);
+    if (get_res == JNI_EDETACHED) {
+#if defined(ANDROID) || defined(__ANDROID__)
+        get_res = g_cachedJVM->AttachCurrentThread(&env, nullptr);
+#else
+        get_res = g_cachedJVM->AttachCurrentThread(reinterpret_cast<void**>(&env), nullptr);
+#endif
+        pthread_setspecific(threadExitCallbackKey, env);
+    }
     if (get_res != 0 || !env) {
         // :(
         std::abort();
@@ -161,6 +237,8 @@ void jniExceptionCheck(JNIEnv * env) {
     }
 }
 
+// TODO: ? Disabling this weak symbol. It's implemented in utils/JvmUtils.
+// Overriding doesn't work with Gold linker ODR violation detector.
 DJINNI_WEAK_DEFINITION
 DJINNI_NORETURN_DEFINITION
 void jniThrowCppFromJavaException(JNIEnv * env, jthrowable java_exception) {
@@ -220,9 +298,16 @@ void jniThrowAssertionError(JNIEnv * env, const char * file, int line, const cha
 
 GlobalRef<jclass> jniFindClass(const char * name) {
     JNIEnv * env = jniGetThreadEnv();
-    DJINNI_ASSERT(name, env);
-    GlobalRef<jclass> guard(env, LocalRef<jclass>(env, env->FindClass(name)).get());
-    jniExceptionCheck(env);
+    DJINNI_ASSERT_NO_EXC_CHECK(name);
+    jclass clazz = env->FindClass(name);
+    if (!clazz) {
+        env->ExceptionClear();
+        // Use cached class loader, needed for our classes on non-Java thread
+        jstring jname = env->NewStringUTF(name);
+        clazz = static_cast<jclass>(env->CallObjectMethod(g_ourClassLoader, g_findClassMethodID, jname));
+        jniExceptionCheck(env);
+    }
+    GlobalRef<jclass> guard(env, LocalRef<jclass>(env, clazz).get());
     if (!guard) {
         jniThrowAssertionError(env, __FILE__, __LINE__, "FindClass returned null");
     }
@@ -231,9 +316,9 @@ GlobalRef<jclass> jniFindClass(const char * name) {
 
 jmethodID jniGetStaticMethodID(jclass clazz, const char * name, const char * sig) {
     JNIEnv * env = jniGetThreadEnv();
-    DJINNI_ASSERT(clazz, env);
-    DJINNI_ASSERT(name, env);
-    DJINNI_ASSERT(sig, env);
+    DJINNI_ASSERT_NO_EXC_CHECK(clazz);
+    DJINNI_ASSERT_NO_EXC_CHECK(name);
+    DJINNI_ASSERT_NO_EXC_CHECK(sig);
     jmethodID id = env->GetStaticMethodID(clazz, name, sig);
     jniExceptionCheck(env);
     if (!id) {
@@ -244,9 +329,9 @@ jmethodID jniGetStaticMethodID(jclass clazz, const char * name, const char * sig
 
 jmethodID jniGetMethodID(jclass clazz, const char * name, const char * sig) {
     JNIEnv * env = jniGetThreadEnv();
-    DJINNI_ASSERT(clazz, env);
-    DJINNI_ASSERT(name, env);
-    DJINNI_ASSERT(sig, env);
+    DJINNI_ASSERT_NO_EXC_CHECK(clazz);
+    DJINNI_ASSERT_NO_EXC_CHECK(name);
+    DJINNI_ASSERT_NO_EXC_CHECK(sig);
     jmethodID id = env->GetMethodID(clazz, name, sig);
     jniExceptionCheck(env);
     if (!id) {
@@ -257,9 +342,9 @@ jmethodID jniGetMethodID(jclass clazz, const char * name, const char * sig) {
 
 jfieldID jniGetFieldID(jclass clazz, const char * name, const char * sig) {
     JNIEnv * env = jniGetThreadEnv();
-    DJINNI_ASSERT(clazz, env);
-    DJINNI_ASSERT(name, env);
-    DJINNI_ASSERT(sig, env);
+    DJINNI_ASSERT_NO_EXC_CHECK(clazz);
+    DJINNI_ASSERT_NO_EXC_CHECK(name);
+    DJINNI_ASSERT_NO_EXC_CHECK(sig);
     jfieldID id = env->GetFieldID(clazz, name, sig);
     jniExceptionCheck(env);
     if (!id) {
@@ -275,7 +360,7 @@ JniEnum::JniEnum(const std::string & name)
     {}
 
 jint JniEnum::ordinal(JNIEnv * env, jobject obj) const {
-    DJINNI_ASSERT(obj, env);
+    DJINNI_ASSERT_NO_EXC_CHECK(obj);
     const jint res = env->CallIntMethod(obj, m_methOrdinal);
     jniExceptionCheck(env);
     return res;
@@ -284,7 +369,7 @@ jint JniEnum::ordinal(JNIEnv * env, jobject obj) const {
 LocalRef<jobject> JniEnum::create(JNIEnv * env, jint value) const {
     LocalRef<jobject> values(env, env->CallStaticObjectMethod(m_clazz.get(), m_staticmethValues));
     jniExceptionCheck(env);
-    DJINNI_ASSERT(values, env);
+    DJINNI_ASSERT_NO_EXC_CHECK(values);
     LocalRef<jobject> result(env,
                              env->GetObjectArrayElement(static_cast<jobjectArray>(values.get()),
                                                         value));
@@ -340,7 +425,7 @@ JniLocalScope::~JniLocalScope() {
 }
 
 bool JniLocalScope::_pushLocalFrame(JNIEnv* const env, jint capacity) {
-    DJINNI_ASSERT(capacity >= 0, env);
+    DJINNI_ASSERT_NO_EXC_CHECK(capacity >= 0);
     const jint push_res = env->PushLocalFrame(capacity);
     return 0 == push_res;
 }
@@ -349,260 +434,42 @@ void JniLocalScope::_popLocalFrame(JNIEnv* const env, jobject returnRef) {
     env->PopLocalFrame(returnRef);
 }
 
-/*
- * UTF-8 and UTF-16 conversion functions from miniutf: https://github.com/dropbox/miniutf
- */
-
-struct offset_pt {
-    int offset;
-    char32_t pt;
-};
-
-static constexpr const offset_pt invalid_pt = { -1, 0 };
-
-/*
- * Decode a codepoint starting at str[i], and return the number of code units (bytes, for
- * UTF-8) consumed and the result. If no valid codepoint is at str[i], return invalid_pt.
- */
-static offset_pt utf8_decode_check(const std::string & str, std::string::size_type i) {
-    uint32_t b0, b1, b2, b3;
-
-    b0 = static_cast<unsigned char>(str[i]);
-
-    if (b0 < 0x80) {
-        // 1-byte character
-        return { 1, b0 };
-    } else if (b0 < 0xC0) {
-        // Unexpected continuation byte
-        return invalid_pt;
-    } else if (b0 < 0xE0) {
-        // 2-byte character
-        if (((b1 = str[i+1]) & 0xC0) != 0x80)
-            return invalid_pt;
-
-        char32_t pt = (b0 & 0x1F) << 6 | (b1 & 0x3F);
-        if (pt < 0x80)
-            return invalid_pt;
-
-        return { 2, pt };
-    } else if (b0 < 0xF0) {
-        // 3-byte character
-        if (((b1 = str[i+1]) & 0xC0) != 0x80)
-            return invalid_pt;
-        if (((b2 = str[i+2]) & 0xC0) != 0x80)
-            return invalid_pt;
-
-        char32_t pt = (b0 & 0x0F) << 12 | (b1 & 0x3F) << 6 | (b2 & 0x3F);
-        if (pt < 0x800)
-            return invalid_pt;
-
-        return { 3, pt };
-    } else if (b0 < 0xF8) {
-        // 4-byte character
-        if (((b1 = str[i+1]) & 0xC0) != 0x80)
-            return invalid_pt;
-        if (((b2 = str[i+2]) & 0xC0) != 0x80)
-            return invalid_pt;
-        if (((b3 = str[i+3]) & 0xC0) != 0x80)
-            return invalid_pt;
-
-        char32_t pt = (b0 & 0x0F) << 18 | (b1 & 0x3F) << 12
-                    | (b2 & 0x3F) << 6  | (b3 & 0x3F);
-        if (pt < 0x10000 || pt >= 0x110000)
-            return invalid_pt;
-
-        return { 4, pt };
-    } else {
-        // Codepoint out of range
-        return invalid_pt;
-    }
-}
-
-static char32_t utf8_decode(const std::string & str, std::string::size_type & i) {
-    offset_pt res = utf8_decode_check(str, i);
-    if (res.offset < 0) {
-        i += 1;
-        return 0xFFFD;
-    } else {
-        i += res.offset;
-        return res.pt;
-    }
-}
-
-static void utf16_encode(char32_t pt, std::u16string & out) {
-    if (pt < 0x10000) {
-        out += static_cast<char16_t>(pt);
-    } else if (pt < 0x110000) {
-        out += { static_cast<char16_t>(((pt - 0x10000) >> 10) + 0xD800),
-                 static_cast<char16_t>((pt & 0x3FF) + 0xDC00) };
-    } else {
-        out += 0xFFFD;
-    }
-}
-
-jstring jniStringFromUTF8(JNIEnv * env, const std::string & str) {
-
-    std::u16string utf16;
-    utf16.reserve(str.length()); // likely overallocate
-    for (std::string::size_type i = 0; i < str.length(); )
-        utf16_encode(utf8_decode(str, i), utf16);
-
-    jstring res = env->NewString(
-        reinterpret_cast<const jchar *>(utf16.data()), jsize(utf16.length()));
-    DJINNI_ASSERT(res, env);
-    return res;
-}
-
-template<int wcharTypeSize>
-static std::u16string implWStringToUTF16(std::wstring::const_iterator, std::wstring::const_iterator)
-{
-    static_assert(wcharTypeSize == 2 || wcharTypeSize == 4, "wchar_t must be represented by UTF-16 or UTF-32 encoding");
-    return {}; // unreachable
-}
-
-template<>
-inline std::u16string implWStringToUTF16<2>(std::wstring::const_iterator begin, std::wstring::const_iterator end) {
-    // case when wchar_t is represented by utf-16 encoding
-    return std::u16string(begin, end);
-}
-
-template<>
-inline std::u16string implWStringToUTF16<4>(std::wstring::const_iterator begin, std::wstring::const_iterator end) {
-    // case when wchar_t is represented by utf-32 encoding
-    std::u16string utf16;
-    utf16.reserve(std::distance(begin, end));
-    for(; begin != end; ++begin)
-        utf16_encode(static_cast<char32_t>(*begin), utf16);
-    return utf16;
-}
-
-inline std::u16string wstringToUTF16(const std::wstring & str) {
-    // hide "defined but not used" warnings
-    (void)implWStringToUTF16<2>;
-    (void)implWStringToUTF16<4>;
-    // Note: The template helper operates on iterators to work around a compiler issue we saw on Mac.
-    // It triggered undefined symbols if wstring methods were called directly in the template function.
-    return implWStringToUTF16<sizeof(wchar_t)>(str.cbegin(), str.cend());
-}
+using WcharConverter = std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::codecvt_mode::little_endian>>;
+using Utf8Conveter = std::wstring_convert<std::codecvt_utf8_utf16<char16_t, 0x10ffff, std::codecvt_mode::little_endian>, char16_t>;
 
 jstring jniStringFromWString(JNIEnv * env, const std::wstring & str) {
-    std::u16string utf16 = wstringToUTF16(str);
-    jstring res = env->NewString(
-        reinterpret_cast<const jchar *>(utf16.data()), utf16.length());
+    std::string u16 = WcharConverter{}.to_bytes(str);
+    jstring res = env->NewString(reinterpret_cast<const jchar*>(u16.data()), u16.size()/sizeof(jchar));
     DJINNI_ASSERT(res, env);
     return res;
-}
-
-// UTF-16 decode helpers.
-static inline bool is_high_surrogate(char16_t c) { return (c >= 0xD800) && (c < 0xDC00); }
-static inline bool is_low_surrogate(char16_t c)  { return (c >= 0xDC00) && (c < 0xE000); }
-
-/*
- * Like utf8_decode_check, but for UTF-16.
- */
-static offset_pt utf16_decode_check(const char16_t * str, std::u16string::size_type i) {
-    if (is_high_surrogate(str[i]) && is_low_surrogate(str[i+1])) {
-        // High surrogate followed by low surrogate
-        char32_t pt = (((str[i] - 0xD800) << 10) | (str[i+1] - 0xDC00)) + 0x10000;
-        return { 2, pt };
-    } else if (is_high_surrogate(str[i]) || is_low_surrogate(str[i])) {
-        // High surrogate *not* followed by low surrogate, or unpaired low surrogate
-        return invalid_pt;
-    } else {
-        return { 1, str[i] };
-    }
-}
-
-static char32_t utf16_decode(const char16_t * str, std::u16string::size_type & i) {
-    offset_pt res = utf16_decode_check(str, i);
-    if (res.offset < 0) {
-        i += 1;
-        return 0xFFFD;
-    } else {
-        i += res.offset;
-        return res.pt;
-    }
-}
-
-static void utf8_encode(char32_t pt, std::string & out) {
-    if (pt < 0x80) {
-        out += static_cast<char>(pt);
-    } else if (pt < 0x800) {
-        out += { static_cast<char>((pt >> 6)   | 0xC0),
-                 static_cast<char>((pt & 0x3F) | 0x80) };
-    } else if (pt < 0x10000) {
-        out += { static_cast<char>((pt >> 12)         | 0xE0),
-                 static_cast<char>(((pt >> 6) & 0x3F) | 0x80),
-                 static_cast<char>((pt & 0x3F)        | 0x80) };
-    } else if (pt < 0x110000) {
-        out += { static_cast<char>((pt >> 18)          | 0xF0),
-                 static_cast<char>(((pt >> 12) & 0x3F) | 0x80),
-                 static_cast<char>(((pt >> 6)  & 0x3F) | 0x80),
-                 static_cast<char>((pt & 0x3F)         | 0x80) };
-    } else {
-        out += { static_cast<char>(0xEF),
-                 static_cast<char>(0xBF),
-                 static_cast<char>(0xBD) }; // U+FFFD
-    }
-}
-
-std::string jniUTF8FromString(JNIEnv * env, const jstring jstr) {
-    DJINNI_ASSERT(jstr, env);
-    const jsize length = env->GetStringLength(jstr);
-    jniExceptionCheck(env);
-
-    const auto deleter = [env, jstr] (const jchar * c) { env->ReleaseStringChars(jstr, c); };
-    std::unique_ptr<const jchar, decltype(deleter)> ptr(env->GetStringChars(jstr, nullptr),
-                                                        deleter);
-
-    std::u16string str(reinterpret_cast<const char16_t *>(ptr.get()), length);
-    std::string out;
-    out.reserve(str.length() * 3 / 2); // estimate
-    for (std::u16string::size_type i = 0; i < str.length(); )
-        utf8_encode(utf16_decode(str.data(), i), out);
-    return out;
-}
-
-template<int wcharTypeSize>
-static std::wstring implUTF16ToWString(const char16_t * /*data*/, size_t /*length*/)
-{
-    static_assert(wcharTypeSize == 2 || wcharTypeSize == 4, "wchar_t must be represented by UTF-16 or UTF-32 encoding");
-    return {}; // unreachable
-}
-
-template<>
-inline std::wstring implUTF16ToWString<2>(const char16_t * data, size_t length) {
-    // case when wchar_t is represented by utf-16 encoding
-    return std::wstring(data, data + length);
-}
-
-template<>
-inline std::wstring implUTF16ToWString<4>(const char16_t * data, size_t length) {
-    // case when wchar_t is represented by utf-32 encoding
-    std::wstring result;
-    result.reserve(length);
-    for (size_t i = 0; i < length; )
-        result += static_cast<wchar_t>(utf16_decode(data, i));
-    return result;
-}
-
-inline std::wstring UTF16ToWString(const char16_t * data, size_t length) {
-    // hide "defined but not used" warnings
-    (void)implUTF16ToWString<2>;
-    (void)implUTF16ToWString<4>;
-    return implUTF16ToWString<sizeof(wchar_t)>(data, length);
 }
 
 std::wstring jniWStringFromString(JNIEnv * env, const jstring jstr) {
     DJINNI_ASSERT(jstr, env);
-    const jsize length = env->GetStringLength(jstr);
-    jniExceptionCheck(env);
+    auto length = env->GetStringLength(jstr);
+    const jchar* u16 = env->GetStringCritical(jstr, nullptr);
+    const char* bytes = reinterpret_cast<const char*>(u16);
+    auto byteLength = length * sizeof(jchar);
+    std::wstring out = WcharConverter{}.from_bytes(bytes, bytes + byteLength);
+    env->ReleaseStringCritical(jstr, u16);
+    return out;
+}
 
-    const auto deleter = [env, jstr] (const jchar * c) { env->ReleaseStringChars(jstr, c); };
-    std::unique_ptr<const jchar, decltype(deleter)> ptr(env->GetStringChars(jstr, nullptr),
-                                                        deleter);
-    const char16_t * data = reinterpret_cast<const char16_t *>(ptr.get());
-    return UTF16ToWString(data, length);
+jstring jniStringFromUTF8(JNIEnv * env, const std::string & str) {
+    std::u16string u16 = Utf8Conveter{}.from_bytes(str);
+    jstring res = env->NewString(reinterpret_cast<const jchar*>(u16.data()), u16.size());
+    DJINNI_ASSERT(res, env);
+    return res;
+}
+
+std::string jniUTF8FromString(JNIEnv* env, const jstring jstr) {
+    DJINNI_ASSERT(jstr, env);
+    auto length = env->GetStringLength(jstr);
+    const jchar* u16 = env->GetStringCritical(jstr, nullptr);
+    const char16_t* p = reinterpret_cast<const char16_t*>(u16);
+    std::string out = Utf8Conveter{}.to_bytes(p, p + length);
+    env->ReleaseStringCritical(jstr, u16);
+    return out;
 }
 
 DJINNI_WEAK_DEFINITION
