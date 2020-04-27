@@ -435,7 +435,7 @@ void JniLocalScope::_popLocalFrame(JNIEnv* const env, jobject returnRef) {
 }
 
 using WcharConverter = std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff, std::codecvt_mode::little_endian>>;
-using Utf8Conveter = std::wstring_convert<std::codecvt_utf8_utf16<char16_t, 0x10ffff, std::codecvt_mode::little_endian>, char16_t>;
+using Utf8Converter = std::wstring_convert<std::codecvt_utf8_utf16<char16_t, 0x10ffff, std::codecvt_mode::little_endian>, char16_t>;
 
 jstring jniStringFromWString(JNIEnv * env, const std::wstring & str) {
     std::string u16 = WcharConverter{}.to_bytes(str);
@@ -456,7 +456,7 @@ std::wstring jniWStringFromString(JNIEnv * env, const jstring jstr) {
 }
 
 jstring jniStringFromUTF8(JNIEnv * env, const std::string & str) {
-    std::u16string u16 = Utf8Conveter{}.from_bytes(str);
+    std::u16string u16 = Utf8Converter{}.from_bytes(str);
     jstring res = env->NewString(reinterpret_cast<const jchar*>(u16.data()), u16.size());
     DJINNI_ASSERT(res, env);
     return res;
@@ -467,7 +467,7 @@ std::string jniUTF8FromString(JNIEnv* env, const jstring jstr) {
     auto length = env->GetStringLength(jstr);
     const jchar* u16 = env->GetStringChars(jstr, nullptr);
     const char16_t* p = reinterpret_cast<const char16_t*>(u16);
-    std::string out = Utf8Conveter{}.to_bytes(p, p + length);
+    std::string out = Utf8Converter{}.to_bytes(p, p + length);
     env->ReleaseStringChars(jstr, u16);
     return out;
 }
