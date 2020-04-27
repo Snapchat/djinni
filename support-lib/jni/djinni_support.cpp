@@ -237,8 +237,6 @@ void jniExceptionCheck(JNIEnv * env) {
     }
 }
 
-// TODO: ? Disabling this weak symbol. It's implemented in utils/JvmUtils.
-// Overriding doesn't work with Gold linker ODR violation detector.
 DJINNI_WEAK_DEFINITION
 DJINNI_NORETURN_DEFINITION
 void jniThrowCppFromJavaException(JNIEnv * env, jthrowable java_exception) {
