@@ -64,7 +64,6 @@ std::unordered_map<::testsuite::color, ::testsuite::color> NativeEnumUsageInterf
 CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_EnumUsageInterface_00024CppProxy_nativeDestroy(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         delete reinterpret_cast<::djinni::CppProxyHandle<::testsuite::EnumUsageInterface>*>(nativeRef);
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
@@ -72,7 +71,6 @@ CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_EnumUsageInterface_00024Cpp
 CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_EnumUsageInterface_00024CppProxy_native_1e(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jobject j_e)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::EnumUsageInterface>(nativeRef);
         auto r = ref->e(::djinni_generated::NativeColor::toCpp(jniEnv, j_e));
         return ::djinni::release(::djinni_generated::NativeColor::fromCpp(jniEnv, r));
@@ -82,7 +80,6 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_EnumUsageInterface_00024
 CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_EnumUsageInterface_00024CppProxy_native_1o(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jobject j_o)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::EnumUsageInterface>(nativeRef);
         auto r = ref->o(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeColor>::toCpp(jniEnv, j_o));
         return ::djinni::release(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeColor>::fromCpp(jniEnv, r));
@@ -92,7 +89,6 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_EnumUsageInterface_00024
 CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_EnumUsageInterface_00024CppProxy_native_1l(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jobject j_l)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::EnumUsageInterface>(nativeRef);
         auto r = ref->l(::djinni::List<::djinni_generated::NativeColor>::toCpp(jniEnv, j_l));
         return ::djinni::release(::djinni::List<::djinni_generated::NativeColor>::fromCpp(jniEnv, r));
@@ -102,7 +98,6 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_EnumUsageInterface_00024
 CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_EnumUsageInterface_00024CppProxy_native_1s(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jobject j_s)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::EnumUsageInterface>(nativeRef);
         auto r = ref->s(::djinni::Set<::djinni_generated::NativeColor>::toCpp(jniEnv, j_s));
         return ::djinni::release(::djinni::Set<::djinni_generated::NativeColor>::fromCpp(jniEnv, r));
@@ -112,7 +107,6 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_EnumUsageInterface_00024
 CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_EnumUsageInterface_00024CppProxy_native_1m(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jobject j_m)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::EnumUsageInterface>(nativeRef);
         auto r = ref->m(::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::toCpp(jniEnv, j_m));
         return ::djinni::release(::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::fromCpp(jniEnv, r));

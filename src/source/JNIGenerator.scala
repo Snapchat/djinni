@@ -184,6 +184,10 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface) {
     val refs = new JNIRefs(ident.name)
+
+    // Add user include file if defined
+    spec.jniFunctionPrologueFile.foreach(x=>refs.jniCpp.add("#include " + q(x)))
+
     i.methods.foreach(m => {
       m.params.foreach(p => refs.find(p.ty))
       m.ret.foreach(refs.find)
@@ -352,7 +356,7 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
           if (static) {
             w.wl(s"$export $jniRetType JNICALL ${methodName(name, static)}(JNIEnv* jniEnv, jobject /*this*/${preComma(paramList)})").braced {
               w.w("try").bracedEnd(s" JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, $zero)") {
-                w.wl(s"DJINNI_FUNCTION_PROLOGUE0(jniEnv);")
+                spec.jniFunctionPrologueFile.foreach(x=>w.wl(s"""DJINNI_FUNCTION_PROLOGUE("${ident.name}.${name}");"""))
                 f
               }
             }
@@ -360,7 +364,7 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
           else {
             w.wl(s"$export $jniRetType JNICALL ${methodName(name, static)}(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef${preComma(paramList)})").braced {
               w.w("try").bracedEnd(s" JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, $zero)") {
-                w.wl(s"DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);")
+                spec.jniFunctionPrologueFile.foreach(x=>w.wl(s"""DJINNI_FUNCTION_PROLOGUE("${ident.name}.${name}");"""))
                 f
               }
             }

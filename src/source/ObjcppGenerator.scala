@@ -127,6 +127,9 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
     val hasStaticMethod = i.methods.exists(_.static);
 
     if (i.ext.cpp) {
+      // Add user include file if defined
+      spec.objcppFunctionPrologueFile.foreach(x=>refs.body.add("#include " + q(x)))
+
       refs.body.add("#import " + q(spec.objcBaseLibIncludePrefix + "DJICppWrapperCache+Private.h"))
       refs.body.add("#include <utility>")
       refs.body.add("#import " + q(spec.objcBaseLibIncludePrefix + "DJIError.h"))
@@ -181,6 +184,7 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
           writeObjcFuncDecl(m, w)
           w.braced {
             w.w("try").bracedEnd(" DJINNI_TRANSLATE_EXCEPTIONS()") {
+              spec.objcppFunctionPrologueFile.foreach(x=>w.wl(s"""DJINNI_FUNCTION_PROLOGUE("${ident.name}.${m.ident.name}");"""))
               m.params.foreach(p => {
                 if (isInterface(p.ty.resolved) && spec.cppNnCheckExpression.nonEmpty) {
                   // We have a non-optional interface, assert that we're getting a non-null value

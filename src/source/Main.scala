@@ -56,6 +56,7 @@ object Main {
     var jniBaseLibClassIdentStyleOptional: Option[IdentConverter] = None
     var jniBaseLibIncludePrefix: String = ""
     var jniUseOnLoad: Boolean = false
+    var jniFunctionPrologueFile: Option[String] = None
     var cppHeaderOutFolderOptional: Option[File] = None
     var cppExt: String = "cpp"
     var cppHeaderExt: String = "hpp"
@@ -75,6 +76,7 @@ object Main {
     var objcppIncludePrefix: String = ""
     var objcppIncludeCppPrefix: String = ""
     var objcppIncludeObjcPrefixOptional: Option[String] = None
+    var objcppFunctionPrologueFile: Option[String] = None
     var objcFileIdentStyleOptional: Option[IdentConverter] = None
     var objcppNamespace: String = "djinni_generated"
     var objcBaseLibIncludePrefix: String = ""
@@ -163,6 +165,8 @@ object Main {
         .text("The JNI base library's include path, relative to the JNI C++ classes.")
       opt[Boolean]("jni-use-on-load-initializer").valueName("<true/false>").foreach(x => jniUseOnLoad = x)
         .text("If true, djinni will use RegisterNativeMethods to bind JNI functions, instead of the Java_* style symbol exports")
+      opt[String]("jni-function-prologue-file").valueName("<header-file>").foreach(x => jniFunctionPrologueFile = Some(x))
+        .text("User header file to include in generated JNI C++ classes.")
       note("")
       opt[File]("objc-out").valueName("<out-folder>").foreach(x => objcOutFolder = Some(x))
         .text("The output folder for Objective-C files (Generator disabled if unspecified).")
@@ -193,6 +197,8 @@ object Main {
         .text("The prefix path for #import of the extended record Objective-C header (.h) files")
       opt[String]("objcpp-namespace").valueName("<prefix>").foreach(objcppNamespace = _)
         .text("The namespace name to use for generated Objective-C++ classes.")
+      opt[String]("objcpp-function-prologue-file").valueName("<header-file>").foreach(x => objcppFunctionPrologueFile = Some(x))
+        .text("User header file to include in generated Objective-C++ classes.")
       opt[String]("objc-base-lib-include-prefix").valueName("...").foreach(x => objcBaseLibIncludePrefix = x)
         .text("The Objective-C++ base library's include path, relative to the Objective-C++ classes.")
       note("")
@@ -337,6 +343,7 @@ object Main {
       jniFileIdentStyle,
       jniBaseLibIncludePrefix,
       jniUseOnLoad,
+      jniFunctionPrologueFile,
       cppExt,
       cppHeaderExt,
       objcOutFolder,
@@ -351,6 +358,7 @@ object Main {
       objcppIncludeCppPrefix,
       objcppIncludeObjcPrefix,
       objcppNamespace,
+      objcppFunctionPrologueFile,
       objcBaseLibIncludePrefix,
       objcSwiftBridgingHeaderWriter,
       objcSwiftBridgingHeaderName,

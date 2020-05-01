@@ -5,6 +5,3 @@
 
 # djinni output directories
 djinni-output-temp/
-
-# djinni generated files
-generated-src

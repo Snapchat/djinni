@@ -51,7 +51,6 @@ std::shared_ptr<::testsuite::JavaOnlyListener> NativeUsesSingleLanguageListeners
 CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_UsesSingleLanguageListeners_00024CppProxy_nativeDestroy(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         delete reinterpret_cast<::djinni::CppProxyHandle<::testsuite::UsesSingleLanguageListeners>*>(nativeRef);
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
@@ -59,7 +58,6 @@ CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_UsesSingleLanguageListeners
 CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_UsesSingleLanguageListeners_00024CppProxy_native_1callForObjC(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jobject j_l)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::UsesSingleLanguageListeners>(nativeRef);
         ref->callForObjC(::djinni_generated::NativeObjcOnlyListener::toCpp(jniEnv, j_l));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
@@ -68,7 +66,6 @@ CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_UsesSingleLanguageListeners
 CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_UsesSingleLanguageListeners_00024CppProxy_native_1returnForObjC(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::UsesSingleLanguageListeners>(nativeRef);
         auto r = ref->returnForObjC();
         return ::djinni::release(::djinni_generated::NativeObjcOnlyListener::fromCpp(jniEnv, r));
@@ -78,7 +75,6 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_UsesSingleLanguageListen
 CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_UsesSingleLanguageListeners_00024CppProxy_native_1callForJava(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jobject j_l)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::UsesSingleLanguageListeners>(nativeRef);
         ref->callForJava(::djinni_generated::NativeJavaOnlyListener::toCpp(jniEnv, j_l));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
@@ -87,7 +83,6 @@ CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_UsesSingleLanguageListeners
 CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_UsesSingleLanguageListeners_00024CppProxy_native_1returnForJava(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::UsesSingleLanguageListeners>(nativeRef);
         auto r = ref->returnForJava();
         return ::djinni::release(::djinni_generated::NativeJavaOnlyListener::fromCpp(jniEnv, r));

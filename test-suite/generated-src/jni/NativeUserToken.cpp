@@ -26,7 +26,6 @@ std::string NativeUserToken::JavaProxy::whoami() {
 CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_UserToken_00024CppProxy_nativeDestroy(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         delete reinterpret_cast<::djinni::CppProxyHandle<::testsuite::UserToken>*>(nativeRef);
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
@@ -34,7 +33,6 @@ CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_UserToken_00024CppProxy_nat
 CJNIEXPORT jstring JNICALL Java_com_dropbox_djinni_test_UserToken_00024CppProxy_native_1whoami(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::UserToken>(nativeRef);
         auto r = ref->whoami();
         return ::djinni::release(::djinni::String::fromCpp(jniEnv, r));

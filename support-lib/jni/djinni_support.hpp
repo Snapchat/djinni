@@ -588,9 +588,6 @@ private:
     } m_iterator;
 };
 
-#define DJINNI_FUNCTION_PROLOGUE0(env_)
-#define DJINNI_FUNCTION_PROLOGUE1(env_, arg1_)
-
 /*
  * Helper for JNI_TRANSLATE_EXCEPTIONS_RETURN.
  *

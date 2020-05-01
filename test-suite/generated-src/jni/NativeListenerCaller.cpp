@@ -15,7 +15,6 @@ NativeListenerCaller::~NativeListenerCaller() = default;
 CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_ListenerCaller_00024CppProxy_nativeDestroy(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         delete reinterpret_cast<::djinni::CppProxyHandle<::testsuite::ListenerCaller>*>(nativeRef);
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
@@ -23,7 +22,6 @@ CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_ListenerCaller_00024CppProx
 CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_ListenerCaller_init(JNIEnv* jniEnv, jobject /*this*/, jobject j_firstL, jobject j_secondL)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE0(jniEnv);
         auto r = ::testsuite::ListenerCaller::init(::djinni_generated::NativeFirstListener::toCpp(jniEnv, j_firstL),
                                                    ::djinni_generated::NativeSecondListener::toCpp(jniEnv, j_secondL));
         return ::djinni::release(::djinni_generated::NativeListenerCaller::fromCpp(jniEnv, r));
@@ -33,7 +31,6 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_ListenerCaller_init(JNIE
 CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_ListenerCaller_00024CppProxy_native_1callFirst(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::ListenerCaller>(nativeRef);
         ref->callFirst();
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
@@ -42,7 +39,6 @@ CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_ListenerCaller_00024CppProx
 CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_ListenerCaller_00024CppProxy_native_1callSecond(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::ListenerCaller>(nativeRef);
         ref->callSecond();
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )

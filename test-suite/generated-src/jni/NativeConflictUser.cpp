@@ -15,7 +15,6 @@ NativeConflictUser::~NativeConflictUser() = default;
 CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_ConflictUser_00024CppProxy_nativeDestroy(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         delete reinterpret_cast<::djinni::CppProxyHandle<::testsuite::ConflictUser>*>(nativeRef);
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
@@ -23,7 +22,6 @@ CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_ConflictUser_00024CppProxy_
 CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_ConflictUser_00024CppProxy_native_1Conflict(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::ConflictUser>(nativeRef);
         auto r = ref->Conflict();
         return ::djinni::release(::djinni_generated::NativeConflict::fromCpp(jniEnv, r));
@@ -33,7 +31,6 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_ConflictUser_00024CppPro
 CJNIEXPORT jboolean JNICALL Java_com_dropbox_djinni_test_ConflictUser_00024CppProxy_native_1conflictArg(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jobject j_cs)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::ConflictUser>(nativeRef);
         auto r = ref->conflict_arg(::djinni::Set<::djinni_generated::NativeConflict>::toCpp(jniEnv, j_cs));
         return ::djinni::release(::djinni::Bool::fromCpp(jniEnv, r));

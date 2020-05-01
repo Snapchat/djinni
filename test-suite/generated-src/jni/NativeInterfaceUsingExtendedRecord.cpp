@@ -15,7 +15,6 @@ NativeInterfaceUsingExtendedRecord::~NativeInterfaceUsingExtendedRecord() = defa
 CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_InterfaceUsingExtendedRecord_00024CppProxy_nativeDestroy(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         delete reinterpret_cast<::djinni::CppProxyHandle<::testsuite::InterfaceUsingExtendedRecord>*>(nativeRef);
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
@@ -23,7 +22,6 @@ CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_InterfaceUsingExtendedRecor
 CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_InterfaceUsingExtendedRecord_00024CppProxy_native_1meth(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jobject j_er)
 {
     try {
-        DJINNI_FUNCTION_PROLOGUE1(jniEnv, nativeRef);
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::InterfaceUsingExtendedRecord>(nativeRef);
         auto r = ref->meth(::djinni_generated::NativeExtendedRecord::toCpp(jniEnv, j_er));
         return ::djinni::release(::djinni_generated::NativeExtendedRecord::fromCpp(jniEnv, r));
