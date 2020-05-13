@@ -1,6 +1,0 @@
-MODIFICATIONS:
- - Added move assigment operator to GlobalRef in all djinni_support.hpp files
- - Made JniClassInitializer constructor public to allow arbitrary additional initialization in JNI_OnLoad()
- - Speed up string passing between Java and C++
- - Eliminate CppProxy finalizers
- - Option to generate ObjC protocols

@@ -1,5 +1,3 @@
-load("//:toolchain.bzl", "COPTS")
-
 cc_library(
     name = "djinni-support-jni",
     srcs = glob(["jni/*.cpp"]),
@@ -7,11 +5,10 @@ cc_library(
         "jni/*.hpp",
         "*.hpp",
     ]),
-    copts = COPTS,
     includes = ["jni"],
     linkstatic = True,
     visibility = ["//visibility:public"],
-    deps = ["//:jni_headers"],
+    deps = ["@bazel_tools//tools/jdk:jni",],
     alwayslink = 1,
 )
 
@@ -22,7 +19,6 @@ objc_library(
         "objc/*.h",
         "*.hpp",
     ]),
-    copts = COPTS,
     includes = ["objc"],
     visibility = ["//visibility:public"],
 )

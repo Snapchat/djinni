@@ -1,7 +1,8 @@
 .DS_Store
-
+.idea/
 # bazel
 /bazel-*
-
+.ijwb/
+.clwb/
 # djinni output directories
 djinni-output-temp/

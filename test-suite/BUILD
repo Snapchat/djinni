@@ -1,4 +1,3 @@
-load("//:toolchain.bzl", "COPTS")
 load("@build_bazel_rules_apple//apple:macos.bzl", "macos_unit_test")
 
 cc_library(
@@ -11,7 +10,6 @@ cc_library(
         "generated-src/cpp/*.hpp",
         "handwritten-src/cpp/*.hpp",
     ]),
-    copts = COPTS,
     includes = [
         "generated-src/cpp",
         "handwritten-src/cpp",
@@ -24,7 +22,6 @@ cc_library(
     name = "djinni-tests-jni",
     srcs = glob(["generated-src/jni/*.cpp"]),
     hdrs = glob(["generated-src/jni/*.hpp"]),
-    copts = COPTS,
     includes = ["generated-src/jni"],
     linkstatic = True,
     deps = [
@@ -36,7 +33,6 @@ cc_library(
 
 cc_binary(
     name = "libdjinni-tests-jni.so",
-    copts = COPTS,
     linkshared = 1,
     deps = [":djinni-tests-jni"],
 )
@@ -51,7 +47,6 @@ objc_library(
         "generated-src/objc/**/*.h",
         "handwritten-src/objc/**/*.h",
     ]),
-    copts = COPTS,
     includes = [
         "generated-src/objc",
         "handwritten-src/objc/impl",
@@ -90,19 +85,20 @@ java_test(
     ]),
     main_class = "com.dropbox.djinni.test.AllTests",
     use_testrunner = False,
-    runtime_deps = [
-        ":libdjinni-tests-jni.so",
-    ],
+    runtime_deps = [":libdjinni-tests-jni.so"],
     deps = [
         ":djinni-tests-jni",
         "//support-lib:djinni-support-java",
-        "@jsr305//jar",
-        "@junit//jar",
+        "@maven//:com_google_code_findbugs_jsr305",
+        "@maven//:junit_junit",
     ],
 )
 
 macos_unit_test(
     name = "djinni-objc-tests",
     minimum_os_version = "10.10",
-    deps = ["djinni-tests-objc", "djinni-tests-objcxx"],
+    deps = [
+        "djinni-tests-objc",
+        "djinni-tests-objcxx",
+    ],
 )
