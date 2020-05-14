@@ -197,7 +197,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       }
 
       writeInitializer("-", "init")
-      if (!r.ext.objc) writeInitializer("+", IdentStyle.camelLower(objcName))
+      if (!r.ext.objc && !spec.objcDisableClassCtor) writeInitializer("+", IdentStyle.camelLower(objcName))
 
       for (c <- r.consts if !marshal.canBeConstVariable(c)) {
         w.wl
@@ -254,7 +254,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       w.wl
 
       // Convenience initializer
-      if(!r.ext.objc) {
+      if(!r.ext.objc && !spec.objcDisableClassCtor) {
         val decl = s"+ (nonnull instancetype)${IdentStyle.camelLower(objcName)}$firstInitializerArg"
         writeAlignedObjcCall(w, decl, r.fields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
         w.wl

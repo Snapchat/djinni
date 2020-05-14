@@ -73,6 +73,7 @@ object Main {
     var objcExtendedRecordIncludePrefix: String = ""
     var objcSwiftBridgingHeaderName: Option[String] = None
     var objcGenProtocol: Boolean = false
+    var objcDisableClassCtor: Boolean = false
     var objcppIncludePrefix: String = ""
     var objcppIncludeCppPrefix: String = ""
     var objcppIncludeObjcPrefixOptional: Option[String] = None
@@ -180,6 +181,8 @@ object Main {
         .text("The name of Objective-C Bridging Header used in XCode's Swift projects.")
       opt[Boolean]("objc-gen-protocol").valueName("<true/false>").foreach(x => objcGenProtocol = x)
         .text("Generate Objective-C protocols for native (+c) only interfaces.")
+      opt[Boolean]("objc-disable-class-ctor").valueName("<true/false>").foreach(x => objcDisableClassCtor = x)
+        .text("Disable generating Objective-C class init helper method.")
       note("")
       opt[File]("objcpp-out").valueName("<out-folder>").foreach(x => objcppOutFolder = Some(x))
         .text("The output folder for private Objective-C++ files (Generator disabled if unspecified).")
@@ -363,6 +366,7 @@ object Main {
       objcSwiftBridgingHeaderWriter,
       objcSwiftBridgingHeaderName,
       objcGenProtocol,
+      objcDisableClassCtor,
       outFileListWriter,
       skipGeneration,
       yamlOutFolder,
