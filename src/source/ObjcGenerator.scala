@@ -390,6 +390,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
         w.wl
       }
 
+      w.wl("#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS")
       w.wl("- (NSString *)description")
       w.braced {
         w.w(s"return ").nestedN(2) {
@@ -420,6 +421,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
         w.wl("];")
       }
       w.wl
+      w.wl("#endif")
 
       w.wl("@end")
     })
