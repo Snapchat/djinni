@@ -19,6 +19,7 @@
 #include <memory>
 #include <functional>
 #include <typeindex>
+#include <unordered_map>
 
 namespace djinni {
 
@@ -174,6 +175,8 @@ public:
     static OwningProxyPointer get(const std::type_index &,
                                   const OwningImplPointer & impl,
                                   AllocatorFunction * alloc);
+
+    static std::unordered_map<const char*, size_t> stats();
 
 private:
     static void cleanup(const std::shared_ptr<Pimpl> &,

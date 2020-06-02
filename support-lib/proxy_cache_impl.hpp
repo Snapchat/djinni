@@ -119,6 +119,18 @@ public:
         }
     }
 
+    std::unordered_map<const char*, size_t> stats() {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        std::unordered_map<const char*, size_t> result;
+        for (const auto& entry: m_mapping) {
+            // Just use the mangled name here because demangling requires
+            // allocation.
+            const auto* mangled_type_name = entry.first.first.name();
+            result[mangled_type_name]++;
+        }
+        return result;
+    }
+
 private:
     struct KeyHash {
         std::size_t operator()(const Key & k) const {
@@ -172,5 +184,11 @@ auto ProxyCache<Traits>::get(const std::type_index & tag,
         -> OwningProxyPointer {
     return get_base()->get(tag, impl, alloc);
 }
+
+template<typename Traits>
+std::unordered_map<const char*, size_t> ProxyCache<Traits>::stats() {
+    return get_base()->stats();
+}
+
 
 } // namespace djinni
