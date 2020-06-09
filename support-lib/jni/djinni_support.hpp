@@ -403,8 +403,9 @@ public:
 
         // Case 2 - already a Java proxy; we just need to pull the C++ impl out. (This case
         // is only possible if we were constructed with a cppProxyClassName parameter.)
+        LocalRef<jclass> clazz {jniEnv->GetObjectClass(j)};
         if (m_cppProxyClass
-                && jniEnv->IsSameObject(jniEnv->GetObjectClass(j), m_cppProxyClass.clazz.get())) {
+            && jniEnv->IsSameObject(clazz.get(), m_cppProxyClass.clazz.get())) {
             jlong handle = jniEnv->GetLongField(j, m_cppProxyClass.idField);
             jniExceptionCheck(jniEnv);
             return objectFromHandleAddress<I>(handle);
