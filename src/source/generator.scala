@@ -78,6 +78,7 @@ package object generatorTools {
                    objcppIncludeObjcPrefix: String,
                    objcppNamespace: String,
                    objcppFunctionPrologueFile: Option[String],
+                   objcppDisableExceptionTranslation: Boolean,
                    objcBaseLibIncludePrefix: String,
                    objcSwiftBridgingHeaderWriter: Option[Writer],
                    objcSwiftBridgingHeaderName: Option[String],

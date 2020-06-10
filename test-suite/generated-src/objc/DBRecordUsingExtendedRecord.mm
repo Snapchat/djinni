@@ -25,9 +25,11 @@
     return s_cr;
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p er:%@>", self.class, (void *)self, self.er];
 }
 
+#endif
 @end

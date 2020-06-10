@@ -183,7 +183,7 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
           w.wl
           writeObjcFuncDecl(m, w)
           w.braced {
-            w.w("try").bracedEnd(" DJINNI_TRANSLATE_EXCEPTIONS()") {
+            val body = () => {
               spec.objcppFunctionPrologueFile.foreach(x=>w.wl(s"""DJINNI_FUNCTION_PROLOGUE("${ident.name}.${m.ident.name}");"""))
               m.params.foreach(p => {
                 if (isInterface(p.ty.resolved) && spec.cppNnCheckExpression.nonEmpty) {
@@ -204,6 +204,15 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
 
               w.wl(";")
               m.ret.fold()(r => w.wl(s"return ${objcppMarshal.fromCpp(r, "objcpp_result_")};"))
+            }
+            if (spec.objcppDisableExceptionTranslation) {
+              // write body without try/DJINNI_TRANSLATE_EXCEPTIONS
+              // objc code will see C++ exceptions
+              body()
+            } else {
+              w.w("try").bracedEnd(" DJINNI_TRANSLATE_EXCEPTIONS()") {
+                body()
+              }
             }
           }
         }

@@ -60,9 +60,11 @@
     return NSOrderedSame;
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p key:%@ rec:%@>", self.class, (void *)self, @(self.key), self.rec];
 }
 
+#endif
 @end

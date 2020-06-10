@@ -27,9 +27,11 @@
                                      misc:misc];
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p recordId:%@ content:%@ misc:%@>", self.class, (void *)self, @(self.recordId), self.content, self.misc];
 }
 
+#endif
 @end

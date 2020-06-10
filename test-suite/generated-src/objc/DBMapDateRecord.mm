@@ -19,9 +19,11 @@
     return [[self alloc] initWithDatesById:datesById];
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p datesById:%@>", self.class, (void *)self, self.datesById];
 }
 
+#endif
 @end

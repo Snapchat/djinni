@@ -44,9 +44,11 @@
     return NSOrderedSame;
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p createdAt:%@>", self.class, (void *)self, self.createdAt];
 }
 
+#endif
 @end

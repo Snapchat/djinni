@@ -23,9 +23,11 @@
                                 iset:iset];
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p set:%@ iset:%@>", self.class, (void *)self, self.set, self.iset];
 }
 
+#endif
 @end

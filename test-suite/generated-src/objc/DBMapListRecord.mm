@@ -19,9 +19,11 @@
     return [[self alloc] initWithMapList:mapList];
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p mapList:%@>", self.class, (void *)self, self.mapList];
 }
 
+#endif
 @end

@@ -23,9 +23,11 @@
                                 imap:imap];
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p map:%@ imap:%@>", self.class, (void *)self, self.map, self.imap];
 }
 
+#endif
 @end

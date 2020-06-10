@@ -78,6 +78,7 @@ object Main {
     var objcppIncludeCppPrefix: String = ""
     var objcppIncludeObjcPrefixOptional: Option[String] = None
     var objcppFunctionPrologueFile: Option[String] = None
+    var objcppDisableExceptionTranslation: Boolean = false
     var objcFileIdentStyleOptional: Option[IdentConverter] = None
     var objcppNamespace: String = "djinni_generated"
     var objcBaseLibIncludePrefix: String = ""
@@ -202,6 +203,8 @@ object Main {
         .text("The namespace name to use for generated Objective-C++ classes.")
       opt[String]("objcpp-function-prologue-file").valueName("<header-file>").foreach(x => objcppFunctionPrologueFile = Some(x))
         .text("User header file to include in generated Objective-C++ classes.")
+      opt[Boolean]("objcpp-disable-exception-translation").valueName("<true/false>").foreach(x => objcppDisableExceptionTranslation = x)
+        .text("Disable generating C++ -> Objective-C exception translation")
       opt[String]("objc-base-lib-include-prefix").valueName("...").foreach(x => objcBaseLibIncludePrefix = x)
         .text("The Objective-C++ base library's include path, relative to the Objective-C++ classes.")
       note("")
@@ -362,6 +365,7 @@ object Main {
       objcppIncludeObjcPrefix,
       objcppNamespace,
       objcppFunctionPrologueFile,
+      objcppDisableExceptionTranslation,
       objcBaseLibIncludePrefix,
       objcSwiftBridgingHeaderWriter,
       objcSwiftBridgingHeaderName,

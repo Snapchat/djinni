@@ -19,9 +19,11 @@
     return [[self alloc] initWithSetList:setList];
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p setList:%@>", self.class, (void *)self, self.setList];
 }
 
+#endif
 @end

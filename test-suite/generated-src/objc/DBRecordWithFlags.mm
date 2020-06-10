@@ -19,9 +19,11 @@
     return [[self alloc] initWithAccess:access];
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p access:%@>", self.class, (void *)self, @(self.access)];
 }
 
+#endif
 @end

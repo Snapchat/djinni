@@ -35,9 +35,11 @@
                                  m:m];
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p e:%@ o:%@ l:%@ s:%@ m:%@>", self.class, (void *)self, @(self.e), self.o, self.l, self.s, self.m];
 }
 
+#endif
 @end

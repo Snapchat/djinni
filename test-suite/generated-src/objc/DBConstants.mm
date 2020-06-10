@@ -93,9 +93,11 @@ BOOL const DBConstantsDummy = NO;
     return s_objectConstant;
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p>", self.class, (void *)self];
 }
 
+#endif
 @end

@@ -19,9 +19,11 @@
     return [[self alloc] initWithS:s];
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p s:%@>", self.class, (void *)self, self.s];
 }
 
+#endif
 @end
