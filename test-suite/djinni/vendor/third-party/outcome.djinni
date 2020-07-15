@@ -1,0 +1,17 @@
+nested_outcome = record {
+  o: outcome<i32, string>;
+} deriving(eq)
+
+test_outcome = interface +c {
+	static getSuccessOutcome(): outcome<string, i32>;
+	static getErrorOutcome(): outcome<string, i32>;
+
+    static putSuccessOutcome(x: outcome<string, i32>): string;
+	static putErrorOutcome(x: outcome<string, i32>): i32;
+
+	static getNestedSuccessOutcome(): nested_outcome;
+	static getNestedErrorOutcome(): nested_outcome;
+
+    static putNestedSuccessOutcome(x: nested_outcome): i32;
+	static putNestedErrorOutcome(x: nested_outcome): string;
+}

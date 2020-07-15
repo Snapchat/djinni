@@ -80,6 +80,7 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
       case MList => "List"
       case MSet => "Set"
       case MMap => "Map"
+      case MOutcome => "Outcome"
       case d: MDef => throw new AssertionError("unreachable")
       case e: MExtern => throw new AssertionError("unreachable")
       case p: MParam => throw new AssertionError("not applicable")
@@ -96,7 +97,7 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
       case MList | MSet =>
         assert(tm.args.size == 1)
         f
-      case MMap =>
+      case MMap | MOutcome =>
         assert(tm.args.size == 2)
         f
       case _ => f

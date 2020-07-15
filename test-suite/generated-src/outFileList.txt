@@ -1,3 +1,6 @@
+djinni-output-temp/cpp/nested_outcome.hpp
+djinni-output-temp/cpp/nested_outcome.cpp
+djinni-output-temp/cpp/test_outcome.hpp
 djinni-output-temp/cpp/test_duration.hpp
 djinni-output-temp/cpp/record_with_duration_and_derivings.hpp
 djinni-output-temp/cpp/record_with_duration_and_derivings.cpp
@@ -53,6 +56,8 @@ djinni-output-temp/cpp/record_with_derivings.cpp
 djinni-output-temp/cpp/record_with_nested_derivings.hpp
 djinni-output-temp/cpp/record_with_nested_derivings.cpp
 djinni-output-temp/cpp/set_record.hpp
+djinni-output-temp/java/NestedOutcome.java
+djinni-output-temp/java/TestOutcome.java
 djinni-output-temp/java/TestDuration.java
 djinni-output-temp/java/RecordWithDurationAndDerivings.java
 djinni-output-temp/java/DateRecord.java
@@ -98,6 +103,10 @@ djinni-output-temp/java/NestedCollection.java
 djinni-output-temp/java/RecordWithDerivings.java
 djinni-output-temp/java/RecordWithNestedDerivings.java
 djinni-output-temp/java/SetRecord.java
+djinni-output-temp/jni/NativeNestedOutcome.hpp
+djinni-output-temp/jni/NativeNestedOutcome.cpp
+djinni-output-temp/jni/NativeTestOutcome.hpp
+djinni-output-temp/jni/NativeTestOutcome.cpp
 djinni-output-temp/jni/NativeTestDuration.hpp
 djinni-output-temp/jni/NativeTestDuration.cpp
 djinni-output-temp/jni/NativeRecordWithDurationAndDerivings.hpp
@@ -184,6 +193,9 @@ djinni-output-temp/jni/NativeRecordWithNestedDerivings.hpp
 djinni-output-temp/jni/NativeRecordWithNestedDerivings.cpp
 djinni-output-temp/jni/NativeSetRecord.hpp
 djinni-output-temp/jni/NativeSetRecord.cpp
+djinni-output-temp/objc/DBNestedOutcome.h
+djinni-output-temp/objc/DBNestedOutcome.mm
+djinni-output-temp/objc/DBTestOutcome.h
 djinni-output-temp/objc/DBTestDuration.h
 djinni-output-temp/objc/DBRecordWithDurationAndDerivings.h
 djinni-output-temp/objc/DBRecordWithDurationAndDerivings.mm
@@ -251,6 +263,10 @@ djinni-output-temp/objc/DBRecordWithNestedDerivings.h
 djinni-output-temp/objc/DBRecordWithNestedDerivings.mm
 djinni-output-temp/objc/DBSetRecord.h
 djinni-output-temp/objc/DBSetRecord.mm
+djinni-output-temp/objc/DBNestedOutcome+Private.h
+djinni-output-temp/objc/DBNestedOutcome+Private.mm
+djinni-output-temp/objc/DBTestOutcome+Private.h
+djinni-output-temp/objc/DBTestOutcome+Private.mm
 djinni-output-temp/objc/DBTestDuration+Private.h
 djinni-output-temp/objc/DBTestDuration+Private.mm
 djinni-output-temp/objc/DBRecordWithDurationAndDerivings+Private.h

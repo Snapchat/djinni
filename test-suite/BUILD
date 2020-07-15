@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary", "objc_library")
+load("@rules_java//java:defs.bzl", "java_test")
 load("@build_bazel_rules_apple//apple:macos.bzl", "macos_unit_test")
 
 cc_library(
@@ -13,6 +15,9 @@ cc_library(
     includes = [
         "generated-src/cpp",
         "handwritten-src/cpp",
+    ],
+    deps = [
+        "//support-lib:djinni-support-common",
     ],
     linkstatic = True,
     alwayslink = 1,
@@ -39,6 +44,9 @@ cc_binary(
 
 objc_library(
     name = "djinni-tests-objcxx",
+    copts = [
+        "-ObjC++",
+    ],
     srcs = glob([
         "generated-src/objc/**/*.mm",
         "handwritten-src/objc/**/*.mm",

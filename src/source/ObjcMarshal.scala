@@ -51,6 +51,8 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
   override def fromCpp(tm: MExpr, expr: String): String = throw new AssertionError("direct cpp to objc conversion not possible")
 
   def references(m: Meta, exclude: String = ""): Seq[SymbolReference] = m match {
+    case MOutcome =>
+      List(ImportRef(q(spec.objcBaseLibIncludePrefix + "DJOutcome.h")))
     case o: MOpaque =>
       List(ImportRef("<Foundation/Foundation.h>"))
     case d: MDef => d.defType match {
@@ -115,6 +117,7 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
             case MList => ("NSArray" + args(tm), true)
             case MSet => ("NSSet" + args(tm), true)
             case MMap => ("NSDictionary" + args(tm), true)
+            case MOutcome => ("DJOutcome" + args(tm), true)
             case d: MDef => d.defType match {
               case DEnum => if (needRef) ("NSNumber", true) else (idObjc.ty(d.name), false)
               case DRecord => (idObjc.ty(d.name), true)
