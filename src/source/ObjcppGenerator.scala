@@ -126,10 +126,9 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
 
     val hasStaticMethod = i.methods.exists(_.static);
 
+    // Add user include file if defined
+    spec.objcppFunctionPrologueFile.foreach(x=>refs.body.add("#include " + q(x)))
     if (i.ext.cpp) {
-      // Add user include file if defined
-      spec.objcppFunctionPrologueFile.foreach(x=>refs.body.add("#include " + q(x)))
-
       refs.body.add("#import " + q(spec.objcBaseLibIncludePrefix + "DJICppWrapperCache+Private.h"))
       refs.body.add("#include <utility>")
       refs.body.add("#import " + q(spec.objcBaseLibIncludePrefix + "DJIError.h"))
@@ -237,6 +236,7 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
               val ret = cppMarshal.fqReturnType(m.ret)
               val params = m.params.map(p => cppMarshal.fqParamType(p.ty) + " c_" + idCpp.local(p.ident))
               w.wl(s"$ret ${idCpp.method(m.ident)}${params.mkString("(", ", ", ")")} override").braced {
+                spec.objcppFunctionPrologueFile.foreach(x=>w.wl(s"""DJINNI_FUNCTION_PROLOGUE("${ident.name}.${m.ident.name}");"""))
                 w.w("@autoreleasepool").braced {
                   val ret = m.ret.fold("")(_ => "auto objcpp_result_ = ")
                   val call = s"[djinni_private_get_proxied_objc_object() ${idObjc.method(m.ident)}"

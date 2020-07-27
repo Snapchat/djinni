@@ -294,12 +294,13 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
           writeJniTypeParams(w, typeParams)
           val methodNameAndSignature: String = s"${idCpp.method(m.ident)}${params.mkString("(", ", ", ")")}"
           w.w(s"$ret $jniSelfWithParams::JavaProxy::$methodNameAndSignature").braced {
+            val javaMethodName = idJava.method(m.ident)
+            spec.jniFunctionPrologueFile.foreach(x=>w.wl(s"""DJINNI_FUNCTION_PROLOGUE("${ident.name}.${javaMethodName}");"""))
             w.wl(s"auto jniEnv = ::djinni::jniGetThreadEnv();")
             w.wl(s"::djinni::JniLocalScope jscope(jniEnv, 10);")
             w.wl(s"const auto& data = ::djinni::JniClass<${withNs(Some(spec.jniNamespace), jniSelf)}>::get();")
             val call = m.ret.fold("jniEnv->CallVoidMethod(")(r => "auto jret = " + toJniCall(r, (jt: String) => s"jniEnv->Call${jt}Method("))
             w.w(call)
-            val javaMethodName = idJava.method(m.ident)
             w.w(s"Handle::get().get(), data.method_$javaMethodName")
             if(m.params.nonEmpty){
               w.wl(",")
