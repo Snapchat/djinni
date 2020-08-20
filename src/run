@@ -15,5 +15,7 @@ done
 base_dir=$(cd "`dirname "$loc"`" && pwd)
 
 pushd $base_dir
-bazel run //src:djinni "$@"
+bazel build //src:djinni
 popd
+
+exec "$base_dir/../bazel-bin/src/djinni" "$@"
