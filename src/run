@@ -14,13 +14,6 @@ while [ -h "$loc" ]; do
 done
 base_dir=$(cd "`dirname "$loc"`" && pwd)
 
-"$base_dir/build.sh"
-
-# Determine os version and choose correspondent .sh or .bat file accordingly.
-os_version="`uname -a`"
-
-if [[ $os_version == *"MINGW"* ]]; then
-  cmd //C "$base_dir/target/start.bat" "$@"
-else
-  exec "$base_dir/target/start" "$@"
-fi
+pushd $base_dir
+bazel run //src:djinni "$@"
+popd

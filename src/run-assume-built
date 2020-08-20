@@ -14,4 +14,4 @@ while [ -h "$loc" ]; do
 done
 base_dir=$(cd "`dirname "$loc"`" && pwd)
 
-exec "$base_dir/target/start" "$@"
+exec "$base_dir/../bazel-bin/src/djinni" "$@"
