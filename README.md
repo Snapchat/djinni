@@ -4,7 +4,7 @@ See the [original dropbox readme](README.dropbox.md) for the full Djinni docs.
 
 ## Working on Djinni in an IDE
 
-You can either load the project via SBT or Bazel
+You can load the project via Bazel
 
 ### Bazel
 
@@ -19,19 +19,18 @@ You can either load the project via SBT or Bazel
 
 You can also use `bazel build //src:djinni` and `bazel run //src:djinni` to verify the build and binary from the command line.
 
-`run_djinni.sh` still uses sbt for builds since bazel isn't pervasive at snap yet.
-
 ## Future Work
 
-- Use bazel to create a deployment jar to use in client instead of sbt and clean up the remaining sbt stuff.
 - Add a proper djinni rule to bazel for generation
   - Main blocker here is djinni does not have deterministic outputs and bazel doesn't support this
 
-
 ## Modifications:
 
+ - Replaced sbt and gyp with Bazel
  - Added move assigment operator to GlobalRef in all djinni_support.hpp files
  - Made JniClassInitializer constructor public to allow arbitrary additional initialization in JNI_OnLoad()
  - Speed up string passing between Java and C++
  - Eliminate CppProxy finalizers
  - Option to generate ObjC protocols
+ - Option to generate function prologue
+ - Added `outcome<>` builtin type

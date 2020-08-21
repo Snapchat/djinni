@@ -13,15 +13,7 @@ This tool is written in Scala and has been tested in JDK 6 and 7.
 ------------------------------------------------------
 Building
 
-To build once:
-
     % ./build.sh
-
-If you're building frequently, load up the build tool's REPL and run
-the "compile" command every time you want to compile it.
-
-    % ./support/sbt
-    > compile
 
 ------------------------------------------------------
 Running
@@ -34,9 +26,3 @@ Running
           --objc-out out/objc
 
     # ./run --help  # to show all options
-
-------------------------------------------------------
-IntelliJ
-
-- There's a ".idea/" project folder.
-- Use IntelliJ 13
