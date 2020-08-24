@@ -1,0 +1,8 @@
+cpp:
+    header: '"proto/cpp/test2.pb.h"'
+    namespace: 'djinni::test2'
+java:
+    class: 'djinni.test2.Test2'
+ 
+messages:
+    - PersistingState

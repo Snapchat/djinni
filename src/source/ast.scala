@@ -28,6 +28,7 @@ abstract sealed class FileRef {
 }
 case class IdlFileRef(override val file: File) extends FileRef
 case class ExternFileRef(override val file: File) extends FileRef
+case class ProtobufFileRef(override val file: File) extends FileRef
 
 case class Ident(name: String, file: File, loc: Loc)
 class ConstRef(ident: Ident) extends Ident(ident.name, ident.file, ident.loc)
@@ -45,6 +46,7 @@ sealed abstract class TypeDecl {
 }
 case class InternTypeDecl(override val ident: Ident, override val params: Seq[TypeParam], override val body: TypeDef, doc: Doc, override val origin: String) extends TypeDecl
 case class ExternTypeDecl(override val ident: Ident, override val params: Seq[TypeParam], override val body: TypeDef, properties: Map[String, Any], override val origin: String) extends TypeDecl
+case class ProtobufTypeDecl(override val ident: Ident, override val params: Seq[TypeParam], override val body: TypeDef, override val origin: String) extends TypeDecl
 
 case class Ext(java: Boolean, cpp: Boolean, objc: Boolean) {
   def any(): Boolean = {
@@ -85,3 +87,10 @@ object Interface {
 }
 
 case class Field(ident: Ident, ty: TypeRef, doc: Doc)
+
+case class ProtobufMessage(cpp: ProtobufMessage.Cpp, java: ProtobufMessage.Java, objc: Option[ProtobufMessage.Objc]) extends TypeDef
+object ProtobufMessage {
+  case class Cpp(header: String, ns: String)
+  case class Java(pkg: String)
+  case class Objc(header: String, prefix: String)
+}

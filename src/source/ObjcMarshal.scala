@@ -15,6 +15,11 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
   override def fqTypename(tm: MExpr): String = typename(tm)
   def fqTypename(name: String, ty: TypeDef): String = typename(name, ty)
 
+  def cppProtoType(tm: MExpr):Option[String] = tm.base match {
+    case MProtobuf(name, _, ProtobufMessage(cpp, _, None)) => Some(cpp.ns + "::" + name)
+    case _ => None
+  }
+
   def nullability(tm: MExpr): Option[String] = {
     val nonnull = Some("nonnull")
     val nullable = Some("nullable")
@@ -32,20 +37,31 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
         case DInterface => interfaceNullity
         case DRecord => if(e.objc.pointer) nonnull else None
       }
+      case MProtobuf(_, _, ProtobufMessage(_, _, None)) => None
       case _ => nonnull
     }
   }
 
   override def paramType(tm: MExpr): String = {
-    nullability(tm).fold("")(_ + " ") + toObjcParamType(tm)
+    cppProtoType(tm) match {
+      case Some(t) => "const " + t + " & "
+      case None => nullability(tm).fold("")(_ + " ") + toObjcParamType(tm)
+    }
   }
   override def fqParamType(tm: MExpr): String = paramType(tm)
 
-  override def returnType(ret: Option[TypeRef]): String = ret.fold("void")((t: TypeRef) => nullability(t.resolved).fold("")(_ + " ") + toObjcParamType(t.resolved))
+  override def returnType(ret: Option[TypeRef]): String = {
+    def objcReturnType(tm: MExpr): String =
+      nullability(tm).fold("")(_ + " ") + toObjcParamType(tm)
+    ret.fold("void")((t: TypeRef) =>
+      cppProtoType(t.resolved).getOrElse(nullability(t.resolved).fold("")(_ + " ") + toObjcParamType(t.resolved)))
+  }
   override def fqReturnType(ret: Option[TypeRef]): String = returnType(ret)
 
-  override def fieldType(tm: MExpr): String = toObjcParamType(tm)
-  override def fqFieldType(tm: MExpr): String = toObjcParamType(tm)
+  override def fieldType(tm: MExpr): String = {
+    cppProtoType(tm).getOrElse(toObjcParamType(tm))
+  }
+  override def fqFieldType(tm: MExpr): String = fieldType(tm)
 
   override def toCpp(tm: MExpr, expr: String): String = throw new AssertionError("direct objc to cpp conversion not possible")
   override def fromCpp(tm: MExpr, expr: String): String = throw new AssertionError("direct cpp to objc conversion not possible")
@@ -72,6 +88,10 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
         List(ImportRef(q(prefix + headerName(d.name))))
     }
     case e: MExtern => List(ImportRef(e.objc.header))
+    case p: MProtobuf => p.body.objc match {
+      case Some(o) => List(ImportRef(o.header))
+      case None => List(ImportRef(p.body.cpp.header))
+    }
     case p: MParam => List()
   }
 
@@ -83,12 +103,14 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
     case i: Interface => true
     case r: Record => true
     case e: Enum => false
+    case p: ProtobufMessage => true
   }
 
   def boxedTypename(td: TypeDecl) = td.body match {
     case i: Interface => typename(td.ident, i)
     case r: Record => typename(td.ident, r)
     case e: Enum => "NSNumber"
+    case p: ProtobufMessage => typename(td.ident, p)
   }
 
   // Return value: (Type_Name, Is_Class_Or_Not)
@@ -132,6 +154,10 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
               case i: Interface => if(useProtocol(i.ext, spec)) (s"id<${e.objc.typename}>", false) else (e.objc.typename, true)
               case _ => if(needRef) (e.objc.boxed, true) else (e.objc.typename, e.objc.pointer)
             }
+            case p: MProtobuf => p.body.objc match {
+              case Some(o) => (o.prefix + p.name, true)
+              case None => (p.body.cpp.ns + "::" + p.name, true)
+            }
             case p: MParam => throw new AssertionError("Parameter should not happen at Obj-C top level")
           }
           base
@@ -141,8 +167,14 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
   }
 
   def toBoxedParamType(tm: MExpr): String = {
-    val (name, needRef) = toObjcType(tm, true)
-    name + (if(needRef) " *" else "")
+    tm.base match {
+      case MProtobuf(_, _, ProtobufMessage(_, _, None)) =>
+        throw new AssertionError("C++ proto types are not compatible with generics")
+      case _ => {
+        val (name, needRef) = toObjcType(tm, true)
+        name + (if(needRef) " *" else "")
+      }
+    }
   }
 
   def toObjcParamType(tm: MExpr): String = {

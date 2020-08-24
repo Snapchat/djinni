@@ -107,6 +107,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     td.body match {
       case i: Interface => "interface" + ext(i.ext)
       case r: Record => "record" + ext(r.ext) + deriving(r)
+      case ProtobufMessage(_,_,_) => "protobuf"
       case Enum(_, false) => "enum"
       case Enum(_, true) => "flags"
     }
@@ -152,12 +153,17 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   private def mexpr(td: TypeDecl) = MExpr(meta(td), List())
 
   private def meta(td: TypeDecl) = {
-    val defType = td.body match {
-      case i: Interface => DInterface
-      case r: Record => DRecord
-      case e: Enum => DEnum
+    td match {
+      case p: ProtobufTypeDecl => MProtobuf(p.ident.name, 0, p.body.asInstanceOf[ProtobufMessage])
+      case _ =>
+        val defType = td.body match {
+          case i: Interface => DInterface
+          case r: Record => DRecord
+          case e: Enum => DEnum
+          case p: ProtobufMessage => throw new AssertionError("unreachable")
+        }
+        MDef(td.ident, 0, defType, td.body)
     }
-    MDef(td.ident, 0, defType, td.body)
   }
 
   override def generate(idl: Seq[TypeDecl]) {
@@ -226,5 +232,6 @@ object YamlGenerator {
     case i: Interface => DInterface
     case r: Record => DRecord
     case e: Enum => DEnum
+    case p: ProtobufMessage => throw new AssertionError("unreachable")
   }
 }

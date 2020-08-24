@@ -1,0 +1,32 @@
+@protobuf "proto.yaml"
+@protobuf "proto2.yaml"
+
+RecordWithEmbeddedProto = record {
+    person: Person;
+}
+
+RecordWithEmbeddedCppProto = record {
+    state: PersistingState;
+}
+
+proto_tests = interface +c {
+    static protoToStrings(x: AddressBook): list<string>;
+    static stringsToProto(x: list<string>): AddressBook;
+
+    static embeddedProtoToString(x: RecordWithEmbeddedProto): string;
+    static stringToEmbeddedProto(x: string): RecordWithEmbeddedProto;
+
+    static cppProtoToString(x: PersistingState): string;
+    static stringToCppProto(x: string): PersistingState;
+
+    static embeddedCppProtoToString(x: RecordWithEmbeddedCppProto): string;
+    static stringToEmbeddedCppProto(x: string): RecordWithEmbeddedCppProto;
+
+    static protoListToStrings(x: list<Person>): list<string>;
+    static stringsToProtoList(x: list<string>): list<Person>;
+    
+    static optionalProtoToString(x: optional<Person>): string;
+    static stringToOptionalProto(x: string): optional<Person>;
+
+    static stringToProtoOutcome(x: string): outcome<Person, i32>;
+}

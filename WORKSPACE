@@ -35,9 +35,9 @@ load("@io_bazel_rules_scala//scala:scala.bzl", "scala_repositories")
 scala_register_toolchains()
 scala_repositories()
 
-protobuf_version = "3.11.3"
+protobuf_version = "3.12.4"
 protobuf_version_sha256 = (
-    "cf754718b0aa945b00550ed7962ddc167167bd922b842199eeb6505e6f344852"
+    "512e5a674bf31f8b7928a64d8adf73ee67b8fe88339ad29adaa3b84dbaa570d8"
 )
 
 http_archive(

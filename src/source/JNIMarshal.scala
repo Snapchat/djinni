@@ -35,6 +35,7 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
 
   def references(m: Meta, exclude: String = ""): Seq[SymbolReference] = m match {
     case o: MOpaque => List(ImportRef(q(spec.jniBaseLibIncludePrefix + "Marshal.hpp")))
+    case p: MProtobuf => List(ImportRef(q(spec.jniBaseLibIncludePrefix + "Marshal.hpp")))
     case d: MDef => List(ImportRef(include(d.name)))
     case e: MExtern => List(ImportRef(e.jni.header))
     case _ => List()
@@ -81,15 +82,29 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       case e: Enum if e.flags => "Ljava/util/EnumSet;"
       case _ => s"L${undecoratedTypename(d.name, d.body)};"
     }
+    case p: MProtobuf => {
+      val prefix = p.body.java.pkg.replaceAllLiterally(".", "/")
+      s"L${prefix}$$${p.name};"
+    }
   }
 
   def javaMethodSignature(params: Iterable[Field], ret: Option[TypeRef]) = {
     params.map(f => typename(f.ty)).mkString("(", "", ")") + ret.fold("V")(typename)
   }
 
+  def javaClassNameType(p: MProtobuf): String = {
+    val fqJavaClass = p.body.java.pkg.replaceAllLiterally(".", "/") + "$" + p.name
+    val classNameChars = fqJavaClass.toList.map(c => s"'$c'")
+    s"""::djinni::JavaProto<${classNameChars.mkString(",")}>"""
+  }
+
   def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => withNs(Some(spec.jniNamespace), helperClass(d.name))
     case e: MExtern => e.jni.translator
+    // We generate a template here rather than in helperTemplates() because this
+    // is not a parameterized type in Djinni IDL.
+    case p: MProtobuf =>
+      s"""::djinni::Protobuf<${withNs(Some(p.body.cpp.ns), p.name)}, ${javaClassNameType(p)}>"""
     case o => withNs(Some("djinni"), o match {
       case p: MPrimitive => p.idlName match {
         case "i8" => "I8"
@@ -110,6 +125,7 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       case MOutcome => "Outcome"
       case d: MDef => throw new AssertionError("unreachable")
       case e: MExtern => throw new AssertionError("unreachable")
+      case p: MProtobuf => throw new AssertionError("unreachable")
       case p: MParam => throw new AssertionError("not applicable")
     })
   }

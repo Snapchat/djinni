@@ -416,6 +416,11 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
                 } else {
                   w.w(s"@(self.${idObjc.field(f.ident)})")
                 }
+              case p: MProtobuf =>
+                p.body.objc match {
+                  case Some(_) => w.w(s"self.${idObjc.field(f.ident)}")
+                  case None => w.w("""@"[Opaque C++ Protobuf object]"""")
+                }
               case _ => w.w(s"self.${idObjc.field(f.ident)}")
             }
           }

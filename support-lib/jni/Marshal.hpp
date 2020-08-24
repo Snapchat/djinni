@@ -17,6 +17,7 @@
 #pragma once
 
 #include "djinni_support.hpp"
+#include <array>
 #include <cassert>
 #include <chrono>
 #include <cstdint>
@@ -604,4 +605,83 @@ namespace djinni
             return c.has_value() ? convertResult(c.value()) : convertError(c.error());
         }
     };
+
+    struct GpbMessageJniInfo
+    {
+        const GlobalRef<jclass> clazz { jniFindClass("com/google/protobuf/MessageLite") };
+        const jmethodID method_to_byte_array { jniGetMethodID(clazz.get(), "toByteArray", "()[B") };
+    };
+
+    // Helper class to carry a Java class name in a type.
+    // This is passed to the JAVA_PROTO parameter of Protobuf<> below.
+    template<char... chars>
+    class JavaProto {
+    public:
+        static const char* name() {
+            static const char charBuf[] = {chars..., '\0'};
+            return charBuf;
+        }
+    };
+
+    // 
+    template<typename CPP_PROTO, typename JAVA_PROTO>
+    class Protobuf {
+    public:
+        using CppType = CPP_PROTO;
+        using JniType = jobject;
+
+        using Boxed = Protobuf;
+
+        static CppType toCpp(JNIEnv* jniEnv, JniType j)
+        {
+            CPP_PROTO ret;
+
+            // Call message.toByteArray() through JNI
+            const auto& msgcls = JniClass<GpbMessageJniInfo>::get();
+            auto bytes = LocalRef<jbyteArray>(jniEnv,
+                 static_cast<jbyteArray>(jniEnv->CallObjectMethod(j, msgcls.method_to_byte_array)));
+            jniExceptionCheck(jniEnv);
+
+            // Get the length of byte array
+            jsize length = jniEnv->GetArrayLength(bytes);
+            jniExceptionCheck(jniEnv);
+            if (length == 0) {
+                return ret;
+            }
+
+            // Get a pointer into the bytes
+            auto deleter = [jniEnv, &bytes](void* c) {if (c) {jniEnv->ReleasePrimitiveArrayCritical(bytes.get(), c, JNI_ABORT);}};
+            std::unique_ptr<uint8_t, decltype(deleter)> ptr(reinterpret_cast<uint8_t*>(jniEnv->GetPrimitiveArrayCritical(bytes.get(), nullptr)), deleter);
+            if (!ptr) {
+                jniExceptionCheck(jniEnv);
+            }
+
+            [[maybe_unused]]
+            bool success = ret.ParseFromArray(ptr.get(), static_cast<int>(length));
+            assert(success);
+            
+            return ret;
+        }
+        
+        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c)
+        {
+            // Serialize to C++ vector
+            std::vector<uint8_t> cppBuf(c.ByteSizeLong());
+            [[maybe_unused]]
+            bool success = c.SerializeToArray(cppBuf.data(), static_cast<int>(cppBuf.size()));
+            assert(success);
+
+            // Wrap C++ vector as java.nio.ByteBuffer (no ownership)
+            auto javaBuf = LocalRef<jobject>(jniEnv, jniEnv->NewDirectByteBuffer(cppBuf.data(), cppBuf.size()));
+            // Acquire the Java Protobuf message class
+            const char* javaClassName = JAVA_PROTO::name();
+            auto cls = jniFindClass(javaClassName);
+            auto sig = std::string("(Ljava/nio/ByteBuffer;)L") + javaClassName + ";";
+            auto mid = jniGetStaticMethodID(cls.get(), "parseFrom", sig.c_str());
+            auto ret = jniEnv->CallStaticObjectMethod(cls.get(), mid, javaBuf.get());
+            jniExceptionCheck(jniEnv);
+            return {jniEnv, ret};
+        }
+    };
+
 } // namespace djinni

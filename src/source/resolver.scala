@@ -50,10 +50,12 @@ def resolve(metas: Scope, idl: Seq[TypeDecl]): Option[Error] = {
           DEnum
         case r: Record => DRecord
         case i: Interface => DInterface
+        case p: ProtobufMessage => throw new AssertionError("unreachable")
       }
       topScope = topScope.updated(typeDecl.ident.name, typeDecl match {
         case td: InternTypeDecl => MDef(typeDecl.ident.name, typeDecl.params.length, defType, typeDecl.body)
         case td: ExternTypeDecl => YamlGenerator.metaFromYaml(td)
+        case td: ProtobufTypeDecl => MProtobuf(td.ident.name, 0, td.body.asInstanceOf[ProtobufMessage])
       })
     }
 
@@ -89,6 +91,7 @@ private def resolve(scope: Scope, typeDef: TypeDef) {
     case e: Enum => resolveEnum(scope, e)
     case r: Record => resolveRecord(scope, r)
     case i: Interface => resolveInterface(scope, i)
+    case p: ProtobufMessage=>
   }
 }
 
@@ -116,6 +119,7 @@ private def resolveConst(typeDef: TypeDef) {
     case e: Enum =>
     case r: Record => f(r.consts)
     case i: Interface => f(i.consts)
+    case p: ProtobufMessage=>
   }
 }
 
@@ -253,6 +257,7 @@ private def resolveRecord(scope: Scope, r: Record) {
             throw new Error(f.ident.loc, s"Some deriving required is not implemented in record ${f.ident.name}").toException
         case DEnum =>
       }
+      case p: MProtobuf =>
       case _ => throw new AssertionError("Type cannot be resolved")
     }
   }

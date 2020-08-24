@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+package djinni.test2;
+
+message PersistingState {
+    string user_id = 1;
+    bool is_active = 2;
+}

@@ -17,6 +17,7 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
     case e: Enum => idCpp.enumType(name)
     case i: Interface => idCpp.ty(name)
     case r: Record => idCpp.ty(name)
+    case p: ProtobufMessage => idCpp.ty(name)
   }
 
   override def fqTypename(tm: MExpr): String = toCppType(tm, Some(spec.cppNamespace), Seq())
@@ -24,6 +25,7 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
     case e: Enum => withNs(Some(spec.cppNamespace), idCpp.enumType(name))
     case i: Interface => withNs(Some(spec.cppNamespace), idCpp.ty(name))
     case r: Record => withNs(Some(spec.cppNamespace), idCpp.ty(name))
+    case p: ProtobufMessage => withNs(Some(p.cpp.ns), idCpp.ty(name))
   }
 
   def paramType(tm: MExpr, scopeSymbols: Seq[String]): String = toCppParamType(tm, None, scopeSymbols)
@@ -92,6 +94,8 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
           case Some(nnHdr) => ImportRef(nnHdr) :: base
           case _ => base
         }
+      case p: ProtobufMessage =>
+        List(ImportRef(p.cpp.header))
     }
     case e: MExtern => e.defType match {
       // Do not forward declare extern types, they might be in arbitrary namespaces.
@@ -99,6 +103,8 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
       case DInterface => List(ImportRef("<memory>"), ImportRef(e.cpp.header))
       case _ => List(ImportRef(e.cpp.header))
     }
+    case p: MProtobuf =>
+      List(ImportRef(p.body.cpp.header))
     case p: MParam => List()
   }
 
@@ -169,6 +175,7 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
         case _ => e.cpp.typename
       }
       case p: MParam => idCpp.typeParam(p.name)
+      case p: MProtobuf => withNs(Some(p.body.cpp.ns), p.name)
     }
     def expr(tm: MExpr): String = {
       spec.cppNnType match {
@@ -226,6 +233,7 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
     case i: Interface => false
     case r: Record => false
     case e: Enum => true
+    case p: ProtobufMessage => false
   }
 
   // this can be used in c++ generation to know whether a const& should be applied to the parameter or not

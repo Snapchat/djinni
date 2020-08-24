@@ -359,6 +359,7 @@ abstract class Generator(spec: Spec)
         generateEnum(td.origin, td.ident, td.doc, e)
       case r: Record => generateRecord(td.origin, td.ident, td.doc, td.params, r)
       case i: Interface => generateInterface(td.origin, td.ident, td.doc, td.params, i)
+      case p: ProtobufMessage => // never need to generate files for protobuf types
     }
     generateModule(decls.filter(td => td.body.isInstanceOf[Interface]))
   }

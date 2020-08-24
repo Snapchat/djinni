@@ -1,0 +1,12 @@
+cpp:
+    header: '"proto/cpp/test.pb.h"'
+    namespace: 'djinni::test'
+java:
+    class: 'djinni.test.Test'
+objc:
+    header: '"proto/objc/test.pbobjc.h"'
+    prefix: 'DJTest'
+ 
+messages:
+    - Person
+    - AddressBook

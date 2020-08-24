@@ -48,6 +48,9 @@ private object IdlParser extends RegexParsers {
       case "extern" ~ x => {
         new ExternFileRef(importFile(x))
       }
+      case "protobuf" ~ x => {
+        new ProtobufFileRef(importFile(x))
+      }
     }
   }
 
@@ -69,9 +72,10 @@ private object IdlParser extends RegexParsers {
 
   def filePath = "[^\"]*".r
 
-  def directive = importDirective | externDirective
+  def directive = importDirective | externDirective | protobufDirective
   def importDirective = "import".r
   def externDirective = "extern".r
+  def protobufDirective = "protobuf".r
 
   def typeDecl(origin: String): Parser[TypeDecl] = doc ~ ident ~ typeList(ident ^^ TypeParam) ~ "=" ~ typeDef ^^ {
     case doc~ident~typeParams~_~body => InternTypeDecl(ident, typeParams, body, doc, origin)
@@ -298,6 +302,67 @@ def parseExternFile(externFile: File, inFileListWriter: Option[Writer]) : Seq[Ty
   }
 }
 
+def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq[TypeDecl]] = {
+  val yaml = new Yaml()
+  val tds = mutable.MutableList[TypeDecl]()
+  val doc = yaml.load(in).asInstanceOf[JMap[String, Any]]
+
+  // - `cpp` key must be present
+  //   - `cpp.header` key must be present
+  //   - `cpp.namespace` key must be present
+  // - `java` key must be present
+  //   - `java.class` key must be present
+  // - `objc` key is optional
+  //   - if `objc` is present then `objc.header` must be present
+  //   - if `objc` is present then `objc.prefix` must be present
+  // - `messages` key must be present
+  //   - `messages` must be a string list
+  val c = Option(doc.get("cpp")) match {
+    case Some(properties) => properties.asInstanceOf[JMap[String, String]].toMap
+    case None => return Left(Error(Loc(fileStack.top, 1, 1), "'cpp' properties not found"))
+  }
+  val j = Option(doc.get("java")) match {
+    case Some(properties) => properties.asInstanceOf[JMap[String, String]].toMap
+    case None => return Left(Error(Loc(fileStack.top, 1, 1), "'java' properties not found"))
+  }
+  // ObjC is optional, if it's not present, then ObjC will use C++ protos
+  val o = Option(doc.get("objc")) match {
+    case Some(properties) => Some(properties.asInstanceOf[JMap[String, String]].toMap)
+    case None => None}
+  val proto = ProtobufMessage(
+    ProtobufMessage.Cpp(c("header"), c("namespace")),
+    ProtobufMessage.Java(j("class")),
+    o match {
+      case Some(oo) => Some(ProtobufMessage.Objc(oo("header"), oo("prefix")))
+      case None => None}
+  )
+  for(message <- doc.get("messages").asInstanceOf[java.util.List[String]]) {
+    val ident = Ident(message, fileStack.top, Loc(fileStack.top, 1, 1))
+    tds += ProtobufTypeDecl(ident, Seq.empty[TypeParam], proto, origin);
+  }
+  Right(tds)
+}
+
+def parseProtobufFile(protobufFile: File, inFileListWriter: Option[Writer]) : Seq[TypeDecl] = {
+  if (inFileListWriter.isDefined) {
+    inFileListWriter.get.write(protobufFile + "\n")
+  }
+
+  visitedFiles.add(protobufFile)
+  fileStack.push(protobufFile)
+  val fin = new FileInputStream(protobufFile)
+  try {
+    parseProtobufManifest(protobufFile.getName, new InputStreamReader(fin, "UTF-8")) match {
+      case Right(x) => x
+      case Left(err) => throw err.toException
+    }
+  }
+  finally {
+    fin.close()
+    fileStack.pop()
+  }
+}
+
 def normalizePath(path: File) : File = {
   return new File(java.nio.file.Paths.get(path.toString()).normalize().toString())
 }
@@ -329,6 +394,8 @@ def parseFile(idlFile: File, inFileListWriter: Option[Writer]): Seq[TypeDecl] = 
                 types = parseFile(normalized, inFileListWriter) ++ types
               case ExternFileRef(file) =>
                 types = parseExternFile(normalized, inFileListWriter) ++ types
+              case ProtobufFileRef(file) =>
+                types = parseProtobufFile(normalized, inFileListWriter) ++ types
             }
           }
         })

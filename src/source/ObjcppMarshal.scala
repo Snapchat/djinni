@@ -33,6 +33,10 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
   def references(m: Meta): Seq[SymbolReference] = m match {
     case o: MOpaque =>
       List(ImportRef(q(spec.objcBaseLibIncludePrefix + "DJIMarshal+Private.h")))
+    case p: MProtobuf => p.body.objc match {
+      case Some(o) => List(ImportRef(q(spec.objcBaseLibIncludePrefix + "DJIMarshal+Private.h")), ImportRef(o.header))
+      case None => List(ImportRef(q(spec.objcBaseLibIncludePrefix + "DJIMarshal+Private.h")))
+    }
     case d: MDef => d.defType match {
       case DEnum | DInterface =>
         List(ImportRef(include(m)))
@@ -63,6 +67,15 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
       case _ => withNs(Some(spec.objcppNamespace), helperClass(d.name))
     }
     case e: MExtern => e.objcpp.translator
+    case p: MProtobuf => p.body.objc match {
+      // We generate a template here rather than in helperTemplates() because this
+      // is not a parameterized type in Djinni IDL
+      case Some(o) => withNs(Some("djinni"), "Protobuf") + "<" +
+        withNs(Some(p.body.cpp.ns), p.name) + ", " + o.prefix + p.name + ">"
+      //Use the passthrough translator when in C++ proto mode
+      case None => withNs(Some("djinni"), "ProtobufPassthrough") + "<" +
+        withNs(Some(p.body.cpp.ns), p.name) + ">"
+    }
     case o => withNs(Some("djinni"), o match {
       case p: MPrimitive => p.idlName match {
         case "i8" => "I8"
@@ -84,6 +97,7 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
       case d: MDef => throw new AssertionError("unreachable")
       case e: MExtern => throw new AssertionError("unreachable")
       case p: MParam => throw new AssertionError("not applicable")
+      case p: MProtobuf => throw new AssertionError("not applicable")
     })
   }
 

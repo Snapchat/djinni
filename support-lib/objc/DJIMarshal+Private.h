@@ -380,4 +380,55 @@ public:
     }
 };
 
+template <typename CPP_PROTO, typename OBJC_PROTO>
+class Protobuf {
+public:
+    using CppType = CPP_PROTO;
+    using ObjcType = OBJC_PROTO*;
+
+    using Boxed = Protobuf;
+
+    static CppType toCpp(ObjcType o)
+    {
+        NSData* serialized = [o data];
+        const void* bytes = [serialized bytes];
+        int size = static_cast<int>([serialized length]);
+        CPP_PROTO cppProto;
+
+        [[maybe_unused]]
+        bool success = cppProto.ParseFromArray(bytes, size);
+        assert(success);
+
+        return cppProto;
+    }
+    static ObjcType fromCpp(const CppType& c)
+    {
+        std::vector<uint8_t> buffer(c.ByteSizeLong());
+        [[maybe_unused]]
+        bool success = c.SerializeToArray(buffer.data(), static_cast<int>(buffer.size()));
+        assert(success);
+        NSData* serialized = [NSData dataWithBytesNoCopy:buffer.data() length:buffer.size() freeWhenDone:NO];
+        NSError* error = nil;
+        OBJC_PROTO* objcProto = [[OBJC_PROTO alloc] initWithData:serialized error:&error];
+        return objcProto;
+    }
+};
+
+template <typename CPP_PROTO>
+class ProtobufPassthrough {
+public:
+    using CppType = CPP_PROTO;
+    using ObjcType = CPP_PROTO;
+    using Boxed = CPP_PROTO;
+
+    static const CppType& toCpp(const ObjcType& o)
+    {
+        return o;
+    }
+    static const ObjcType& fromCpp(const CppType& c)
+    {
+        return c;
+    }
+};
+
 } // namespace djinni

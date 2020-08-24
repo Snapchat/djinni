@@ -17,6 +17,7 @@
 package djinni
 
 import djinni.ast.TypeDef
+import djinni.ast.ProtobufMessage
 import scala.collection.immutable
 
 package object meta {
@@ -68,6 +69,7 @@ object MExtern {
     typeSignature: String // The mangled Java type signature (e.g. "Ljava/lang/String;")
   )
 }
+case class MProtobuf(name: String, override val numParams: Int, body: ProtobufMessage) extends Meta
 
 abstract sealed class MOpaque extends Meta { val idlName: String }
 
