@@ -27,6 +27,7 @@ public class AllTests extends TestSuite {
         mySuite.addTestSuite(FunctionPrologueTest.class);
         mySuite.addTestSuite(OutcomeTest.class);
         mySuite.addTestSuite(ProtoTest.class);
+        mySuite.addTestSuite(ArrayTest.class);
         return mySuite;
     }
 

@@ -14,6 +14,9 @@ djinni-output-temp/cpp/access_flags.hpp
 djinni-output-temp/cpp/empty_flags.hpp
 djinni-output-temp/cpp/flag_roundtrip.hpp
 djinni-output-temp/cpp/record_with_flags.hpp
+djinni-output-temp/cpp/vec2.hpp
+djinni-output-temp/cpp/vec2.cpp
+djinni-output-temp/cpp/test_array.hpp
 djinni-output-temp/cpp/_varname_record_.hpp
 djinni-output-temp/cpp/_varname_interface_.hpp
 djinni-output-temp/cpp/extended_record_base.hpp
@@ -72,6 +75,8 @@ djinni-output-temp/java/AccessFlags.java
 djinni-output-temp/java/EmptyFlags.java
 djinni-output-temp/java/FlagRoundtrip.java
 djinni-output-temp/java/RecordWithFlags.java
+djinni-output-temp/java/Vec2.java
+djinni-output-temp/java/TestArray.java
 djinni-output-temp/java/VarnameRecord.java
 djinni-output-temp/java/VarnameInterface.java
 djinni-output-temp/java/ExtendedRecord.java
@@ -133,6 +138,10 @@ djinni-output-temp/jni/NativeFlagRoundtrip.hpp
 djinni-output-temp/jni/NativeFlagRoundtrip.cpp
 djinni-output-temp/jni/NativeRecordWithFlags.hpp
 djinni-output-temp/jni/NativeRecordWithFlags.cpp
+djinni-output-temp/jni/NativeVec2.hpp
+djinni-output-temp/jni/NativeVec2.cpp
+djinni-output-temp/jni/NativeTestArray.hpp
+djinni-output-temp/jni/NativeTestArray.cpp
 djinni-output-temp/jni/NativeVarnameRecord.hpp
 djinni-output-temp/jni/NativeVarnameRecord.cpp
 djinni-output-temp/jni/NativeVarnameInterface.hpp
@@ -225,6 +234,9 @@ djinni-output-temp/objc/DBEmptyFlags.h
 djinni-output-temp/objc/DBFlagRoundtrip.h
 djinni-output-temp/objc/DBRecordWithFlags.h
 djinni-output-temp/objc/DBRecordWithFlags.mm
+djinni-output-temp/objc/DBVec2.h
+djinni-output-temp/objc/DBVec2.mm
+djinni-output-temp/objc/DBTestArray.h
 djinni-output-temp/objc/DBVarnameRecord.h
 djinni-output-temp/objc/DBVarnameRecord.mm
 djinni-output-temp/objc/DBVarnameInterface.h
@@ -304,6 +316,10 @@ djinni-output-temp/objc/DBFlagRoundtrip+Private.h
 djinni-output-temp/objc/DBFlagRoundtrip+Private.mm
 djinni-output-temp/objc/DBRecordWithFlags+Private.h
 djinni-output-temp/objc/DBRecordWithFlags+Private.mm
+djinni-output-temp/objc/DBVec2+Private.h
+djinni-output-temp/objc/DBVec2+Private.mm
+djinni-output-temp/objc/DBTestArray+Private.h
+djinni-output-temp/objc/DBTestArray+Private.mm
 djinni-output-temp/objc/DBVarnameRecord+Private.h
 djinni-output-temp/objc/DBVarnameRecord+Private.mm
 djinni-output-temp/objc/DBVarnameInterface+Private.h

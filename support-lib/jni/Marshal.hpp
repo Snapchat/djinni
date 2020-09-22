@@ -615,7 +615,7 @@ namespace djinni
     // Helper class to carry a Java class name in a type.
     // This is passed to the JAVA_PROTO parameter of Protobuf<> below.
     template<char... chars>
-    class JavaProto {
+    class JavaClassName {
     public:
         static const char* name() {
             static const char charBuf[] = {chars..., '\0'};
@@ -684,4 +684,147 @@ namespace djinni
         }
     };
 
+    // Base template, covers non-primitive types (boxed arrays)
+    template <class T, class ClassNameT>
+    class Array
+    {
+        using ECppType = typename T::CppType;
+        using EJniType = typename T::Boxed::JniType;
+
+    public:
+        using CppType = std::vector<ECppType>;
+        using JniType = jobject;
+
+        using Boxed = Array;
+
+        static CppType toCpp(JNIEnv* jniEnv, JniType j)
+        {
+            jobjectArray oa = static_cast<jobjectArray>(j);
+            auto size = jniEnv->GetArrayLength(oa);
+            CppType c;
+            c.reserve(size);
+            for(jint i = 0; i < size; ++i) {
+                auto je =  LocalRef<jobject>(jniEnv, jniEnv->GetObjectArrayElement(oa, i));
+                c.push_back(T::Boxed::toCpp(jniEnv, static_cast<EJniType>(je.get())));
+            }
+            return c;
+        }
+
+        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c)
+        {
+            auto j = LocalRef<JniType>(jniEnv, 
+                jniEnv->NewObjectArray(static_cast<jsize>(c.size()), JniClass<Array>::get().clazz.get(), nullptr));
+            for(size_t i = 0; i < c.size(); ++i) {
+                auto je = T::Boxed::fromCpp(jniEnv, c[i]);
+                jniEnv->SetObjectArrayElement(static_cast<jobjectArray>(j.get()), static_cast<jsize>(i), je.get());
+            }
+            return j;
+        }
+    private:
+        friend ::djinni::JniClass<Array>;
+        const GlobalRef<jclass> clazz { jniFindClass(ClassNameT::name()) };
+    };
+
+    // Primitive array optimization implementation
+    template <typename T, typename PrimitiveT>
+    class PrimitiveArray
+    {
+        using ECppType = typename PrimitiveT::CppType;
+        using EJniType = typename PrimitiveT::JniType;
+
+    public:
+        using CppType = std::vector<ECppType>;
+        using JniType = jobject;
+
+        using Boxed = T;
+
+        static CppType toCpp(JNIEnv* jniEnv, JniType j)
+        {
+            auto arr = static_cast<jarray>(j);
+            auto size = jniEnv->GetArrayLength(arr);
+            if (size == 0) {
+                return {};
+            }
+            auto deleter = [jniEnv, arr] (void* c) {if (c) {jniEnv->ReleasePrimitiveArrayCritical(arr, c, JNI_ABORT);}};
+            std::unique_ptr<EJniType, decltype(deleter)> ptr(
+                reinterpret_cast<EJniType*>(jniEnv->GetPrimitiveArrayCritical(arr, nullptr)),
+                deleter);
+            if (!ptr) {
+                jniExceptionCheck(jniEnv);
+                return {};
+            }
+            return CppType{ptr.get(), ptr.get() + size};
+        }
+
+        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c)
+        {
+            auto j = T::makePrimitiveArray(jniEnv, static_cast<jint>(c.size()));
+            if (c.size() > 0) {
+                auto deleter = [jniEnv, j] (void* c) {if (c) {jniEnv->ReleasePrimitiveArrayCritical(j, c, JNI_ABORT);}};
+                std::unique_ptr<EJniType, decltype(deleter)> ptr(
+                    reinterpret_cast<EJniType*>(jniEnv->GetPrimitiveArrayCritical(j, nullptr)),
+                    deleter);
+                std::copy(c.begin(), c.end(), ptr.get());
+            }
+            return LocalRef<JniType>(jniEnv, static_cast<JniType>(j));
+        }
+    };
+
+    // Specialize for supported primitive types
+    template <typename ClassNameT>
+    class Array<Bool, ClassNameT> : public PrimitiveArray<Array<Bool, ClassNameT>, Bool>
+    {
+    public:
+        static jbooleanArray makePrimitiveArray(JNIEnv* jniEnv, jsize size) {
+            return jniEnv->NewBooleanArray(size);
+        }
+    };
+    template <typename ClassNameT>
+    class Array<I8, ClassNameT> : public PrimitiveArray<Array<I8, ClassNameT>, I8>
+    {
+    public:
+        static jbyteArray makePrimitiveArray(JNIEnv* jniEnv, jsize size) {
+            return jniEnv->NewByteArray(size);
+        }
+    };
+    template <typename ClassNameT>
+    class Array<I16, ClassNameT> : public PrimitiveArray<Array<I16, ClassNameT>, I16>
+    {
+    public:
+        static jshortArray makePrimitiveArray(JNIEnv* jniEnv, jsize size) {
+            return jniEnv->NewShortArray(size);
+        }
+    };
+    template <typename ClassNameT>
+    class Array<I32, ClassNameT> : public PrimitiveArray<Array<I32, ClassNameT>, I32>
+    {
+    public:
+        static jintArray makePrimitiveArray(JNIEnv* jniEnv, jsize size) {
+            return jniEnv->NewIntArray(size);
+        }
+    };
+    template <typename ClassNameT>
+    class Array<I64, ClassNameT> : public PrimitiveArray<Array<I64, ClassNameT>, I64>
+    {
+    public:
+        static jlongArray makePrimitiveArray(JNIEnv* jniEnv, jsize size) {
+            return jniEnv->NewLongArray(size);
+        }
+    };
+    template <typename ClassNameT>
+    class Array<F32, ClassNameT> : public PrimitiveArray<Array<F32, ClassNameT>, F32>
+    {
+    public:
+        static jfloatArray makePrimitiveArray(JNIEnv* jniEnv, jsize size) {
+            return jniEnv->NewFloatArray(size);
+        }
+    };
+    template <typename ClassNameT>
+    class Array<F64, ClassNameT> : public PrimitiveArray<Array<F64, ClassNameT>, F64>
+    {
+    public:
+        static jdoubleArray makePrimitiveArray(JNIEnv* jniEnv, jsize size) {
+            return jniEnv->NewDoubleArray(size);
+        }
+    };
 } // namespace djinni

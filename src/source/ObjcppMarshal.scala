@@ -94,6 +94,7 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
       case MSet => "Set"
       case MMap => "Map"
       case MOutcome => "Outcome"
+      case MArray => "Array"
       case d: MDef => throw new AssertionError("unreachable")
       case e: MExtern => throw new AssertionError("unreachable")
       case p: MParam => throw new AssertionError("not applicable")
@@ -108,7 +109,7 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
         assert(tm.args.size == 1)
         val argHelperClass = helperClass(tm.args.head)
         s"<${spec.cppOptionalTemplate}, $argHelperClass>"
-      case MList | MSet =>
+      case MList | MSet | MArray =>
         assert(tm.args.size == 1)
         f
       case MMap | MOutcome =>

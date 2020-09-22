@@ -285,6 +285,10 @@ public:
     }
 };
 
+// ObjC does not have managed primitive array, so Array is the same as List in ObjC.
+template<class T>
+using Array = List<T>;
+
 template<class T>
 class Set {
     using ECppType = typename T::CppType;

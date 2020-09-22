@@ -1,0 +1,11 @@
+vec2 = record {
+    x: i32;
+    y: i32;
+} deriving (eq)
+
+test_array = interface +c {
+    static testStringArray(a: array<string>): array<string>;
+    static testIntArray(a: array<i32>): array<i32>;
+    static testRecordArray(a: array<vec2>): array<vec2>;
+    static testArrayOfArray(a: array<array<i32>>): array<array<i32>>;
+}

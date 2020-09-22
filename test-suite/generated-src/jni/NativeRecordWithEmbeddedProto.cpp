@@ -13,7 +13,7 @@ NativeRecordWithEmbeddedProto::~NativeRecordWithEmbeddedProto() = default;
 auto NativeRecordWithEmbeddedProto::fromCpp(JNIEnv* jniEnv, const CppType& c) -> ::djinni::LocalRef<JniType> {
     const auto& data = ::djinni::JniClass<NativeRecordWithEmbeddedProto>::get();
     auto r = ::djinni::LocalRef<JniType>{jniEnv->NewObject(data.clazz.get(), data.jconstructor,
-                                                           ::djinni::get(::djinni::Protobuf<::djinni::test::Person, ::djinni::JavaProto<'d','j','i','n','n','i','/','t','e','s','t','/','T','e','s','t','$','P','e','r','s','o','n'>>::fromCpp(jniEnv, c.person)))};
+                                                           ::djinni::get(::djinni::Protobuf<::djinni::test::Person, ::djinni::JavaClassName<'d','j','i','n','n','i','/','t','e','s','t','/','T','e','s','t','$','P','e','r','s','o','n'>>::fromCpp(jniEnv, c.person)))};
     ::djinni::jniExceptionCheck(jniEnv);
     return r;
 }
@@ -22,7 +22,7 @@ auto NativeRecordWithEmbeddedProto::toCpp(JNIEnv* jniEnv, JniType j) -> CppType 
     ::djinni::JniLocalScope jscope(jniEnv, 2);
     assert(j != nullptr);
     const auto& data = ::djinni::JniClass<NativeRecordWithEmbeddedProto>::get();
-    return {::djinni::Protobuf<::djinni::test::Person, ::djinni::JavaProto<'d','j','i','n','n','i','/','t','e','s','t','/','T','e','s','t','$','P','e','r','s','o','n'>>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mPerson))};
+    return {::djinni::Protobuf<::djinni::test::Person, ::djinni::JavaClassName<'d','j','i','n','n','i','/','t','e','s','t','/','T','e','s','t','$','P','e','r','s','o','n'>>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mPerson))};
 }
 
 }  // namespace djinni_generated

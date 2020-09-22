@@ -311,7 +311,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
               for (f <- r.fields) {
                 skipFirst { w.wl(" &&") }
                 f.ty.resolved.base match {
-                  case MBinary => w.w(s"java.util.Arrays.equals(${idJava.field(f.ident)}, other.${idJava.field(f.ident)})")
+                  case MBinary | MArray => w.w(s"java.util.Arrays.equals(${idJava.field(f.ident)}, other.${idJava.field(f.ident)})")
                   case MList | MSet | MMap | MString | MDate | MOutcome => w.w(s"this.${idJava.field(f.ident)}.equals(other.${idJava.field(f.ident)})")
                   case MOptional =>
                     w.w(s"((this.${idJava.field(f.ident)} == null && other.${idJava.field(f.ident)} == null) || ")
@@ -350,7 +350,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
             val multiplier = "31"
             for (f <- r.fields) {
               val fieldHashCode = f.ty.resolved.base match {
-                case MBinary => s"java.util.Arrays.hashCode(${idJava.field(f.ident)})"
+                case MBinary | MArray => s"java.util.Arrays.hashCode(${idJava.field(f.ident)})"
                 case MList | MSet | MMap | MString | MDate | MOutcome => s"${idJava.field(f.ident)}.hashCode()"
                 // Need to repeat this case for MDef
                 case df: MDef => s"${idJava.field(f.ident)}.hashCode()"
@@ -374,7 +374,6 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
             }
             w.wl(s"return hashCode;")
           }
-
         }
 
         w.wl

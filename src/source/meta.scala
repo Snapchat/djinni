@@ -87,6 +87,7 @@ case object MList extends MOpaque { val numParams = 1; val idlName = "list" }
 case object MSet extends MOpaque { val numParams = 1; val idlName = "set" }
 case object MMap extends MOpaque { val numParams = 2; val idlName = "map" }
 case object MOutcome extends MOpaque { val numParams = 2; val idlName = "outcome"}
+case object MArray extends MOpaque { val numParams = 1; val idlName = "array"}
 
 val defaults: Map[String,MOpaque] = immutable.HashMap(
   ("i8",   MPrimitive("i8",   "byte",    "jbyte",    "int8_t",  "Byte",    "B", "int8_t",  "NSNumber")),
@@ -103,7 +104,8 @@ val defaults: Map[String,MOpaque] = immutable.HashMap(
   ("list", MList),
   ("set", MSet),
   ("map", MMap),
-  ("outcome", MOutcome))
+  ("outcome", MOutcome),
+  ("array", MArray))
 
 def isInterface(ty: MExpr): Boolean = {
   ty.base match {

@@ -21,7 +21,6 @@ public class ProtoTest extends TestCase {
         names.add("tom");
         names.add("jerry");
         AddressBook proto = ProtoTests.stringsToProto(names);
-        System.out.println(proto);
         assertEquals(proto.getPeopleList().get(0).getName(), "tom");
         assertEquals(proto.getPeopleList().get(1).getName(), "jerry");
     }

@@ -139,7 +139,7 @@ private def constTypeCheck(ty: MExpr, value: Any, resolvedConsts: Seq[Const]) {
     throw new AssertionError(s"Const ${ref.name} does not exist")
   }
   ty.base match {
-    case MBinary | MList | MSet | MMap | MOutcome =>
+    case MBinary | MList | MSet | MMap | MOutcome | MArray =>
       throw new AssertionError("Type not allowed for constant")
     case MString =>
       if (!value.isInstanceOf[String] ||
@@ -225,7 +225,7 @@ private def resolveRecord(scope: Scope, r: Record) {
         throw new Error(f.ident.loc, "Cannot safely implement Eq on a record that may be extended").toException
       }
     f.ty.resolved.base match {
-      case MBinary | MList | MSet | MMap | MOutcome =>
+      case MBinary | MList | MSet | MMap | MOutcome | MArray =>
         if (r.derivingTypes.contains(DerivingType.Ord))
           throw new Error(f.ident.loc, "Cannot compare collections in Ord deriving (Java limitation)").toException
       case MString =>

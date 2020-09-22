@@ -58,7 +58,7 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
     case MDate => List(ImportRef("<chrono>"))
     case MBinary => List(ImportRef("<vector>"), ImportRef("<cstdint>"))
     case MOptional => List(ImportRef(spec.cppOptionalHeader))
-    case MList => List(ImportRef("<vector>"))
+    case MList | MArray => List(ImportRef("<vector>"))
     case MSet => List(ImportRef("<unordered_set>"))
     case MMap => List(ImportRef("<unordered_map>"))
     case MOutcome => List(ImportRef(spec.cppExpectedHeader))
@@ -160,7 +160,7 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
       case MDate => "std::chrono::system_clock::time_point"
       case MBinary => "std::vector<uint8_t>"
       case MOptional => spec.cppOptionalTemplate
-      case MList => "std::vector"
+      case MList | MArray => "std::vector"
       case MSet => "std::unordered_set"
       case MMap => "std::unordered_map"
       case MOutcome => "djinni::expected"

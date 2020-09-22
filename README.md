@@ -36,6 +36,7 @@ You can also use `bazel build //src:djinni` and `bazel run //src:djinni` to veri
  - Option to generate function prologue
  - Option to omit objc helper methods
  - Option to disable exception translation in ObjC
+ - array<> type support
  - outcome<> type support
  - Protobuf type support
 
@@ -152,3 +153,13 @@ MyInterface = interface +c {
     static foo(x: AddressBook);
 }
 ```
+
+### Optimize primitive array with array<>
+
+The new array<> type is similar to list<>, but optimized for Java primitive
+arrays. It is mapped to regular Java arrays (T[]) instead of ArrayList. Since it
+doesn't have to box elements as objects, it's order of magnitude faster than
+list<> when the element type is primitive.
+
+array<> is identical to list<> in Objective-C because there is no managed
+primitive array in Objective-C.

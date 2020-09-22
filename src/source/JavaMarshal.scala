@@ -98,6 +98,7 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
             case MOptional => throw new AssertionError("nested optional?")
             case m => f(arg, true)
           }
+        case MArray => toJavaType(tm.args.head, packageName) + "[]"
         case e: MExtern => (if(needRef) e.java.boxed else e.java.typename) + (if(e.java.generic) args(tm) else "")
         case p: MProtobuf => p.name
         case o =>
@@ -111,6 +112,7 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
             case MSet => "HashSet"
             case MMap => "HashMap"
             case MOutcome => "Outcome"
+            case MArray => throw new AssertionError("array should have been special cased")
             case d: MDef => withPackage(packageName, idJava.ty(d.name))
             case e: MExtern => throw new AssertionError("unreachable")
             case e: MProtobuf => throw new AssertionError("unreachable")

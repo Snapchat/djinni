@@ -136,7 +136,7 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
             case MDate => ("NSDate", true)
             case MBinary => ("NSData", true)
             case MOptional => throw new AssertionError("optional should have been special cased")
-            case MList => ("NSArray" + args(tm), true)
+            case MList | MArray => ("NSArray" + args(tm), true)
             case MSet => ("NSSet" + args(tm), true)
             case MMap => ("NSDictionary" + args(tm), true)
             case MOutcome => ("DJOutcome" + args(tm), true)

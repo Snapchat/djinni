@@ -75,6 +75,7 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       case MSet => "Ljava/util/HashSet;"
       case MMap => "Ljava/util/HashMap;"
       case MOutcome => "Lcom/snapchat/djinni/Outcome;"
+      case MArray => s"[${javaTypeSignature(tm.args.head)}"
     }
     case e: MExtern => e.jni.typeSignature
     case MParam(_) => "Ljava/lang/Object;"
@@ -88,23 +89,29 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
     }
   }
 
+  // Regexp shortcut
+  implicit class RegexOps(sc: StringContext) {
+    def r = new util.matching.Regex(sc.parts.mkString, sc.parts.tail.map(_ => "x"): _*)
+  }
+  // If class is an object type, return the type signature without the prefixing "L" and trailing ";"
+  // Otherwise return type signature.  This is the form JNI FindClass() function expects.
+  private def javaClassNameForFindClass(tm: MExpr): String = javaTypeSignature(tm) match {
+    case r"^L(.*)${cls};$$" => cls  // starts with L and ends with ;
+    case default => default         // otherwise
+  }
+
   def javaMethodSignature(params: Iterable[Field], ret: Option[TypeRef]) = {
     params.map(f => typename(f.ty)).mkString("(", "", ")") + ret.fold("V")(typename)
   }
 
-  def javaClassNameType(p: MProtobuf): String = {
-    val fqJavaClass = p.body.java.pkg.replaceAllLiterally(".", "/") + "$" + p.name
+  def javaClassNameAsCppType(fqJavaClass: String): String = {
     val classNameChars = fqJavaClass.toList.map(c => s"'$c'")
-    s"""::djinni::JavaProto<${classNameChars.mkString(",")}>"""
+    s"""::djinni::JavaClassName<${classNameChars.mkString(",")}>"""
   }
 
   def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => withNs(Some(spec.jniNamespace), helperClass(d.name))
     case e: MExtern => e.jni.translator
-    // We generate a template here rather than in helperTemplates() because this
-    // is not a parameterized type in Djinni IDL.
-    case p: MProtobuf =>
-      s"""::djinni::Protobuf<${withNs(Some(p.body.cpp.ns), p.name)}, ${javaClassNameType(p)}>"""
     case o => withNs(Some("djinni"), o match {
       case p: MPrimitive => p.idlName match {
         case "i8" => "I8"
@@ -123,9 +130,10 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       case MSet => "Set"
       case MMap => "Map"
       case MOutcome => "Outcome"
+      case MProtobuf(_,_,_) => "Protobuf"
+      case MArray => "Array"
       case d: MDef => throw new AssertionError("unreachable")
       case e: MExtern => throw new AssertionError("unreachable")
-      case p: MProtobuf => throw new AssertionError("unreachable")
       case p: MParam => throw new AssertionError("not applicable")
     })
   }
@@ -144,6 +152,13 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       case MMap | MOutcome =>
         assert(tm.args.size == 2)
         f
+      case p: MProtobuf =>
+        assert(tm.args.size == 0)
+        val fqJavaProtoClass = p.body.java.pkg.replaceAllLiterally(".", "/") + "$" + p.name
+        s"""<${withNs(Some(p.body.cpp.ns), p.name)}, ${javaClassNameAsCppType(fqJavaProtoClass)}>"""
+      case MArray =>
+        assert(tm.args.size == 1)
+        s"""<${helperClass(tm.args.head)}, ${javaClassNameAsCppType(javaClassNameForFindClass(tm.args.head))}>"""
       case _ => f
     }
   }

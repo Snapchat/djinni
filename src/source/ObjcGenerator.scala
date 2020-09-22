@@ -176,7 +176,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
     def checkMutable(tm: MExpr): Boolean = tm.base match {
       case MOptional => checkMutable(tm.args.head)
       case MString => true
-      case MList => true
+      case MList | MArray => true
       case MSet => true
       case MMap => true
       case MOutcome => true
@@ -282,7 +282,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
               skipFirst { w.wl(" &&") }
               f.ty.resolved.base match {
                 case MBinary => w.w(s"[self.${idObjc.field(f.ident)} isEqualToData:typedOther.${idObjc.field(f.ident)}]")
-                case MList => w.w(s"[self.${idObjc.field(f.ident)} isEqualToArray:typedOther.${idObjc.field(f.ident)}]")
+                case MList | MArray => w.w(s"[self.${idObjc.field(f.ident)} isEqualToArray:typedOther.${idObjc.field(f.ident)}]")
                 case MSet => w.w(s"[self.${idObjc.field(f.ident)} isEqualToSet:typedOther.${idObjc.field(f.ident)}]")
                 case MMap => w.w(s"[self.${idObjc.field(f.ident)} isEqualToDictionary:typedOther.${idObjc.field(f.ident)}]")
                 case MOutcome => w.w(s"[self.${idObjc.field(f.ident)} isEqualToOutcome:typedOther.${idObjc.field(f.ident)}]")
