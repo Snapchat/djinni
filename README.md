@@ -88,8 +88,9 @@ These help reducing the binary size of the app slightly.
 
 ### Disable C++ exception translation in ObjC
 
-You can use `--objcpp-disable-exception true` to disable the translation of C++
-exceptions to ObjC.  This means ObjC code will see C++ exceptions directly.
+You can use `--objcpp-disable-exception-translation true` to disable the
+translation of C++ exceptions to ObjC.  This means ObjC code will see C++
+exceptions directly.
 
 This is sometimes preferrable compared to the default behaviour which converts
 C++ exceptions to ObjC NSException, because the original exception stack is
