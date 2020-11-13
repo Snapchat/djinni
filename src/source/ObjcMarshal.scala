@@ -151,7 +151,11 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
                   (s"id<${idObjc.ty(d.name)}>", false)
             }
             case e: MExtern => e.body match {
-              case i: Interface => if(useProtocol(i.ext, spec)) (s"id<${e.objc.typename}>", false) else (e.objc.typename, true)
+              case i: Interface =>
+                if(i.ext.objc || e.objc.protocol)
+                  (s"id<${e.objc.typename}>", false)
+                else
+                  (e.objc.typename, true)
               case _ => if(needRef) (e.objc.boxed, true) else (e.objc.typename, e.objc.pointer)
             }
             case p: MProtobuf => p.body.objc match {

@@ -119,13 +119,22 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     "byValue" -> cppMarshal.byValue(td)
   )
 
-  private def objc(td: TypeDecl) = Map[String, Any](
-    "typename" -> QuotedString(objcMarshal.fqTypename(td.ident, td.body)),
-    "header" -> QuotedString(objcMarshal.include(td.ident)),
-    "boxed" -> QuotedString(objcMarshal.boxedTypename(td)),
-    "pointer" -> objcMarshal.isPointer(td),
-    "hash" -> QuotedString("%s.hash")
-  )
+  private def objc(td: TypeDecl) = {
+    val map = Map[String, Any](
+      "typename" -> QuotedString(objcMarshal.fqTypename(td.ident, td.body)),
+      "header" -> QuotedString(objcMarshal.include(td.ident)),
+      "boxed" -> QuotedString(objcMarshal.boxedTypename(td)),
+      "pointer" -> objcMarshal.isPointer(td),
+      "hash" -> QuotedString("%s.hash"))
+    td.body match {
+      case Interface(_,_,_) =>
+        if (spec.objcGenProtocol)
+          map + ("protocol" -> spec.objcGenProtocol)
+        else
+          map
+      case _ => map
+    }
+  }
 
   private def objcpp(td: TypeDecl) = Map[String, Any](
     "translator" -> QuotedString(objcppMarshal.helperName(mexpr(td))),
@@ -205,7 +214,8 @@ object YamlGenerator {
       nested(td, "objc")("header").toString,
       nested(td, "objc")("boxed").toString,
       nested(td, "objc")("pointer").asInstanceOf[Boolean],
-      nested(td, "objc")("hash").toString),
+      nested(td, "objc")("hash").toString,
+      if (nested(td, "objc") contains "protocol") nested(td, "objc")("protocol").asInstanceOf[Boolean] else false),
     MExtern.Objcpp(
       nested(td, "objcpp")("translator").toString,
       nested(td, "objcpp")("header").toString),
