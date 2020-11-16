@@ -38,7 +38,9 @@ val fileStack = mutable.Stack[File]()
 private object IdlParser extends RegexParsers {
   override protected val whiteSpace = """[ \t\n\r]+""".r
 
-  def idlFile(origin: String): Parser[IdlFile] = rep(importFileRef) ~ rep(typeDecl(origin)) ^^ { case imp~types => IdlFile(imp, types) }
+  def idlFile(origin: String): Parser[IdlFile] = rep(flag) ~ rep(importFileRef) ~ rep(typeDecl(origin)) ^^ { case f~imp~types => IdlFile(imp, types, f) }
+
+  def flag(): Parser[String] = "@flag" ~> ("\"" ~> """([^"\\]|\\[\\"])*""".r <~ "\"") ^^ { _.replaceAll("""\\(.)""", "$1") }
 
   def importFileRef(): Parser[FileRef] = {
     ("@" ~> directive) ~ ("\"" ~> filePath <~ "\"") ^^ {
@@ -367,7 +369,7 @@ def normalizePath(path: File) : File = {
   return new File(java.nio.file.Paths.get(path.toString()).normalize().toString())
 }
 
-def parseFile(idlFile: File, inFileListWriter: Option[Writer]): Seq[TypeDecl] = {
+def parseFile(idlFile: File, inFileListWriter: Option[Writer]): (Seq[TypeDecl], Seq[String]) = {
   val normalizedIdlFile = normalizePath(idlFile)
   if (inFileListWriter.isDefined) {
     inFileListWriter.get.write(normalizedIdlFile + "\n")
@@ -383,6 +385,7 @@ def parseFile(idlFile: File, inFileListWriter: Option[Writer]): Seq[TypeDecl] = 
         System.exit(1); return null;
       case Right(idl) => {
         var types = idl.typeDecls
+        var flags = idl.flags
         idl.imports.foreach(x => {
           val normalized = normalizePath(x.file)
           if (fileStack.contains(normalized)) {
@@ -390,8 +393,11 @@ def parseFile(idlFile: File, inFileListWriter: Option[Writer]): Seq[TypeDecl] = 
           }
           if (!visitedFiles.contains(normalized)) {
             x match {
-              case IdlFileRef(file) =>
-                types = parseFile(normalized, inFileListWriter) ++ types
+              case IdlFileRef(file) => {
+                val (t, f) = parseFile(normalized, inFileListWriter)
+                types = t ++ types
+                flags = f ++ flags
+              }
               case ExternFileRef(file) =>
                 types = parseExternFile(normalized, inFileListWriter) ++ types
               case ProtobufFileRef(file) =>
@@ -399,7 +405,7 @@ def parseFile(idlFile: File, inFileListWriter: Option[Writer]): Seq[TypeDecl] = 
             }
           }
         })
-        types
+        (types, flags)
       }
     }
   }

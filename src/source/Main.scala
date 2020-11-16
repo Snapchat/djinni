@@ -278,7 +278,7 @@ object Main {
     } else {
       None
     }
-    val idl = try {
+    val (idl, flags) = try {
       (new Parser(idlIncludePaths)).parseFile(idlFile, inFileListWriter)
     }
     catch {
@@ -289,6 +289,12 @@ object Main {
     finally {
       if (inFileListWriter.isDefined) {
         inFileListWriter.get.close()
+      }
+    }
+
+    if (!flags.isEmpty) {
+      if (!argParser.parse(flags.map({_.split(" ", 2)}).flatten :+ "--idl" :+ idlFile.getName())) {
+        System.exit(1); return
       }
     }
 

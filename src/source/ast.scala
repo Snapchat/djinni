@@ -21,7 +21,7 @@ import djinni.ast.Record.DerivingType.DerivingType
 import djinni.meta.MExpr
 import djinni.syntax.Loc
 
-case class IdlFile(imports: Seq[FileRef], typeDecls: Seq[TypeDecl])
+case class IdlFile(imports: Seq[FileRef], typeDecls: Seq[TypeDecl], flags: Seq[String])
 
 abstract sealed class FileRef {
   val file: File

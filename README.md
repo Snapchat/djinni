@@ -39,6 +39,7 @@ You can also use `bazel build //src:djinni` and `bazel run //src:djinni` to veri
  - array<> type support
  - outcome<> type support
  - Protobuf type support
+ - Local flags with `@flag` directive
 
 ## Using new features
 
@@ -163,3 +164,24 @@ list<> when the element type is primitive.
 
 array<> is identical to list<> in Objective-C because there is no managed
 primitive array in Objective-C.
+
+### Local flags with `@flag` directive
+
+In addition to supplying switches on the Djinni command line, it's also possible
+to specify them in the idl file with the `@flag` directive.
+
+For example, adding the line
+
+```
+@flag "--objc-gen-protocol true"
+```
+
+to the djinni idl file will enable generation of objc protocols for
+interfaces. This is equivalent to adding the same switches to the djinni command
+line.
+
+- Multiple `@flag` lines can appear in the same file.
+- `@flag` lines must appear at the top of the djinni idl file before anything
+  else.
+- `@import`ed files can include `@flag` lines too, and they will apply to the
+  parent file. (this means you can put common flags in a file and `@import` it)
