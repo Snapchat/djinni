@@ -22,6 +22,18 @@ cc_library(
     alwayslink = 1,
 )
 
+cc_library(
+    name = "djinni-support-android",
+    srcs = glob(["jni/*.cpp"]),
+    hdrs = glob(["jni/*.hpp"]),
+    includes = ["jni"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//support-lib:djinni-support-common",
+    ],
+    alwayslink = 1,
+)
+
 objc_library(
     name = "djinni-support-objc",
     srcs = glob(["objc/*.mm"]),
