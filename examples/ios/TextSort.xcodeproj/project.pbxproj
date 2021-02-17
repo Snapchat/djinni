@@ -1,0 +1,487 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2F4FE44D25DCC2EF007E57D6 /* TXSSortItems+Private.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2F4FE44525DCC2EF007E57D6 /* TXSSortItems+Private.mm */; };
+		2F4FE44E25DCC2EF007E57D6 /* TXSTextboxListener+Private.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2F4FE44625DCC2EF007E57D6 /* TXSTextboxListener+Private.mm */; };
+		2F4FE44F25DCC2EF007E57D6 /* TXSItemList.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2F4FE44A25DCC2EF007E57D6 /* TXSItemList.mm */; };
+		2F4FE45025DCC2EF007E57D6 /* TXSItemList+Private.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2F4FE44C25DCC2EF007E57D6 /* TXSItemList+Private.mm */; };
+		2F4FE46C25DCC3D4007E57D6 /* sort_items_impl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2F4FE46A25DCC3D4007E57D6 /* sort_items_impl.cpp */; };
+		2FD110E425DCD70300594136 /* DJOutcome.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2FD110DD25DCD70300594136 /* DJOutcome.mm */; };
+		2FD110E525DCD70300594136 /* DJIProxyCaches.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2FD110DF25DCD70300594136 /* DJIProxyCaches.mm */; };
+		2FD110E625DCD70300594136 /* DJIError.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2FD110E225DCD70300594136 /* DJIError.mm */; };
+		65834DE119AC599E0061AD3F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65834DE019AC599E0061AD3F /* Foundation.framework */; };
+		65834DE319AC599E0061AD3F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65834DE219AC599E0061AD3F /* CoreGraphics.framework */; };
+		65834DE519AC599E0061AD3F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 65834DE419AC599E0061AD3F /* UIKit.framework */; };
+		65834DEB19AC599E0061AD3F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 65834DE919AC599E0061AD3F /* InfoPlist.strings */; };
+		65834DF419AC599E0061AD3F /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65834DF219AC599E0061AD3F /* Main_iPhone.storyboard */; };
+		65834DFC19AC599E0061AD3F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 65834DFB19AC599E0061AD3F /* Images.xcassets */; };
+		65D7FDFA19AD0CDF0038F82F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D7FDF319AD0CDF0038F82F /* main.m */; };
+		65D7FDFB19AD0CDF0038F82F /* TXSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D7FDF519AD0CDF0038F82F /* TXSAppDelegate.m */; };
+		65D7FDFC19AD0CDF0038F82F /* TXSTextboxListenerImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D7FDF719AD0CDF0038F82F /* TXSTextboxListenerImpl.m */; };
+		65D7FDFD19AD0CDF0038F82F /* TXSViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D7FDF919AD0CDF0038F82F /* TXSViewController.m */; };
+		A546A26E1E72FBAF004A8BBD /* TXSTextboxListenerDebugableImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = A546A26D1E72FBAF004A8BBD /* TXSTextboxListenerDebugableImpl.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		2F4FE43C25DCC2E2007E57D6 /* item_list.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = item_list.hpp; path = "../../generated-src/cpp/item_list.hpp"; sourceTree = "<group>"; };
+		2F4FE43D25DCC2E2007E57D6 /* sort_order.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = sort_order.hpp; path = "../../generated-src/cpp/sort_order.hpp"; sourceTree = "<group>"; };
+		2F4FE43E25DCC2E2007E57D6 /* sort_items.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = sort_items.hpp; path = "../../generated-src/cpp/sort_items.hpp"; sourceTree = "<group>"; };
+		2F4FE43F25DCC2E2007E57D6 /* textbox_listener.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = textbox_listener.hpp; path = "../../generated-src/cpp/textbox_listener.hpp"; sourceTree = "<group>"; };
+		2F4FE44025DCC2EF007E57D6 /* TXSTextboxListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TXSTextboxListener.h; path = "../../generated-src/objc/TXSTextboxListener.h"; sourceTree = "<group>"; };
+		2F4FE44125DCC2EF007E57D6 /* TXSItemList+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "TXSItemList+Private.h"; path = "../../generated-src/objc/TXSItemList+Private.h"; sourceTree = "<group>"; };
+		2F4FE44225DCC2EF007E57D6 /* TXSSortItems.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TXSSortItems.h; path = "../../generated-src/objc/TXSSortItems.h"; sourceTree = "<group>"; };
+		2F4FE44325DCC2EF007E57D6 /* TXSSortOrder+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "TXSSortOrder+Private.h"; path = "../../generated-src/objc/TXSSortOrder+Private.h"; sourceTree = "<group>"; };
+		2F4FE44425DCC2EF007E57D6 /* TXSSortItems+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "TXSSortItems+Private.h"; path = "../../generated-src/objc/TXSSortItems+Private.h"; sourceTree = "<group>"; };
+		2F4FE44525DCC2EF007E57D6 /* TXSSortItems+Private.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "TXSSortItems+Private.mm"; path = "../../generated-src/objc/TXSSortItems+Private.mm"; sourceTree = "<group>"; };
+		2F4FE44625DCC2EF007E57D6 /* TXSTextboxListener+Private.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "TXSTextboxListener+Private.mm"; path = "../../generated-src/objc/TXSTextboxListener+Private.mm"; sourceTree = "<group>"; };
+		2F4FE44725DCC2EF007E57D6 /* TextSort-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "TextSort-Bridging-Header.h"; path = "../../generated-src/objc/TextSort-Bridging-Header.h"; sourceTree = "<group>"; };
+		2F4FE44825DCC2EF007E57D6 /* TXSSortOrder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TXSSortOrder.h; path = "../../generated-src/objc/TXSSortOrder.h"; sourceTree = "<group>"; };
+		2F4FE44925DCC2EF007E57D6 /* TXSItemList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TXSItemList.h; path = "../../generated-src/objc/TXSItemList.h"; sourceTree = "<group>"; };
+		2F4FE44A25DCC2EF007E57D6 /* TXSItemList.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = TXSItemList.mm; path = "../../generated-src/objc/TXSItemList.mm"; sourceTree = "<group>"; };
+		2F4FE44B25DCC2EF007E57D6 /* TXSTextboxListener+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "TXSTextboxListener+Private.h"; path = "../../generated-src/objc/TXSTextboxListener+Private.h"; sourceTree = "<group>"; };
+		2F4FE44C25DCC2EF007E57D6 /* TXSItemList+Private.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "TXSItemList+Private.mm"; path = "../../generated-src/objc/TXSItemList+Private.mm"; sourceTree = "<group>"; };
+		2F4FE46A25DCC3D4007E57D6 /* sort_items_impl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sort_items_impl.cpp; path = "../../handwritten-src/cpp/sort_items_impl.cpp"; sourceTree = "<group>"; };
+		2F4FE46B25DCC3D4007E57D6 /* sort_items_impl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = sort_items_impl.hpp; path = "../../handwritten-src/cpp/sort_items_impl.hpp"; sourceTree = "<group>"; };
+		2FD110DC25DCD70300594136 /* DJICppWrapperCache+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "DJICppWrapperCache+Private.h"; sourceTree = "<group>"; };
+		2FD110DD25DCD70300594136 /* DJOutcome.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DJOutcome.mm; sourceTree = "<group>"; };
+		2FD110DE25DCD70300594136 /* DJIError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DJIError.h; sourceTree = "<group>"; };
+		2FD110DF25DCD70300594136 /* DJIProxyCaches.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DJIProxyCaches.mm; sourceTree = "<group>"; };
+		2FD110E025DCD70300594136 /* DJIObjcWrapperCache+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "DJIObjcWrapperCache+Private.h"; sourceTree = "<group>"; };
+		2FD110E125DCD70300594136 /* DJOutcome.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DJOutcome.h; sourceTree = "<group>"; };
+		2FD110E225DCD70300594136 /* DJIError.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DJIError.mm; sourceTree = "<group>"; };
+		2FD110E325DCD70300594136 /* DJIMarshal+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "DJIMarshal+Private.h"; sourceTree = "<group>"; };
+		65834DDD19AC599E0061AD3F /* TextSort.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TextSort.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		65834DE019AC599E0061AD3F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		65834DE219AC599E0061AD3F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		65834DE419AC599E0061AD3F /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		65834DE819AC599E0061AD3F /* TextSort-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TextSort-Info.plist"; sourceTree = "<group>"; };
+		65834DEA19AC599E0061AD3F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		65834DEE19AC599E0061AD3F /* TextSort-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TextSort-Prefix.pch"; sourceTree = "<group>"; };
+		65834DF319AC599E0061AD3F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
+		65834DFB19AC599E0061AD3F /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		65D7FDF319AD0CDF0038F82F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		65D7FDF419AD0CDF0038F82F /* TXSAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSAppDelegate.h; sourceTree = "<group>"; };
+		65D7FDF519AD0CDF0038F82F /* TXSAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSAppDelegate.m; sourceTree = "<group>"; };
+		65D7FDF619AD0CDF0038F82F /* TXSTextboxListenerImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSTextboxListenerImpl.h; sourceTree = "<group>"; };
+		65D7FDF719AD0CDF0038F82F /* TXSTextboxListenerImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSTextboxListenerImpl.m; sourceTree = "<group>"; };
+		65D7FDF819AD0CDF0038F82F /* TXSViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXSViewController.h; sourceTree = "<group>"; };
+		65D7FDF919AD0CDF0038F82F /* TXSViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TXSViewController.m; sourceTree = "<group>"; };
+		A546A26D1E72FBAF004A8BBD /* TXSTextboxListenerDebugableImpl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TXSTextboxListenerDebugableImpl.swift; path = "../handwritten-src/swift/TXSTextboxListenerDebugableImpl.swift"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		65834DDA19AC599E0061AD3F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65834DE319AC599E0061AD3F /* CoreGraphics.framework in Frameworks */,
+				65834DE519AC599E0061AD3F /* UIKit.framework in Frameworks */,
+				65834DE119AC599E0061AD3F /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2F4FE43825DCC2B5007E57D6 /* generated-cpp */ = {
+			isa = PBXGroup;
+			children = (
+				2F4FE43C25DCC2E2007E57D6 /* item_list.hpp */,
+				2F4FE43E25DCC2E2007E57D6 /* sort_items.hpp */,
+				2F4FE43D25DCC2E2007E57D6 /* sort_order.hpp */,
+				2F4FE43F25DCC2E2007E57D6 /* textbox_listener.hpp */,
+			);
+			name = "generated-cpp";
+			path = "../generated-src/cpp";
+			sourceTree = "<group>";
+		};
+		2F4FE43925DCC2BD007E57D6 /* handwritten-cpp */ = {
+			isa = PBXGroup;
+			children = (
+				2F4FE46A25DCC3D4007E57D6 /* sort_items_impl.cpp */,
+				2F4FE46B25DCC3D4007E57D6 /* sort_items_impl.hpp */,
+			);
+			name = "handwritten-cpp";
+			path = "../handwritten-src/cpp";
+			sourceTree = "<group>";
+		};
+		2F4FE43B25DCC2D8007E57D6 /* generated-objc */ = {
+			isa = PBXGroup;
+			children = (
+				2F4FE44725DCC2EF007E57D6 /* TextSort-Bridging-Header.h */,
+				2F4FE44925DCC2EF007E57D6 /* TXSItemList.h */,
+				2F4FE44A25DCC2EF007E57D6 /* TXSItemList.mm */,
+				2F4FE44125DCC2EF007E57D6 /* TXSItemList+Private.h */,
+				2F4FE44C25DCC2EF007E57D6 /* TXSItemList+Private.mm */,
+				2F4FE44225DCC2EF007E57D6 /* TXSSortItems.h */,
+				2F4FE44425DCC2EF007E57D6 /* TXSSortItems+Private.h */,
+				2F4FE44525DCC2EF007E57D6 /* TXSSortItems+Private.mm */,
+				2F4FE44825DCC2EF007E57D6 /* TXSSortOrder.h */,
+				2F4FE44325DCC2EF007E57D6 /* TXSSortOrder+Private.h */,
+				2F4FE44025DCC2EF007E57D6 /* TXSTextboxListener.h */,
+				2F4FE44B25DCC2EF007E57D6 /* TXSTextboxListener+Private.h */,
+				2F4FE44625DCC2EF007E57D6 /* TXSTextboxListener+Private.mm */,
+			);
+			name = "generated-objc";
+			path = "../generated-src/objc";
+			sourceTree = "<group>";
+		};
+		2FD110DB25DCD70300594136 /* support-lib-objc */ = {
+			isa = PBXGroup;
+			children = (
+				2FD110DC25DCD70300594136 /* DJICppWrapperCache+Private.h */,
+				2FD110DD25DCD70300594136 /* DJOutcome.mm */,
+				2FD110DE25DCD70300594136 /* DJIError.h */,
+				2FD110DF25DCD70300594136 /* DJIProxyCaches.mm */,
+				2FD110E025DCD70300594136 /* DJIObjcWrapperCache+Private.h */,
+				2FD110E125DCD70300594136 /* DJOutcome.h */,
+				2FD110E225DCD70300594136 /* DJIError.mm */,
+				2FD110E325DCD70300594136 /* DJIMarshal+Private.h */,
+			);
+			name = support-lib-objc;
+			path = "../../support-lib/objc";
+			sourceTree = "<group>";
+		};
+		65834DD419AC599E0061AD3F = {
+			isa = PBXGroup;
+			children = (
+				2FD110DB25DCD70300594136 /* objc */,
+				2F4FE43B25DCC2D8007E57D6 /* generated-objc */,
+				2F4FE43925DCC2BD007E57D6 /* handwritten-cpp */,
+				2F4FE43825DCC2B5007E57D6 /* generated-cpp */,
+				A546A26A1E72F967004A8BBD /* handwritten-swift */,
+				65D7FDF219AD0C730038F82F /* handwritten-objc */,
+				65834DE619AC599E0061AD3F /* TextSort */,
+				65834DDF19AC599E0061AD3F /* Frameworks */,
+				65834DDE19AC599E0061AD3F /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		65834DDE19AC599E0061AD3F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				65834DDD19AC599E0061AD3F /* TextSort.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		65834DDF19AC599E0061AD3F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				65834DE019AC599E0061AD3F /* Foundation.framework */,
+				65834DE219AC599E0061AD3F /* CoreGraphics.framework */,
+				65834DE419AC599E0061AD3F /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		65834DE619AC599E0061AD3F /* TextSort */ = {
+			isa = PBXGroup;
+			children = (
+				65834DF219AC599E0061AD3F /* Main_iPhone.storyboard */,
+				65834DFB19AC599E0061AD3F /* Images.xcassets */,
+				65834DE719AC599E0061AD3F /* Supporting Files */,
+			);
+			path = TextSort;
+			sourceTree = "<group>";
+		};
+		65834DE719AC599E0061AD3F /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				65834DE819AC599E0061AD3F /* TextSort-Info.plist */,
+				65834DE919AC599E0061AD3F /* InfoPlist.strings */,
+				65834DEE19AC599E0061AD3F /* TextSort-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		65D7FDF219AD0C730038F82F /* handwritten-objc */ = {
+			isa = PBXGroup;
+			children = (
+				65D7FDF319AD0CDF0038F82F /* main.m */,
+				65D7FDF419AD0CDF0038F82F /* TXSAppDelegate.h */,
+				65D7FDF519AD0CDF0038F82F /* TXSAppDelegate.m */,
+				65D7FDF619AD0CDF0038F82F /* TXSTextboxListenerImpl.h */,
+				65D7FDF719AD0CDF0038F82F /* TXSTextboxListenerImpl.m */,
+				65D7FDF819AD0CDF0038F82F /* TXSViewController.h */,
+				65D7FDF919AD0CDF0038F82F /* TXSViewController.m */,
+			);
+			name = "handwritten-objc";
+			path = "../handwritten-src/objc";
+			sourceTree = "<group>";
+		};
+		A546A26A1E72F967004A8BBD /* handwritten-swift */ = {
+			isa = PBXGroup;
+			children = (
+				A546A26D1E72FBAF004A8BBD /* TXSTextboxListenerDebugableImpl.swift */,
+			);
+			name = "handwritten-swift";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		65834DDC19AC599E0061AD3F /* TextSort */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 65834E1219AC599E0061AD3F /* Build configuration list for PBXNativeTarget "TextSort" */;
+			buildPhases = (
+				65834DD919AC599E0061AD3F /* Sources */,
+				65834DDA19AC599E0061AD3F /* Frameworks */,
+				65834DDB19AC599E0061AD3F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TextSort;
+			productName = TextSort;
+			productReference = 65834DDD19AC599E0061AD3F /* TextSort.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		65834DD519AC599E0061AD3F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = TXS;
+				LastUpgradeCheck = 0820;
+				ORGANIZATIONNAME = "Dropbox, Inc.";
+				TargetAttributes = {
+					65834DDC19AC599E0061AD3F = {
+						LastSwiftMigration = 0820;
+					};
+				};
+			};
+			buildConfigurationList = 65834DD819AC599E0061AD3F /* Build configuration list for PBXProject "TextSort" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				en,
+				Base,
+			);
+			mainGroup = 65834DD419AC599E0061AD3F;
+			productRefGroup = 65834DDE19AC599E0061AD3F /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				65834DDC19AC599E0061AD3F /* TextSort */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		65834DDB19AC599E0061AD3F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65834DFC19AC599E0061AD3F /* Images.xcassets in Resources */,
+				65834DF419AC599E0061AD3F /* Main_iPhone.storyboard in Resources */,
+				65834DEB19AC599E0061AD3F /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		65834DD919AC599E0061AD3F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2F4FE45025DCC2EF007E57D6 /* TXSItemList+Private.mm in Sources */,
+				2F4FE44F25DCC2EF007E57D6 /* TXSItemList.mm in Sources */,
+				2F4FE44E25DCC2EF007E57D6 /* TXSTextboxListener+Private.mm in Sources */,
+				2F4FE44D25DCC2EF007E57D6 /* TXSSortItems+Private.mm in Sources */,
+				2FD110E625DCD70300594136 /* DJIError.mm in Sources */,
+				2FD110E425DCD70300594136 /* DJOutcome.mm in Sources */,
+				2FD110E525DCD70300594136 /* DJIProxyCaches.mm in Sources */,
+				65D7FDFC19AD0CDF0038F82F /* TXSTextboxListenerImpl.m in Sources */,
+				65D7FDFB19AD0CDF0038F82F /* TXSAppDelegate.m in Sources */,
+				2F4FE46C25DCC3D4007E57D6 /* sort_items_impl.cpp in Sources */,
+				65D7FDFD19AD0CDF0038F82F /* TXSViewController.m in Sources */,
+				A546A26E1E72FBAF004A8BBD /* TXSTextboxListenerDebugableImpl.swift in Sources */,
+				65D7FDFA19AD0CDF0038F82F /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		65834DE919AC599E0061AD3F /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				65834DEA19AC599E0061AD3F /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		65834DF219AC599E0061AD3F /* Main_iPhone.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				65834DF319AC599E0061AD3F /* Base */,
+			);
+			name = Main_iPhone.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		65834E1019AC599E0061AD3F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../support-lib/objc $(SRCROOT)/../generated-src/objc";
+			};
+			name = Debug;
+		};
+		65834E1119AC599E0061AD3F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				USER_HEADER_SEARCH_PATHS = "$(SRCROOT)/../../support-lib/objc $(SRCROOT)/../generated-src/objc";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		65834E1319AC599E0061AD3F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TextSort/TextSort-Prefix.pch";
+				INFOPLIST_FILE = "TextSort/TextSort-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = "Dropbox.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "../generated-src/objc/TextSort-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = 1;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		65834E1419AC599E0061AD3F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "TextSort/TextSort-Prefix.pch";
+				INFOPLIST_FILE = "TextSort/TextSort-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = "Dropbox.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "../generated-src/objc/TextSort-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = 1;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		65834DD819AC599E0061AD3F /* Build configuration list for PBXProject "TextSort" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				65834E1019AC599E0061AD3F /* Debug */,
+				65834E1119AC599E0061AD3F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		65834E1219AC599E0061AD3F /* Build configuration list for PBXNativeTarget "TextSort" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				65834E1319AC599E0061AD3F /* Debug */,
+				65834E1419AC599E0061AD3F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 65834DD519AC599E0061AD3F /* Project object */;
+}

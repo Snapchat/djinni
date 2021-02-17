@@ -1,3 +1,6 @@
+load("@build_bazel_rules_apple//apple:ios.bzl", "ios_application")
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+
 cc_library(
     name = "textsort-common",
     srcs = glob([
@@ -18,6 +21,8 @@ cc_library(
     alwayslink = 1,
 )
 
+# ------------------------------------------------------------------
+
 java_library(
     name = "textsort-java",
     srcs = glob(["generated-src/java/**/*.java"]),
@@ -35,6 +40,8 @@ cc_library(
     linkopts = ["-lm"],
     alwayslink = 1,
 )
+
+# ------------------------------------------------------------------
 
 android_library(
     name = "textsort-activity",

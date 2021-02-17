@@ -80,12 +80,15 @@ maven_install(
 
 git_repository(
     name="build_bazel_rules_apple",
-    commit="5131f3d46794bf227d296c82f30c2499c9de3c5b",
+    commit="73f12ab72777d6863693e33bc9128552f1dd5361",
     remote="https://github.com/bazelbuild/rules_apple.git",
 )
 
-load(
-    "@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies",
-)
-
+load("@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies",)
 apple_rules_dependencies()
+
+load("@build_bazel_rules_swift//swift:repositories.bzl", "swift_rules_dependencies",)
+swift_rules_dependencies()
+
+load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies",)
+apple_support_dependencies()
