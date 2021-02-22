@@ -26,8 +26,10 @@ cc_library(
 java_library(
     name = "textsort-java",
     srcs = glob(["generated-src/java/**/*.java"]),
-    deps = ["@maven//:com_google_code_findbugs_jsr305",
-            "//support-lib:djinni-support-java"],
+    deps = [
+        "//support-lib:djinni-support-java",
+        "@maven//:com_google_code_findbugs_jsr305",
+    ],
 )
 
 cc_library(
@@ -35,9 +37,11 @@ cc_library(
     srcs = glob(["generated-src/jni/*.cpp"]),
     hdrs = glob(["generated-src/jni/*.hpp"]),
     includes = ["generated-src/jni"],
-    deps = [":textsort-common",
-            "//support-lib:djinni-support-android"],
     linkopts = ["-lm"],
+    deps = [
+        ":textsort-common",
+        "//support-lib:djinni-support-android",
+    ],
     alwayslink = 1,
 )
 
@@ -46,16 +50,18 @@ cc_library(
 android_library(
     name = "textsort-activity",
     srcs = glob(["handwritten-src/java/com/dropbox/textsort/*.java"]),
+    custom_package = "com.dropbox.textsort",
     manifest = "android/app/src/main/AndroidManifest.xml",
     resource_files = glob(["android/app/src/main/res/**"]),
-    deps = [":textsort-java",
-            ":textsort-jni",],
-    custom_package = "com.dropbox.textsort",
+    deps = [
+        ":textsort-java",
+        ":textsort-jni",
+    ],
 )
 
 android_binary(
     name = "android-app",
+    custom_package = "com.dropbox.textsort",
     manifest = "android/AndroidManifest.xml",
     deps = [":textsort-activity"],
-    custom_package = "com.dropbox.textsort",
 )
