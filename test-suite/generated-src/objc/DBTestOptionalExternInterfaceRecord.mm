@@ -16,12 +16,14 @@
 
 + (nonnull instancetype)testOptionalExternInterfaceRecordWithSampleInterface:(nullable DBSampleInterface *)sampleInterface
 {
-    return [(DBTestOptionalExternInterfaceRecord*)[self alloc] initWithSampleInterface:sampleInterface];
+    return [[self alloc] initWithSampleInterface:sampleInterface];
 }
 
+#ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"<%@ %p sampleInterface:%@>", self.class, (void *)self, self.sampleInterface];
 }
 
+#endif
 @end
