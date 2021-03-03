@@ -185,3 +185,10 @@ line.
   else.
 - `@import`ed files can include `@flag` lines too, and they will apply to the
   parent file. (this means you can put common flags in a file and `@import` it)
+
+### FAQ
+
+Q. Can we include arbitrary bytes in the `string` type?
+
+A. No! iOS Java strings are unicode, so arbitrary bytes won't necessarily be able
+to get translated into such strings.
