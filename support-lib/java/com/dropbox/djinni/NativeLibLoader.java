@@ -106,7 +106,7 @@ public class NativeLibLoader {
         URL libsURL =
                 NativeLibLoader.class
                     .getClassLoader()
-                    .getResource(djinniNativeLibsJarPath);
+                    .getResource(jarPath);
         if (libsURL == null) { return; }
 
         // Are we actually referencing a jar path?
@@ -122,7 +122,10 @@ public class NativeLibLoader {
         DirectoryStream<Path> directoryStream = Files.newDirectoryStream(myPath);
         try {
             for (Path p : directoryStream) {
-                loadLibFromJarPath(p);
+                // It is not guaranteed that p is an absolute path
+                // In particular, this behavior appears to have changed from JRE 8 to 11
+                // Subsequent code makes this assumption, so convert the path
+                loadLibFromJarPath(p.toAbsolutePath());
             }
         } finally {
             directoryStream.close();
