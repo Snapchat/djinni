@@ -32,7 +32,7 @@ public class AllTests extends TestSuite {
     }
 
     public static void main(String[] args) throws Exception {
-        System.load(System.getProperty("user.dir") + "/test-suite/libdjinni-tests-jni.so");
+        NativeLibLoader.loadLibs();
         JUnitCore.main("com.dropbox.djinni.test.AllTests");
     }
 }

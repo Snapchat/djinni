@@ -126,6 +126,7 @@ java_test(
         "@maven//:junit_junit",
         "@com_google_protobuf//java/core:core",
     ],
+    jvm_flags = ["-Ddjinni.native_libs_dirs=./test-suite/libdjinni-tests-jni.so"],
 )
 
 macos_unit_test(
