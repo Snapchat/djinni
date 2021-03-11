@@ -97,7 +97,7 @@ JniClassInitializer::JniClassInitializer(std::function<void()> init) {
 }
 
 static jobject g_ourClassLoader;
-static jmethodID g_findClassMethodID;
+static jmethodID g_loadClassMethodID;
 
 static auto& getMethodRecords() {
     static std::vector<std::tuple<const char*, const JNINativeMethod*, size_t>> methods;
@@ -122,7 +122,7 @@ void jniInit(JavaVM * jvm) {
     g_ourClassLoader = (jobject)env->NewGlobalRef(tmp);
 
     jclass classLoaderClass = env->FindClass("java/lang/ClassLoader");
-    g_findClassMethodID = env->GetMethodID(classLoaderClass, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
+    g_loadClassMethodID = env->GetMethodID(classLoaderClass, "loadClass", "(Ljava/lang/String;)Ljava/lang/Class;");
 
     for (const auto& record : getMethodRecords()) {
         auto [classString, nativeMethods, nativeMethodsSize] = record;
@@ -302,7 +302,7 @@ GlobalRef<jclass> jniFindClass(const char * name) {
         env->ExceptionClear();
         // Use cached class loader, needed for our classes on non-Java thread
         jstring jname = env->NewStringUTF(name);
-        clazz = static_cast<jclass>(env->CallObjectMethod(g_ourClassLoader, g_findClassMethodID, jname));
+        clazz = static_cast<jclass>(env->CallObjectMethod(g_ourClassLoader, g_loadClassMethodID, jname));
         jniExceptionCheck(env);
     }
     GlobalRef<jclass> guard(env, LocalRef<jclass>(env, clazz).get());
