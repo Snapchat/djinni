@@ -2,27 +2,40 @@
 
 See the [original dropbox readme](README.dropbox.md) for the full Djinni docs.
 
-## Working on Djinni in an IDE
+## Building
+
+Both the Djinni code generator and test suite are built with Bazel. You can use
+either plain Bazel or [Bazelisk](https://github.com/bazelbuild/bazelisk).
+
+### Building and running the test suite
+
+`bazel test //test-suite:all` builds and then runs all tests.
+
+Or `bazel test //test-suite:djinni-objc-tests` and `bazel test
+//test-suite:djinni-java-tests` to run Objective-C and Java tests separately.
+
+### Building and running the mobile example apps
+
+The Android example app can be build with bazel: `bazel build
+//examples:android-app`, and then install to a device with `adb install
+bazel-bin/examples/android-app.apk`
+
+The iOS example app are built with Xcode. Simply open the project in Xcode and
+it should work.
+
+### Working on the Djinni code generator
 
 You can load the project via Bazel
 
-### Bazel
-
 - Intellij with the Bazel and Scala plugin is required
-- Configure the bazel binary, or download [Bazelisk](https://github.com/bazelbuild/bazelisk)
-  and set it as the binary in the IDEA bazel settings.
+- Configure the bazel binary. If you use Bazelisk, set it as the binary in the IDEA bazel settings.
 - In Intellij, import a new Bazel project.
-    - Workspace directory: `/Users/$HOME/Snapchat/Dev/client/tools/sc-djinni`
+    - Workspace directory: `/Users/$HOME/path-to-djinni-directory`
     - Import project view file: `WORKSPACE/bzl/ide/djinni.bazelproject`
 - Similarly you can also use CLion if you wish to edit the C++ code
     - You can set up any of the cc_* targets after importing the workspace.
 
 You can also use `bazel build //src:djinni` and `bazel run //src:djinni` to verify the build and binary from the command line.
-
-## Future Work
-
-- Add a proper djinni rule to bazel for generation
-  - Main blocker here is djinni does not have deterministic outputs and bazel doesn't support this
 
 ## Modifications
 
@@ -190,5 +203,12 @@ line.
 
 Q. Can we include arbitrary bytes in the `string` type?
 
-A. No! iOS Java strings are unicode, so arbitrary bytes won't necessarily be able
-to get translated into such strings.
+A. No! iOS and Java strings are unicode, so arbitrary bytes won't necessarily be
+able to get translated into such strings.
+
+Q. How many Djinni objects can I have?
+
+A. There is no limit in iOS.  But on Android, JNI has a limit on the number of
+global references you can create (usually ~64k). Each `interface` type Djinni
+object (either native object in java or java object in native) takes up one
+global reference. `record` type objects do not take up global references.
