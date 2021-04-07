@@ -42,8 +42,8 @@ You can also use `bazel build //src:djinni` and `bazel run //src:djinni` to veri
  - Replaced sbt and gyp with Bazel
  - Added move assigment operator to GlobalRef in all djinni_support.hpp files
  - Made JniClassInitializer constructor public to allow arbitrary additional initialization in JNI_OnLoad()
- - Speed up string passing between Java and C++
- - Eliminate CppProxy finalizers
+ - Speed up string passing between Java and C++ (about 5-10x faster depending on string size)
+ - Eliminate CppProxy finalizers (better stability)
  - Injecting code with `DJINNI_FUNCTION_PROLOGUE`
  - Option to generate ObjC protocols
  - Option to generate function prologue
@@ -76,7 +76,7 @@ You should then `#define` the `DJINNI_FUNCTION_PROLOGUE` macro in the specified
 header file to inject whatever code you need there.
 
 For example you could make it log the method name. Or you could instantiate a
-scoped object to log the duration of the call.
+scoped object to trace the duration of the call.
 
 ### Generate all interfaces as ObjC protocols
 
@@ -200,6 +200,15 @@ line.
   parent file. (this means you can put common flags in a file and `@import` it)
 
 ### FAQ
+
+Q. Do I need to use Bazel to build my project?
+
+A. No. You may use whatever build system or IDE you like. All you need for your
+project is including the generated files in it. We use Bazel to build the code
+generator and unit tests, but it's not needed for building user projects. You
+still need to have Bazel installed if you want to run the code generator though,
+because the run_djinni.sh script indirectly uses it to ensure the code generator
+is built and up to date.
 
 Q. Can we include arbitrary bytes in the `string` type?
 
