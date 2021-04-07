@@ -1,0 +1,60 @@
+EnumSixValue = enum {
+    First;
+    Second;
+    Third;
+    Fourth;
+    Fifth;
+    Sixth;
+}
+
+RecordSixInt = record {
+    i1: i64;
+    i2: i64;
+    i3: i64;
+    i4: i64;
+    i5: i64;
+    i6: i64;
+}
+
+# interfaces for native C++ objects, to be returned from C++
+ObjectNative = interface +c {
+    baseline(); 
+}
+
+# interfaces for platform Java or Objective-C objects, to be passed to C++
+ObjectPlatform = interface +j +o {
+    onDone();
+}
+
+# djinni_perf_benchmark: This interface will be implemented in C++ and can be called from any language.
+djinni_perf_benchmark = interface +c {
+    static getInstance(): djinni_perf_benchmark;
+
+    cppTests(): i64;
+
+    baseline();
+
+    argString(s: string);
+    argBinary(b: binary);
+    argEnumSixValue(e: EnumSixValue);
+    argRecordSixInt(r: RecordSixInt);
+    argListInt(v: list<i64>);
+    argArrayInt(v: array<i64>);
+    argObject(c: ObjectPlatform);
+    argListObject(l: list<ObjectPlatform>);
+    argListRecord(l: list<RecordSixInt>);
+    argArrayRecord(a: list<RecordSixInt>);
+
+    returnInt(i: i64): i64;
+    returnString(size: i32): string;
+    returnBinary(size: i32): binary;
+    returnObject(): ObjectNative;
+    returnListInt(size: i32): list<i64>;
+    returnArrayInt(size: i32): array<i64>;
+    returnListObject(size: i32): list<ObjectNative>;
+
+    returnListRecord(size: i32): list<RecordSixInt>;
+    returnArrayRecord(size: i32): list<RecordSixInt>;
+
+    roundTripString(s: string): string;
+}

@@ -1,8 +1,7 @@
-load("@build_bazel_rules_apple//apple:ios.bzl", "ios_application")
-load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kt_android_library")
 
 cc_library(
-    name = "textsort-common",
+    name = "benchmark-common",
     srcs = glob([
         "generated-src/cpp/*.cpp",
         "handwritten-src/cpp/*.cpp",
@@ -24,7 +23,7 @@ cc_library(
 # ------------------------------------------------------------------
 
 java_library(
-    name = "textsort-java",
+    name = "benchmark-java",
     srcs = glob(["generated-src/java/**/*.java"]),
     deps = [
         "//support-lib:djinni-support-java",
@@ -33,13 +32,16 @@ java_library(
 )
 
 cc_library(
-    name = "textsort-jni",
+    name = "benchmark-jni",
     srcs = glob(["generated-src/jni/*.cpp"]),
     hdrs = glob(["generated-src/jni/*.hpp"]),
     includes = ["generated-src/jni"],
-    linkopts = ["-lm", "-ldl"],
+    linkopts = [
+        "-lm",
+        "-ldl",
+    ],
     deps = [
-        ":textsort-common",
+        ":benchmark-common",
         "//support-lib:djinni-support-android",
     ],
     alwayslink = 1,
@@ -47,18 +49,21 @@ cc_library(
 
 # ------------------------------------------------------------------
 
-android_library(
-    name = "textsort-activity",
-    srcs = glob(["handwritten-src/java/com/dropbox/textsort/*.java"]),
-    custom_package = "com.dropbox.textsort",
+kt_android_library(
+    name = "benchmark-activity",
+    srcs = glob(["android/app/src/main/java/com/snapchat/djinni/benchmark/*.kt"]),
+    custom_package = "com.snapchat.djinni.benchmark",
     manifest = "android/app/src/main/AndroidManifest.xml",
     resource_files = glob(["android/app/src/main/res/**"]),
-    deps = [":textsort-java",],
+    deps = [":benchmark-java"],
 )
 
 android_binary(
-    name = "android-app",
-    custom_package = "com.dropbox.textsort",
+    name = "perftest",
+    custom_package = "com.snapchat.djinni.benchmark",
     manifest = "android/AndroidManifest.xml",
-    deps = [":textsort-activity", ":textsort-jni"],
+    deps = [
+        ":benchmark-activity",
+        ":benchmark-jni",
+    ],
 )
