@@ -6,3 +6,4 @@
 .clwb/
 # djinni output directories
 djinni-output-temp/
+.bazelversion
