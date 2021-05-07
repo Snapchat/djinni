@@ -1,0 +1,17 @@
+@extern "../../support-lib/dataref.yaml"
+@extern "../../support-lib/dataview.yaml"
+
+DataRefTest = interface +c {
+  sendData(data: DataRef);
+  retriveAsBin(): binary;
+  sendMutableData(data: DataRef);
+  
+  generateData(): DataRef;
+  dataFromVec() : DataRef;
+  dataFromStr() : DataRef;
+
+  sendDataView(data: DataView): binary;
+  recvDataView(): DataView;
+
+  static create() : DataRefTest;
+}

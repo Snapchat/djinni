@@ -70,6 +70,7 @@ public class NativeObjectManager {
                                     wrapper.cleanup();
                                 } catch (Exception e) {
                                     // Nothing we can do, just keep going
+                                    System.out.println("Exception in native cleanup: " + e.getCause());
                                 }
                             }
                         }

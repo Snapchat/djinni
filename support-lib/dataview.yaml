@@ -1,0 +1,28 @@
+name: DataView
+typedef: 'record'
+params: []
+prefix: ""
+cpp:
+  typename: '::snapchat::djinni::DataView'
+  header: '"DataView.hpp"'
+  byValue: false
+objc:
+  typename: 'NSData'
+  pointer: true
+  hash: '%s.hash'
+  boxed: 'NSData'
+  header: '<Foundation/Foundation.h>'
+objcpp:
+  translator: '::snapchat::djinni::NativeDataView'
+  header: '"DataView_objc.hpp"'
+java:
+  reference: true
+  typename: 'java.nio.ByteBuffer'
+  generic: true
+  hash: '%s.hashCode()'
+  boxed: 'java.nio.ByteBuffer'
+jni:
+  translator: '::snapchat::djinni::NativeDataView'
+  header: '"DataView_jni.hpp"'
+  typename: jobject
+  typeSignature: 'Ljava/nio/ByteBuffer;'

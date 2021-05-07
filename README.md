@@ -53,6 +53,8 @@ You can also use `bazel build //src:djinni` and `bazel run //src:djinni` to veri
  - outcome<> type support
  - Protobuf type support
  - Local flags with `@flag` directive
+ - DataView for copy free data passing
+ - DateRef for copy free data passing with ownership
 
 ## Using new features
 
@@ -198,6 +200,38 @@ line.
   else.
 - `@import`ed files can include `@flag` lines too, and they will apply to the
   parent file. (this means you can put common flags in a file and `@import` it)
+
+### Exposing data across language boundary with DataView
+
+The builtin `binary` type always copies data across language boundary. It is
+simple to use but can be expensive when the size of the data is large or when
+the same data is passed back and force many times.
+
+The `DataView` type is a viewport into a buffer owned by the other language. It
+maps to the custom `DataView` class in C++. In Java it is mapped to
+`java.nio.ByteBuffer` (direct buffer). And in Objective-C, it is mapped to
+`NSData`.
+
+It is important to keep in mind that `DataView` does not carry ownership. If the
+underlying data is destroyed by the owner, then it will point to an invalid
+memory location. It is your responsibility to make sure the buffer remains valid
+while you use it.
+
+### Use DataRef to pass data across language boundary with ownership
+
+`DataRef` is a buffer in Java or Objective-C heap but accessible from C++. It is
+also mapped to `java.nio.ByteBuffer` and `NSData`. But unlike `DataView`, it
+owns the buffer so destroying the object on one side of the language boundary
+does not destroy the underlying buffer as long as the other side still holds it.
+
+Since the underlying data object is in Java or Object-C, it is more expensive to
+create than `DataView`. But the ownership allows you to hold on to the object
+without worrying about memory safety.
+
+DataRef has a special optimization to take over the data from
+`std::vector<uint8_t>` and `std::string`. If you construct a `DataRef` with an
+R-value reference of these types, then `DataRef` can steal the buffer from them
+without copying the bytes.
 
 ### FAQ
 
