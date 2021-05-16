@@ -1,6 +1,14 @@
-# Snapchat Djinni
+# Djinni
 
-See the [original dropbox readme](README.dropbox.md) for the full Djinni docs.
+Djinni is a project originally created by Dropbox that generates bridging code
+between C++ and other programming languages. While Dropbox has stopped
+maintaining the open source Djinni repository on Github, we at Snapchat have
+developed our internal fork since then. After contacting Dropbox, we are now
+officially taking over the maintenance of Djinni from Dropbox and will keep
+developing it here.
+
+This file only covers the parts that have been changed.  Please see the
+[original dropbox readme](README.dropbox.md) for the full Djinni documentation.
 
 ## Building
 
@@ -35,7 +43,8 @@ You can load the project via Bazel
 - Similarly you can also use CLion if you wish to edit the C++ code
     - You can set up any of the cc_* targets after importing the workspace.
 
-You can also use `bazel build //src:djinni` and `bazel run //src:djinni` to verify the build and binary from the command line.
+You can also use `bazel build //src:djinni` and `bazel run //src:djinni` to
+verify the build and binary from the command line.
 
 ## Modifications
 
@@ -55,12 +64,13 @@ You can also use `bazel build //src:djinni` and `bazel run //src:djinni` to veri
  - Local flags with `@flag` directive
  - DataView for copy free data passing
  - DateRef for copy free data passing with ownership
+ - Bug fixes
 
 ## Using new features
 
 ### Injecting code to Djinni calls
 
-sc-djinni introduced two new switches:
+Two new switches are introduced:
 
 ```
 --jni-function-prologue-file "path/to/header_file.h"
@@ -85,7 +95,7 @@ scoped object to trace the duration of the call.
 By default, Djinni only generates interfaces as ObjC `@protocol` when these
 interfaces are tagged with `+o`.  Otherwise they become `@interface` in ObjC.
 
-sc-djinni introduces a new switch to override the default:
+A new switch is introduced to override the default:
 
 `--objc-gen-protocol true`
 
