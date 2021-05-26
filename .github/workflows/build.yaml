@@ -1,0 +1,28 @@
+name: Bazel build
+
+on:
+    push:
+      branches:
+        - master
+    pull_request: {}
+
+jobs:
+    build:
+        name: Build and Test
+        runs-on: ubuntu-latest
+        steps:
+
+        - name: Checkout repository
+          uses: actions/checkout@v2
+
+        - name: Setup cache
+          uses: actions/cache@v2
+          with:
+            path: "/home/runner/.cache/bazel"
+            key: ${{ runner.os }}-${{ env.cache-name }}-bazel
+
+        - name: Build
+          run: src/build.sh
+
+        - name: Test
+          run: bazel test //test-suite:all
