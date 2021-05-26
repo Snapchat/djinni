@@ -1,0 +1,32 @@
+name: Build and Test
+
+on:
+    push:
+      branches:
+        - master
+    pull_request: {}
+
+jobs:
+    build:
+        name: Build and Test
+        runs-on: macos-latest
+        steps:
+
+        - name: Checkout repository
+          uses: actions/checkout@v2
+
+        - name: Cache bazel build results
+          uses: actions/cache@v2
+          env:
+            cache-name: bazel-cache
+          with:
+            path: ~/.cache/bazel
+            key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.ref }}
+            restore-keys: |
+              ${{ runner.os }}-${{ env.cache-name }}-master
+
+        - name: Build
+          run: bazel build //src:djinni
+
+        - name: Test
+          run: bazel test //test-suite:all

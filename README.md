@@ -12,6 +12,8 @@ This file only covers the parts that have been changed.  Please see the
 
 ## Building
 
+![Bazel Build](https://github.com/Snapchat/djinni/workflows/Build%20and%20Test/badge.svg)
+
 Both the Djinni code generator and test suite are built with Bazel. You can use
 either plain Bazel or [Bazelisk](https://github.com/bazelbuild/bazelisk).
 
