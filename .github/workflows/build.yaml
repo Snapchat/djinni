@@ -1,4 +1,4 @@
-name: Bazel build
+name: Build and Test
 
 on:
     push:
@@ -9,20 +9,24 @@ on:
 jobs:
     build:
         name: Build and Test
-        runs-on: ubuntu-latest
+        runs-on: macos-latest
         steps:
 
         - name: Checkout repository
           uses: actions/checkout@v2
 
-        - name: Setup cache
+        - name: Cache bazel build results
           uses: actions/cache@v2
+          env:
+            cache-name: bazel-cache
           with:
-            path: "/home/runner/.cache/bazel"
-            key: ${{ runner.os }}-${{ env.cache-name }}-bazel
+            path: ~/.cache/bazel
+            key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.ref }}
+            restore-keys: |
+              ${{ runner.os }}-${{ env.cache-name }}-master
 
         - name: Build
-          run: src/build.sh
+          run: bazel build //src:djinni
 
         - name: Test
           run: bazel test //test-suite:all
