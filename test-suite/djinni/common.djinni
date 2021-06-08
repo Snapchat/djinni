@@ -16,3 +16,4 @@
 @import "varnames.djinni"
 @import "relative_paths.djinni"
 @import "array.djinni"
+@import "nscopying.djinni"

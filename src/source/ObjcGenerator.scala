@@ -197,7 +197,12 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
     // Generate the header file for record
     writeObjcFile(marshal.headerName(objcName), origin, refs.header, w => {
       writeDoc(w, doc)
-      w.wl(s"@interface $self : NSObject")
+
+      if (r.derivingTypes.contains(DerivingType.NSCopying)) {
+        w.wl(s"@interface $self : NSObject<NSCopying>")
+      } else {
+        w.wl(s"@interface $self : NSObject")
+      }
 
       def writeInitializer(sign: String, prefix: String) {
         val decl = s"$sign (nonnull instancetype)$prefix$firstInitializerArg"
@@ -397,6 +402,14 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
           }
           w.wl("return NSOrderedSame;")
         }
+        w.wl
+      }
+
+      if (r.derivingTypes.contains(DerivingType.NSCopying)) {
+        w.wl("- (id)copyWithZone:(NSZone *)zone")
+        w.wl("{")
+        w.wl("    return self;")
+        w.wl("}")
         w.wl
       }
 

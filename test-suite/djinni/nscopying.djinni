@@ -1,0 +1,3 @@
+support_copying = record {
+  x: i32;
+} deriving (nscopying)
