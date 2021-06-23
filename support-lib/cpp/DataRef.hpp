@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <string.h>
 
 #if !defined(DATAREF_JNI) && !defined(DATAREF_OBJC)
   #if defined(__ANDROID__)
