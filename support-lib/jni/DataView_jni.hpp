@@ -11,7 +11,9 @@ struct NativeDataView {
     using JniType = jobject;
 
     static CppType toCpp(JNIEnv* jniEnv, JniType o) {
-        return DataView((uint8_t*)jniEnv->GetDirectBufferAddress(o), (size_t)jniEnv->GetDirectBufferCapacity(o));
+        auto size = jniEnv->GetDirectBufferCapacity(o);
+        assert(size != -1); // GetDirectBufferCapacity() returns -1 when the ByteBuffer is not direct
+        return DataView(reinterpret_cast<uint8_t*>(jniEnv->GetDirectBufferAddress(o)), static_cast<size_t>(size));
     }
 
     static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c) {
