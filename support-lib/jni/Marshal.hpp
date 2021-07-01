@@ -541,14 +541,8 @@ namespace djinni
         const GlobalRef<jclass> clazz { jniFindClass("com/snapchat/djinni/Outcome") };
         const jmethodID method_from_result { jniGetStaticMethodID(clazz.get(), "fromResult", "(Ljava/lang/Object;)Lcom/snapchat/djinni/Outcome;") };
         const jmethodID method_from_error { jniGetStaticMethodID(clazz.get(), "fromError", "(Ljava/lang/Object;)Lcom/snapchat/djinni/Outcome;") };
-        const jmethodID method_result { jniGetMethodID(clazz.get(), "result", "()Ljava/util/Optional;") };
-        const jmethodID method_error { jniGetMethodID(clazz.get(), "error", "()Ljava/util/Optional;") };
-    };
-    struct OptionalJniInfo
-    {
-        const GlobalRef<jclass> clazz { jniFindClass("java/util/Optional") };
-        const jmethodID method_is_present { jniGetMethodID(clazz.get(), "isPresent", "()Z") };
-        const jmethodID method_get { jniGetMethodID(clazz.get(), "get", "()Ljava/lang/Object;") };
+        const jmethodID method_result_or { jniGetMethodID(clazz.get(), "resultOr", "(Ljava/lang/Object;)Ljava/lang/Object;") };
+        const jmethodID method_error_or_null { jniGetMethodID(clazz.get(), "errorOrNull", "()Ljava/lang/Object;") };
     };
 
     template <class RESULT, class ERROR>
@@ -567,23 +561,14 @@ namespace djinni
         static CppType toCpp(JNIEnv* jniEnv, JniType j)
         {
             const auto& outcomeJniInfo = JniClass<OutcomeJniInfo>::get();
-            const auto& optJniInfo = JniClass<OptionalJniInfo>::get();
-            auto r = LocalRef<jobject>(jniEnv, jniEnv->CallObjectMethod(j, outcomeJniInfo.method_result));
+            auto r = LocalRef<jobject>(jniEnv, jniEnv->CallObjectMethod(j, outcomeJniInfo.method_result_or, nullptr));
             jniExceptionCheck(jniEnv);
-            auto resultPresent = jniEnv->CallBooleanMethod(r.get(), optJniInfo.method_is_present);
-            jniExceptionCheck(jniEnv);
-            if (resultPresent == JNI_TRUE) {
-                auto rr = LocalRef<jobject>(jniEnv, jniEnv->CallObjectMethod(r, optJniInfo.method_get));
-                jniExceptionCheck(jniEnv);
-                return RESULT::Boxed::toCpp(jniEnv, reinterpret_cast<typename RESULT::Boxed::JniType>(rr.get()));
+            if (r.get() != nullptr) {
+                return RESULT::Boxed::toCpp(jniEnv, reinterpret_cast<typename RESULT::Boxed::JniType>(r.get()));
             } else {
+                auto e = LocalRef<jobject>(jniEnv, jniEnv->CallObjectMethod(j, outcomeJniInfo.method_error_or_null));
                 // if result is not present then error must be present, we can skip the present check
-                auto e = LocalRef<jobject>(
-                    jniEnv, jniEnv->CallObjectMethod(j, outcomeJniInfo.method_error));
-                jniExceptionCheck(jniEnv);
-                auto ee = LocalRef<jobject>(jniEnv, jniEnv->CallObjectMethod(e, optJniInfo.method_get));
-                jniExceptionCheck(jniEnv);
-                return make_unexpected(ERROR::Boxed::toCpp(jniEnv, reinterpret_cast<typename ERROR::Boxed::JniType>(ee.get())));
+                return make_unexpected(ERROR::Boxed::toCpp(jniEnv, reinterpret_cast<typename ERROR::Boxed::JniType>(e.get())));
             }
         }
 

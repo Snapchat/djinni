@@ -2,7 +2,6 @@ package com.snapchat.djinni;
 
 import java.util.function.Function;
 import java.util.Objects;
-import java.util.Optional;
 
 public abstract class Outcome<Result, Error> {
     // No default construction. This object can only be created via the static
@@ -15,8 +14,8 @@ public abstract class Outcome<Result, Error> {
         if (o == null) return false;
         if (!(o instanceof Outcome)) return false;
         Outcome other = (Outcome) o;
-        return match(x -> x.equals(other.result().orElse(null)),
-                     x -> x.equals(other.error().orElse(null)));
+        return match(x -> x.equals(other.resultOr(null)),
+                     x -> x.equals(other.errorOrNull()));
     }
 
     @Override
@@ -30,17 +29,13 @@ public abstract class Outcome<Result, Error> {
     public abstract <R> R match(Function<? super Result, ? extends R> handleResult,
                                 Function<? super Error, ? extends R> handleError);
 
-    // Provide access to result as optional
-    public Optional<Result> result() {
-        return this.match(Optional::of, x -> Optional.empty());
-    }
     // Returns either result or default value
     public Result resultOr(Result defaultResult) {
         return this.match(x -> x, x -> defaultResult);
     }
-    // Provide access to error as optional
-    public Optional<Error> error() {
-        return this.match(x -> Optional.empty(), Optional::of);
+
+    public Error errorOrNull() {
+        return this.match(x -> null, x -> x);
     }
     
     // Construct Outcome from result
