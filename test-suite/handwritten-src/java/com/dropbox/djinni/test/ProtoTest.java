@@ -54,6 +54,6 @@ public class ProtoTest extends TestCase {
         assertEquals(p.getName(), "tom");
 
         Outcome<Person, Integer> r = ProtoTests.stringToProtoOutcome("tom");
-        assertEquals(r.result().get().getName(), "tom");
+        assertEquals(r.resultOr(null).getName(), "tom");
     }
 }

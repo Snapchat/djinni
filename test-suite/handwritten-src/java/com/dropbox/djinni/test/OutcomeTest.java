@@ -8,14 +8,14 @@ public class OutcomeTest extends TestCase {
         // construct result outcome in native and pass to objc
         Outcome r = TestOutcome.getSuccessOutcome();
         // results are equal
-        assertEquals(r.result().get(), "hello");
+        assertEquals(r.resultOr(""), "hello");
         // outcome objects compare equal
         assertEquals(r, Outcome.fromResult("hello"));
 
         // construct error outcome in native and pass to objc
         Outcome e = TestOutcome.getErrorOutcome();
         // error values are equal
-        assertEquals(e.error().get(), 42);
+        assertEquals(e.errorOrNull(), 42);
         // outcome objects compare equal
         assertEquals(e, Outcome.fromError(42));
 
@@ -37,11 +37,11 @@ public class OutcomeTest extends TestCase {
 
         // test outcome as nested object
         NestedOutcome nr = TestOutcome.getNestedSuccessOutcome();
-        assertEquals(nr.getO().result().get(), Integer.valueOf(42));
+        assertEquals(nr.getO().resultOr(null), Integer.valueOf(42));
         assertEquals(nr, new NestedOutcome(Outcome.fromResult(42)));
 
         NestedOutcome ne = TestOutcome.getNestedErrorOutcome();
-        assertEquals(ne.getO().error().get(), "hello");
+        assertEquals(ne.getO().errorOrNull(), "hello");
         assertEquals(ne, new NestedOutcome(Outcome.fromError("hello")));
 
         assertEquals(TestOutcome.putNestedSuccessOutcome(new NestedOutcome(Outcome.fromResult(42))), 42);
