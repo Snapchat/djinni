@@ -67,7 +67,9 @@ public:
         // call ByteBuffer.isReadOnly() to determine mutability
         _readonly = env->CallBooleanMethod(_data.get(), ::djinni::JniClass<BufferClassInfo>::get().isReadOnly) != 0;
         ::djinni::jniExceptionCheck(env);
-        _len = static_cast<size_t>(env->GetDirectBufferCapacity(_data.get()));
+        auto len = env->GetDirectBufferCapacity(_data.get());
+        assert(len != -1); // GetDirectBufferCapacity() returns -1 when the ByteBuffer is not direct
+        _len = static_cast<size_t>(len);
         _buf = reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(_data.get()));
     }
     // take over a std::vector's buffer without copying it
