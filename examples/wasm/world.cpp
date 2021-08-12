@@ -10,7 +10,26 @@ using namespace emscripten;
 std::map<val, void*> jsProxyCache;
 std::map<void*, val> cppProxyCache;
 
-template<class I, class Self, class JsProxy>
+class JsProxyBase {
+public:
+    JsProxyBase(val v) : _js(std::move(v)) {
+        std::cout << "+proxy" << std::endl;
+        jsProxyCache[_js] = this;
+    }
+
+    virtual ~JsProxyBase() {
+        std::cout << "~JsProxy" << std::endl;
+        jsProxyCache.erase(_js);
+    }
+
+    const val& _jsRef() const {
+        return _js;
+    }
+private:
+    val _js;
+};
+
+template<typename I, typename Self>
 struct JsInterface {
     static void nativeDestroy(const std::shared_ptr<I>& cpp) {
         std::cout << "delete entry from cppProxyCache" << std::endl;
@@ -18,7 +37,7 @@ struct JsInterface {
         cppProxyCache.erase(cpp.get());
     }
     static val _toJs(const std::shared_ptr<I>& c) {
-        if (auto* p = dynamic_cast<JsProxy*>(c.get())) {
+        if (auto* p = dynamic_cast<JsProxyBase*>(c.get())) {
             // unwrap js object
             std::cout << "unwrap js object" << std::endl;
             return p->_jsRef();
@@ -50,31 +69,12 @@ struct JsInterface {
             if (i != jsProxyCache.end()) {
                 // existing js proxy
                 std::cout << "existing js proxy" << std::endl;
-                return reinterpret_cast<JsProxy*>(i->second)->shared_from_this();
+                return reinterpret_cast<typename Self::JsProxy*>(i->second)->shared_from_this();
             } else {
-                return std::make_shared<JsProxy>(js);
+                return std::make_shared<typename Self::JsProxy>(js);
             }
         }
     }
-};
-
-class JsProxyBase {
-public:
-    JsProxyBase(val v) : _js(std::move(v)) {
-        std::cout << "+proxy" << std::endl;
-        jsProxyCache[_js] = this;
-    }
-
-    virtual ~JsProxyBase() {
-        std::cout << "~JsProxy" << std::endl;
-        jsProxyCache.erase(_js);
-    }
-
-    const val& _jsRef() const {
-        return _js;
-    }
-private:
-    val _js;
 };
 
 // djinni generated interface
@@ -88,20 +88,15 @@ public:
     static bool comp(const std::shared_ptr<MyInterface>& i, const std::shared_ptr<MyInterface>& j);
 };
 
-// djinni generated JS proxy
-class MyInterface_JsProxy:public JsProxyBase,
-                          public MyInterface,
-                          public std::enable_shared_from_this<MyInterface_JsProxy> {
-public:
-    MyInterface_JsProxy(val v) : JsProxyBase(std::move(v)) {}
-    
-    void foo(int x) override {
-        _jsRef().call<void>("foo", x);
-    }
-};
-
 // djinni generated stubs
-struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface, MyInterface_JsProxy> {
+struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
+    class JsProxy: public JsProxyBase, public MyInterface, public std::enable_shared_from_this<JsProxy> {
+    public:
+        JsProxy(val v) : JsProxyBase(std::move(v)) {}
+        void foo(int x) override {
+            _jsRef().call<void>("foo", x);
+        }
+    };
     static val cppProxy() {
         static val inst = val::module_property("MyInterface_CppProxy");
         return inst;
