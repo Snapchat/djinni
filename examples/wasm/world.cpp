@@ -6,19 +6,57 @@
 
 using namespace emscripten;
 
+template<typename T>
+class InstanceTracker {
+    static int& count() {
+        static int theCount = 0;
+        return theCount;
+    }
+public:
+    InstanceTracker() {
+        std::cout << "++" << typeid(T).name() << " => " << ++count() << std::endl;
+    }
+    virtual ~InstanceTracker() {
+        std::cout << "--" << typeid(T).name() << " => " << --count() << std::endl;
+    }
+};
+
 // library code
+template<typename T>
+class Primitive {
+public:
+    using CppType = T;
+    using JsType = T;
+    using Boxed = Primitive;
+
+    static CppType toCpp(const JsType& j)
+    {
+        return j;
+    }
+    static JsType fromCpp(const CppType& c)
+    {
+        return c;
+    }
+};
+
+using Bool = Primitive<bool>;
+using I8 = Primitive<int8_t>;
+using I16 = Primitive<int16_t>;
+using I32 = Primitive<int32_t>;
+using I64 = Primitive<int64_t>;
+using F32 = Primitive<float>;
+using F64 = Primitive<double>;
+
 std::map<val, void*> jsProxyCache;
 std::map<void*, val> cppProxyCache;
 
 class JsProxyBase {
 public:
     JsProxyBase(val v) : _js(std::move(v)) {
-        std::cout << "+proxy" << std::endl;
         jsProxyCache[_js] = this;
     }
 
     virtual ~JsProxyBase() {
-        std::cout << "~JsProxy" << std::endl;
         jsProxyCache.erase(_js);
     }
 
@@ -90,7 +128,10 @@ public:
 
 // djinni generated stubs
 struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
-    class JsProxy: public JsProxyBase, public MyInterface, public std::enable_shared_from_this<JsProxy> {
+    class JsProxy: public JsProxyBase,
+                   public MyInterface,
+                   public InstanceTracker<JsProxy>,
+                   public std::enable_shared_from_this<JsProxy> {
     public:
         JsProxy(val v) : JsProxyBase(std::move(v)) {}
         void foo(int x) override {
@@ -133,11 +174,10 @@ EMSCRIPTEN_BINDINGS(MyInterface) {
 }
 
 // user implementation
-class MyInterfaceImpl : public MyInterface {
+class MyInterfaceImpl : public MyInterface, public InstanceTracker<MyInterfaceImpl> {
 public:
-    ~MyInterfaceImpl() override {
-        std::cout << "~MyInterfaceImpl" << std::endl;
-    }
+    MyInterfaceImpl() {}
+
     void foo(int x) override {
         std::cout << "MyInterfaceImpl::foo(" << x <<")" << std::endl;
     }
