@@ -47,17 +47,40 @@ using I64 = Primitive<int64_t>;
 using F32 = Primitive<float>;
 using F64 = Primitive<double>;
 
-std::map<val, void*> jsProxyCache;
+class String {
+public:
+    using CppType = std::string;
+    using JsType = val;
+    using Boxed = String;
+    
+    static CppType toCpp(const JsType& j)
+    {
+        return j.as<CppType>();
+    }
+    static JsType fromCpp(const CppType& c)
+    {
+        return JsType{c};
+    }
+};
+
+// TODO: optimize
+struct JsProxyCacheEntry {
+    val js;
+    void* cpp;
+};
+std::vector<JsProxyCacheEntry> jsProxyCache;
 std::map<void*, val> cppProxyCache;
 
 class JsProxyBase {
 public:
-    JsProxyBase(val v) : _js(std::move(v)) {
-        jsProxyCache[_js] = this;
+    JsProxyBase(const val& v) : _js(v) {
+        jsProxyCache.emplace_back(JsProxyCacheEntry{_js, this});
     }
 
     virtual ~JsProxyBase() {
-        jsProxyCache.erase(_js);
+        jsProxyCache.erase(std::remove_if(jsProxyCache.begin(), jsProxyCache.end(), [&](const auto& x){
+            return x.js == _js;
+        }), jsProxyCache.end());
     }
 
     const val& _jsRef() const {
@@ -103,11 +126,12 @@ struct JsInterface {
             std::cout << "getting cpp object" << std::endl;
             return js[nativeRef].as<std::shared_ptr<I>>();
         } else { // is jsproxy
-            auto i = jsProxyCache.find(js);
+            auto i = std::find_if(jsProxyCache.begin(), jsProxyCache.end(), [&](const auto& x){
+                return x.js == js;
+            });
             if (i != jsProxyCache.end()) {
-                // existing js proxy
                 std::cout << "existing js proxy" << std::endl;
-                return reinterpret_cast<typename Self::JsProxy*>(i->second)->shared_from_this();
+                return reinterpret_cast<typename Self::JsProxy*>(i->cpp)->shared_from_this();
             } else {
                 return std::make_shared<typename Self::JsProxy>(js);
             }
@@ -120,6 +144,7 @@ class MyInterface {
 public:
     virtual ~MyInterface() = default;
     virtual void foo(int x) = 0;
+    virtual std::string testStr(const std::string& x) = 0;
     static std::shared_ptr<MyInterface> create();
     static std::shared_ptr<MyInterface> instance();
     static std::shared_ptr<MyInterface> pass(const std::shared_ptr<MyInterface>& i);
@@ -133,9 +158,12 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
                    public InstanceTracker<JsProxy>,
                    public std::enable_shared_from_this<JsProxy> {
     public:
-        JsProxy(val v) : JsProxyBase(std::move(v)) {}
+        JsProxy(const val& v) : JsProxyBase(v) {}
         void foo(int x) override {
-            _jsRef().call<void>("foo", x);
+            return _jsRef().call<void>("foo", x);
+        }
+        std::string testStr(const std::string& x) override {
+            return String::toCpp(_jsRef().call<val>("testStr", String::fromCpp(x)));
         }
     };
     static val cppProxy() {
@@ -145,6 +173,9 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
     // ---------
     static void foo(const std::shared_ptr<MyInterface>& self, int x) {
         return self->foo(x);
+    }
+    static val testStr(const std::shared_ptr<MyInterface>& self, const val& x) {
+        return String::fromCpp(self->testStr(String::toCpp(x)));
     }
     static val create() {
         return _toJs(MyInterface::create());
@@ -165,6 +196,7 @@ EMSCRIPTEN_BINDINGS(MyInterface) {
     class_<MyInterface>("MyInterface")
         .smart_ptr<std::shared_ptr<MyInterface>>("MyInterface")
         .function("foo", &NativeMyInterface::foo)
+        .function("testStr", &NativeMyInterface::testStr)
         .class_function("create", &NativeMyInterface::create)
         .class_function("instance", &NativeMyInterface::instance)
         .class_function("pass", &NativeMyInterface::pass)
@@ -180,6 +212,9 @@ public:
 
     void foo(int x) override {
         std::cout << "MyInterfaceImpl::foo(" << x <<")" << std::endl;
+    }
+    std::string testStr(const std::string& x) override {
+        return x + " 123";
     }
 };
 

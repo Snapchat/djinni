@@ -16,6 +16,9 @@ class MyInterface_CppProxy {
     foo(x) {
         return this._nativeRef.foo(x);
     }
+    testStr(x) {
+        return this._nativeRef.testStr(x);
+    }
 }
 Module.MyInterface_CppProxy = MyInterface_CppProxy;
 
@@ -24,21 +27,24 @@ class MyInterfaceJS {
     foo(x) {
         console.log("MyInterfaceJS.foo(" + x + ")");
     }
+    testStr(x) {
+        console.log("MyInterfaceJS.testStr(" + x + ")");
+    }
 }
 
 function same(a, b, desc) {
     if (a === b) {
-        console.log(desc + ': pass');
+        console.log(desc + ': yes');
     } else {
-        console.log(desc + ': fail');
+        console.log(desc + ': no');
     }
 }
 
 function same_c(a, b, desc) {
     if (Module.MyInterface.comp(a, b)) {
-        console.log(desc + ': pass');
+        console.log(desc + ': yes');
     } else {
-        console.log(desc + ': fail');
+        console.log(desc + ': no');
     }
 }
 
@@ -59,11 +65,17 @@ let main = function() {
         var i = new MyInterfaceJS();
         var j = new MyInterfaceJS();
         same_c(i, j, "same js object passed to cpp twice");
+        same_c(i, i, "same js object passed to cpp twice");
     }
 
     {
         var i = new MyInterfaceJS();
         var j = Module.MyInterface.pass(i);
         same(i, j, "js object to cpp and back");
+    }
+
+    {
+        var i = Module.MyInterface.instance();
+        console.log("got string: " + i.testStr("hello"));
     }
 }
