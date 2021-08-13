@@ -75,18 +75,14 @@ public:
     
     static CppType toCpp(const JsType& j)
     {
-        static val bigintType = val::global("BigInt");
-        auto milliesSinceEpoch = std::chrono::milliseconds(bigintType(j.call<val>("getTime")).as<int64_t>());
+        auto milliesSinceEpoch = std::chrono::milliseconds(static_cast<int64_t>(j.call<val>("getTime").as<double>()));
         return CppType(milliesSinceEpoch);
     }
     static JsType fromCpp(const CppType& c)
     {
         auto milliesSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(c.time_since_epoch());
         static val dateType = val::global("Date");
-        static val number = val::global("Number");
-        auto d = dateType.new_();
-        d.call<void>("setTime", number(milliesSinceEpoch.count()));
-        return d;
+        return dateType.new_(static_cast<double>(milliesSinceEpoch.count()));
     }
 };
 
