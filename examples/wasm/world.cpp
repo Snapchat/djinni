@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <map>
+#include <vector>
 
 using namespace emscripten;
 
@@ -46,20 +47,23 @@ using I32 = Primitive<int32_t>;
 using I64 = Primitive<int64_t>;
 using F32 = Primitive<float>;
 using F64 = Primitive<double>;
+using String = Primitive<std::string>;
+using WString = Primitive<std::wstring>;
 
-class String {
+class Binary {
 public:
-    using CppType = std::string;
+    using CppType = std::vector<uint8_t>;
     using JsType = val;
-    using Boxed = String;
+    using Boxed = Binary;
     
     static CppType toCpp(const JsType& j)
     {
-        return j.as<CppType>();
+        return convertJSArrayToNumberVector<uint8_t>(j);
     }
     static JsType fromCpp(const CppType& c)
     {
-        return JsType{c};
+        val memoryView{ typed_memory_view(c.size(), c.data()) };
+        return memoryView.call<val>("slice", 0);
     }
 };
 
@@ -143,8 +147,9 @@ struct JsInterface {
 class MyInterface {
 public:
     virtual ~MyInterface() = default;
-    virtual void foo(int x) = 0;
-    virtual std::string testStr(const std::string& x) = 0;
+    virtual void foo(int32_t x) = 0;
+    virtual std::wstring testStr(const std::wstring& x) = 0;
+    virtual std::vector<uint8_t> testBin(const std::vector<uint8_t>& bin) = 0;
     static std::shared_ptr<MyInterface> create();
     static std::shared_ptr<MyInterface> instance();
     static std::shared_ptr<MyInterface> pass(const std::shared_ptr<MyInterface>& i);
@@ -162,8 +167,11 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
         void foo(int x) override {
             return _jsRef().call<void>("foo", x);
         }
-        std::string testStr(const std::string& x) override {
-            return String::toCpp(_jsRef().call<val>("testStr", String::fromCpp(x)));
+        std::wstring testStr(const std::wstring& x) override {
+            return WString::toCpp(_jsRef().call<std::wstring>("testStr", WString::fromCpp(x)));
+        }
+        std::vector<uint8_t> testBin(const std::vector<uint8_t>& bin) override {
+            return Binary::toCpp(_jsRef().call<val>("testBin", Binary::fromCpp(bin)));
         }
     };
     static val cppProxy() {
@@ -171,11 +179,14 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
         return inst;
     }
     // ---------
-    static void foo(const std::shared_ptr<MyInterface>& self, int x) {
-        return self->foo(x);
+    static void foo(const std::shared_ptr<MyInterface>& self, int32_t x) {
+        return self->foo(I32::toCpp(x));
     }
-    static val testStr(const std::shared_ptr<MyInterface>& self, const val& x) {
-        return String::fromCpp(self->testStr(String::toCpp(x)));
+    static std::wstring testStr(const std::shared_ptr<MyInterface>& self, const std::wstring& x) {
+        return WString::fromCpp(self->testStr(WString::toCpp(x)));
+    }
+    static val testBin(const std::shared_ptr<MyInterface>& self, const val& bin) {
+        return Binary::fromCpp(self->testBin(Binary::toCpp(bin)));
     }
     static val create() {
         return _toJs(MyInterface::create());
@@ -197,6 +208,7 @@ EMSCRIPTEN_BINDINGS(MyInterface) {
         .smart_ptr<std::shared_ptr<MyInterface>>("MyInterface")
         .function("foo", &NativeMyInterface::foo)
         .function("testStr", &NativeMyInterface::testStr)
+        .function("testBin", &NativeMyInterface::testBin)
         .class_function("create", &NativeMyInterface::create)
         .class_function("instance", &NativeMyInterface::instance)
         .class_function("pass", &NativeMyInterface::pass)
@@ -210,11 +222,16 @@ class MyInterfaceImpl : public MyInterface, public InstanceTracker<MyInterfaceIm
 public:
     MyInterfaceImpl() {}
 
-    void foo(int x) override {
+    void foo(int32_t x) override {
         std::cout << "MyInterfaceImpl::foo(" << x <<")" << std::endl;
     }
-    std::string testStr(const std::string& x) override {
-        return x + " 123";
+    std::wstring testStr(const std::wstring& x) override {
+        return x + L" 123";
+    }
+    std::vector<uint8_t> testBin(const std::vector<uint8_t>& bin) override {
+        auto v = bin;
+        v.push_back(123);
+        return v;
     }
 };
 

@@ -1,10 +1,9 @@
 // ---- Library code
-const djinniFinalizerRegistry = new FinalizationRegistry(nativeRef => {
+Module.djinniFinalizerRegistry = new FinalizationRegistry(nativeRef => {
     console.log("finalizing " + nativeRef);
     nativeRef.nativeDestroy();
     nativeRef.delete();
 });
-Module.djinniFinalizerRegistry = djinniFinalizerRegistry;
 
 // ---- Generated javascript
 class MyInterface_CppProxy {
@@ -19,6 +18,9 @@ class MyInterface_CppProxy {
     testStr(x) {
         return this._nativeRef.testStr(x);
     }
+    testBin(x) {
+        return this._nativeRef.testBin(x);
+    }
 }
 Module.MyInterface_CppProxy = MyInterface_CppProxy;
 
@@ -29,6 +31,9 @@ class MyInterfaceJS {
     }
     testStr(x) {
         console.log("MyInterfaceJS.testStr(" + x + ")");
+    }
+    testBin(x) {
+        console.log("MyInterfaceJS.testBin(" + x + ")");
     }
 }
 
@@ -77,5 +82,16 @@ let main = function() {
     {
         var i = Module.MyInterface.instance();
         console.log("got string: " + i.testStr("hello"));
+    }
+
+    {
+        var i = Module.MyInterface.instance();
+        i.foo(32);
+    }
+
+    {
+        var i = Module.MyInterface.instance();
+        var v = i.testBin(new Uint8Array([1,2,3]));
+        console.log(v);
     }
 }
