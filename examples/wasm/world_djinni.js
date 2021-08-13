@@ -21,6 +21,9 @@ class MyInterface_CppProxy {
     testBin(x) {
         return this._nativeRef.testBin(x);
     }
+    testDate(x) {
+        return this._nativeRef.testDate(x);
+    }
 }
 Module.MyInterface_CppProxy = MyInterface_CppProxy;
 
@@ -34,6 +37,9 @@ class MyInterfaceJS {
     }
     testBin(x) {
         console.log("MyInterfaceJS.testBin(" + x + ")");
+    }
+    testDate(x) {
+        console.log("MyInterfaceJS.testDate(" + x + ")");
     }
 }
 
@@ -93,5 +99,13 @@ let main = function() {
         var i = Module.MyInterface.instance();
         var v = i.testBin(new Uint8Array([1,2,3]));
         console.log(v);
+    }
+
+    {
+        var d = new Date()
+        console.log(d);
+        var i = Module.MyInterface.instance();
+        d = i.testDate(d);
+        console.log(d);
     }
 }

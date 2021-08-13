@@ -67,6 +67,29 @@ public:
     }
 };
 
+class Date {
+public:
+    using CppType = std::chrono::system_clock::time_point;
+    using JsType = val;
+    using Boxed = Date;
+    
+    static CppType toCpp(const JsType& j)
+    {
+        static val bigintType = val::global("BigInt");
+        auto milliesSinceEpoch = std::chrono::milliseconds(bigintType(j.call<val>("getTime")).as<int64_t>());
+        return CppType(milliesSinceEpoch);
+    }
+    static JsType fromCpp(const CppType& c)
+    {
+        auto milliesSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(c.time_since_epoch());
+        static val dateType = val::global("Date");
+        static val number = val::global("Number");
+        auto d = dateType.new_();
+        d.call<void>("setTime", number(milliesSinceEpoch.count()));
+        return d;
+    }
+};
+
 // TODO: optimize
 struct JsProxyCacheEntry {
     val js;
@@ -150,6 +173,8 @@ public:
     virtual void foo(int32_t x) = 0;
     virtual std::wstring testStr(const std::wstring& x) = 0;
     virtual std::vector<uint8_t> testBin(const std::vector<uint8_t>& bin) = 0;
+    virtual std::chrono::system_clock::time_point testDate(const std::chrono::system_clock::time_point& d) = 0;
+
     static std::shared_ptr<MyInterface> create();
     static std::shared_ptr<MyInterface> instance();
     static std::shared_ptr<MyInterface> pass(const std::shared_ptr<MyInterface>& i);
@@ -173,6 +198,9 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
         std::vector<uint8_t> testBin(const std::vector<uint8_t>& bin) override {
             return Binary::toCpp(_jsRef().call<val>("testBin", Binary::fromCpp(bin)));
         }
+        std::chrono::system_clock::time_point testDate(const std::chrono::system_clock::time_point& d) override {
+            return Date::toCpp(_jsRef().call<val>("testDate", Date::fromCpp(d)));
+        }
     };
     static val cppProxy() {
         static val inst = val::module_property("MyInterface_CppProxy");
@@ -187,6 +215,9 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
     }
     static val testBin(const std::shared_ptr<MyInterface>& self, const val& bin) {
         return Binary::fromCpp(self->testBin(Binary::toCpp(bin)));
+    }
+    static val testDate(const std::shared_ptr<MyInterface>& self, const val& d) {
+        return Date::fromCpp(self->testDate(Date::toCpp(d)));
     }
     static val create() {
         return _toJs(MyInterface::create());
@@ -209,6 +240,7 @@ EMSCRIPTEN_BINDINGS(MyInterface) {
         .function("foo", &NativeMyInterface::foo)
         .function("testStr", &NativeMyInterface::testStr)
         .function("testBin", &NativeMyInterface::testBin)
+        .function("testDate", &NativeMyInterface::testDate)
         .class_function("create", &NativeMyInterface::create)
         .class_function("instance", &NativeMyInterface::instance)
         .class_function("pass", &NativeMyInterface::pass)
@@ -232,6 +264,9 @@ public:
         auto v = bin;
         v.push_back(123);
         return v;
+    }
+    std::chrono::system_clock::time_point testDate(const std::chrono::system_clock::time_point& d) override {
+        return d + std::chrono::hours(240);
     }
 };
 
