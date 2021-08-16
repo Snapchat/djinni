@@ -1,5 +1,5 @@
 // ---- Library code
-Module.djinniFinalizerRegistry = new FinalizationRegistry(nativeRef => {
+Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => {
     console.log("finalizing " + nativeRef);
     nativeRef.nativeDestroy();
     nativeRef.delete();
@@ -23,6 +23,9 @@ class MyInterface_CppProxy {
     }
     testDate(x) {
         return this._nativeRef.testDate(x);
+    }
+    testRecord(x) {
+        return this._nativeRef.testRecord(x);
     }
 }
 Module.MyInterface_CppProxy = MyInterface_CppProxy;
@@ -75,7 +78,7 @@ let main = function() {
     {
         var i = new MyInterfaceJS();
         var j = new MyInterfaceJS();
-        same_c(i, j, "same js object passed to cpp twice");
+        same_c(i, j, "different js object passed to cpp");
         same_c(i, i, "same js object passed to cpp twice");
     }
 
@@ -107,5 +110,11 @@ let main = function() {
         var i = Module.MyInterface.instance();
         d = i.testDate(d);
         console.log(d);
+    }
+
+    {
+        var i = Module.MyInterface.instance();
+        var r = { _x: 100, _y: "hello" };
+        console.log(i.testRecord(r));
     }
 }

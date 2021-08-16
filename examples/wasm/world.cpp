@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <optional>
 
 using namespace emscripten;
 
@@ -28,7 +29,19 @@ class Primitive {
 public:
     using CppType = T;
     using JsType = T;
-    using Boxed = Primitive;
+
+    struct Boxed
+    {
+        using JsType = val;
+        static CppType toCpp(JsType j)
+        {
+            return j.as<CppType>();
+        }
+        static JsType fromCpp(CppType c)
+        {
+            return JsType(c);
+        }
+    };
 
     static CppType toCpp(const JsType& j)
     {
@@ -86,6 +99,33 @@ public:
     }
 };
 
+template <template <class> class OptionalType, class T>
+struct Optional
+{
+    template <typename C> static OptionalType<typename C::CppType> opt_type(...);
+    template <typename C> static typename C::CppOptType opt_type(typename C::CppOptType *);
+    using CppType = decltype(opt_type<T>(nullptr));
+    using JsType = val;
+    using Boxed = Optional;
+    
+    static CppType toCpp(const JsType& j)
+    {
+        if (j.isUndefined() || j.isNull()) {
+            return CppType{};
+        } else {
+            return T::Boxed::toCpp(j);
+        }
+    }
+    static JsType fromCpp(const OptionalType<typename T::CppType>& c)
+    {
+        return c ? T::Boxed::fromCpp(*c) : val::null();
+    }
+    template <typename C = T>
+    static JsType fromCpp(const typename C::CppOptType& cppOpt) {
+        return T::Boxed::fromCppOpt(cppOpt);
+    }
+};
+
 // TODO: optimize
 struct JsProxyCacheEntry {
     val js;
@@ -121,7 +161,10 @@ struct JsInterface {
         cppProxyCache.erase(cpp.get());
     }
     static val _toJs(const std::shared_ptr<I>& c) {
-        if (auto* p = dynamic_cast<JsProxyBase*>(c.get())) {
+        if (c == nullptr) {
+            return val::null();
+        }
+        else if (auto* p = dynamic_cast<JsProxyBase*>(c.get())) {
             // unwrap js object
             std::cout << "unwrap js object" << std::endl;
             return p->_jsRef();
@@ -137,7 +180,7 @@ struct JsInterface {
                 val cppProxy = Self::cppProxy().new_(nativeRef);
                 val weakRef = weakRefClass.new_(cppProxy);
                 cppProxyCache.emplace(c.get(), weakRef);
-                static val finalizerRegistry = val::module_property("djinniFinalizerRegistry");
+                static val finalizerRegistry = val::module_property("cppProxyFinalizerRegistry");
                 finalizerRegistry.call<void>("register", cppProxy, nativeRef);
                 return cppProxy;
             }
@@ -145,7 +188,10 @@ struct JsInterface {
     }
     static std::shared_ptr<I> _fromJs(const val& js) {
         static const val nativeRef("_nativeRef");
-        if (nativeRef.in(js)) { // is cpp object
+        if (js.isUndefined() || js.isNull()) {
+            return {};
+        }
+        else if (nativeRef.in(js)) { // is cpp object
             std::cout << "getting cpp object" << std::endl;
             return js[nativeRef].as<std::shared_ptr<I>>();
         } else { // is jsproxy
@@ -163,6 +209,13 @@ struct JsInterface {
 };
 
 // djinni generated interface
+struct MyRecord {
+    int32_t _x;
+    std::string _y;
+
+    MyRecord(int32_t x, const std::string& y) : _x(x), _y(y) {}
+};
+
 class MyInterface {
 public:
     virtual ~MyInterface() = default;
@@ -170,6 +223,7 @@ public:
     virtual std::wstring testStr(const std::wstring& x) = 0;
     virtual std::vector<uint8_t> testBin(const std::vector<uint8_t>& bin) = 0;
     virtual std::chrono::system_clock::time_point testDate(const std::chrono::system_clock::time_point& d) = 0;
+    virtual MyRecord testRecord(const MyRecord& r) = 0;
 
     static std::shared_ptr<MyInterface> create();
     static std::shared_ptr<MyInterface> instance();
@@ -178,6 +232,25 @@ public:
 };
 
 // djinni generated stubs
+struct NativeMyRecord {
+    using CppType = MyRecord;
+    using JsType = val;
+    using Boxed = NativeMyRecord;
+    
+    static CppType toCpp(const JsType& j)
+    {
+        return CppType (I32::Boxed::toCpp(j["_x"]),
+                        String::Boxed::toCpp(j["_y"]));
+    }
+    static JsType fromCpp(const CppType& c)
+    {
+        val js = val::object();
+        js.set("_x", I32::Boxed::fromCpp(c._x));
+        js.set("_y", String::Boxed::fromCpp(c._y));
+        return js;
+    }
+};
+
 struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
     class JsProxy: public JsProxyBase,
                    public MyInterface,
@@ -197,11 +270,22 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
         std::chrono::system_clock::time_point testDate(const std::chrono::system_clock::time_point& d) override {
             return Date::toCpp(_jsRef().call<val>("testDate", Date::fromCpp(d)));
         }
+        MyRecord testRecord(const MyRecord& r) override {
+            return NativeMyRecord::toCpp(_jsRef().call<val>("testRecord", NativeMyRecord::fromCpp(r)));
+        }
     };
     static val cppProxy() {
         static val inst = val::module_property("MyInterface_CppProxy");
         return inst;
     }
+    // ---------
+    using CppType = std::shared_ptr<MyInterface>;
+    using CppOptType = std::shared_ptr<MyInterface>;
+    using JsType = val;
+    using Boxed = NativeMyInterface;
+    static CppType toCpp(JsType j) { return _fromJs(j); }
+    static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
+    static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
     // ---------
     static void foo(const std::shared_ptr<MyInterface>& self, int32_t x) {
         return self->foo(I32::toCpp(x));
@@ -215,17 +299,20 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
     static val testDate(const std::shared_ptr<MyInterface>& self, const val& d) {
         return Date::fromCpp(self->testDate(Date::toCpp(d)));
     }
+    static val testRecord(const std::shared_ptr<MyInterface>& self, const val& r) {
+        return NativeMyRecord::fromCpp(self->testRecord(NativeMyRecord::toCpp(r)));
+    }
     static val create() {
-        return _toJs(MyInterface::create());
+        return NativeMyInterface::fromCpp(MyInterface::create());
     }
     static val instance() {
-        return _toJs(MyInterface::instance());
+        return NativeMyInterface::fromCpp(MyInterface::instance());
     }
     static val pass(const val& i) {
-        return _toJs(MyInterface::pass(_fromJs(i)));
+        return NativeMyInterface::fromCpp(MyInterface::pass(NativeMyInterface::toCpp(i)));
     }
     static bool comp(const val& i, const val& j) {
-        return MyInterface::comp(_fromJs(i), _fromJs(j));
+        return Bool::fromCpp(MyInterface::comp(NativeMyInterface::toCpp(i), NativeMyInterface::toCpp(j)));
     }
 };
 
@@ -237,6 +324,7 @@ EMSCRIPTEN_BINDINGS(MyInterface) {
         .function("testStr", &NativeMyInterface::testStr)
         .function("testBin", &NativeMyInterface::testBin)
         .function("testDate", &NativeMyInterface::testDate)
+        .function("testRecord", &NativeMyInterface::testRecord)
         .class_function("create", &NativeMyInterface::create)
         .class_function("instance", &NativeMyInterface::instance)
         .class_function("pass", &NativeMyInterface::pass)
@@ -263,6 +351,9 @@ public:
     }
     std::chrono::system_clock::time_point testDate(const std::chrono::system_clock::time_point& d) override {
         return d + std::chrono::hours(240);
+    }
+    MyRecord testRecord(const MyRecord& r) override {
+        return MyRecord(r._x + 100, r._y);
     }
 };
 
