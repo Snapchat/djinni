@@ -127,6 +127,7 @@ struct Optional
 };
 
 using JsProxyId = int32_t;
+static JsProxyId nextId = 0;
 std::unordered_map<JsProxyId, void*> jsProxyCache;
 std::unordered_map<void*, val> cppProxyCache;
 
@@ -135,11 +136,9 @@ public:
     JsProxyBase(const val& v) : _js(v), _id(_js["_djinni_js_proxy_id"].as<JsProxyId>()) {
         jsProxyCache.emplace(_id, this);
     }
-
     virtual ~JsProxyBase() {
         jsProxyCache.erase(_id);
     }
-
     const val& _jsRef() const {
         return _js;
     }
@@ -190,7 +189,6 @@ struct JsInterface {
             std::cout << "getting cpp object" << std::endl;
             return js[nativeRef].as<std::shared_ptr<I>>();
         } else { // is jsproxy
-            static JsProxyId nextId = 0;
             JsProxyId id;
             auto idProp = js["_djinni_js_proxy_id"];
             if (idProp.isUndefined()) {
