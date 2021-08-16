@@ -132,7 +132,7 @@ std::map<void*, val> cppProxyCache;
 
 class JsProxyBase {
 public:
-    JsProxyBase(const val& v) : _js(v), _id(_js["_jsProxyId"].as<JsProxyId>()) {
+    JsProxyBase(const val& v) : _js(v), _id(_js["_djinni_js_proxy_id"].as<JsProxyId>()) {
         jsProxyCache.emplace(_id, this);
     }
 
@@ -182,7 +182,7 @@ struct JsInterface {
         }
     }
     static std::shared_ptr<I> _fromJs(val js) {
-        static const val nativeRef("_nativeRef");
+        static const val nativeRef("_djinni_native_ref");
         if (js.isUndefined() || js.isNull()) {
             return {};
         }
@@ -192,11 +192,11 @@ struct JsInterface {
         } else { // is jsproxy
             static JsProxyId nextId = 0;
             JsProxyId id;
-            auto idProp = js["_jsProxyId"];
+            auto idProp = js["_djinni_js_proxy_id"];
             if (idProp.isUndefined()) {
                 id = nextId++;
                 std::cout << "assign proxy id " << id << std::endl;
-                js.set("_jsProxyId", id);
+                js.set("_djinni_js_proxy_id", id);
             } else {
                 id = idProp.as<JsProxyId>();
             }

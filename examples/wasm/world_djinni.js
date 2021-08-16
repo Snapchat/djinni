@@ -10,22 +10,22 @@ class MyInterface_CppProxy {
     // take over ownership
     constructor(nativeRef) {
         console.log('new cpp proxy');
-        this._nativeRef = nativeRef;
+        this._djinni_native_ref = nativeRef;
     }
     foo(x) {
-        return this._nativeRef.foo(x);
+        return this._djinni_native_ref.foo(x);
     }
     testStr(x) {
-        return this._nativeRef.testStr(x);
+        return this._djinni_native_ref.testStr(x);
     }
     testBin(x) {
-        return this._nativeRef.testBin(x);
+        return this._djinni_native_ref.testBin(x);
     }
     testDate(x) {
-        return this._nativeRef.testDate(x);
+        return this._djinni_native_ref.testDate(x);
     }
     testRecord(x) {
-        return this._nativeRef.testRecord(x);
+        return this._djinni_native_ref.testRecord(x);
     }
 }
 Module.MyInterface_CppProxy = MyInterface_CppProxy;
