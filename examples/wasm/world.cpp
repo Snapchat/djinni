@@ -126,24 +126,18 @@ struct Optional
     }
 };
 
-// TODO: optimize
-struct JsProxyCacheEntry {
-    val js;
-    void* cpp;
-};
-std::vector<JsProxyCacheEntry> jsProxyCache;
+using JsProxyId = int32_t;
+std::map<JsProxyId, void*> jsProxyCache;
 std::map<void*, val> cppProxyCache;
 
 class JsProxyBase {
 public:
-    JsProxyBase(const val& v) : _js(v) {
-        jsProxyCache.emplace_back(JsProxyCacheEntry{_js, this});
+    JsProxyBase(const val& v) : _js(v), _id(_js["_jsProxyId"].as<JsProxyId>()) {
+        jsProxyCache.emplace(_id, this);
     }
 
     virtual ~JsProxyBase() {
-        jsProxyCache.erase(std::remove_if(jsProxyCache.begin(), jsProxyCache.end(), [&](const auto& x){
-            return x.js == _js;
-        }), jsProxyCache.end());
+        jsProxyCache.erase(_id);
     }
 
     const val& _jsRef() const {
@@ -151,6 +145,7 @@ public:
     }
 private:
     val _js;
+    JsProxyId _id;
 };
 
 template<typename I, typename Self>
@@ -186,7 +181,7 @@ struct JsInterface {
             }
         }
     }
-    static std::shared_ptr<I> _fromJs(const val& js) {
+    static std::shared_ptr<I> _fromJs(val js) {
         static const val nativeRef("_nativeRef");
         if (js.isUndefined() || js.isNull()) {
             return {};
@@ -195,12 +190,20 @@ struct JsInterface {
             std::cout << "getting cpp object" << std::endl;
             return js[nativeRef].as<std::shared_ptr<I>>();
         } else { // is jsproxy
-            auto i = std::find_if(jsProxyCache.begin(), jsProxyCache.end(), [&](const auto& x){
-                return x.js == js;
-            });
+            static JsProxyId nextId = 0;
+            JsProxyId id;
+            auto idProp = js["_jsProxyId"];
+            if (idProp.isUndefined()) {
+                id = nextId++;
+                std::cout << "assign proxy id " << id << std::endl;
+                js.set("_jsProxyId", id);
+            } else {
+                id = idProp.as<JsProxyId>();
+            }
+            auto i = jsProxyCache.find(id);
             if (i != jsProxyCache.end()) {
                 std::cout << "existing js proxy" << std::endl;
-                return reinterpret_cast<typename Self::JsProxy*>(i->cpp)->shared_from_this();
+                return reinterpret_cast<typename Self::JsProxy*>(i->second)->shared_from_this();
             } else {
                 return std::make_shared<typename Self::JsProxy>(js);
             }
