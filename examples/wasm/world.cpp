@@ -2,7 +2,7 @@
 #include <emscripten/bind.h>
 
 #include <iostream>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <optional>
 
@@ -127,8 +127,8 @@ struct Optional
 };
 
 using JsProxyId = int32_t;
-std::map<JsProxyId, void*> jsProxyCache;
-std::map<void*, val> cppProxyCache;
+std::unordered_map<JsProxyId, void*> jsProxyCache;
+std::unordered_map<void*, val> cppProxyCache;
 
 class JsProxyBase {
 public:
