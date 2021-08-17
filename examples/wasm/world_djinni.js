@@ -27,6 +27,12 @@ class MyInterface_CppProxy {
     testRecord(x) {
         return this._djinni_native_ref.testRecord(x);
     }
+    testOptional1(x) {
+        return this._djinni_native_ref.testOptional1(x);
+    }
+    testOptional2(x) {
+        return this._djinni_native_ref.testOptional2(x);
+    }
 }
 Module.MyInterface_CppProxy = MyInterface_CppProxy;
 
@@ -128,4 +134,27 @@ let main = function() {
     }
 
     console.log("-------- 10")
+    {
+        var i = Module.MyInterface.instance();
+        console.log(i.testOptional1(null));
+        var r = { _x: 100, _y: "hello" };
+        console.log(i.testOptional1(r));
+    }
+
+    console.log("-------- 11")
+    {
+        var i = Module.MyInterface.instance();
+        var r = i.testOptional2(null);
+        if (r) {
+            r.foo();
+        } else {
+            console.log("got empty optional");
+        }
+        var r = i.testOptional2(new MyInterfaceJS());
+        if (r) {
+            r.foo(222);
+        }
+    }
+
+    console.log("--------")
 }

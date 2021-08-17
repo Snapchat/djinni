@@ -225,6 +225,8 @@ public:
     virtual std::vector<uint8_t> testBin(const std::vector<uint8_t>& bin) = 0;
     virtual std::chrono::system_clock::time_point testDate(const std::chrono::system_clock::time_point& d) = 0;
     virtual MyRecord testRecord(const MyRecord& r) = 0;
+    virtual std::optional<MyRecord> testOptional1(const std::optional<MyRecord>& o) = 0;
+    virtual std::shared_ptr<MyInterface> testOptional2(const std::shared_ptr<MyInterface>& o) = 0;
 
     static std::shared_ptr<MyInterface> create();
     static std::shared_ptr<MyInterface> instance();
@@ -274,6 +276,17 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
         MyRecord testRecord(const MyRecord& r) override {
             return NativeMyRecord::toCpp(_jsRef().call<val>("testRecord", NativeMyRecord::fromCpp(r)));
         }
+        std::optional<MyRecord> testOptional1(const std::optional<MyRecord>& o) override {
+            return Optional<std::optional, NativeMyRecord>::toCpp(
+                _jsRef().call<val>("testOptional1",
+                                   Optional<std::optional, NativeMyRecord>::fromCpp(o)));
+        }
+        std::shared_ptr<MyInterface> testOptional2(const std::shared_ptr<MyInterface>& o) override {
+            return Optional<std::optional, NativeMyInterface>::toCpp(
+                _jsRef().call<val>("testOptional2",
+                                   Optional<std::optional, NativeMyInterface>::fromCpp(o)));
+        }
+
     };
     static val cppProxy() {
         static val inst = val::module_property("MyInterface_CppProxy");
@@ -303,6 +316,12 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
     static val testRecord(const std::shared_ptr<MyInterface>& self, const val& r) {
         return NativeMyRecord::fromCpp(self->testRecord(NativeMyRecord::toCpp(r)));
     }
+    static val testOptional1(const std::shared_ptr<MyInterface>& self, const val& o) {
+        return Optional<std::optional, NativeMyRecord>::fromCpp(self->testOptional1(Optional<std::optional, NativeMyRecord>::toCpp(o)));
+    }
+    static val testOptional2(const std::shared_ptr<MyInterface>& self, const val& o) {
+        return Optional<std::optional, NativeMyInterface>::fromCpp(self->testOptional2(Optional<std::optional, NativeMyInterface>::toCpp(o)));
+    }
     static val create() {
         return NativeMyInterface::fromCpp(MyInterface::create());
     }
@@ -326,6 +345,8 @@ EMSCRIPTEN_BINDINGS(MyInterface) {
         .function("testBin", &NativeMyInterface::testBin)
         .function("testDate", &NativeMyInterface::testDate)
         .function("testRecord", &NativeMyInterface::testRecord)
+        .function("testOptional1", &NativeMyInterface::testOptional1)
+        .function("testOptional2", &NativeMyInterface::testOptional2)
         .class_function("create", &NativeMyInterface::create)
         .class_function("instance", &NativeMyInterface::instance)
         .class_function("pass", &NativeMyInterface::pass)
@@ -355,6 +376,21 @@ public:
     }
     MyRecord testRecord(const MyRecord& r) override {
         return MyRecord(r._x + 100, r._y);
+    }
+    std::optional<MyRecord> testOptional1(const std::optional<MyRecord>& o) override {
+        if (o) {
+            return MyRecord(o->_x + 100, o->_y);
+        } else {
+            return {};
+        }
+    }
+    std::shared_ptr<MyInterface> testOptional2(const std::shared_ptr<MyInterface>& o) override {
+        if (o) {
+            o->foo(111);
+            return MyInterface::create();
+        } else {
+            return {};
+        }
     }
 };
 
