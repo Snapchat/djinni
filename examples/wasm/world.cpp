@@ -3,8 +3,10 @@
 
 #include <iostream>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <optional>
+#include <algorithm>
 
 using namespace emscripten;
 
@@ -30,25 +32,20 @@ public:
     using CppType = T;
     using JsType = T;
 
-    struct Boxed
-    {
+    struct Boxed {
         using JsType = val;
-        static CppType toCpp(JsType j)
-        {
+        static CppType toCpp(JsType j) {
             return j.as<CppType>();
         }
-        static JsType fromCpp(CppType c)
-        {
+        static JsType fromCpp(CppType c) {
             return JsType(c);
         }
     };
 
-    static CppType toCpp(const JsType& j)
-    {
+    static CppType toCpp(const JsType& j) {
         return j;
     }
-    static JsType fromCpp(const CppType& c)
-    {
+    static JsType fromCpp(const CppType& c) {
         return c;
     }
 };
@@ -69,12 +66,10 @@ public:
     using JsType = val;
     using Boxed = Binary;
     
-    static CppType toCpp(const JsType& j)
-    {
+    static CppType toCpp(const JsType& j) {
         return convertJSArrayToNumberVector<uint8_t>(j);
     }
-    static JsType fromCpp(const CppType& c)
-    {
+    static JsType fromCpp(const CppType& c) {
         val memoryView{ typed_memory_view(c.size(), c.data()) };
         return memoryView.call<val>("slice", 0);
     }
@@ -86,13 +81,11 @@ public:
     using JsType = val;
     using Boxed = Date;
     
-    static CppType toCpp(const JsType& j)
-    {
+    static CppType toCpp(const JsType& j) {
         auto milliesSinceEpoch = std::chrono::milliseconds(static_cast<int64_t>(j.call<val>("getTime").as<double>()));
         return CppType(milliesSinceEpoch);
     }
-    static JsType fromCpp(const CppType& c)
-    {
+    static JsType fromCpp(const CppType& c) {
         auto milliesSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(c.time_since_epoch());
         static val dateType = val::global("Date");
         return dateType.new_(static_cast<double>(milliesSinceEpoch.count()));
@@ -108,21 +101,107 @@ struct Optional
     using JsType = val;
     using Boxed = Optional;
     
-    static CppType toCpp(const JsType& j)
-    {
+    static CppType toCpp(const JsType& j) {
         if (j.isUndefined() || j.isNull()) {
             return CppType{};
         } else {
             return T::Boxed::toCpp(j);
         }
     }
-    static JsType fromCpp(const OptionalType<typename T::CppType>& c)
-    {
+    static JsType fromCpp(const OptionalType<typename T::CppType>& c) {
         return c ? T::Boxed::fromCpp(*c) : val::null();
     }
     template <typename C = T>
     static JsType fromCpp(const typename C::CppOptType& cppOpt) {
         return T::Boxed::fromCppOpt(cppOpt);
+    }
+};
+
+template <typename T> 
+class List {
+    using ECppType = typename T::CppType;
+    using EJsType = typename T::Boxed::JsType;
+public:
+    using CppType = std::vector<ECppType>;
+    using JsType = val;
+    using Boxed = List;
+
+    static CppType toCpp(const JsType& j) {
+        const size_t l = j["length"].as<size_t>();
+        CppType rv;
+        rv.reserve(l);
+        for (size_t i = 0; i < l; ++i) {
+            rv.push_back(T::Boxed::toCpp(j[i]));
+        }
+        return rv;
+    }
+    static JsType fromCpp(const CppType& c) {
+        val new_array = val::array();
+        for (const auto& e: c) {
+            new_array.call<void>("push", T::Boxed::fromCpp(e));
+        }
+        return new_array;
+    }
+};
+
+template <typename T>
+class Set  {
+    using ECppType = typename T::CppType;
+    using EJsType = typename T::Boxed::JsType;
+public:
+    using CppType = std::unordered_set<ECppType>;
+    using JsType = val;
+    using Boxed = Set;
+
+    static CppType toCpp(const JsType& j) {
+        static val arrayClass = val::global("Array");
+        val entries = arrayClass.call<val>("from", j);
+        const size_t l = entries["length"].as<size_t>();
+        CppType rs;
+        for (size_t i = 0; i < l; ++i) {
+            rs.insert(T::Boxed::toCpp(entries[i]));
+        }
+        return rs;
+    }
+    static JsType fromCpp(const CppType& c) {
+        static val setClass = val::global("Set");
+        val newSet = setClass.new_();
+        for (const auto& e: c) {
+            newSet.call<void>("add", T::Boxed::fromCpp(e));
+        }
+        return newSet;
+    }
+};
+
+template <typename Key, typename Value>
+class Map {
+    using CppKeyType = typename Key::CppType;
+    using CppValueType = typename Value::CppType;
+    using JsKeyType = typename Key::Boxed::JsType;
+    using JsValueType = typename Value::Boxed::JsType;
+public:
+    using CppType = std::unordered_map<CppKeyType, CppValueType>;
+    using JsType = val;
+    using Boxed = Map;
+
+    static CppType toCpp(const JsType& j) {
+        static val arrayClass = val::global("Array");
+        val entries = arrayClass.call<val>("from", j);
+        const size_t l = entries["length"].as<size_t>();
+        CppType rm;
+        for (size_t i = 0; i < l; ++i) {
+            rm.emplace(Key::Boxed::toCpp(entries[i][0]),
+                       Value::Boxed::toCpp(entries[i][1]));
+        }
+        return rm;
+    }
+    static JsType fromCpp(const CppType& c) {
+        static val mapClass = val::global("Map");
+        val newMap = mapClass.new_();
+        for (const auto &[k, v] : c) {
+            newMap.call<void>("set", Key::Boxed::fromCpp(k), Value::Boxed::fromCpp(v));
+        }
+        return newMap;
     }
 };
 
@@ -227,6 +306,9 @@ public:
     virtual MyRecord testRecord(const MyRecord& r) = 0;
     virtual std::optional<MyRecord> testOptional1(const std::optional<MyRecord>& o) = 0;
     virtual std::shared_ptr<MyInterface> testOptional2(const std::shared_ptr<MyInterface>& o) = 0;
+    virtual std::vector<MyRecord> testList(const std::vector<MyRecord>& l) = 0;
+    virtual std::unordered_set<std::string> testSet(const std::unordered_set<std::string>& s) = 0;
+    virtual std::unordered_map<std::string, MyRecord> testMap(const std::unordered_map<std::string, MyRecord>& m) = 0;
 
     static std::shared_ptr<MyInterface> create();
     static std::shared_ptr<MyInterface> instance();
@@ -286,7 +368,15 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
                 _jsRef().call<val>("testOptional2",
                                    Optional<std::optional, NativeMyInterface>::fromCpp(o)));
         }
-
+        std::vector<MyRecord> testList(const std::vector<MyRecord>& l) override {
+            return List<NativeMyRecord>::toCpp(_jsRef().call<val>("testList", List<NativeMyRecord>::fromCpp(l)));
+        }
+        std::unordered_set<std::string> testSet(const std::unordered_set<std::string>& s) override {
+            return Set<String>::toCpp(_jsRef().call<val>("testSet", Set<String>::fromCpp(s)));
+        }
+        std::unordered_map<std::string, MyRecord> testMap(const std::unordered_map<std::string, MyRecord>& m) override {
+            return Map<String, NativeMyRecord>::toCpp(_jsRef().call<val>("testMap", Map<String, NativeMyRecord>::fromCpp(m)));
+        }
     };
     static val cppProxy() {
         static val inst = val::module_property("MyInterface_CppProxy");
@@ -322,6 +412,15 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
     static val testOptional2(const std::shared_ptr<MyInterface>& self, const val& o) {
         return Optional<std::optional, NativeMyInterface>::fromCpp(self->testOptional2(Optional<std::optional, NativeMyInterface>::toCpp(o)));
     }
+    static val testList(const std::shared_ptr<MyInterface>& self, const val& l) {
+        return List<NativeMyRecord>::fromCpp(self->testList(List<NativeMyRecord>::toCpp(l)));
+    }
+    static val testSet(const std::shared_ptr<MyInterface>& self, const val& s) {
+        return Set<String>::fromCpp(self->testSet(Set<String>::toCpp(s)));
+    }
+    static val testMap(const std::shared_ptr<MyInterface>& self, const val& m) {
+        return Map<String, NativeMyRecord>::fromCpp(self->testMap(Map<String, NativeMyRecord>::toCpp(m)));
+    }
     static val create() {
         return NativeMyInterface::fromCpp(MyInterface::create());
     }
@@ -347,6 +446,9 @@ EMSCRIPTEN_BINDINGS(MyInterface) {
         .function("testRecord", &NativeMyInterface::testRecord)
         .function("testOptional1", &NativeMyInterface::testOptional1)
         .function("testOptional2", &NativeMyInterface::testOptional2)
+        .function("testList", &NativeMyInterface::testList)
+        .function("testSet", &NativeMyInterface::testSet)
+        .function("testMap", &NativeMyInterface::testMap)
         .class_function("create", &NativeMyInterface::create)
         .class_function("instance", &NativeMyInterface::instance)
         .class_function("pass", &NativeMyInterface::pass)
@@ -391,6 +493,25 @@ public:
         } else {
             return {};
         }
+    }
+    std::vector<MyRecord> testList(const std::vector<MyRecord>& l) override {
+        auto copy = l;
+        std::reverse(copy.begin(), copy.end());
+        return copy;
+    }
+    std::unordered_set<std::string> testSet(const std::unordered_set<std::string>& s) override {
+        std::unordered_set<std::string> r;
+        for (const auto& e: s) {
+            r.emplace(e + " xxxx");
+        }
+        return r;
+    }
+    std::unordered_map<std::string, MyRecord> testMap(const std::unordered_map<std::string, MyRecord>& m) override {
+        std::unordered_map<std::string, MyRecord> r;
+        for (const auto &[k, v] : m) {
+            r.emplace(v._y, MyRecord{v._x, k});
+        }
+        return r;
     }
 };
 

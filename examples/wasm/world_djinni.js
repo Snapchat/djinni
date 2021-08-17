@@ -33,6 +33,15 @@ class MyInterface_CppProxy {
     testOptional2(x) {
         return this._djinni_native_ref.testOptional2(x);
     }
+    testList(x) {
+        return this._djinni_native_ref.testList(x);
+    }
+    testSet(x) {
+        return this._djinni_native_ref.testSet(x);
+    }
+    testMap(x) {
+        return this._djinni_native_ref.testMap(x);
+    }
 }
 Module.MyInterface_CppProxy = MyInterface_CppProxy;
 
@@ -154,6 +163,32 @@ let main = function() {
         if (r) {
             r.foo(222);
         }
+    }
+
+    console.log("-------- 12")
+    {
+        var i = Module.MyInterface.instance();
+        var l = [{_x: 100, _y: "100"}, {_x: 200, _y: "200"}, {_x: 300, _y: "300"}];
+        var r = i.testList(l);
+        console.log(r);
+    }
+
+    console.log("-------- 13")
+    {
+        var i = Module.MyInterface.instance();
+        var s = new Set(["1", "2", "3"]);
+        var r = i.testSet(s);
+        console.log(r);
+    }
+
+    console.log("-------- 14")
+    {
+        var i = Module.MyInterface.instance();
+        var m = new Map([["1", {_x: 100, _y: "100"}],
+                         ["2", {_x: 200, _y: "200"}],
+                         ["3", {_x: 300, _y: "300"}]]);
+        var r = i.testMap(m);
+        console.log(r);
     }
 
     console.log("--------")
