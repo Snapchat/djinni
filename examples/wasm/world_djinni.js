@@ -1,10 +1,3 @@
-// ---- Library code
-Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => {
-    console.log("finalizing cpp object");
-    nativeRef.nativeDestroy();
-    nativeRef.delete();
-});
-
 // ---- Generated javascript
 class MyInterface_CppProxy {
     // take over ownership

@@ -334,6 +334,18 @@ private:
     JsProxyId _id;
 };
 
+static val getCppProxyFinalizerRegistry() {
+    EM_ASM(
+        console.log("create cppProxyFinalizerRegistry");
+        Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => {
+            console.log("finalizing cpp object");
+            nativeRef.nativeDestroy();
+            nativeRef.delete();
+        });
+    );
+    return val::module_property("cppProxyFinalizerRegistry");
+}
+
 template<typename I, typename Self>
 struct JsInterface {
     static void nativeDestroy(const std::shared_ptr<I>& cpp) {
@@ -361,7 +373,7 @@ struct JsInterface {
                 val cppProxy = Self::cppProxy().new_(nativeRef);
                 val weakRef = weakRefClass.new_(cppProxy);
                 cppProxyCache.emplace(c.get(), weakRef);
-                static val finalizerRegistry = val::module_property("cppProxyFinalizerRegistry");
+                static val finalizerRegistry = getCppProxyFinalizerRegistry();
                 finalizerRegistry.call<void>("register", cppProxy, nativeRef);
                 return cppProxy;
             }
