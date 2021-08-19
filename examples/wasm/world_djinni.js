@@ -42,6 +42,9 @@ class MyInterface_CppProxy {
     testMap(x) {
         return this._djinni_native_ref.testMap(x);
     }
+    testOutcome(x) {
+        return this._djinni_native_ref.testOutcome(x);
+    }
 }
 Module.MyInterface_CppProxy = MyInterface_CppProxy;
 
@@ -50,14 +53,12 @@ class MyInterfaceJS {
     foo(x) {
         console.log("MyInterfaceJS.foo(" + x + ")");
     }
-    testStr(x) {
-        console.log("MyInterfaceJS.testStr(" + x + ")");
-    }
-    testBin(x) {
-        console.log("MyInterfaceJS.testBin(" + x + ")");
-    }
-    testDate(x) {
-        console.log("MyInterfaceJS.testDate(" + x + ")");
+    testOutcome(success) {
+        if (success) {
+            return { result: {_x: 1000, _y: "one thousand"}};
+        } else {
+            return { error: "fail" };
+        }
     }
 }
 
@@ -189,6 +190,28 @@ let main = function() {
                          ["3", {_x: 300, _y: "300"}]]);
         var r = i.testMap(m);
         console.log(r);
+    }
+
+    console.log("-------- 15")
+    {
+        var i = Module.MyInterface.instance();
+        var r = i.testOutcome(true);
+        console.log(r);
+        r = i.testOutcome(false);
+        console.log(r);
+    }
+
+    console.log("-------- 16")
+    {
+        var i = new MyInterfaceJS();
+        Module.MyInterface.testOutcome2(i);
+    }
+
+    console.log("-------- 17")
+    {
+        var a = new Uint32Array([1,2,3,4]);
+        var b = Module.MyInterface.testArray(a);
+        console.log(b);
     }
 
     console.log("--------")

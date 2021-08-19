@@ -1,6 +1,8 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
+#include "expected.hpp"
+
 #include <iostream>
 #include <unordered_map>
 #include <unordered_set>
@@ -9,6 +11,8 @@
 #include <algorithm>
 
 using namespace emscripten;
+using djinni::expected;
+using djinni::make_unexpected;
 
 template<typename T>
 class InstanceTracker {
@@ -205,6 +209,110 @@ public:
     }
 };
 
+// js success type:
+// { result: ...}
+// js error type:
+// { error: ...}
+template <class RESULT, class ERROR>
+struct Outcome
+{
+    using CppType = expected<typename RESULT::CppType, typename ERROR::CppType>;
+    using JsType = val;
+    using Boxed = Outcome;
+    
+    static CppType toCpp(const JsType& j) {
+        val res = j["result"];
+        if (!res.isUndefined()) {
+            return RESULT::Boxed::toCpp(res);
+        } else {
+            val err = j["error"];
+            assert(!err.isUndefined());
+            return make_unexpected(ERROR::Boxed::toCpp(err));
+        }
+    }
+    static JsType fromCpp(const CppType& c) {
+        if (c.has_value()) {
+            val res = val::object();
+            res.set("result", RESULT::Boxed::fromCpp(c.value()));
+            return res;
+        } else {
+            val err = val::object();
+            err.set("error", ERROR::Boxed::fromCpp(c.error()));
+            return err;
+        }
+    }
+};
+
+template <typename T>
+struct TypedArrayTraits {
+    static val getArrayClass() {
+        return val::undefined();
+    }
+};
+template<>
+struct TypedArrayTraits<I8> {
+    static val getArrayClass() {
+        static val arrayClass = val::global("Int8Array");
+        return arrayClass;
+    }
+};
+template<>
+struct TypedArrayTraits<I16> {
+    static val getArrayClass() {
+        static val arrayClass = val::global("Int16Array");
+        return arrayClass;
+    }
+};
+template<>
+struct TypedArrayTraits<I32> {
+    static val getArrayClass() {
+        static val arrayClass = val::global("Int32Array");
+        return arrayClass;
+    }
+};
+template<>
+struct TypedArrayTraits<F32> {
+    static val getArrayClass() {
+        static val arrayClass = val::global("Float32Array");
+        return arrayClass;
+    }
+};
+template<>
+struct TypedArrayTraits<F64> {
+    static val getArrayClass() {
+        static val arrayClass = val::global("Float64Array");
+        return arrayClass;
+    }
+};
+
+template <typename T>
+struct Array {
+    using CppType = std::vector<typename T::CppType>;
+    using JsType = val;
+    using Boxed = Array;
+
+    static CppType toCpp(const JsType& j) {
+        static val arrayBufferClass = val::global("ArrayBuffer");
+        if (j["buffer"].instanceof(arrayBufferClass)) {
+            std::cout << "typed array to vector" << std::endl;
+            return convertJSArrayToNumberVector<typename T::CppType>(j);
+        } else {
+            return List<T>::toCpp(j);
+        }
+    }
+    static JsType fromCpp(const CppType& c) {
+        val arrayClass = TypedArrayTraits<T>::getArrayClass();
+        if (!arrayClass.isUndefined()) {
+            std::cout << "vector to typed array" << std::endl;
+            val memoryView{ typed_memory_view(c.size(), c.data()) };
+            val buffer = memoryView.call<val>("slice", 0);
+            return arrayClass.new_(buffer);
+        } else {
+            return List<T>::fromCpp(c);
+        }
+    }
+};
+
 using JsProxyId = int32_t;
 static JsProxyId nextId = 0;
 std::unordered_map<JsProxyId, void*> jsProxyCache;
@@ -309,11 +417,14 @@ public:
     virtual std::vector<MyRecord> testList(const std::vector<MyRecord>& l) = 0;
     virtual std::unordered_set<std::string> testSet(const std::unordered_set<std::string>& s) = 0;
     virtual std::unordered_map<std::string, MyRecord> testMap(const std::unordered_map<std::string, MyRecord>& m) = 0;
+    virtual expected<MyRecord, std::string> testOutcome(bool success) = 0;
 
     static std::shared_ptr<MyInterface> create();
     static std::shared_ptr<MyInterface> instance();
     static std::shared_ptr<MyInterface> pass(const std::shared_ptr<MyInterface>& i);
     static bool comp(const std::shared_ptr<MyInterface>& i, const std::shared_ptr<MyInterface>& j);
+    static void testOutcome2(const std::shared_ptr<MyInterface>& i);
+    static std::vector<int32_t> testArray(const std::vector<int32_t>& a);
 };
 
 // djinni generated stubs
@@ -377,6 +488,9 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
         std::unordered_map<std::string, MyRecord> testMap(const std::unordered_map<std::string, MyRecord>& m) override {
             return Map<String, NativeMyRecord>::toCpp(_jsRef().call<val>("testMap", Map<String, NativeMyRecord>::fromCpp(m)));
         }
+        expected<MyRecord, std::string> testOutcome(bool success) override {
+            return Outcome<NativeMyRecord, String>::toCpp(_jsRef().call<val>("testOutcome", Bool::fromCpp(success)));
+        }
     };
     static val cppProxy() {
         static val inst = val::module_property("MyInterface_CppProxy");
@@ -421,6 +535,9 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
     static val testMap(const std::shared_ptr<MyInterface>& self, const val& m) {
         return Map<String, NativeMyRecord>::fromCpp(self->testMap(Map<String, NativeMyRecord>::toCpp(m)));
     }
+    static val testOutcome(const std::shared_ptr<MyInterface>& self, bool success) {
+        return Outcome<NativeMyRecord, String>::fromCpp(self->testOutcome(Bool::toCpp(success)));
+    }
     static val create() {
         return NativeMyInterface::fromCpp(MyInterface::create());
     }
@@ -432,6 +549,12 @@ struct NativeMyInterface : JsInterface<MyInterface, NativeMyInterface> {
     }
     static bool comp(const val& i, const val& j) {
         return Bool::fromCpp(MyInterface::comp(NativeMyInterface::toCpp(i), NativeMyInterface::toCpp(j)));
+    }
+    static void testOutcome2(const val& i) {
+        return MyInterface::testOutcome2(NativeMyInterface::toCpp(i));
+    }
+    static val testArray(const val& a) {
+        return Array<I32>::fromCpp(MyInterface::testArray(Array<I32>::toCpp(a)));
     }
 };
 
@@ -449,10 +572,13 @@ EMSCRIPTEN_BINDINGS(MyInterface) {
         .function("testList", &NativeMyInterface::testList)
         .function("testSet", &NativeMyInterface::testSet)
         .function("testMap", &NativeMyInterface::testMap)
+        .function("testOutcome", &NativeMyInterface::testOutcome)
         .class_function("create", &NativeMyInterface::create)
         .class_function("instance", &NativeMyInterface::instance)
         .class_function("pass", &NativeMyInterface::pass)
         .class_function("comp", &NativeMyInterface::comp)
+        .class_function("testOutcome2", &NativeMyInterface::testOutcome2)
+        .class_function("testArray", &NativeMyInterface::testArray)
         .function("nativeDestroy", &NativeMyInterface::nativeDestroy)
         ;
 }
@@ -513,6 +639,13 @@ public:
         }
         return r;
     }
+    expected<MyRecord, std::string> testOutcome(bool success) override {
+        if (success) {
+            return MyRecord(100, "hello");
+        } else {
+            return make_unexpected("BAD");
+        }
+    }
 };
 
 std::shared_ptr<MyInterface> MyInterface::create() {
@@ -526,6 +659,26 @@ std::shared_ptr<MyInterface> MyInterface::instance() {
 
 std::shared_ptr<MyInterface> MyInterface::pass(const std::shared_ptr<MyInterface>& i) {
     return i;
+}
+
+void MyInterface::testOutcome2(const std::shared_ptr<MyInterface>& i) {
+    auto outcome1 = i->testOutcome(true);
+    if (outcome1.has_value()) {
+        std::cout << "success" << std::endl;
+        std::cout << outcome1.value()._x << std::endl;
+        std::cout << outcome1.value()._y << std::endl;
+    }
+    auto outcome2 = i->testOutcome(false);
+    if (!outcome2.has_value()) {
+        std::cout << "error" << std::endl;
+        std::cout << outcome2.error() << std::endl;
+    }
+}
+
+std::vector<int32_t> MyInterface::testArray(const std::vector<int32_t>& a) {
+    std::vector<int32_t> copy = a;
+    std::reverse(copy.begin(), copy.end());
+    return copy;
 }
 
 bool MyInterface::comp(const std::shared_ptr<MyInterface>& i, const std::shared_ptr<MyInterface>& j) {
