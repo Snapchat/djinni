@@ -20,7 +20,7 @@ Date::JsType Date::fromCpp(const CppType& c) {
     return dateType.new_(static_cast<double>(milliesSinceEpoch.count()));
 }
 
-std::atomic<JsProxyId> nextId = 0;
+JsProxyId nextId = 0;
 std::unordered_map<JsProxyId, std::weak_ptr<JsProxyBase>> jsProxyCache;
 std::unordered_map<void*, em::val> cppProxyCache;
 std::mutex jsProxyCacheMutex;

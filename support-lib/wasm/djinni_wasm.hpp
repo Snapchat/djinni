@@ -310,7 +310,7 @@ private:
     JsProxyId _id;
 };
 
-extern std::atomic<JsProxyId> nextId;
+extern JsProxyId nextId;
 extern std::unordered_map<JsProxyId, std::weak_ptr<JsProxyBase>> jsProxyCache;
 extern std::unordered_map<void*, em::val> cppProxyCache;
 extern std::mutex jsProxyCacheMutex;
