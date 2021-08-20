@@ -20,15 +20,17 @@ Date::JsType Date::fromCpp(const CppType& c) {
     return dateType.new_(static_cast<double>(milliesSinceEpoch.count()));
 }
 
-JsProxyId nextId = 0;
-std::unordered_map<JsProxyId, void*> jsProxyCache;
+std::atomic<JsProxyId> nextId = 0;
+std::unordered_map<JsProxyId, std::weak_ptr<JsProxyBase>> jsProxyCache;
 std::unordered_map<void*, em::val> cppProxyCache;
+std::mutex jsProxyCacheMutex;
+std::mutex cppProxyCacheMutex;
 
 JsProxyBase::JsProxyBase(const em::val& v) : _js(v), _id(_js["_djinni_js_proxy_id"].as<JsProxyId>()) {
-    jsProxyCache.emplace(_id, this);
 }
 
 JsProxyBase::~JsProxyBase() {
+    std::lock_guard lk(jsProxyCacheMutex);
     jsProxyCache.erase(_id);
 }
 

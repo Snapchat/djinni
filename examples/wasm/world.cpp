@@ -57,8 +57,7 @@ struct NativeMyRecord {
 struct NativeMyInterface : djinni::JsInterface<MyInterface, NativeMyInterface> {
     class JsProxy: public djinni::JsProxyBase,
                    public MyInterface,
-                   public djinni::InstanceTracker<JsProxy>,
-                   public std::enable_shared_from_this<JsProxy> {
+                   public djinni::InstanceTracker<JsProxy> {
     public:
         JsProxy(const em::val& v) : JsProxyBase(v) {}
         void foo(int x) override {

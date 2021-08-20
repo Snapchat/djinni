@@ -15,8 +15,6 @@ namespace em = emscripten;
 
 namespace djinni {
 
-using JsProxyId = int32_t;
-
 template<typename T>
 class InstanceTracker {
     static int& count() {
@@ -300,6 +298,8 @@ struct Array {
     }
 };
 
+using JsProxyId = int32_t;
+
 class JsProxyBase {
 public:
     JsProxyBase(const em::val& v);
@@ -310,9 +310,11 @@ private:
     JsProxyId _id;
 };
 
-extern JsProxyId nextId;
-extern std::unordered_map<JsProxyId, void*> jsProxyCache;
+extern std::atomic<JsProxyId> nextId;
+extern std::unordered_map<JsProxyId, std::weak_ptr<JsProxyBase>> jsProxyCache;
 extern std::unordered_map<void*, em::val> cppProxyCache;
+extern std::mutex jsProxyCacheMutex;
+extern std::mutex cppProxyCacheMutex;
 
 extern em::val getCppProxyFinalizerRegistry();
 
@@ -320,60 +322,81 @@ template<typename I, typename Self>
 struct JsInterface {
     static void nativeDestroy(const std::shared_ptr<I>& cpp) {
         std::cout << "delete entry from cppProxyCache" << std::endl;
+        std::lock_guard lk(cppProxyCacheMutex);
         assert(cppProxyCache.find(cpp.get()) != cppProxyCache.end());
         cppProxyCache.erase(cpp.get());
     }
     static em::val _toJs(const std::shared_ptr<I>& c) {
         if (c == nullptr) {
+            // null object
             return em::val::null();
         }
         else if (auto* p = dynamic_cast<JsProxyBase*>(c.get())) {
-            // unwrap js object
+            // unwrap existing js proxy
             std::cout << "unwrap js object" << std::endl;
             return p->_jsRef();
         } else {
+            // look up in cpp proxy cache
+            std::lock_guard lk(cppProxyCacheMutex);
             auto i = cppProxyCache.find(c.get());
             if (i != cppProxyCache.end()) {
-                // existing cpp proxy
+                // found existing cpp proxy
                 std::cout << "already has cpp proxy" << std::endl;
-                return i->second.template call<em::val>("deref");
-            } else {
-                static em::val weakRefClass = em::val::global("WeakRef");
-                em::val nativeRef(c);
-                em::val cppProxy = Self::cppProxy().new_(nativeRef);
-                em::val weakRef = weakRefClass.new_(cppProxy);
-                cppProxyCache.emplace(c.get(), weakRef);
-                static em::val finalizerRegistry = getCppProxyFinalizerRegistry();
-                finalizerRegistry.call<void>("register", cppProxy, nativeRef);
-                return cppProxy;
+                auto strongRef = i->second.template call<em::val>("deref");
+                if (!strongRef.isUndefined()) {
+                    // and it's not expired
+                    return strongRef;
+                }
             }
+            // not found or cache entry expired
+            // create a new cpp proxy and store it in cache
+            static em::val weakRefClass = em::val::global("WeakRef");
+            em::val nativeRef(c);
+            em::val cppProxy = Self::cppProxy().new_(nativeRef);
+            em::val weakRef = weakRefClass.new_(cppProxy);
+            cppProxyCache.emplace(c.get(), weakRef);
+            static em::val finalizerRegistry = getCppProxyFinalizerRegistry();
+            finalizerRegistry.call<void>("register", cppProxy, nativeRef);
+            return cppProxy;
         }
     }
     static std::shared_ptr<I> _fromJs(em::val js) {
         static const em::val nativeRef("_djinni_native_ref");
+        // null object
         if (js.isUndefined() || js.isNull()) {
             return {};
         }
-        else if (nativeRef.in(js)) { // is cpp object
+        else if (nativeRef.in(js)) {
+            // existing cpp proxy
             std::cout << "getting cpp object" << std::endl;
             return js[nativeRef].as<std::shared_ptr<I>>();
-        } else { // is jsproxy
+        } else {
+            std::lock_guard lk(jsProxyCacheMutex);
+            // check prsence of proxy id in js object
             JsProxyId id;
             auto idProp = js["_djinni_js_proxy_id"];
             if (idProp.isUndefined()) {
+                // no id, assign a new id
                 id = nextId++;
                 std::cout << "assign proxy id " << id << std::endl;
                 js.set("_djinni_js_proxy_id", id);
             } else {
+                // already has id, look up in js proxy cache
                 id = idProp.as<JsProxyId>();
+                auto i = jsProxyCache.find(id);
+                if (i != jsProxyCache.end()) {
+                    auto strongProxyRef = i->second.lock();
+                    if (strongProxyRef) {
+                        std::cout << "existing js proxy" << std::endl;
+                        return std::dynamic_pointer_cast<typename Self::JsProxy>(strongProxyRef);
+                    }
+                }
             }
-            auto i = jsProxyCache.find(id);
-            if (i != jsProxyCache.end()) {
-                std::cout << "existing js proxy" << std::endl;
-                return reinterpret_cast<typename Self::JsProxy*>(i->second)->shared_from_this();
-            } else {
-                return std::make_shared<typename Self::JsProxy>(js);
-            }
+            // not found or cache entry expired
+            // create new js proxy and store it in cache
+            auto newJsProxy = std::make_shared<typename Self::JsProxy>(js);
+            jsProxyCache.emplace(id, newJsProxy);
+            return newJsProxy;
         }
     }
 };
