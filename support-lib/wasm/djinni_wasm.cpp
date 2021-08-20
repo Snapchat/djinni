@@ -24,17 +24,6 @@ JsProxyId nextId = 0;
 std::unordered_map<JsProxyId, void*> jsProxyCache;
 std::unordered_map<void*, em::val> cppProxyCache;
 
-void removeFromCppProxyCache(void* p) {
-    std::cout << "delete entry from cppProxyCache" << std::endl;
-    assert(cppProxyCache.find(p) != cppProxyCache.end());
-    cppProxyCache.erase(p);
-}
-
-void* getJsProxy(JsProxyId id) {
-    auto i = jsProxyCache.find(id);
-    return (i != jsProxyCache.end()) ? i->second : nullptr;
-}
-
 JsProxyBase::JsProxyBase(const em::val& v) : _js(v), _id(_js["_djinni_js_proxy_id"].as<JsProxyId>()) {
     jsProxyCache.emplace(_id, this);
 }

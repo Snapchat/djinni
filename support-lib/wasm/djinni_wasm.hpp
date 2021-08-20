@@ -4,7 +4,6 @@
 #include <emscripten/bind.h>
 
 #include "../expected.hpp"
-#include "../proxy_cache_impl.hpp"
 
 #include <unordered_map>
 #include <unordered_set>
