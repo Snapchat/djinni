@@ -50,4 +50,28 @@ em::val getCppProxyFinalizerRegistry() {
     return em::val::module_property("cppProxyFinalizerRegistry");
 }
 
+em::val getCppProxyClass() {
+    static std::once_flag defineProxyClassOnce;
+    std::call_once(defineProxyClassOnce, []{
+        EM_ASM(
+            console.log("define cpp proxy class");
+            class DjinniCppProxy {
+                constructor(nativeRef, methods) {
+                    console.log('new cpp proxy');
+                    this._djinni_native_ref = nativeRef;
+                    let self = this;
+                    methods.forEach(function(method) {
+                            self[method] = function(...args) {
+                                return nativeRef[method](...args);
+                            }
+                        });
+                }
+            }
+            Module.DjinniCppProxy = DjinniCppProxy;
+        );
+    });
+    static auto inst  = em::val::module_property("DjinniCppProxy");
+    return inst;
+}
+
 }

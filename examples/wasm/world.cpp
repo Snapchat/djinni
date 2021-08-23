@@ -98,9 +98,10 @@ struct NativeMyInterface : djinni::JsInterface<MyInterface, NativeMyInterface> {
             return djinni::Outcome<NativeMyRecord, djinni::String>::toCpp(_jsRef().call<em::val>("testOutcome", djinni::Bool::fromCpp(success)));
         }
     };
-    static em::val cppProxy() {
-        static em::val inst = em::val::module_property("MyInterface_CppProxy");
-        return inst;
+    static em::val cppProxyMethods() {
+        static const std::vector<std::string> methods = {"foo", "testStr", "testBin", "testDate", "testRecord", "testOptional1", "testOptional2", "testList", "testSet", "testMap", "testOutcome"};
+        static const em::val methodsArray = em::val::array(methods);
+        return methodsArray;
     }
     // ---------
     using CppType = std::shared_ptr<MyInterface>;

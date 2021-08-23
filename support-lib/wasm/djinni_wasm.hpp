@@ -317,6 +317,7 @@ extern std::mutex jsProxyCacheMutex;
 extern std::mutex cppProxyCacheMutex;
 
 extern em::val getCppProxyFinalizerRegistry();
+extern em::val getCppProxyClass();
 
 template<typename I, typename Self>
 struct JsInterface {
@@ -352,7 +353,7 @@ struct JsInterface {
             // create a new cpp proxy and store it in cache
             static em::val weakRefClass = em::val::global("WeakRef");
             em::val nativeRef(c);
-            em::val cppProxy = Self::cppProxy().new_(nativeRef);
+            em::val cppProxy = getCppProxyClass().new_(nativeRef, Self::cppProxyMethods());
             em::val weakRef = weakRefClass.new_(cppProxy);
             cppProxyCache.emplace(c.get(), weakRef);
             static em::val finalizerRegistry = getCppProxyFinalizerRegistry();
