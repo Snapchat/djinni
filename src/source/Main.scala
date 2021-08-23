@@ -84,6 +84,7 @@ object Main {
     var objcFileIdentStyleOptional: Option[IdentConverter] = None
     var objcppNamespace: String = "djinni_generated"
     var objcBaseLibIncludePrefix: String = ""
+    var wasmOutFolder: Option[File] = None
     var inFileListPath: Option[File] = None
     var outFileListPath: Option[File] = None
     var skipGeneration: Boolean = false
@@ -214,6 +215,9 @@ object Main {
       opt[String]("objc-base-lib-include-prefix").valueName("...").foreach(x => objcBaseLibIncludePrefix = x)
         .text("The Objective-C++ base library's include path, relative to the Objective-C++ classes.")
       note("")
+      opt[File]("wasm-out").valueName("<out-folder>").foreach(x => wasmOutFolder = Some(x))
+        .text("The output for the WASM bridge C++ files (Generator disabled if unspecified).")
+      note("")
       opt[File]("yaml-out").valueName("<out-folder>").foreach(x => yamlOutFolder = Some(x))
         .text("The output folder for YAML files (Generator disabled if unspecified).")
       opt[String]("yaml-out-file").valueName("<out-file>").foreach(x => yamlOutFile = Some(x))
@@ -249,7 +253,6 @@ object Main {
       identStyle("ident-objc-type-param", c => { objcIdentStyle = objcIdentStyle.copy(typeParam = c) })
       identStyle("ident-objc-local",      c => { objcIdentStyle = objcIdentStyle.copy(local = c) })
       identStyle("ident-objc-file",       c => { objcFileIdentStyleOptional = Some(c) })
-
     }
 
     if (!argParser.parse(args)) {
@@ -385,6 +388,7 @@ object Main {
       objcGenProtocol,
       objcDisableClassCtor,
       objcClosedEnums,
+      wasmOutFolder,
       outFileListWriter,
       skipGeneration,
       yamlOutFolder,

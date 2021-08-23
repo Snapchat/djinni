@@ -86,6 +86,7 @@ package object generatorTools {
                    objcGenProtocol: Boolean,
                    objcDisableClassCtor: Boolean,
                    objcClosedEnums: Boolean,
+                   wasmOutFolder: Option[File],
                    outFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],
@@ -232,6 +233,12 @@ package object generatorTools {
         SwiftBridgingHeaderGenerator.writeAutogenerationWarning(spec.objcSwiftBridgingHeaderName.get, spec.objcSwiftBridgingHeaderWriter.get)
         SwiftBridgingHeaderGenerator.writeBridgingVars(spec.objcSwiftBridgingHeaderName.get, spec.objcSwiftBridgingHeaderWriter.get)
         new SwiftBridgingHeaderGenerator(spec).generate(idl)
+      }
+      if (spec.wasmOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("WASM", spec.wasmOutFolder.get)
+        }
+        new WasmGenerator(spec).generate(idl)
       }
       if (spec.yamlOutFolder.isDefined) {
         if (!spec.skipGeneration) {
