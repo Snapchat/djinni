@@ -20,7 +20,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     return "Native" + spec.cppFileIdentStyle(name)
   }
   private def marshallerName(name: String): String = {
-    return "Native" + spec.cppIdentStyle.ty(name)
+    return "Native" + idCpp.ty(name)
   }
   private def marshallerNamespace(): String = {
     return "djinni_generated"
@@ -146,8 +146,8 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       m.ret.foreach(refs.find)
     })
 
-    val cls = withNs(Some(spec.cppNamespace), idCpp.ty(ident.name))
-    val helper = marshallerName(ident.name)
+    val cls = withNs(Some(spec.cppNamespace), idCpp.ty(ident))
+    val helper = marshallerName(ident)
 
     writeHppFileGeneric(spec.wasmOutFolder.get, marshallerNamespace(), spec.cppFileIdentStyle)(hppFileName(ident.name), origin, refs.hpp, Nil, (w => {
       w.w(s"struct $helper : ::djinni::JsInterface<$cls, $helper>").bracedSemi {
@@ -168,9 +168,9 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         // stubs
         for (m <- i.methods) {
           val selfRef = if (m.static) "" else "const CppType& self, "
-          w.w(s"static ${stubRetType(m)} ${m.ident.name}(${selfRef}")
+          w.w(s"static ${stubRetType(m)} ${idCpp.method(m.ident)}(${selfRef}")
           w.w(m.params.map(p => {
-            s"${stubParamType(p.ty)} ${stubParamName(p.ident.name)}"
+            s"${stubParamType(p.ty)} ${stubParamName(idCpp.local(p.ident))}"
           }).mkString(","))
           w.wl(");")
         }
@@ -181,9 +181,9 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
           w.wl("JsProxy(const em::val& v) : JsProxyBase(v) {}")
           for (m <- i.methods) {
             if (!m.static) {
-              w.w(s"${cppMarshal.fqReturnType(m.ret)} ${m.ident.name}(")
+              w.w(s"${cppMarshal.fqReturnType(m.ret)} ${idCpp.method(m.ident)}(")
               w.w(m.params.map(p => {
-                s"${cppMarshal.fqParamType(p.ty)} ${p.ident.name}"
+                s"${cppMarshal.fqParamType(p.ty)} ${idCpp.local(p.ident)}"
               }).mkString(","))
               w.wl(") override;")
             }
@@ -197,7 +197,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       w.w(s"em::val $helper::cppProxyMethods()").braced {
         w.w("static const em::val methods = em::val::array(std::vector<std::string>").bracedEnd(");") {
           for (m <- i.methods) {
-            w.wl(s""""${m.ident.name}",""")
+            w.wl(s""""${idCpp.method(m.ident)}",""")
           }
         }
         w.wl("return methods;")
@@ -206,15 +206,15 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       // js proxy methods
       for (m <- i.methods) {
         if (!m.static) {
-          w.w(s"${cppMarshal.fqReturnType(m.ret)} ${helper}::JsProxy::${m.ident.name}(")
+          w.w(s"${cppMarshal.fqReturnType(m.ret)} ${helper}::JsProxy::${idCpp.method(m.ident)}(")
           w.w(m.params.map(p => {
-            s"${cppMarshal.fqParamType(p.ty)} ${p.ident.name}"
+            s"${cppMarshal.fqParamType(p.ty)} ${idCpp.local(p.ident)}"
           }).mkString(","))
           w.w(")").braced {
             val retPrefix = if (m.ret.isEmpty) "" else s"${helperName(m.ret.get.resolved)}::toCpp("
             val retSuffix = if (m.ret.isEmpty) "" else ")"
             writeAlignedCall(w, s"""return ${retPrefix}_jsRef().call<${stubRetType(m)}>("${m.ident.name}", """, m.params, s")${retSuffix}", p => {
-              s"${helperName(p.ty.resolved)}::fromCpp(${p.ident.name})"
+              s"${helperName(p.ty.resolved)}::fromCpp(${idCpp.local(p.ident)})"
             })
             w.wl(";")
           }
@@ -228,7 +228,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
           w.wl(s""".function("nativeDestroy", &$helper::nativeDestroy)""")
           for (m <- i.methods) {
             val funcType = if (m.static) "class_function" else "function"
-            w.wl(s""".$funcType("${m.ident.name}", $helper::${m.ident.name})""")
+            w.wl(s""".$funcType("${m.ident.name}", $helper::${idCpp.method(m.ident)})""")
           }
           w.wl(";")
         }
@@ -265,7 +265,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.w(s"auto $helper::fromCpp(const CppType& c) -> JsType").braced {
           w.wl("em::val js = em::val::object();")
           for (f <- r.fields) {
-            w.wl(s"""js.set("${f.ident.name}", ${helperClass(f.ty.resolved)}::Boxed::fromCpp(c.${f.ident.name}));""")
+            w.wl(s"""js.set("${f.ident.name}", ${helperClass(f.ty.resolved)}::Boxed::fromCpp(c.${idCpp.field(f.ident)}));""")
           }
           w.wl("return js")
         }
