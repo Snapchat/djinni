@@ -64,6 +64,30 @@ using F64 = Primitive<double>;
 using String = Primitive<std::string>;
 using WString = Primitive<std::wstring>;
 
+template<typename T>
+class WasmEnum {
+public:
+    using CppType = T;
+    using JsType = int32_t;
+
+    struct Boxed {
+        using JsType = em::val;
+        static CppType toCpp(JsType j) {
+            return static_cast<CppType>(j.as<int32_t>());
+        }
+        static JsType fromCpp(CppType c) {
+            return JsType(static_cast<int32_t>(c));
+        }
+    };
+
+    static CppType toCpp(const JsType& j) {
+        return static_cast<CppType>(j);
+    }
+    static JsType fromCpp(const CppType& c) {
+        return static_cast<JsType>(c);
+    }
+};
+
 class Binary {
 public:
     using CppType = std::vector<uint8_t>;

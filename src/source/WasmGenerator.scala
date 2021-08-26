@@ -13,16 +13,10 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
   val cppMarshal = new CppMarshal(spec)
 
   // TODO: use wasm indent style spec
-  private def hppFileName(name: String): String = {
-    return "Native" + spec.cppFileIdentStyle(name)
+  private def wasmFilename(name: String): String = {
+    return spec.jniFileIdentStyle(name)
   }
-  private def cppFileName(name: String): String = {
-    return "Native" + spec.cppFileIdentStyle(name)
-  }
-  private def marshallerName(name: String): String = {
-    return "Native" + idCpp.ty(name)
-  }
-  private def marshallerNamespace(): String = {
+  private def helperNamespace(): String = {
     return "djinni_generated"
   }
   private def includePrefix(): String = {
@@ -30,9 +24,8 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     return "";
   }
 
-  private def helperClass(name: String) = marshallerName(name)
+  private def helperClass(name: String) = "Native" + idCpp.ty(name)
   private def helperClass(tm: MExpr): String = helperName(tm) + helperTemplates(tm)
-
   private def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => withNs(Some(spec.jniNamespace), helperClass(d.name))
     case e: MExtern => e.jni.translator
@@ -61,7 +54,6 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       case p: MParam => throw new AssertionError("not applicable")
     })
   }
-
   private def helperTemplates(tm: MExpr): String = {
     def f() = if(tm.args.isEmpty) "" else tm.args.map(helperClass).mkString("<", ", ", ">")
     tm.base match {
@@ -97,6 +89,10 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
   private def stubParamType(t: TypeRef): String = t.resolved.base match {
     case p: MPrimitive => p.cName
     case MString => if (spec.cppUseWideStrings) "const std::wstring&" else "const std::string&"
+    case d: MDef => d.defType match {
+      case DEnum => "int32_t"
+      case _ => "const em::val&"
+    }
     case _ => "const em::val&"
   }
   private def stubParamName(name: String): String = s"w_${idCpp.local(name)}"
@@ -136,6 +132,12 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
   //------------------------------------------------------------------------------
 
   override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
+    val refs = new WasmRefs(ident.name)
+    writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle)(wasmFilename(ident.name), origin, refs.hpp, Nil, (w => {
+      val cls = cppMarshal.fqTypename(ident, e)
+      val helper = helperClass(ident)
+      w.wl(s"struct $helper: ::djinni::WasmEnum<$cls> {};")
+    }), (w => {}))
   }
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface) {
@@ -147,9 +149,9 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     })
 
     val cls = withNs(Some(spec.cppNamespace), idCpp.ty(ident))
-    val helper = marshallerName(ident)
+    val helper = helperClass(ident)
 
-    writeHppFileGeneric(spec.wasmOutFolder.get, marshallerNamespace(), spec.cppFileIdentStyle)(hppFileName(ident.name), origin, refs.hpp, Nil, (w => {
+    writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle)(wasmFilename(ident.name), origin, refs.hpp, Nil, (w => {
       w.w(s"struct $helper : ::djinni::JsInterface<$cls, $helper>").bracedSemi {
         // types
         w.wl(s"using CppType = std::shared_ptr<$cls>;")
@@ -191,7 +193,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       }
     }), (w => {}))
 
-    writeCppFileGeneric(spec.wasmOutFolder.get, marshallerNamespace(), spec.cppFileIdentStyle, includePrefix())(cppFileName(ident.name), origin, refs.cpp, (w => {
+    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle, includePrefix())(wasmFilename(ident.name), origin, refs.cpp, (w => {
       // method list
       w.w(s"em::val $helper::cppProxyMethods()").braced {
         w.w("static const em::val methods = em::val::array(std::vector<std::string>").bracedEnd(");") {
@@ -257,11 +259,11 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     val refs = new WasmRefs(ident.name)
 
     val cls = withNs(Some(spec.cppNamespace), idCpp.ty(ident.name))
-    val helper = marshallerName(ident.name)
+    val helper = helperClass(ident.name)
 
     // TODO: consts in records
 
-    writeHppFileGeneric(spec.wasmOutFolder.get, marshallerNamespace(), spec.cppFileIdentStyle)(hppFileName(ident.name), origin, refs.hpp, Nil, (w => {
+    writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle)(wasmFilename(ident.name), origin, refs.hpp, Nil, (w => {
       w.wl(s"struct $helper").bracedSemi {
         w.wl(s"using CppType = $cls;")
         w.wl("using JsType = em::val;")
@@ -272,7 +274,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       }
     }), (w => {}))
 
-    writeCppFileGeneric(spec.wasmOutFolder.get, marshallerNamespace(), spec.cppFileIdentStyle, includePrefix())(cppFileName(ident.name), origin, refs.cpp, (w => {
+    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle, includePrefix())(wasmFilename(ident.name), origin, refs.cpp, (w => {
         w.w(s"auto $helper::toCpp(const JsType& j) -> CppType").braced {
           writeAlignedCall(w, "return {", r.fields, "}", f => {
             s"""${helperClass(f.ty.resolved)}::Boxed::toCpp(j["${f.ident.name}"])"""

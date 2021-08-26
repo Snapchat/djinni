@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>WASM Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <h1>WASM Demo</h1>
+    <textarea id="txt" cols="40" rows="5"></textarea>
+    <p/>
+    <script>
+      var Module = {
+          onRuntimeInitialized: function() {
+              class SortListener {
+                  update(itemList) {
+                      document.getElementById('txt').value = itemList.items.join('\n')
+                  }
+              }
+              sorter = Module.sort_items.create_with_listener(new SortListener())
+          }
+      };
+      function sort(order) {
+          var lines = document.getElementById('txt').value.split('\n');
+          var itemList = {
+              items: lines
+          };
+          sorter.sort(order, itemList);
+      }
+      function onSortAsc() {
+          sort(0)
+      }
+      function onSortDesc() {
+          sort(1)
+      }
+      function onSortRandom() {
+          sort(2)
+      }
+    </script>
+    <script src="demo_cpp.js"></script>
+    <button onclick="onSortAsc()">Sort Asc</button> 
+    <button onclick="onSortDesc()">Sort Desc</button> 
+    <button onclick="onSortRandom()">Sort Random</button> 
+  </body>
+</html>
