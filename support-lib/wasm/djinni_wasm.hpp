@@ -380,8 +380,7 @@ struct JsInterface {
             em::val cppProxy = getCppProxyClass().new_(nativeRef, Self::cppProxyMethods());
             em::val weakRef = weakRefClass.new_(cppProxy);
             cppProxyCache.emplace(c.get(), weakRef);
-            static em::val finalizerRegistry = getCppProxyFinalizerRegistry();
-            finalizerRegistry.call<void>("register", cppProxy, nativeRef);
+            getCppProxyFinalizerRegistry().call<void>("register", cppProxy, nativeRef);
             return cppProxy;
         }
     }

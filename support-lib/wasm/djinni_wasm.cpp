@@ -38,39 +38,46 @@ const em::val& JsProxyBase::_jsRef() const {
     return _js;
 }
 
-em::val getCppProxyFinalizerRegistry() {
-    EM_ASM(
+EM_JS(void, djinni_init, (), {
+    if (typeof Module.cppProxyFinalizerRegistry == 'undefined') {
         console.log("create cppProxyFinalizerRegistry");
         Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => {
             console.log("finalizing cpp object");
             nativeRef.nativeDestroy();
             nativeRef.delete();
         });
-    );
-    return em::val::module_property("cppProxyFinalizerRegistry");
+    }
+    if (typeof Module.DjinniCppProxy == 'undefined') {
+        console.log("define cpp proxy class");
+        class DjinniCppProxy {
+            constructor(nativeRef, methods) {
+                console.log('new cpp proxy');
+                this._djinni_native_ref = nativeRef;
+                let self = this;
+                methods.forEach(function(method) {
+                    self[method] = function(...args) {
+                        return nativeRef[method](...args);
+                    }
+                });
+            }
+        }
+        Module.DjinniCppProxy = DjinniCppProxy;
+    }
+});
+
+static em::val getJsHelper(const char* name) {
+    static std::once_flag djinniInitOnce;
+    std::call_once(djinniInitOnce, djinni_init);
+    return em::val::module_property(name);
+}
+
+em::val getCppProxyFinalizerRegistry() {
+    static auto inst  = getJsHelper("cppProxyFinalizerRegistry");
+    return inst;
 }
 
 em::val getCppProxyClass() {
-    static std::once_flag defineProxyClassOnce;
-    std::call_once(defineProxyClassOnce, []{
-        EM_ASM(
-            console.log("define cpp proxy class");
-            class DjinniCppProxy {
-                constructor(nativeRef, methods) {
-                    console.log('new cpp proxy');
-                    this._djinni_native_ref = nativeRef;
-                    let self = this;
-                    methods.forEach(function(method) {
-                            self[method] = function(...args) {
-                                return nativeRef[method](...args);
-                            }
-                        });
-                }
-            }
-            Module.DjinniCppProxy = DjinniCppProxy;
-        );
-    });
-    static auto inst  = em::val::module_property("DjinniCppProxy");
+    static auto inst  = getJsHelper("DjinniCppProxy");
     return inst;
 }
 

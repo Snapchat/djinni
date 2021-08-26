@@ -5,22 +5,26 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>WASM Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="demo_cpp.js"></script>
   </head>
   <body>
     <h1>WASM Demo</h1>
-    <textarea id="txt" cols="40" rows="5"></textarea>
-    <p/>
+    <p>
+    <textarea id="txt" cols="40" rows="5">item1
+item3
+item5
+item2
+item4</textarea>
+    </p>
     <script>
-      var Module = {
-          onRuntimeInitialized: function() {
-              class SortListener {
-                  update(itemList) {
-                      document.getElementById('txt').value = itemList.items.join('\n')
-                  }
-              }
-              sorter = Module.sort_items.create_with_listener(new SortListener())
+      class SortListener {
+          update(itemList) {
+              document.getElementById('txt').value = itemList.items.join('\n')
           }
-      };
+      }
+      client().then(module => {
+          sorter = module.sort_items.create_with_listener(new SortListener())
+      });
       function sort(order) {
           var lines = document.getElementById('txt').value.split('\n');
           var itemList = {
@@ -38,7 +42,6 @@
           sort(2)
       }
     </script>
-    <script src="demo_cpp.js"></script>
     <button onclick="onSortAsc()">Sort Asc</button> 
     <button onclick="onSortDesc()">Sort Desc</button> 
     <button onclick="onSortRandom()">Sort Random</button> 
