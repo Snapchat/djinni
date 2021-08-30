@@ -256,69 +256,71 @@ struct Outcome
 };
 
 template <typename T>
-struct TypedArrayTraits {
-    static em::val getArrayClass() {return em::val::undefined();}
-};
-template<>
-struct TypedArrayTraits<I8> {
-    static em::val getArrayClass() {
-        static em::val arrayClass = em::val::global("Int8Array");
-        return arrayClass;}
-};
-template<>
-struct TypedArrayTraits<I16> {
-    static em::val getArrayClass() {
-        static em::val arrayClass = em::val::global("Int16Array");
-        return arrayClass;
-    }
-};
-template<>
-struct TypedArrayTraits<I32> {
-    static em::val getArrayClass() {
-        static em::val arrayClass = em::val::global("Int32Array");
-        return arrayClass;
-    }
-};
-template<>
-struct TypedArrayTraits<F32> {
-    static em::val getArrayClass() {
-        static em::val arrayClass = em::val::global("Float32Array");
-        return arrayClass;
-    }
-};
-template<>
-struct TypedArrayTraits<F64> {
-    static em::val getArrayClass() {
-        static em::val arrayClass = em::val::global("Float64Array");
-        return arrayClass;
-    }
-};
-
-template <typename T>
 struct Array {
     using CppType = std::vector<typename T::CppType>;
     using JsType = em::val;
     using Boxed = Array;
 
     static CppType toCpp(const JsType& j) {
-        static em::val arrayBufferClass = em::val::global("ArrayBuffer");
-        if (j["buffer"].instanceof(arrayBufferClass)) {
-            std::cout << "typed array to vector" << std::endl;
-            return em::convertJSArrayToNumberVector<typename T::CppType>(j);
-        } else {
-            return List<T>::toCpp(j);
-        }
+        return List<T>::toCpp(j);
     }
     static JsType fromCpp(const CppType& c) {
-        em::val arrayClass = TypedArrayTraits<T>::getArrayClass();
-        if (!arrayClass.isUndefined()) {
-            std::cout << "vector to typed array" << std::endl;
-            em::val memoryView{ em::typed_memory_view(c.size(), c.data()) };
-            em::val buffer = memoryView.call<em::val>("slice", 0);
-            return arrayClass.new_(buffer);
-        } else {
-            return List<T>::fromCpp(c);
-        }
+        return List<T>::fromCpp(c);
+    }
+};
+template <typename T>
+struct PrimitiveArray {
+    using CppType = std::vector<typename T::CppType>;
+    using JsType = em::val;
+    using Boxed = PrimitiveArray;
+
+    static CppType toCpp(const JsType& j) {
+        static em::val arrayBufferClass = em::val::global("ArrayBuffer");
+        assert(j["buffer"].instanceof(arrayBufferClass));
+        std::cout << "typed array to vector" << std::endl;
+        return em::convertJSArrayToNumberVector<typename T::CppType>(j);
+    }
+    static JsType fromCpp(const CppType& c) {
+        em::val arrayClass = Array<T>::getArrayClass();
+        std::cout << "vector to typed array" << std::endl;
+        em::val memoryView{ em::typed_memory_view(c.size(), c.data()) };
+        em::val buffer = memoryView.call<em::val>("slice", 0);
+        return arrayClass.new_(buffer);
+    }
+};
+template <>
+struct Array<I8> : PrimitiveArray<I8> {
+    static em::val getArrayClass() {
+        static em::val arrayClass = em::val::global("Int8Array");
+        return arrayClass;
+    }
+};
+template <>
+struct Array<I16> : PrimitiveArray<I16> {
+    static em::val getArrayClass() {
+        static em::val arrayClass = em::val::global("Int16Array");
+        return arrayClass;
+    }
+};
+template <>
+struct Array<I32> : PrimitiveArray<I32> {
+    static em::val getArrayClass() {
+        static em::val arrayClass = em::val::global("Int32Array");
+        return arrayClass;
+    }
+};
+template <>
+struct Array<F32> : PrimitiveArray<F32> {
+    static em::val getArrayClass() {
+        static em::val arrayClass = em::val::global("Float32Array");
+        return arrayClass;
+    }
+};
+template <>
+struct Array<F64> : PrimitiveArray<F64> {
+    static em::val getArrayClass() {
+        static em::val arrayClass = em::val::global("Float64Array");
+        return arrayClass;
     }
 };
 
