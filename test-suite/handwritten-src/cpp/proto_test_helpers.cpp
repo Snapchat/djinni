@@ -1,3 +1,5 @@
+#if (!defined(__EMSCRIPTEN__))
+
 #include "proto_tests.hpp"
 #include "RecordWithEmbeddedProto.hpp"
 #include "RecordWithEmbeddedCppProto.hpp"
@@ -93,3 +95,5 @@ djinni::expected<::djinni::test::Person, int32_t> ProtoTests::stringToProtoOutco
 }
 
 }
+
+#endif
