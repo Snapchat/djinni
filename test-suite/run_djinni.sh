@@ -32,6 +32,7 @@ cpp_out="$base_dir/generated-src/cpp"
 jni_out="$base_dir/generated-src/jni"
 objc_out="$base_dir/generated-src/objc"
 java_out="$base_dir/generated-src/java/com/dropbox/djinni/test"
+wasm_out="$base_dir/generated-src/wasm"
 yaml_out="$base_dir/generated-src/yaml"
 
 java_package="com.dropbox.djinni.test"
@@ -118,6 +119,8 @@ fi
     --objcpp-out "$temp_out_relative/objc" \
     --objc-type-prefix DB \
     \
+    --wasm-out "$temp_out_relative/wasm" \
+    \
     --list-in-files "./generated-src/inFileList.txt" \
     --list-out-files "./generated-src/outFileList.txt"\
     \
@@ -195,6 +198,7 @@ mirror "cpp" "$temp_out/cpp" "$cpp_out"
 mirror "java" "$temp_out/java" "$java_out"
 mirror "jni" "$temp_out/jni" "$jni_out"
 mirror "objc" "$temp_out/objc" "$objc_out"
+mirror "wasm" "$temp_out/wasm" "$wasm_out"
 
 date > "$gen_stamp"
 
