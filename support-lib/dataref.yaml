@@ -26,3 +26,7 @@ jni:
   header: '"DataRef_jni.hpp"'
   typename: jobject
   typeSignature: 'Ljava/nio/ByteBuffer;'
+wasm:
+  typename: 'em::val'
+  translator: '::snapchat::djinni::NativeDataRef'
+  header: 'djinni_wasm.hpp'

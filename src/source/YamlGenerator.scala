@@ -16,6 +16,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   val objcppMarshal = new ObjcppMarshal(spec)
   val javaMarshal = new JavaMarshal(spec)
   val jniMarshal = new JNIMarshal(spec)
+  val wasmMarshal = new WasmGenerator(spec)
 
   case class QuotedString(str: String) // For anything that migt require escaping
 
@@ -51,6 +52,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     w.wl("objcpp:").nested { write(w, objcpp(td)) }
     w.wl("java:").nested { write(w, java(td)) }
     w.wl("jni:").nested { write(w, jni(td)) }
+    w.wl("wasm:").nested { write(w, wasm(td)) }
   }
 
   private def write(w: IndentWriter, m: Map[String, Any]) {
@@ -159,6 +161,12 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     "typeSignature" -> QuotedString(jniMarshal.fqTypename(td.ident, td.body))
   )
 
+  private def wasm(td: TypeDecl) = Map[String, Any](
+    "translator" -> QuotedString(wasmMarshal.helperName(mexpr(td))),
+    "header" -> QuotedString(wasmMarshal.include(td.ident)),
+    "typename" -> wasmMarshal.wasmType(mexpr(td))
+  )
+
   // TODO: there has to be a way to do all this without the MExpr/Meta conversions?
   private def mexpr(td: TypeDecl) = MExpr(meta(td), List())
 
@@ -232,7 +240,11 @@ object YamlGenerator {
       nested(td, "jni")("translator").toString,
       nested(td, "jni")("header").toString,
       nested(td, "jni")("typename").toString,
-      nested(td, "jni")("typeSignature").toString)
+      nested(td, "jni")("typeSignature").toString),
+    MExtern.Wasm(
+      nested(td, "wasm")("typename").toString,
+      nested(td, "wasm")("translator").toString,
+      nested(td, "wasm")("header").toString)
   )
 
   private def nested(td: ExternTypeDecl, key: String) = {

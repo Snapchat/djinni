@@ -17,7 +17,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     return spec.jniFileIdentStyle(name)
   }
   private def helperNamespace(): String = {
-    return "djinni_generated"
+    return spec.jniNamespace;
   }
   private def includePrefix(): String = {
     // TODO: add include path prefix
@@ -26,9 +26,9 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
 
   private def helperClass(name: String) = "Native" + idCpp.ty(name)
   private def helperClass(tm: MExpr): String = helperName(tm) + helperTemplates(tm)
-  private def helperName(tm: MExpr): String = tm.base match {
-    case d: MDef => withNs(Some(spec.jniNamespace), helperClass(d.name))
-    case e: MExtern => e.jni.translator
+  def helperName(tm: MExpr): String = tm.base match {
+    case d: MDef => withNs(Some(helperNamespace()), helperClass(d.name))
+    case e: MExtern => e.wasm.translator
     case o => withNs(Some("djinni"), o match {
       case p: MPrimitive => p.idlName match {
         case "i8" => "I8"
@@ -78,7 +78,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  private def wasmType(t: TypeRef): String = t.resolved.base match {
+  def wasmType(tm: MExpr): String = tm.base match {
     case p: MPrimitive => p.cName
     case MString => if (spec.cppUseWideStrings) "std::wstring" else "std::string"
     case d: MDef => d.defType match {
@@ -87,6 +87,8 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     }
     case _ => "em::val"
   }
+  def wasmType(t: TypeRef): String = wasmType(t.resolved)
+
   private def stubRetType(m: Interface.Method): String = {
     return if (m.ret.isEmpty) "void" else wasmType(m.ret.get)
   }
@@ -99,13 +101,14 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     }
     case _ => "const em::val&"
   }
+
   private def stubParamName(name: String): String = s"w_${idCpp.local(name)}"
 
   def include(ident: String) = q(spec.jniIncludePrefix + spec.jniFileIdentStyle(ident) + "." + spec.cppHeaderExt)
 
   def references(m: Meta, exclude: String = ""): Seq[SymbolReference] = m match {
     case d: MDef => List(ImportRef(include(d.name)))
-    case e: MExtern => List(ImportRef(e.jni.header))
+    case e: MExtern => List(ImportRef(e.wasm.header))
     case _ => List()
   }
 
@@ -190,7 +193,8 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
               w.w(m.params.map(p => {
                 s"${cppMarshal.fqParamType(p.ty)} ${idCpp.local(p.ident)}"
               }).mkString(","))
-              w.wl(") override;")
+              val constModifier = if (m.const) " const" else ""
+              w.wl(s")$constModifier override;")
             }
           }
         }
@@ -229,11 +233,12 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       // js proxy methods
       for (m <- i.methods) {
         if (!m.static) {
+          val constModifier = if (m.const) " const" else ""
           w.w(s"${cppMarshal.fqReturnType(m.ret)} ${helper}::JsProxy::${idCpp.method(m.ident)}(")
           w.w(m.params.map(p => {
             s"${cppMarshal.fqParamType(p.ty)} ${idCpp.local(p.ident)}"
           }).mkString(","))
-          w.w(")").braced {
+          w.w(s")$constModifier").braced {
             val retPrefix = if (m.ret.isEmpty) "" else s"${helperClass(m.ret.get.resolved)}::toCpp("
             val retSuffix = if (m.ret.isEmpty) "" else ")"
             val methodName = if (m.params.isEmpty) q(m.ident.name) else q(m.ident.name) + ", "

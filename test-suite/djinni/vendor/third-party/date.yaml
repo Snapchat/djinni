@@ -30,3 +30,7 @@ jni:
   header: '"Marshal.hpp"'
   typename: jobject
   typeSignature: 'Ljava/util/Date;'
+wasm:
+  typename: 'em::val'
+  translator: '::djinni::Date'
+  header: '"djinni_wasm.hpp"'
