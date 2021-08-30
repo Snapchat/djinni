@@ -81,6 +81,10 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
   private def wasmType(t: TypeRef): String = t.resolved.base match {
     case p: MPrimitive => p.cName
     case MString => if (spec.cppUseWideStrings) "std::wstring" else "std::string"
+    case d: MDef => d.defType match {
+      case DEnum => "int32_t"
+      case _ => "em::val"
+    }
     case _ => "em::val"
   }
   private def stubRetType(m: Interface.Method): String = {
@@ -169,7 +173,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl("")
         // stubs
         for (m <- i.methods) {
-          val selfRef = if (m.static) "" else "const CppType& self, "
+          val selfRef = if (m.static) "" else if (m.params.isEmpty) "const CppType& self" else "const CppType& self, "
           w.w(s"static ${stubRetType(m)} ${idCpp.method(m.ident)}(${selfRef}")
           w.w(m.params.map(p => {
             s"${stubParamType(p.ty)} ${stubParamName(idCpp.local(p.ident))}"
@@ -206,7 +210,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       w.wl("")
       // stub methods
       for (m <- i.methods) {
-        val selfRef = if (m.static) "" else "const CppType& self, "
+        val selfRef = if (m.static) "" else if (m.params.isEmpty) "const CppType& self" else "const CppType& self, "
         w.w(s"${stubRetType(m)} $helper::${idCpp.method(m.ident)}(${selfRef}")
         w.w(m.params.map(p => {
           s"${stubParamType(p.ty)} ${stubParamName(p.ident)}"
@@ -232,7 +236,8 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
           w.w(")").braced {
             val retPrefix = if (m.ret.isEmpty) "" else s"${helperClass(m.ret.get.resolved)}::toCpp("
             val retSuffix = if (m.ret.isEmpty) "" else ")"
-            writeAlignedCall(w, s"""return ${retPrefix}_jsRef().call<${stubRetType(m)}>("${m.ident.name}", """, m.params, s")${retSuffix}", p => {
+            val methodName = if (m.params.isEmpty) q(m.ident.name) else q(m.ident.name) + ", "
+            writeAlignedCall(w, s"""return ${retPrefix}_jsRef().call<${stubRetType(m)}>($methodName""", m.params, s")${retSuffix}", p => {
               s"${helperClass(p.ty.resolved)}::fromCpp(${idCpp.local(p.ident)})"
             })
             w.wl(";")
@@ -257,6 +262,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
 
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: Record) {
     val refs = new WasmRefs(ident.name)
+    r.fields.foreach(f => refs.find(f.ty))
 
     val cls = withNs(Some(spec.cppNamespace), idCpp.ty(ident.name))
     val helper = helperClass(ident.name)
