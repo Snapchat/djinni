@@ -7,7 +7,7 @@ namespace djinni_generated {
 
 em::val NativeCppException::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "throw_an_exception",
+        "throwAnException",
         "get",
     });
     return methods;
@@ -21,14 +21,14 @@ em::val NativeCppException::get() {
 }
 
 int32_t NativeCppException::JsProxy::throw_an_exception() {
-    return ::djinni::I32::toCpp(_jsRef().call<int32_t>("throw_an_exception"));
+    return ::djinni::I32::toCpp(_jsRef().call<int32_t>("throwAnException"));
 }
 
 EMSCRIPTEN_BINDINGS(cpp_exception) {
-    em::class_<::testsuite::CppException>("cpp_exception")
-        .smart_ptr<std::shared_ptr<::testsuite::CppException>>("cpp_exception")
+    em::class_<::testsuite::CppException>("CppException")
+        .smart_ptr<std::shared_ptr<::testsuite::CppException>>("CppException")
         .function("nativeDestroy", &NativeCppException::nativeDestroy)
-        .function("throw_an_exception", NativeCppException::throw_an_exception)
+        .function("throwAnException", NativeCppException::throw_an_exception)
         .class_function("get", NativeCppException::get)
         ;
 }

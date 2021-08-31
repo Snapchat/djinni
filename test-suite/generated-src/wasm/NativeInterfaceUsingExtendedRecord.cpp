@@ -22,8 +22,8 @@ em::val NativeInterfaceUsingExtendedRecord::meth(const CppType& self, const em::
 }
 
 EMSCRIPTEN_BINDINGS(interface_using_extended_record) {
-    em::class_<::testsuite::InterfaceUsingExtendedRecord>("interface_using_extended_record")
-        .smart_ptr<std::shared_ptr<::testsuite::InterfaceUsingExtendedRecord>>("interface_using_extended_record")
+    em::class_<::testsuite::InterfaceUsingExtendedRecord>("InterfaceUsingExtendedRecord")
+        .smart_ptr<std::shared_ptr<::testsuite::InterfaceUsingExtendedRecord>>("InterfaceUsingExtendedRecord")
         .function("nativeDestroy", &NativeInterfaceUsingExtendedRecord::nativeDestroy)
         .function("meth", NativeInterfaceUsingExtendedRecord::meth)
         ;

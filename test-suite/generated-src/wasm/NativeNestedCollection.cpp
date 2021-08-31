@@ -6,11 +6,11 @@
 namespace djinni_generated {
 
 auto NativeNestedCollection::toCpp(const JsType& j) -> CppType {
-    return {::djinni::List<::djinni::Set<::djinni::String>>::Boxed::toCpp(j["set_list"])};
+    return {::djinni::List<::djinni::Set<::djinni::String>>::Boxed::toCpp(j["mSetList"])};
 }
 auto NativeNestedCollection::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("set_list", ::djinni::List<::djinni::Set<::djinni::String>>::Boxed::fromCpp(c.set_list));
+    js.set("mSetList", ::djinni::List<::djinni::Set<::djinni::String>>::Boxed::fromCpp(c.set_list));
     return js;
 }
 

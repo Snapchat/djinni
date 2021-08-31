@@ -13,8 +13,8 @@ em::val NativeJavaOnlyListener::cppProxyMethods() {
 
 
 EMSCRIPTEN_BINDINGS(java_only_listener) {
-    em::class_<::testsuite::JavaOnlyListener>("java_only_listener")
-        .smart_ptr<std::shared_ptr<::testsuite::JavaOnlyListener>>("java_only_listener")
+    em::class_<::testsuite::JavaOnlyListener>("JavaOnlyListener")
+        .smart_ptr<std::shared_ptr<::testsuite::JavaOnlyListener>>("JavaOnlyListener")
         .function("nativeDestroy", &NativeJavaOnlyListener::nativeDestroy)
         ;
 }

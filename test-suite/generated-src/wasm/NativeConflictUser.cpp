@@ -9,7 +9,7 @@ namespace djinni_generated {
 em::val NativeConflictUser::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
         "Conflict",
-        "conflict_arg",
+        "conflictArg",
     });
     return methods;
 }
@@ -26,15 +26,15 @@ std::shared_ptr<::testsuite::Conflict> NativeConflictUser::JsProxy::Conflict() {
 }
 
 bool NativeConflictUser::JsProxy::conflict_arg(const std::unordered_set<std::shared_ptr<::testsuite::Conflict>> & cs) {
-    return ::djinni::Bool::toCpp(_jsRef().call<bool>("conflict_arg", ::djinni::Set<::djinni_generated::NativeConflict>::fromCpp(cs)));
+    return ::djinni::Bool::toCpp(_jsRef().call<bool>("conflictArg", ::djinni::Set<::djinni_generated::NativeConflict>::fromCpp(cs)));
 }
 
 EMSCRIPTEN_BINDINGS(conflict_user) {
-    em::class_<::testsuite::ConflictUser>("conflict_user")
-        .smart_ptr<std::shared_ptr<::testsuite::ConflictUser>>("conflict_user")
+    em::class_<::testsuite::ConflictUser>("ConflictUser")
+        .smart_ptr<std::shared_ptr<::testsuite::ConflictUser>>("ConflictUser")
         .function("nativeDestroy", &NativeConflictUser::nativeDestroy)
         .function("Conflict", NativeConflictUser::Conflict)
-        .function("conflict_arg", NativeConflictUser::conflict_arg)
+        .function("conflictArg", NativeConflictUser::conflict_arg)
         ;
 }
 

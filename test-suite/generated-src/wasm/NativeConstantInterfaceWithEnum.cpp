@@ -13,8 +13,8 @@ em::val NativeConstantInterfaceWithEnum::cppProxyMethods() {
 
 
 EMSCRIPTEN_BINDINGS(constant_interface_with_enum) {
-    em::class_<::testsuite::ConstantInterfaceWithEnum>("constant_interface_with_enum")
-        .smart_ptr<std::shared_ptr<::testsuite::ConstantInterfaceWithEnum>>("constant_interface_with_enum")
+    em::class_<::testsuite::ConstantInterfaceWithEnum>("ConstantInterfaceWithEnum")
+        .smart_ptr<std::shared_ptr<::testsuite::ConstantInterfaceWithEnum>>("ConstantInterfaceWithEnum")
         .function("nativeDestroy", &NativeConstantInterfaceWithEnum::nativeDestroy)
         ;
 }

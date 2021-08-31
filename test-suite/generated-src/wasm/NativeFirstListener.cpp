@@ -21,8 +21,8 @@ void NativeFirstListener::JsProxy::first() {
 }
 
 EMSCRIPTEN_BINDINGS(first_listener) {
-    em::class_<::testsuite::FirstListener>("first_listener")
-        .smart_ptr<std::shared_ptr<::testsuite::FirstListener>>("first_listener")
+    em::class_<::testsuite::FirstListener>("FirstListener")
+        .smart_ptr<std::shared_ptr<::testsuite::FirstListener>>("FirstListener")
         .function("nativeDestroy", &NativeFirstListener::nativeDestroy)
         .function("first", NativeFirstListener::first)
         ;

@@ -6,11 +6,11 @@
 namespace djinni_generated {
 
 auto NativeMapListRecord::toCpp(const JsType& j) -> CppType {
-    return {::djinni::List<::djinni::Map<::djinni::String, ::djinni::I64>>::Boxed::toCpp(j["map_list"])};
+    return {::djinni::List<::djinni::Map<::djinni::String, ::djinni::I64>>::Boxed::toCpp(j["mMapList"])};
 }
 auto NativeMapListRecord::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("map_list", ::djinni::List<::djinni::Map<::djinni::String, ::djinni::I64>>::Boxed::fromCpp(c.map_list));
+    js.set("mMapList", ::djinni::List<::djinni::Map<::djinni::String, ::djinni::I64>>::Boxed::fromCpp(c.map_list));
     return js;
 }
 

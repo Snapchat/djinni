@@ -54,8 +54,8 @@ std::unordered_map<::testsuite::color, ::testsuite::color> NativeEnumUsageInterf
 }
 
 EMSCRIPTEN_BINDINGS(enum_usage_interface) {
-    em::class_<::testsuite::EnumUsageInterface>("enum_usage_interface")
-        .smart_ptr<std::shared_ptr<::testsuite::EnumUsageInterface>>("enum_usage_interface")
+    em::class_<::testsuite::EnumUsageInterface>("EnumUsageInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::EnumUsageInterface>>("EnumUsageInterface")
         .function("nativeDestroy", &NativeEnumUsageInterface::nativeDestroy)
         .function("e", NativeEnumUsageInterface::e)
         .function("o", NativeEnumUsageInterface::o)

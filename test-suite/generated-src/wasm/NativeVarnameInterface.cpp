@@ -8,8 +8,8 @@ namespace djinni_generated {
 
 em::val NativeVarnameInterface::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "_rmethod_",
-        "_imethod_",
+        "Rmethod",
+        "Imethod",
     });
     return methods;
 }
@@ -22,19 +22,19 @@ em::val NativeVarnameInterface::_imethod_(const CppType& self, const em::val& w_
 }
 
 ::testsuite::VarnameRecord NativeVarnameInterface::JsProxy::_rmethod_(const ::testsuite::VarnameRecord & _r_arg_) {
-    return ::djinni_generated::NativeVarnameRecord::toCpp(_jsRef().call<em::val>("_rmethod_", ::djinni_generated::NativeVarnameRecord::fromCpp(_r_arg_)));
+    return ::djinni_generated::NativeVarnameRecord::toCpp(_jsRef().call<em::val>("Rmethod", ::djinni_generated::NativeVarnameRecord::fromCpp(_r_arg_)));
 }
 
 std::shared_ptr<::testsuite::VarnameInterface> NativeVarnameInterface::JsProxy::_imethod_(const std::shared_ptr<::testsuite::VarnameInterface> & _i_arg_) {
-    return ::djinni_generated::NativeVarnameInterface::toCpp(_jsRef().call<em::val>("_imethod_", ::djinni_generated::NativeVarnameInterface::fromCpp(_i_arg_)));
+    return ::djinni_generated::NativeVarnameInterface::toCpp(_jsRef().call<em::val>("Imethod", ::djinni_generated::NativeVarnameInterface::fromCpp(_i_arg_)));
 }
 
 EMSCRIPTEN_BINDINGS(_varname_interface_) {
-    em::class_<::testsuite::VarnameInterface>("_varname_interface_")
-        .smart_ptr<std::shared_ptr<::testsuite::VarnameInterface>>("_varname_interface_")
+    em::class_<::testsuite::VarnameInterface>("VarnameInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::VarnameInterface>>("VarnameInterface")
         .function("nativeDestroy", &NativeVarnameInterface::nativeDestroy)
-        .function("_rmethod_", NativeVarnameInterface::_rmethod_)
-        .function("_imethod_", NativeVarnameInterface::_imethod_)
+        .function("Rmethod", NativeVarnameInterface::_rmethod_)
+        .function("Imethod", NativeVarnameInterface::_imethod_)
         ;
 }
 

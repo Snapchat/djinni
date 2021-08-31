@@ -36,8 +36,8 @@ void NativeListenerCaller::JsProxy::callSecond() {
 }
 
 EMSCRIPTEN_BINDINGS(listener_caller) {
-    em::class_<::testsuite::ListenerCaller>("listener_caller")
-        .smart_ptr<std::shared_ptr<::testsuite::ListenerCaller>>("listener_caller")
+    em::class_<::testsuite::ListenerCaller>("ListenerCaller")
+        .smart_ptr<std::shared_ptr<::testsuite::ListenerCaller>>("ListenerCaller")
         .function("nativeDestroy", &NativeListenerCaller::nativeDestroy)
         .class_function("init", NativeListenerCaller::init)
         .function("callFirst", NativeListenerCaller::callFirst)

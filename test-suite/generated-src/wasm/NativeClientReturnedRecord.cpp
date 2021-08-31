@@ -6,15 +6,15 @@
 namespace djinni_generated {
 
 auto NativeClientReturnedRecord::toCpp(const JsType& j) -> CppType {
-    return {::djinni::I64::Boxed::toCpp(j["record_id"]),
-            ::djinni::String::Boxed::toCpp(j["content"]),
-            ::djinni::Optional<std::experimental::optional, ::djinni::String>::Boxed::toCpp(j["misc"])};
+    return {::djinni::I64::Boxed::toCpp(j["mRecordId"]),
+            ::djinni::String::Boxed::toCpp(j["mContent"]),
+            ::djinni::Optional<std::experimental::optional, ::djinni::String>::Boxed::toCpp(j["mMisc"])};
 }
 auto NativeClientReturnedRecord::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("record_id", ::djinni::I64::Boxed::fromCpp(c.record_id));
-    js.set("content", ::djinni::String::Boxed::fromCpp(c.content));
-    js.set("misc", ::djinni::Optional<std::experimental::optional, ::djinni::String>::Boxed::fromCpp(c.misc));
+    js.set("mRecordId", ::djinni::I64::Boxed::fromCpp(c.record_id));
+    js.set("mContent", ::djinni::String::Boxed::fromCpp(c.content));
+    js.set("mMisc", ::djinni::Optional<std::experimental::optional, ::djinni::String>::Boxed::fromCpp(c.misc));
     return js;
 }
 

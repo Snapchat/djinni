@@ -7,11 +7,11 @@
 namespace djinni_generated {
 
 auto NativeMapDateRecord::toCpp(const JsType& j) -> CppType {
-    return {::djinni::Map<::djinni::String, ::djinni::Date>::Boxed::toCpp(j["dates_by_id"])};
+    return {::djinni::Map<::djinni::String, ::djinni::Date>::Boxed::toCpp(j["mDatesById"])};
 }
 auto NativeMapDateRecord::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("dates_by_id", ::djinni::Map<::djinni::String, ::djinni::Date>::Boxed::fromCpp(c.dates_by_id));
+    js.set("mDatesById", ::djinni::Map<::djinni::String, ::djinni::Date>::Boxed::fromCpp(c.dates_by_id));
     return js;
 }
 

@@ -30,8 +30,8 @@ em::val NativeTestArray::testArrayOfArray(const em::val& w_a) {
 }
 
 EMSCRIPTEN_BINDINGS(test_array) {
-    em::class_<::testsuite::TestArray>("test_array")
-        .smart_ptr<std::shared_ptr<::testsuite::TestArray>>("test_array")
+    em::class_<::testsuite::TestArray>("TestArray")
+        .smart_ptr<std::shared_ptr<::testsuite::TestArray>>("TestArray")
         .function("nativeDestroy", &NativeTestArray::nativeDestroy)
         .class_function("testStringArray", NativeTestArray::testStringArray)
         .class_function("testIntArray", NativeTestArray::testIntArray)

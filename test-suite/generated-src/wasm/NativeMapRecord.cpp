@@ -6,13 +6,13 @@
 namespace djinni_generated {
 
 auto NativeMapRecord::toCpp(const JsType& j) -> CppType {
-    return {::djinni::Map<::djinni::String, ::djinni::I64>::Boxed::toCpp(j["map"]),
-            ::djinni::Map<::djinni::I32, ::djinni::I32>::Boxed::toCpp(j["imap"])};
+    return {::djinni::Map<::djinni::String, ::djinni::I64>::Boxed::toCpp(j["mMap"]),
+            ::djinni::Map<::djinni::I32, ::djinni::I32>::Boxed::toCpp(j["mImap"])};
 }
 auto NativeMapRecord::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("map", ::djinni::Map<::djinni::String, ::djinni::I64>::Boxed::fromCpp(c.map));
-    js.set("imap", ::djinni::Map<::djinni::I32, ::djinni::I32>::Boxed::fromCpp(c.imap));
+    js.set("mMap", ::djinni::Map<::djinni::String, ::djinni::I64>::Boxed::fromCpp(c.map));
+    js.set("mImap", ::djinni::Map<::djinni::I32, ::djinni::I32>::Boxed::fromCpp(c.imap));
     return js;
 }
 

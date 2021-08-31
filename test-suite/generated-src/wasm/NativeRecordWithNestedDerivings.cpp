@@ -7,13 +7,13 @@
 namespace djinni_generated {
 
 auto NativeRecordWithNestedDerivings::toCpp(const JsType& j) -> CppType {
-    return {::djinni::I32::Boxed::toCpp(j["key"]),
-            ::djinni_generated::NativeRecordWithDerivings::Boxed::toCpp(j["rec"])};
+    return {::djinni::I32::Boxed::toCpp(j["mKey"]),
+            ::djinni_generated::NativeRecordWithDerivings::Boxed::toCpp(j["mRec"])};
 }
 auto NativeRecordWithNestedDerivings::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("key", ::djinni::I32::Boxed::fromCpp(c.key));
-    js.set("rec", ::djinni_generated::NativeRecordWithDerivings::Boxed::fromCpp(c.rec));
+    js.set("mKey", ::djinni::I32::Boxed::fromCpp(c.key));
+    js.set("mRec", ::djinni_generated::NativeRecordWithDerivings::Boxed::fromCpp(c.rec));
     return js;
 }
 

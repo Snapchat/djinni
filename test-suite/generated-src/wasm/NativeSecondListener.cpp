@@ -21,8 +21,8 @@ void NativeSecondListener::JsProxy::second() {
 }
 
 EMSCRIPTEN_BINDINGS(second_listener) {
-    em::class_<::testsuite::SecondListener>("second_listener")
-        .smart_ptr<std::shared_ptr<::testsuite::SecondListener>>("second_listener")
+    em::class_<::testsuite::SecondListener>("SecondListener")
+        .smart_ptr<std::shared_ptr<::testsuite::SecondListener>>("SecondListener")
         .function("nativeDestroy", &NativeSecondListener::nativeDestroy)
         .function("second", NativeSecondListener::second)
         ;

@@ -46,8 +46,8 @@ std::string NativeTestOutcome::putNestedErrorOutcome(const em::val& w_x) {
 }
 
 EMSCRIPTEN_BINDINGS(test_outcome) {
-    em::class_<::testsuite::TestOutcome>("test_outcome")
-        .smart_ptr<std::shared_ptr<::testsuite::TestOutcome>>("test_outcome")
+    em::class_<::testsuite::TestOutcome>("TestOutcome")
+        .smart_ptr<std::shared_ptr<::testsuite::TestOutcome>>("TestOutcome")
         .function("nativeDestroy", &NativeTestOutcome::nativeDestroy)
         .class_function("getSuccessOutcome", NativeTestOutcome::getSuccessOutcome)
         .class_function("getErrorOutcome", NativeTestOutcome::getErrorOutcome)

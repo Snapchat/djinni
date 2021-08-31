@@ -6,13 +6,13 @@
 namespace djinni_generated {
 
 auto NativeVec2::toCpp(const JsType& j) -> CppType {
-    return {::djinni::I32::Boxed::toCpp(j["x"]),
-            ::djinni::I32::Boxed::toCpp(j["y"])};
+    return {::djinni::I32::Boxed::toCpp(j["mX"]),
+            ::djinni::I32::Boxed::toCpp(j["mY"])};
 }
 auto NativeVec2::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("x", ::djinni::I32::Boxed::fromCpp(c.x));
-    js.set("y", ::djinni::I32::Boxed::fromCpp(c.y));
+    js.set("mX", ::djinni::I32::Boxed::fromCpp(c.x));
+    js.set("mY", ::djinni::I32::Boxed::fromCpp(c.y));
     return js;
 }
 

@@ -94,8 +94,8 @@ int64_t NativeTestDuration::unbox(const em::val& w_dt) {
 }
 
 EMSCRIPTEN_BINDINGS(test_duration) {
-    em::class_<::testsuite::TestDuration>("test_duration")
-        .smart_ptr<std::shared_ptr<::testsuite::TestDuration>>("test_duration")
+    em::class_<::testsuite::TestDuration>("TestDuration")
+        .smart_ptr<std::shared_ptr<::testsuite::TestDuration>>("TestDuration")
         .function("nativeDestroy", &NativeTestDuration::nativeDestroy)
         .class_function("hoursString", NativeTestDuration::hoursString)
         .class_function("minutesString", NativeTestDuration::minutesString)

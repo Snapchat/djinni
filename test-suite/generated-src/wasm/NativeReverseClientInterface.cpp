@@ -7,9 +7,9 @@ namespace djinni_generated {
 
 em::val NativeReverseClientInterface::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "return_str",
-        "meth_taking_interface",
-        "meth_taking_optional_interface",
+        "returnStr",
+        "methTakingInterface",
+        "methTakingOptionalInterface",
         "create",
     });
     return methods;
@@ -29,24 +29,24 @@ em::val NativeReverseClientInterface::create() {
 }
 
 std::string NativeReverseClientInterface::JsProxy::return_str() const {
-    return ::djinni::String::toCpp(_jsRef().call<std::string>("return_str"));
+    return ::djinni::String::toCpp(_jsRef().call<std::string>("returnStr"));
 }
 
 std::string NativeReverseClientInterface::JsProxy::meth_taking_interface(const std::shared_ptr<::testsuite::ReverseClientInterface> & i) {
-    return ::djinni::String::toCpp(_jsRef().call<std::string>("meth_taking_interface", ::djinni_generated::NativeReverseClientInterface::fromCpp(i)));
+    return ::djinni::String::toCpp(_jsRef().call<std::string>("methTakingInterface", ::djinni_generated::NativeReverseClientInterface::fromCpp(i)));
 }
 
 std::string NativeReverseClientInterface::JsProxy::meth_taking_optional_interface(const std::shared_ptr<::testsuite::ReverseClientInterface> & i) {
-    return ::djinni::String::toCpp(_jsRef().call<std::string>("meth_taking_optional_interface", ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeReverseClientInterface>::fromCpp(i)));
+    return ::djinni::String::toCpp(_jsRef().call<std::string>("methTakingOptionalInterface", ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeReverseClientInterface>::fromCpp(i)));
 }
 
 EMSCRIPTEN_BINDINGS(reverse_client_interface) {
-    em::class_<::testsuite::ReverseClientInterface>("reverse_client_interface")
-        .smart_ptr<std::shared_ptr<::testsuite::ReverseClientInterface>>("reverse_client_interface")
+    em::class_<::testsuite::ReverseClientInterface>("ReverseClientInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::ReverseClientInterface>>("ReverseClientInterface")
         .function("nativeDestroy", &NativeReverseClientInterface::nativeDestroy)
-        .function("return_str", NativeReverseClientInterface::return_str)
-        .function("meth_taking_interface", NativeReverseClientInterface::meth_taking_interface)
-        .function("meth_taking_optional_interface", NativeReverseClientInterface::meth_taking_optional_interface)
+        .function("returnStr", NativeReverseClientInterface::return_str)
+        .function("methTakingInterface", NativeReverseClientInterface::meth_taking_interface)
+        .function("methTakingOptionalInterface", NativeReverseClientInterface::meth_taking_optional_interface)
         .class_function("create", NativeReverseClientInterface::create)
         ;
 }

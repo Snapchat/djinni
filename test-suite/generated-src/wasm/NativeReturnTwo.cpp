@@ -7,8 +7,8 @@ namespace djinni_generated {
 
 em::val NativeReturnTwo::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "get_instance",
-        "return_two",
+        "getInstance",
+        "returnTwo",
     });
     return methods;
 }
@@ -21,15 +21,15 @@ int8_t NativeReturnTwo::return_two(const CppType& self) {
 }
 
 int8_t NativeReturnTwo::JsProxy::return_two() {
-    return ::djinni::I8::toCpp(_jsRef().call<int8_t>("return_two"));
+    return ::djinni::I8::toCpp(_jsRef().call<int8_t>("returnTwo"));
 }
 
 EMSCRIPTEN_BINDINGS(return_two) {
-    em::class_<::testsuite::ReturnTwo>("return_two")
-        .smart_ptr<std::shared_ptr<::testsuite::ReturnTwo>>("return_two")
+    em::class_<::testsuite::ReturnTwo>("ReturnTwo")
+        .smart_ptr<std::shared_ptr<::testsuite::ReturnTwo>>("ReturnTwo")
         .function("nativeDestroy", &NativeReturnTwo::nativeDestroy)
-        .class_function("get_instance", NativeReturnTwo::get_instance)
-        .function("return_two", NativeReturnTwo::return_two)
+        .class_function("getInstance", NativeReturnTwo::get_instance)
+        .function("returnTwo", NativeReturnTwo::return_two)
         ;
 }
 

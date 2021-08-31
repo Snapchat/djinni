@@ -24,12 +24,12 @@ function units(n, u) {
     return n + ' ' + u;
 }
 
-function runTests(tests) {
+function runTests(module, tests) {
     failed = [];
     var total = 0;
     var t2 = performance.now();
     tests.forEach(function(cls) {
-        var t = new cls();
+        var t = new cls(module);
         var count = 0;
         var t1 = performance.now();
         Reflect.ownKeys(Reflect.getPrototypeOf(t)).forEach(function(m) {
@@ -39,7 +39,12 @@ function runTests(tests) {
                 var failedBefore = failed.length;
                 var t0 = performance.now();
                 if (t['setUp'] !== undefined) {t.setUp();}
-                t[m]();
+                try {
+                    t[m]();
+                } catch (err) {
+                    console.log(err);
+                    assertTrue(false);
+                }
                 if (t['tearDown'] !== undefined) {t.tearDown();}
                 var status = failed.length > failedBefore ? '[  FAILED  ] ' : '[       OK ] ';
                 println(status + cls.name + '.' + m + ' (' + (performance.now() - t0) + ' ms)')

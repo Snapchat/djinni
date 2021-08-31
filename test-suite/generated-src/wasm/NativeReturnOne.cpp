@@ -7,8 +7,8 @@ namespace djinni_generated {
 
 em::val NativeReturnOne::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "get_instance",
-        "return_one",
+        "getInstance",
+        "returnOne",
     });
     return methods;
 }
@@ -21,15 +21,15 @@ int8_t NativeReturnOne::return_one(const CppType& self) {
 }
 
 int8_t NativeReturnOne::JsProxy::return_one() {
-    return ::djinni::I8::toCpp(_jsRef().call<int8_t>("return_one"));
+    return ::djinni::I8::toCpp(_jsRef().call<int8_t>("returnOne"));
 }
 
 EMSCRIPTEN_BINDINGS(return_one) {
-    em::class_<::testsuite::ReturnOne>("return_one")
-        .smart_ptr<std::shared_ptr<::testsuite::ReturnOne>>("return_one")
+    em::class_<::testsuite::ReturnOne>("ReturnOne")
+        .smart_ptr<std::shared_ptr<::testsuite::ReturnOne>>("ReturnOne")
         .function("nativeDestroy", &NativeReturnOne::nativeDestroy)
-        .class_function("get_instance", NativeReturnOne::get_instance)
-        .function("return_one", NativeReturnOne::return_one)
+        .class_function("getInstance", NativeReturnOne::get_instance)
+        .function("returnOne", NativeReturnOne::return_one)
         ;
 }
 

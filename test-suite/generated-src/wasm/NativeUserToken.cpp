@@ -21,8 +21,8 @@ std::string NativeUserToken::JsProxy::whoami() {
 }
 
 EMSCRIPTEN_BINDINGS(user_token) {
-    em::class_<::testsuite::UserToken>("user_token")
-        .smart_ptr<std::shared_ptr<::testsuite::UserToken>>("user_token")
+    em::class_<::testsuite::UserToken>("UserToken")
+        .smart_ptr<std::shared_ptr<::testsuite::UserToken>>("UserToken")
         .function("nativeDestroy", &NativeUserToken::nativeDestroy)
         .function("whoami", NativeUserToken::whoami)
         ;

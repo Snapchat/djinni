@@ -47,8 +47,8 @@ std::shared_ptr<::testsuite::JavaOnlyListener> NativeUsesSingleLanguageListeners
 }
 
 EMSCRIPTEN_BINDINGS(uses_single_language_listeners) {
-    em::class_<::testsuite::UsesSingleLanguageListeners>("uses_single_language_listeners")
-        .smart_ptr<std::shared_ptr<::testsuite::UsesSingleLanguageListeners>>("uses_single_language_listeners")
+    em::class_<::testsuite::UsesSingleLanguageListeners>("UsesSingleLanguageListeners")
+        .smart_ptr<std::shared_ptr<::testsuite::UsesSingleLanguageListeners>>("UsesSingleLanguageListeners")
         .function("nativeDestroy", &NativeUsesSingleLanguageListeners::nativeDestroy)
         .function("callForObjC", NativeUsesSingleLanguageListeners::callForObjC)
         .function("returnForObjC", NativeUsesSingleLanguageListeners::returnForObjC)

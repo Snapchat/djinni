@@ -21,8 +21,8 @@ void NativeConstantsInterface::JsProxy::dummy() {
 }
 
 EMSCRIPTEN_BINDINGS(constants_interface) {
-    em::class_<::testsuite::ConstantsInterface>("constants_interface")
-        .smart_ptr<std::shared_ptr<::testsuite::ConstantsInterface>>("constants_interface")
+    em::class_<::testsuite::ConstantsInterface>("ConstantsInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::ConstantsInterface>>("ConstantsInterface")
         .function("nativeDestroy", &NativeConstantsInterface::nativeDestroy)
         .function("dummy", NativeConstantsInterface::dummy)
         ;

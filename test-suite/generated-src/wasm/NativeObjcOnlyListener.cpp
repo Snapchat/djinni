@@ -13,8 +13,8 @@ em::val NativeObjcOnlyListener::cppProxyMethods() {
 
 
 EMSCRIPTEN_BINDINGS(objc_only_listener) {
-    em::class_<::testsuite::ObjcOnlyListener>("objc_only_listener")
-        .smart_ptr<std::shared_ptr<::testsuite::ObjcOnlyListener>>("objc_only_listener")
+    em::class_<::testsuite::ObjcOnlyListener>("ObjcOnlyListener")
+        .smart_ptr<std::shared_ptr<::testsuite::ObjcOnlyListener>>("ObjcOnlyListener")
         .function("nativeDestroy", &NativeObjcOnlyListener::nativeDestroy)
         ;
 }

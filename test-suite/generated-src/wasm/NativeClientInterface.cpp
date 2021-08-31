@@ -8,11 +8,11 @@ namespace djinni_generated {
 
 em::val NativeClientInterface::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "get_record",
-        "identifier_check",
-        "return_str",
-        "meth_taking_interface",
-        "meth_taking_optional_interface",
+        "getRecord",
+        "identifierCheck",
+        "returnStr",
+        "methTakingInterface",
+        "methTakingOptionalInterface",
     });
     return methods;
 }
@@ -38,38 +38,38 @@ std::string NativeClientInterface::meth_taking_optional_interface(const CppType&
 }
 
 ::testsuite::ClientReturnedRecord NativeClientInterface::JsProxy::get_record(int64_t record_id,const std::string & utf8string,const std::experimental::optional<std::string> & misc) {
-    return ::djinni_generated::NativeClientReturnedRecord::toCpp(_jsRef().call<em::val>("get_record", ::djinni::I64::fromCpp(record_id),
-                                                                                                      ::djinni::String::fromCpp(utf8string),
-                                                                                                      ::djinni::Optional<std::experimental::optional, ::djinni::String>::fromCpp(misc)));
+    return ::djinni_generated::NativeClientReturnedRecord::toCpp(_jsRef().call<em::val>("getRecord", ::djinni::I64::fromCpp(record_id),
+                                                                                                     ::djinni::String::fromCpp(utf8string),
+                                                                                                     ::djinni::Optional<std::experimental::optional, ::djinni::String>::fromCpp(misc)));
 }
 
 double NativeClientInterface::JsProxy::identifier_check(const std::vector<uint8_t> & data,int32_t r,int64_t jret) {
-    return ::djinni::F64::toCpp(_jsRef().call<double>("identifier_check", ::djinni::Binary::fromCpp(data),
-                                                                          ::djinni::I32::fromCpp(r),
-                                                                          ::djinni::I64::fromCpp(jret)));
+    return ::djinni::F64::toCpp(_jsRef().call<double>("identifierCheck", ::djinni::Binary::fromCpp(data),
+                                                                         ::djinni::I32::fromCpp(r),
+                                                                         ::djinni::I64::fromCpp(jret)));
 }
 
 std::string NativeClientInterface::JsProxy::return_str() {
-    return ::djinni::String::toCpp(_jsRef().call<std::string>("return_str"));
+    return ::djinni::String::toCpp(_jsRef().call<std::string>("returnStr"));
 }
 
 std::string NativeClientInterface::JsProxy::meth_taking_interface(const std::shared_ptr<::testsuite::ClientInterface> & i) {
-    return ::djinni::String::toCpp(_jsRef().call<std::string>("meth_taking_interface", ::djinni_generated::NativeClientInterface::fromCpp(i)));
+    return ::djinni::String::toCpp(_jsRef().call<std::string>("methTakingInterface", ::djinni_generated::NativeClientInterface::fromCpp(i)));
 }
 
 std::string NativeClientInterface::JsProxy::meth_taking_optional_interface(const std::shared_ptr<::testsuite::ClientInterface> & i) {
-    return ::djinni::String::toCpp(_jsRef().call<std::string>("meth_taking_optional_interface", ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeClientInterface>::fromCpp(i)));
+    return ::djinni::String::toCpp(_jsRef().call<std::string>("methTakingOptionalInterface", ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeClientInterface>::fromCpp(i)));
 }
 
 EMSCRIPTEN_BINDINGS(client_interface) {
-    em::class_<::testsuite::ClientInterface>("client_interface")
-        .smart_ptr<std::shared_ptr<::testsuite::ClientInterface>>("client_interface")
+    em::class_<::testsuite::ClientInterface>("ClientInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::ClientInterface>>("ClientInterface")
         .function("nativeDestroy", &NativeClientInterface::nativeDestroy)
-        .function("get_record", NativeClientInterface::get_record)
-        .function("identifier_check", NativeClientInterface::identifier_check)
-        .function("return_str", NativeClientInterface::return_str)
-        .function("meth_taking_interface", NativeClientInterface::meth_taking_interface)
-        .function("meth_taking_optional_interface", NativeClientInterface::meth_taking_optional_interface)
+        .function("getRecord", NativeClientInterface::get_record)
+        .function("identifierCheck", NativeClientInterface::identifier_check)
+        .function("returnStr", NativeClientInterface::return_str)
+        .function("methTakingInterface", NativeClientInterface::meth_taking_interface)
+        .function("methTakingOptionalInterface", NativeClientInterface::meth_taking_optional_interface)
         ;
 }
 

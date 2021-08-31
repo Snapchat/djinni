@@ -15,31 +15,31 @@ namespace djinni_generated {
 
 em::val NativeTestHelpers::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "get_set_record",
-        "check_set_record",
-        "get_primitive_list",
-        "check_primitive_list",
-        "get_nested_collection",
-        "check_nested_collection",
-        "get_map",
-        "check_map",
-        "get_empty_map",
-        "check_empty_map",
-        "get_map_list_record",
-        "check_map_list_record",
-        "check_client_interface_ascii",
-        "check_client_interface_nonascii",
-        "check_client_interface_args",
-        "check_enum_map",
-        "check_enum",
-        "token_id",
-        "create_cpp_token",
-        "check_cpp_token",
-        "cpp_token_id",
-        "check_token_type",
-        "return_none",
-        "assorted_primitives_id",
-        "id_binary",
+        "getSetRecord",
+        "checkSetRecord",
+        "getPrimitiveList",
+        "checkPrimitiveList",
+        "getNestedCollection",
+        "checkNestedCollection",
+        "getMap",
+        "checkMap",
+        "getEmptyMap",
+        "checkEmptyMap",
+        "getMapListRecord",
+        "checkMapListRecord",
+        "checkClientInterfaceAscii",
+        "checkClientInterfaceNonascii",
+        "checkClientInterfaceArgs",
+        "checkEnumMap",
+        "checkEnum",
+        "tokenId",
+        "createCppToken",
+        "checkCppToken",
+        "cppTokenId",
+        "checkTokenType",
+        "returnNone",
+        "assortedPrimitivesId",
+        "idBinary",
     });
     return methods;
 }
@@ -122,34 +122,34 @@ em::val NativeTestHelpers::id_binary(const em::val& w_b) {
 }
 
 EMSCRIPTEN_BINDINGS(test_helpers) {
-    em::class_<::testsuite::TestHelpers>("test_helpers")
-        .smart_ptr<std::shared_ptr<::testsuite::TestHelpers>>("test_helpers")
+    em::class_<::testsuite::TestHelpers>("TestHelpers")
+        .smart_ptr<std::shared_ptr<::testsuite::TestHelpers>>("TestHelpers")
         .function("nativeDestroy", &NativeTestHelpers::nativeDestroy)
-        .class_function("get_set_record", NativeTestHelpers::get_set_record)
-        .class_function("check_set_record", NativeTestHelpers::check_set_record)
-        .class_function("get_primitive_list", NativeTestHelpers::get_primitive_list)
-        .class_function("check_primitive_list", NativeTestHelpers::check_primitive_list)
-        .class_function("get_nested_collection", NativeTestHelpers::get_nested_collection)
-        .class_function("check_nested_collection", NativeTestHelpers::check_nested_collection)
-        .class_function("get_map", NativeTestHelpers::get_map)
-        .class_function("check_map", NativeTestHelpers::check_map)
-        .class_function("get_empty_map", NativeTestHelpers::get_empty_map)
-        .class_function("check_empty_map", NativeTestHelpers::check_empty_map)
-        .class_function("get_map_list_record", NativeTestHelpers::get_map_list_record)
-        .class_function("check_map_list_record", NativeTestHelpers::check_map_list_record)
-        .class_function("check_client_interface_ascii", NativeTestHelpers::check_client_interface_ascii)
-        .class_function("check_client_interface_nonascii", NativeTestHelpers::check_client_interface_nonascii)
-        .class_function("check_client_interface_args", NativeTestHelpers::check_client_interface_args)
-        .class_function("check_enum_map", NativeTestHelpers::check_enum_map)
-        .class_function("check_enum", NativeTestHelpers::check_enum)
-        .class_function("token_id", NativeTestHelpers::token_id)
-        .class_function("create_cpp_token", NativeTestHelpers::create_cpp_token)
-        .class_function("check_cpp_token", NativeTestHelpers::check_cpp_token)
-        .class_function("cpp_token_id", NativeTestHelpers::cpp_token_id)
-        .class_function("check_token_type", NativeTestHelpers::check_token_type)
-        .class_function("return_none", NativeTestHelpers::return_none)
-        .class_function("assorted_primitives_id", NativeTestHelpers::assorted_primitives_id)
-        .class_function("id_binary", NativeTestHelpers::id_binary)
+        .class_function("getSetRecord", NativeTestHelpers::get_set_record)
+        .class_function("checkSetRecord", NativeTestHelpers::check_set_record)
+        .class_function("getPrimitiveList", NativeTestHelpers::get_primitive_list)
+        .class_function("checkPrimitiveList", NativeTestHelpers::check_primitive_list)
+        .class_function("getNestedCollection", NativeTestHelpers::get_nested_collection)
+        .class_function("checkNestedCollection", NativeTestHelpers::check_nested_collection)
+        .class_function("getMap", NativeTestHelpers::get_map)
+        .class_function("checkMap", NativeTestHelpers::check_map)
+        .class_function("getEmptyMap", NativeTestHelpers::get_empty_map)
+        .class_function("checkEmptyMap", NativeTestHelpers::check_empty_map)
+        .class_function("getMapListRecord", NativeTestHelpers::get_map_list_record)
+        .class_function("checkMapListRecord", NativeTestHelpers::check_map_list_record)
+        .class_function("checkClientInterfaceAscii", NativeTestHelpers::check_client_interface_ascii)
+        .class_function("checkClientInterfaceNonascii", NativeTestHelpers::check_client_interface_nonascii)
+        .class_function("checkClientInterfaceArgs", NativeTestHelpers::check_client_interface_args)
+        .class_function("checkEnumMap", NativeTestHelpers::check_enum_map)
+        .class_function("checkEnum", NativeTestHelpers::check_enum)
+        .class_function("tokenId", NativeTestHelpers::token_id)
+        .class_function("createCppToken", NativeTestHelpers::create_cpp_token)
+        .class_function("checkCppToken", NativeTestHelpers::check_cpp_token)
+        .class_function("cppTokenId", NativeTestHelpers::cpp_token_id)
+        .class_function("checkTokenType", NativeTestHelpers::check_token_type)
+        .class_function("returnNone", NativeTestHelpers::return_none)
+        .class_function("assortedPrimitivesId", NativeTestHelpers::assorted_primitives_id)
+        .class_function("idBinary", NativeTestHelpers::id_binary)
         ;
 }
 

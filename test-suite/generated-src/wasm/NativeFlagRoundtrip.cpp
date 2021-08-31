@@ -9,10 +9,10 @@ namespace djinni_generated {
 
 em::val NativeFlagRoundtrip::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "roundtrip_access",
-        "roundtrip_empty",
-        "roundtrip_access_boxed",
-        "roundtrip_empty_boxed",
+        "roundtripAccess",
+        "roundtripEmpty",
+        "roundtripAccessBoxed",
+        "roundtripEmptyBoxed",
     });
     return methods;
 }
@@ -31,13 +31,13 @@ em::val NativeFlagRoundtrip::roundtrip_empty_boxed(const em::val& w_flag) {
 }
 
 EMSCRIPTEN_BINDINGS(flag_roundtrip) {
-    em::class_<::testsuite::FlagRoundtrip>("flag_roundtrip")
-        .smart_ptr<std::shared_ptr<::testsuite::FlagRoundtrip>>("flag_roundtrip")
+    em::class_<::testsuite::FlagRoundtrip>("FlagRoundtrip")
+        .smart_ptr<std::shared_ptr<::testsuite::FlagRoundtrip>>("FlagRoundtrip")
         .function("nativeDestroy", &NativeFlagRoundtrip::nativeDestroy)
-        .class_function("roundtrip_access", NativeFlagRoundtrip::roundtrip_access)
-        .class_function("roundtrip_empty", NativeFlagRoundtrip::roundtrip_empty)
-        .class_function("roundtrip_access_boxed", NativeFlagRoundtrip::roundtrip_access_boxed)
-        .class_function("roundtrip_empty_boxed", NativeFlagRoundtrip::roundtrip_empty_boxed)
+        .class_function("roundtripAccess", NativeFlagRoundtrip::roundtrip_access)
+        .class_function("roundtripEmpty", NativeFlagRoundtrip::roundtrip_empty)
+        .class_function("roundtripAccessBoxed", NativeFlagRoundtrip::roundtrip_access_boxed)
+        .class_function("roundtripEmptyBoxed", NativeFlagRoundtrip::roundtrip_empty_boxed)
         ;
 }
 
