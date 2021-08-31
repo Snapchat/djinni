@@ -17,29 +17,31 @@ item2
 item4</textarea>
     </p>
     <script>
+      var m;
       class SortListener {
           update(itemList) {
-              document.getElementById('txt').value = itemList.items.join('\n')
+              document.getElementById('txt').value = itemList.mItems.join('\n')
           }
       }
       client().then(module => {
-          sorter = module.sort_items.create_with_listener(new SortListener())
+          m = module;
+          sorter = module.SortItems.createWithListener(new SortListener())
       });
       function sort(order) {
           var lines = document.getElementById('txt').value.split('\n');
           var itemList = {
-              items: lines
+              mItems: lines
           };
           sorter.sort(order, itemList);
       }
       function onSortAsc() {
-          sort(0)
+          sort(m.SortOrder.ASCENDING)
       }
       function onSortDesc() {
-          sort(1)
+          sort(m.SortOrder.DESCENDING)
       }
       function onSortRandom() {
-          sort(2)
+          sort(m.SortOrder.RANDOM)
       }
     </script>
     <button onclick="onSortAsc()">Sort Asc</button> 

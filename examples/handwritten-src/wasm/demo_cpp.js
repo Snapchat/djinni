@@ -1796,6 +1796,7 @@ var ASM_CONSTS = {
   
 };
 function djinni_init(){ if (typeof Module.cppProxyFinalizerRegistry == 'undefined') { console.log("create cppProxyFinalizerRegistry"); Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => { console.log("finalizing cpp object"); nativeRef.nativeDestroy(); nativeRef.delete(); }); } if (typeof Module.DjinniCppProxy == 'undefined') { console.log("define cpp proxy class"); class DjinniCppProxy { constructor(nativeRef, methods) { console.log('new cpp proxy'); this._djinni_native_ref = nativeRef; let self = this; methods.forEach(function(method) { self[method] = function(...args) { return nativeRef[method](...args); } }); } } Module.DjinniCppProxy = DjinniCppProxy; } }
+function djinni_init_textsort_sort_order(){ Module.SortOrder = { ASCENDING: 0, DESCENDING: 1, RANDOM: 2 } }
 
 
 
@@ -6885,6 +6886,7 @@ var asmLibraryArg = {
   "_emval_take_value": __emval_take_value,
   "abort": _abort,
   "djinni_init": djinni_init,
+  "djinni_init_textsort_sort_order": djinni_init_textsort_sort_order,
   "emscripten_memcpy_big": _emscripten_memcpy_big,
   "emscripten_resize_heap": _emscripten_resize_heap,
   "environ_get": _environ_get,

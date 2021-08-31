@@ -11,8 +11,8 @@ namespace djinni_generated {
 em::val NativeSortItems::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
         "sort",
-        "create_with_listener",
-        "run_sort",
+        "createWithListener",
+        "runSort",
     });
     return methods;
 }
@@ -34,12 +34,12 @@ void NativeSortItems::JsProxy::sort(::textsort::sort_order order,const ::textsor
 }
 
 EMSCRIPTEN_BINDINGS(sort_items) {
-    em::class_<::textsort::SortItems>("sort_items")
-        .smart_ptr<std::shared_ptr<::textsort::SortItems>>("sort_items")
+    em::class_<::textsort::SortItems>("SortItems")
+        .smart_ptr<std::shared_ptr<::textsort::SortItems>>("SortItems")
         .function("nativeDestroy", &NativeSortItems::nativeDestroy)
         .function("sort", NativeSortItems::sort)
-        .class_function("create_with_listener", NativeSortItems::create_with_listener)
-        .class_function("run_sort", NativeSortItems::run_sort)
+        .class_function("createWithListener", NativeSortItems::create_with_listener)
+        .class_function("runSort", NativeSortItems::run_sort)
         ;
 }
 

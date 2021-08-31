@@ -140,11 +140,23 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
 
   override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
     val refs = new WasmRefs(ident.name)
+    val cls = cppMarshal.fqTypename(ident, e)
+    val helper = helperClass(ident)
     writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle)(wasmFilename(ident.name), origin, refs.hpp, Nil, (w => {
-      val cls = cppMarshal.fqTypename(ident, e)
-      val helper = helperClass(ident)
       w.wl(s"struct $helper: ::djinni::WasmEnum<$cls> {};")
     }), (w => {}))
+    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle, includePrefix())(wasmFilename(ident.name), origin, refs.cpp, (w => {
+      w.wl(s"EM_JS(void, djinni_init_${spec.cppNamespace}_${ident.name}, (), {").nested {
+        w.w(s"Module.${idJava.ty(ident)} = ").braced {
+          w.wl(e.options.zipWithIndex.map{case (o, i) => idJava.enum(o.ident.name) + ": " + i}.mkString(", "))
+        }
+      }
+      w.wl("})")
+      w.wl("")
+      w.w(s"EMSCRIPTEN_BINDINGS(${ident.name})").braced {
+        w.wl(s"djinni_init_${spec.cppNamespace}_${ident.name}();")
+      }
+    }))
   }
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface) {

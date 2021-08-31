@@ -22,8 +22,8 @@ void NativeTextboxListener::JsProxy::update(const ::textsort::ItemList & items) 
 }
 
 EMSCRIPTEN_BINDINGS(textbox_listener) {
-    em::class_<::textsort::TextboxListener>("textbox_listener")
-        .smart_ptr<std::shared_ptr<::textsort::TextboxListener>>("textbox_listener")
+    em::class_<::textsort::TextboxListener>("TextboxListener")
+        .smart_ptr<std::shared_ptr<::textsort::TextboxListener>>("TextboxListener")
         .function("nativeDestroy", &NativeTextboxListener::nativeDestroy)
         .function("update", NativeTextboxListener::update)
         ;
