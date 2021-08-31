@@ -45,3 +45,5 @@ class ClientInterfaceTest {
         assertEq(i.methTakingOptionalInterface(i), "test");
     }
 }
+
+allTests.push(ClientInterfaceTest);

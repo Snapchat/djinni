@@ -12,6 +12,12 @@
     <h1>Djinni/WASM Test</h1>
     <pre id="output"></pre>
     <script src="ClientInterfaceTest.js"></script>
-    <script src="test.js"></script>
+    <script src="ArrayTests.js"></script>
+    <script src="DurationTest.js"></script>
+    <script>
+      tests().then(module => {
+          runTests(module, allTests);
+      })
+    </script>
   </body>
 </html>

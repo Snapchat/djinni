@@ -453,12 +453,15 @@ djinni-output-temp/wasm/NativeMapDateRecord.cpp
 djinni-output-temp/wasm/NativeDataRefTest.hpp
 djinni-output-temp/wasm/NativeDataRefTest.cpp
 djinni-output-temp/wasm/NativeConstantEnum.hpp
+djinni-output-temp/wasm/NativeConstantEnum.cpp
 djinni-output-temp/wasm/NativeConstantWithEnum.hpp
 djinni-output-temp/wasm/NativeConstantWithEnum.cpp
 djinni-output-temp/wasm/NativeConstantInterfaceWithEnum.hpp
 djinni-output-temp/wasm/NativeConstantInterfaceWithEnum.cpp
 djinni-output-temp/wasm/NativeAccessFlags.hpp
+djinni-output-temp/wasm/NativeAccessFlags.cpp
 djinni-output-temp/wasm/NativeEmptyFlags.hpp
+djinni-output-temp/wasm/NativeEmptyFlags.cpp
 djinni-output-temp/wasm/NativeFlagRoundtrip.hpp
 djinni-output-temp/wasm/NativeFlagRoundtrip.cpp
 djinni-output-temp/wasm/NativeRecordWithFlags.hpp
@@ -516,6 +519,7 @@ djinni-output-temp/wasm/NativeSampleInterface.cpp
 djinni-output-temp/wasm/NativeUserToken.hpp
 djinni-output-temp/wasm/NativeUserToken.cpp
 djinni-output-temp/wasm/NativeColor.hpp
+djinni-output-temp/wasm/NativeColor.cpp
 djinni-output-temp/wasm/NativeEnumUsageRecord.hpp
 djinni-output-temp/wasm/NativeEnumUsageRecord.cpp
 djinni-output-temp/wasm/NativeEnumUsageInterface.hpp
