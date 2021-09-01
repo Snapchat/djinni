@@ -17,7 +17,7 @@ class SetRecordTest {
         jsSet.add("StringA");
         jsSet.add("StringB");
         jsSet.add("StringC");
-        var jsSetRecord = {set: jsSet, iset: iSet);
+        var jsSetRecord = {set: jsSet, iset: iSet};
         assertTrue(this.m.TestHelpers.checkSetRecord(jsSetRecord));
     }
 }

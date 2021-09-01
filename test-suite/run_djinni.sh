@@ -89,6 +89,8 @@ fi
     --objcpp-out "$temp_out_relative/objc" \
     --objc-type-prefix DB \
     \
+    --wasm-out "$temp_out_relative/wasm" \
+    \
     --yaml-out "$temp_out_relative/yaml" \
     --yaml-out-file "yaml-test.yaml" \
     --yaml-prefix "test_" \

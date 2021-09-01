@@ -9,6 +9,7 @@
 #include <unordered_set>
 #include <vector>
 #include <optional>
+#include <stdexcept>
 #include <iostream>
 
 namespace em = emscripten;

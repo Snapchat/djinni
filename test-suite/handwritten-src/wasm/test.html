@@ -13,6 +13,7 @@
     <pre id="output"></pre>
     <script src="ClientInterfaceTest.js"></script>
     <script src="ArrayTests.js"></script>
+    <script src="CppExceptionTest.js"></script>
     <script src="DurationTest.js"></script>
     <script src="EnumTest.js"></script>
     <script src="MapRecordTest.js"></script>
@@ -22,6 +23,15 @@
     <script src="PrimitivesTest.js"></script>
     <script src="SetRecordTest.js"></script>
     <script src="TokenTest.js"></script>
+    <script src="WcharTest.js"></script>
+    <!-- Things we can't test in JS:
+         * Android parcelable
+         * Deriving ord hash nscopy
+         * Catching C++ exception (incomplete)
+         * DataRef/DataView (not yet)
+         * Function prologue (not yet)
+         * Protobuf (not yet)
+      -->
     <script>
       tests().then(module => {
           runTests(module, allTests);
