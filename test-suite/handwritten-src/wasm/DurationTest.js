@@ -14,15 +14,15 @@ class DurationTest {
         assertEq(this.m.TestDuration.minutesString(minutes(1)), "1");
         assertEq(this.m.TestDuration.secondsString(seconds(1)), "1");
         assertEq(this.m.TestDuration.millisString(millis(1)), "1");
-        assertEq(this.m.TestDuration.microsString(micros(1000)), "1000");
-        assertEq(this.m.TestDuration.nanosString(nanos(1000000)), "1000000");
+        assertEq(this.m.TestDuration.microsString(micros(1)), "1");
+        assertEq(this.m.TestDuration.nanosString(nanos(1)), "1");
 
         assertEq(this.m.TestDuration.hours(1), hours(1));
         assertEq(this.m.TestDuration.minutes(1), minutes(1));
         assertEq(this.m.TestDuration.seconds(1), seconds(1));
         assertEq(this.m.TestDuration.millis(1), millis(1));
         assertEq(this.m.TestDuration.micros(1), micros(1));
-        assertEq(this.m.TestDuration.nanos(1000000), nanos(1000000));
+        assertEq(this.m.TestDuration.nanos(1), nanos(1));
 
         assertEq(this.m.TestDuration.hoursf(1.5), minutes(90));
         assertEq(this.m.TestDuration.minutesf(1.5), seconds(90));

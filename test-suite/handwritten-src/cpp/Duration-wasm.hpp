@@ -22,17 +22,17 @@ namespace djinni
     struct Duration<Rep, DurationPeriod<Ratio>>
     {
         using CppType = std::chrono::duration<typename Rep::CppType, Ratio>;
-        using JsType = em::val; // js duration is a plain number (milliseconds)
+        using JsType = em::val; // js duration is a plain number (milliseconds in double)
 
         using Boxed = Duration;
 
         static CppType toCpp(const JsType& j)
         {
-            return std::chrono::duration_cast<CppType>(std::chrono::milliseconds(static_cast<int64_t>(j.as<double>())));
+            return std::chrono::duration_cast<CppType>(std::chrono::nanoseconds(static_cast<int64_t>(j.as<double>() * 1000000)));
         }
         static JsType fromCpp(const CppType& c)
         {
-            return JsType{std::chrono::duration_cast<std::chrono::milliseconds>(c).count()};
+            return JsType{static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(c).count()) / 1000000};
         }
     };
 }
