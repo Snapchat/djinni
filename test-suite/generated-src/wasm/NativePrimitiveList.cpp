@@ -6,11 +6,11 @@
 namespace djinni_generated {
 
 auto NativePrimitiveList::toCpp(const JsType& j) -> CppType {
-    return {::djinni::List<::djinni::I64>::Boxed::toCpp(j["mList"])};
+    return {::djinni::List<::djinni::I64>::Boxed::toCpp(j["list"])};
 }
 auto NativePrimitiveList::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("mList", ::djinni::List<::djinni::I64>::Boxed::fromCpp(c.list));
+    js.set("list", ::djinni::List<::djinni::I64>::Boxed::fromCpp(c.list));
     return js;
 }
 

@@ -147,8 +147,8 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     }), (w => {}))
     writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle, includePrefix())(wasmFilename(ident.name), origin, refs.cpp, (w => {
       w.wl(s"EM_JS(void, djinni_init_${spec.cppNamespace}_${ident.name}, (), {").nested {
-        w.w(s"Module.${idJava.ty(ident)} = ").braced {
-          w.wl(e.options.zipWithIndex.map{case (o, i) => idJava.enum(o.ident.name) + ": " + i}.mkString(", "))
+        w.w(s"Module.${idJs.ty(ident)} = ").braced {
+          w.wl(e.options.zipWithIndex.map{case (o, i) => idJs.enum(o.ident.name) + ": " + i}.mkString(", "))
         }
       }
       w.wl("})")
@@ -218,7 +218,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       w.w(s"em::val $helper::cppProxyMethods()").braced {
         w.w("static const em::val methods = em::val::array(std::vector<std::string>").bracedEnd(");") {
           for (m <- i.methods) {
-            w.wl(s""""${idJava.method(m.ident)}",""")
+            w.wl(s""""${idJs.method(m.ident)}",""")
           }
         }
         w.wl("return methods;")
@@ -253,7 +253,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
           w.w(s")$constModifier").braced {
             val retPrefix = if (m.ret.isEmpty) "" else s"${helperClass(m.ret.get.resolved)}::toCpp("
             val retSuffix = if (m.ret.isEmpty) "" else ")"
-            val methodName = q(idJava.method(m.ident.name)) + (if (m.params.isEmpty) "" else ", ")
+            val methodName = q(idJs.method(m.ident.name)) + (if (m.params.isEmpty) "" else ", ")
             writeAlignedCall(w, s"""return ${retPrefix}_jsRef().call<${stubRetType(m)}>($methodName""", m.params, s")${retSuffix}", p => {
               s"${helperClass(p.ty.resolved)}::fromCpp(${idCpp.local(p.ident)})"
             })
@@ -264,12 +264,12 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       }
       // embind
       w.w(s"EMSCRIPTEN_BINDINGS(${ident.name})").braced {
-        w.wl(s"""em::class_<$cls>("${idJava.ty(ident.name)}")""").nested {
-          w.wl(s""".smart_ptr<std::shared_ptr<$cls>>("${idJava.ty(ident.name)}")""")
-          w.wl(s""".function("${idJava.method("native_destroy")}", &$helper::nativeDestroy)""")
+        w.wl(s"""em::class_<$cls>("${idJs.ty(ident.name)}")""").nested {
+          w.wl(s""".smart_ptr<std::shared_ptr<$cls>>("${idJs.ty(ident.name)}")""")
+          w.wl(s""".function("${idJs.method("native_destroy")}", &$helper::nativeDestroy)""")
           for (m <- i.methods) {
             val funcType = if (m.static) "class_function" else "function"
-            w.wl(s""".$funcType("${idJava.method(m.ident.name)}", $helper::${idCpp.method(m.ident)})""")
+            w.wl(s""".$funcType("${idJs.method(m.ident.name)}", $helper::${idCpp.method(m.ident)})""")
           }
           w.wl(";")
         }
@@ -300,14 +300,14 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle, includePrefix())(wasmFilename(ident.name), origin, refs.cpp, (w => {
         w.w(s"auto $helper::toCpp(const JsType& j) -> CppType").braced {
           writeAlignedCall(w, "return {", r.fields, "}", f => {
-            s"""${helperClass(f.ty.resolved)}::Boxed::toCpp(j["${idJava.field(f.ident.name)}"])"""
+            s"""${helperClass(f.ty.resolved)}::Boxed::toCpp(j["${idJs.field(f.ident.name)}"])"""
           })
           w.wl(";")
         }
         w.w(s"auto $helper::fromCpp(const CppType& c) -> JsType").braced {
           w.wl("em::val js = em::val::object();")
           for (f <- r.fields) {
-            w.wl(s"""js.set("${idJava.field(f.ident.name)}", ${helperClass(f.ty.resolved)}::Boxed::fromCpp(c.${idCpp.field(f.ident)}));""")
+            w.wl(s"""js.set("${idJs.field(f.ident.name)}", ${helperClass(f.ty.resolved)}::Boxed::fromCpp(c.${idCpp.field(f.ident)}));""")
           }
           w.wl("return js;")
         }

@@ -7,11 +7,11 @@
 namespace djinni_generated {
 
 auto NativeDateRecord::toCpp(const JsType& j) -> CppType {
-    return {::djinni::Date::Boxed::toCpp(j["mCreatedAt"])};
+    return {::djinni::Date::Boxed::toCpp(j["createdAt"])};
 }
 auto NativeDateRecord::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("mCreatedAt", ::djinni::Date::Boxed::fromCpp(c.created_at));
+    js.set("createdAt", ::djinni::Date::Boxed::fromCpp(c.created_at));
     return js;
 }
 

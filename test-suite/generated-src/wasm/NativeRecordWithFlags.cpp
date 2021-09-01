@@ -7,11 +7,11 @@
 namespace djinni_generated {
 
 auto NativeRecordWithFlags::toCpp(const JsType& j) -> CppType {
-    return {::djinni_generated::NativeAccessFlags::Boxed::toCpp(j["mAccess"])};
+    return {::djinni_generated::NativeAccessFlags::Boxed::toCpp(j["access"])};
 }
 auto NativeRecordWithFlags::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("mAccess", ::djinni_generated::NativeAccessFlags::Boxed::fromCpp(c.access));
+    js.set("access", ::djinni_generated::NativeAccessFlags::Boxed::fromCpp(c.access));
     return js;
 }
 

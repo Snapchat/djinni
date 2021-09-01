@@ -6,11 +6,11 @@
 namespace djinni_generated {
 
 auto NativeSupportCopying::toCpp(const JsType& j) -> CppType {
-    return {::djinni::I32::Boxed::toCpp(j["mX"])};
+    return {::djinni::I32::Boxed::toCpp(j["x"])};
 }
 auto NativeSupportCopying::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("mX", ::djinni::I32::Boxed::fromCpp(c.x));
+    js.set("x", ::djinni::I32::Boxed::fromCpp(c.x));
     return js;
 }
 

@@ -6,11 +6,11 @@
 namespace djinni_generated {
 
 auto NativeExtendedRecord::toCpp(const JsType& j) -> CppType {
-    return {::djinni::Bool::Boxed::toCpp(j["mFoo"])};
+    return {::djinni::Bool::Boxed::toCpp(j["foo"])};
 }
 auto NativeExtendedRecord::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("mFoo", ::djinni::Bool::Boxed::fromCpp(c.foo));
+    js.set("foo", ::djinni::Bool::Boxed::fromCpp(c.foo));
     return js;
 }
 

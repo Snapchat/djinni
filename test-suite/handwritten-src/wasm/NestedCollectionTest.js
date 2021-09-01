@@ -12,11 +12,11 @@ class NestedCollectionTest {
         var jsList = [];
         jsList.push(jsSet1);
         jsList.push(jsSet2);
-        this.jsNestedCollection = { mSetList: jsList };
+        this.jsNestedCollection = { setList: jsList };
     }
     testCppNestedRecordToJsNestedCollection() {
         var converted = this.m.TestHelpers.getNestedCollection();
-        assertEq(this.jsNestedCollection.mSetList, converted.mSetList);
+        assertEq(this.jsNestedCollection.setList, converted.setList);
     }
 
     testJsNestedRecordToCppNestedCollection() {

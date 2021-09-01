@@ -15,8 +15,8 @@ class ArrayTest {
     }
 
     testRecordArray() {
-        var inputRecords = [{mX:1, mY:1}, {mX:2, mY:2}, {mX:3, mY:3}];
-        var expectedRecords = [{mX:3, mY:3}, {mX:2, mY:2}, {mX:1, mY:1}];
+        var inputRecords = [{x:1, y:1}, {x:2, y:2}, {x:3, y:3}];
+        var expectedRecords = [{x:3, y:3}, {x:2, y:2}, {x:1, y:1}];
         assertArrayEq(this.module.TestArray.testRecordArray(inputRecords), expectedRecords);
     }
     

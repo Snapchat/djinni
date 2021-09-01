@@ -7,11 +7,11 @@
 namespace djinni_generated {
 
 auto NativeRecordWithDurationAndDerivings::toCpp(const JsType& j) -> CppType {
-    return {::djinni::Duration<::djinni::F64, ::djinni::Duration_ns>::Boxed::toCpp(j["mDt"])};
+    return {::djinni::Duration<::djinni::F64, ::djinni::Duration_ns>::Boxed::toCpp(j["dt"])};
 }
 auto NativeRecordWithDurationAndDerivings::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("mDt", ::djinni::Duration<::djinni::F64, ::djinni::Duration_ns>::Boxed::fromCpp(c.dt));
+    js.set("dt", ::djinni::Duration<::djinni::F64, ::djinni::Duration_ns>::Boxed::fromCpp(c.dt));
     return js;
 }
 

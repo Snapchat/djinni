@@ -20,7 +20,7 @@ item4</textarea>
       var m;
       class SortListener {
           update(itemList) {
-              document.getElementById('txt').value = itemList.mItems.join('\n')
+              document.getElementById('txt').value = itemList.items.join('\n')
           }
       }
       client().then(module => {
@@ -30,7 +30,7 @@ item4</textarea>
       function sort(order) {
           var lines = document.getElementById('txt').value.split('\n');
           var itemList = {
-              mItems: lines
+              items: lines
           };
           sorter.sort(order, itemList);
       }

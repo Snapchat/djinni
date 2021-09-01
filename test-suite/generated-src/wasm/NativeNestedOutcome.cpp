@@ -6,11 +6,11 @@
 namespace djinni_generated {
 
 auto NativeNestedOutcome::toCpp(const JsType& j) -> CppType {
-    return {::djinni::Outcome<::djinni::I32, ::djinni::String>::Boxed::toCpp(j["mO"])};
+    return {::djinni::Outcome<::djinni::I32, ::djinni::String>::Boxed::toCpp(j["o"])};
 }
 auto NativeNestedOutcome::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("mO", ::djinni::Outcome<::djinni::I32, ::djinni::String>::Boxed::fromCpp(c.o));
+    js.set("o", ::djinni::Outcome<::djinni::I32, ::djinni::String>::Boxed::fromCpp(c.o));
     return js;
 }
 

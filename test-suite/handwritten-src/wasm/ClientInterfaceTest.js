@@ -2,9 +2,9 @@ class ClientInterfaceImpl {
     getRecord(id, utf8String, misc) {
         if (utf8String != "Non-ASCII /\0 非 ASCII 字符" && utf8String != "Hello World!") {
         }
-        return {mRecordId: id,
-                mContent: utf8String,
-                mMisc: misc};
+        return {recordId: id,
+                content: utf8String,
+                misc: misc};
     }
     identifierCheck(data, r, jret) {
         return 0.0;

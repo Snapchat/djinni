@@ -85,6 +85,7 @@ object Main {
     var objcppNamespace: String = "djinni_generated"
     var objcBaseLibIncludePrefix: String = ""
     var wasmOutFolder: Option[File] = None
+    var jsIdentStyle = IdentStyle.jsDefault
     var inFileListPath: Option[File] = None
     var outFileListPath: Option[File] = None
     var skipGeneration: Boolean = false
@@ -389,6 +390,7 @@ object Main {
       objcDisableClassCtor,
       objcClosedEnums,
       wasmOutFolder,
+      jsIdentStyle,
       outFileListWriter,
       skipGeneration,
       yamlOutFolder,

@@ -6,13 +6,13 @@
 namespace djinni_generated {
 
 auto NativeConstantRecord::toCpp(const JsType& j) -> CppType {
-    return {::djinni::I32::Boxed::toCpp(j["mSomeInteger"]),
-            ::djinni::String::Boxed::toCpp(j["mSomeString"])};
+    return {::djinni::I32::Boxed::toCpp(j["someInteger"]),
+            ::djinni::String::Boxed::toCpp(j["someString"])};
 }
 auto NativeConstantRecord::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("mSomeInteger", ::djinni::I32::Boxed::fromCpp(c.some_integer));
-    js.set("mSomeString", ::djinni::String::Boxed::fromCpp(c.some_string));
+    js.set("someInteger", ::djinni::I32::Boxed::fromCpp(c.some_integer));
+    js.set("someString", ::djinni::String::Boxed::fromCpp(c.some_string));
     return js;
 }
 

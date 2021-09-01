@@ -13,7 +13,7 @@ class MapRecordTest {
 
     testCppMapListToJsMapList() {
         var jsMapListRecord = this.m.TestHelpers.getMapListRecord();
-        var jsMapList = jsMapListRecord.mMapList;
+        var jsMapList = jsMapListRecord.mapList;
         assertEq(1, jsMapList.length);
         this.checkJsMap(jsMapList[0]);
     }
@@ -29,7 +29,7 @@ class MapRecordTest {
     testJsMapListToCppMapList() {
         var jsMapList = [];
         jsMapList.push(this.getJsMap());
-        assertTrue(this.m.TestHelpers.checkMapListRecord({mMapList: jsMapList}));
+        assertTrue(this.m.TestHelpers.checkMapListRecord({mapList: jsMapList}));
     }
 
     getJsMap() {
