@@ -5,14 +5,14 @@ import com.snapchat.djinni.Outcome;
 
 public class OutcomeTest extends TestCase {
     public void test() {
-        // construct result outcome in native and pass to objc
+        // construct result outcome in native and pass to java
         Outcome r = TestOutcome.getSuccessOutcome();
         // results are equal
         assertEquals(r.resultOr(""), "hello");
         // outcome objects compare equal
         assertEquals(r, Outcome.fromResult("hello"));
 
-        // construct error outcome in native and pass to objc
+        // construct error outcome in native and pass to java
         Outcome e = TestOutcome.getErrorOutcome();
         // error values are equal
         assertEquals(e.errorOrNull(), 42);
@@ -22,9 +22,9 @@ public class OutcomeTest extends TestCase {
         // result outcome and error outcome does not compare equal
         assertFalse(r.equals(e));
 
-        // construct result outcome in objc then pass to native and back
+        // construct result outcome in java then pass to native and back
         assertEquals(TestOutcome.putSuccessOutcome(Outcome.fromResult("hello")), "hello");
-        // construct error outcome in objc then pass to native and back
+        // construct error outcome in java then pass to native and back
         assertEquals(TestOutcome.putErrorOutcome(Outcome.fromError(42)), 42);
 
         // Hash equal
