@@ -7,7 +7,8 @@ namespace djinni_generated {
 
 EM_JS(void, djinni_init_testsuite_constant_enum, (), {
     Module.ConstantEnum =  {
-        SOME_VALUE: 0, SOME_OTHER_VALUE: 1
+        SOME_VALUE : 0,
+        SOME_OTHER_VALUE : 1,
     }
 })
 

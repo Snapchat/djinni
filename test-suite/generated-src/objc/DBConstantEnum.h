@@ -6,6 +6,6 @@
 /** enum for use in constants */
 typedef NS_ENUM(NSInteger, DBConstantEnum)
 {
-    DBConstantEnumSomeValue,
-    DBConstantEnumSomeOtherValue,
+    DBConstantEnumSomeValue = 0,
+    DBConstantEnumSomeOtherValue = 1,
 };

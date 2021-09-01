@@ -1801,10 +1801,10 @@ var ASM_CONSTS = {
   
 };
 function djinni_init(){ if (typeof Module.cppProxyFinalizerRegistry == 'undefined') { console.log("create cppProxyFinalizerRegistry"); Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => { console.log("finalizing cpp object"); nativeRef.nativeDestroy(); nativeRef.delete(); }); } if (typeof Module.DjinniCppProxy == 'undefined') { console.log("define cpp proxy class"); class DjinniCppProxy { constructor(nativeRef, methods) { console.log('new cpp proxy'); this._djinni_native_ref = nativeRef; let self = this; methods.forEach(function(method) { self[method] = function(...args) { return nativeRef[method](...args); } }); } } Module.DjinniCppProxy = DjinniCppProxy; } }
-function djinni_init_testsuite_access_flags(){ Module.AccessFlags = { NOBODY: 0, OWNER_READ: 1, OWNER_WRITE: 2, OWNER_EXECUTE: 3, GROUP_READ: 4, GROUP_WRITE: 5, GROUP_EXECUTE: 6, SYSTEM_READ: 7, SYSTEM_WRITE: 8, SYSTEM_EXECUTE: 9, EVERYBODY: 10 } }
-function djinni_init_testsuite_color(){ Module.Color = { RED: 0, ORANGE: 1, YELLOW: 2, GREEN: 3, BLUE: 4, INDIGO: 5, VIOLET: 6 } }
-function djinni_init_testsuite_constant_enum(){ Module.ConstantEnum = { SOME_VALUE: 0, SOME_OTHER_VALUE: 1 } }
-function djinni_init_testsuite_empty_flags(){ Module.EmptyFlags = { NONE: 0, ALL: 1 } }
+function djinni_init_testsuite_access_flags(){ Module.AccessFlags = { NOBODY : 0, OWNER_READ : 1 << 0, OWNER_WRITE : 1 << 1, OWNER_EXECUTE : 1 << 2, GROUP_READ : 1 << 3, GROUP_WRITE : 1 << 4, GROUP_EXECUTE : 1 << 5, SYSTEM_READ : 1 << 6, SYSTEM_WRITE : 1 << 7, SYSTEM_EXECUTE : 1 << 8, EVERYBODY : (1 << 9) - 1, } }
+function djinni_init_testsuite_color(){ Module.Color = { RED : 0, ORANGE : 1, YELLOW : 2, GREEN : 3, BLUE : 4, INDIGO : 5, VIOLET : 6, } }
+function djinni_init_testsuite_constant_enum(){ Module.ConstantEnum = { SOME_VALUE : 0, SOME_OTHER_VALUE : 1, } }
+function djinni_init_testsuite_empty_flags(){ Module.EmptyFlags = { NONE : 0, ALL : (1 << 0) - 1, } }
 
 
 

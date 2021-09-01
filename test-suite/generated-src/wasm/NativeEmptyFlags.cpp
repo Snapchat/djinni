@@ -7,7 +7,8 @@ namespace djinni_generated {
 
 EM_JS(void, djinni_init_testsuite_empty_flags, (), {
     Module.EmptyFlags =  {
-        NONE: 0, ALL: 1
+        NONE : 0,
+        ALL : (1 << 0) - 1,
     }
 })
 

@@ -7,7 +7,18 @@ namespace djinni_generated {
 
 EM_JS(void, djinni_init_testsuite_color, (), {
     Module.Color =  {
-        RED: 0, ORANGE: 1, YELLOW: 2, GREEN: 3, BLUE: 4, INDIGO: 5, VIOLET: 6
+        RED : 0,
+        ORANGE : 1,
+        YELLOW : 2,
+        GREEN : 3,
+        BLUE : 4,
+        /**
+         * "It is customary to list indigo as a color lying between blue and violet, but it has
+         * never seemed to me that indigo is worth the dignity of being considered a separate
+         * color. To my eyes it seems merely deep blue." --Isaac Asimov
+         */
+        INDIGO : 5,
+        VIOLET : 6,
     }
 })
 

@@ -12,7 +12,6 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
 
   val cppMarshal = new CppMarshal(spec)
 
-  // TODO: use wasm indent style spec
   private def wasmFilename(name: String): String = {
     return spec.jniFileIdentStyle(name)
   }
@@ -136,6 +135,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       case _ =>
     }
   }
+
   //------------------------------------------------------------------------------
 
   override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
@@ -148,7 +148,9 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle, includePrefix())(wasmFilename(ident.name), origin, refs.cpp, (w => {
       w.wl(s"EM_JS(void, djinni_init_${spec.cppNamespace}_${ident.name}, (), {").nested {
         w.w(s"Module.${idJs.ty(ident)} = ").braced {
-          w.wl(e.options.zipWithIndex.map{case (o, i) => idJs.enum(o.ident.name) + ": " + i}.mkString(", "))
+          writeEnumOptionNone(w, e, idJs.enum(_), ":")
+          writeEnumOptions(w, e, idJs.enum(_), ":")
+          writeEnumOptionAll(w, e, idJs.enum(_), ":")
         }
       }
       w.wl("})")

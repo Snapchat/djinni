@@ -6,5 +6,5 @@
 typedef NS_OPTIONS(NSUInteger, DBEmptyFlags)
 {
     DBEmptyFlagsNone = 0,
-    DBEmptyFlagsAll = 0,
+    DBEmptyFlagsAll = (1 << 0) - 1,
 };

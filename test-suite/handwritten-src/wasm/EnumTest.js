@@ -1,23 +1,42 @@
 class EnumTest {
     constructor(module) {
-        this.module = module;
+        this.m = module;
     }
     testEnumKey() {
-        var m = new Map();
-        m.set(this.module.Color.RED, "red");
-        m.set(this.module.Color.ORANGE, "orange");
-        m.set(this.module.Color.YELLOW, "yellow");
-        m.set(this.module.Color.GREEN, "green");
-        m.set(this.module.Color.BLUE, "blue");
-        m.set(this.module.Color.INDIGO, "indigo");
-        m.set(this.module.Color.VIOLET, "violet");
-        this.module.TestHelpers.checkEnumMap(m);
+        var map = new Map();
+        map.set(this.m.Color.RED, "red");
+        map.set(this.m.Color.ORANGE, "orange");
+        map.set(this.m.Color.YELLOW, "yellow");
+        map.set(this.m.Color.GREEN, "green");
+        map.set(this.m.Color.BLUE, "blue");
+        map.set(this.m.Color.INDIGO, "indigo");
+        map.set(this.m.Color.VIOLET, "violet");
+        this.m.TestHelpers.checkEnumMap(map);
     }
     testAccessFlagRoundtrip() {
-        assertTrue(false);
+        var flags = [
+            this.m.AccessFlags.NOBODY,
+            this.m.AccessFlags.EVERYBODY,
+            this.m.AccessFlags.OWNER_READ,
+            this.m.AccessFlags.OWNER_READ | this.m.AccessFlags.OWNER_WRITE,
+            this.m.AccessFlags.OWNER_READ | this.m.AccessFlags.OWNER_WRITE | this.m.AccessFlags.OWNER_EXECUTE,
+        ];
+        for (var i = 0; i < flags.length; ++i) {
+            assertEq(flags[i], this.m.FlagRoundtrip.roundtripAccess(flags[i]));
+            assertEq(flags[i], this.m.FlagRoundtrip.roundtripAccessBoxed(flags[i]));
+        }
+        assertNull(this.m.FlagRoundtrip.roundtripAccessBoxed(null));
     }
     testEmptyFlagRoundtrip() {
-        assertTrue(false);
+        var flags = [
+            this.m.EmptyFlags.NONE,
+            this.m.EmptyFlags.ALL,
+        ];
+        for (var i = 0; i < flags.length; ++i) {
+            assertEq(flags[i], this.m.FlagRoundtrip.roundtripEmpty(flags[i]));
+            assertEq(flags[i], this.m.FlagRoundtrip.roundtripEmptyBoxed(flags[i]));
+        }
+        assertNull(this.m.FlagRoundtrip.roundtripEmptyBoxed(null));
     }
 }
 

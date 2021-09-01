@@ -7,7 +7,17 @@ namespace djinni_generated {
 
 EM_JS(void, djinni_init_testsuite_access_flags, (), {
     Module.AccessFlags =  {
-        NOBODY: 0, OWNER_READ: 1, OWNER_WRITE: 2, OWNER_EXECUTE: 3, GROUP_READ: 4, GROUP_WRITE: 5, GROUP_EXECUTE: 6, SYSTEM_READ: 7, SYSTEM_WRITE: 8, SYSTEM_EXECUTE: 9, EVERYBODY: 10
+        NOBODY : 0,
+        OWNER_READ : 1 << 0,
+        OWNER_WRITE : 1 << 1,
+        OWNER_EXECUTE : 1 << 2,
+        GROUP_READ : 1 << 3,
+        GROUP_WRITE : 1 << 4,
+        GROUP_EXECUTE : 1 << 5,
+        SYSTEM_READ : 1 << 6,
+        SYSTEM_WRITE : 1 << 7,
+        SYSTEM_EXECUTE : 1 << 8,
+        EVERYBODY : (1 << 9) - 1,
     }
 })
 
