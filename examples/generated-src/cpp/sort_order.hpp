@@ -13,8 +13,6 @@ enum class sort_order : int {
     RANDOM = 2,
 };
 
-const char* to_string(sort_order e);
-
 }  // namespace textsort
 
 namespace std {

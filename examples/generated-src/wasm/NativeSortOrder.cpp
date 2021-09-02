@@ -5,16 +5,18 @@
 
 namespace djinni_generated {
 
-EM_JS(void, djinni_init_textsort_sort_order, (), {
-    Module.SortOrder =  {
-        ASCENDING : 0,
-        DESCENDING : 1,
-        RANDOM : 2,
-    }
-})
+namespace textsort {
+    EM_JS(void, djinni_init_sort_order, (), {
+        Module.SortOrder =  {
+            ASCENDING : 0,
+            DESCENDING : 1,
+            RANDOM : 2,
+        }
+    })
+}
 
 EMSCRIPTEN_BINDINGS(sort_order) {
-    djinni_init_textsort_sort_order();
+    textsort::djinni_init_sort_order();
 }
 
 }  // namespace djinni_generated

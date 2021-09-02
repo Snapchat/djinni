@@ -1806,10 +1806,10 @@ var tempI64;
 var ASM_CONSTS = {
   
 };
-function djinni_init_testsuite_access_flags(){ Module.AccessFlags = { NOBODY : 0, OWNER_READ : 1 << 0, OWNER_WRITE : 1 << 1, OWNER_EXECUTE : 1 << 2, GROUP_READ : 1 << 3, GROUP_WRITE : 1 << 4, GROUP_EXECUTE : 1 << 5, SYSTEM_READ : 1 << 6, SYSTEM_WRITE : 1 << 7, SYSTEM_EXECUTE : 1 << 8, EVERYBODY : (1 << 9) - 1, } }
-function djinni_init_testsuite_color(){ Module.Color = { RED : 0, ORANGE : 1, YELLOW : 2, GREEN : 3, BLUE : 4, INDIGO : 5, VIOLET : 6, } }
-function djinni_init_testsuite_constant_enum(){ Module.ConstantEnum = { SOME_VALUE : 0, SOME_OTHER_VALUE : 1, } }
-function djinni_init_testsuite_empty_flags(){ Module.EmptyFlags = { NONE : 0, ALL : (1 << 0) - 1, } }
+function djinni_init_access_flags(){ Module.AccessFlags = { NOBODY : 0, OWNER_READ : 1 << 0, OWNER_WRITE : 1 << 1, OWNER_EXECUTE : 1 << 2, GROUP_READ : 1 << 3, GROUP_WRITE : 1 << 4, GROUP_EXECUTE : 1 << 5, SYSTEM_READ : 1 << 6, SYSTEM_WRITE : 1 << 7, SYSTEM_EXECUTE : 1 << 8, EVERYBODY : (1 << 9) - 1, } }
+function djinni_init_color(){ Module.Color = { RED : 0, ORANGE : 1, YELLOW : 2, GREEN : 3, BLUE : 4, INDIGO : 5, VIOLET : 6, } }
+function djinni_init_constant_enum(){ Module.ConstantEnum = { SOME_VALUE : 0, SOME_OTHER_VALUE : 1, } }
+function djinni_init_empty_flags(){ Module.EmptyFlags = { NONE : 0, ALL : (1 << 0) - 1, } }
 function djinni_init_wasm(){ console.log("djinni_init_wasm"); Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => { console.log("finalizing cpp object"); nativeRef.nativeDestroy(); nativeRef.delete(); }); Module.directBufferFinalizerRegistry = new FinalizationRegistry(addr => { Module._releaseDirectBuffer(addr); }); class DjinniCppProxy { constructor(nativeRef, methods) { console.log('new cpp proxy'); this._djinni_native_ref = nativeRef; let self = this; methods.forEach(function(method) { self[method] = function(...args) { return nativeRef[method](...args); } }); } } Module.DjinniCppProxy = DjinniCppProxy; }
 
 
@@ -6933,10 +6933,10 @@ var asmLibraryArg = {
   "_emval_set_property": __emval_set_property,
   "_emval_take_value": __emval_take_value,
   "abort": _abort,
-  "djinni_init_testsuite_access_flags": djinni_init_testsuite_access_flags,
-  "djinni_init_testsuite_color": djinni_init_testsuite_color,
-  "djinni_init_testsuite_constant_enum": djinni_init_testsuite_constant_enum,
-  "djinni_init_testsuite_empty_flags": djinni_init_testsuite_empty_flags,
+  "djinni_init_access_flags": djinni_init_access_flags,
+  "djinni_init_color": djinni_init_color,
+  "djinni_init_constant_enum": djinni_init_constant_enum,
+  "djinni_init_empty_flags": djinni_init_empty_flags,
   "djinni_init_wasm": djinni_init_wasm,
   "emscripten_memcpy_big": _emscripten_memcpy_big,
   "emscripten_resize_heap": _emscripten_resize_heap,

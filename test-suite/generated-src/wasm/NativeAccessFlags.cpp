@@ -5,24 +5,26 @@
 
 namespace djinni_generated {
 
-EM_JS(void, djinni_init_testsuite_access_flags, (), {
-    Module.AccessFlags =  {
-        NOBODY : 0,
-        OWNER_READ : 1 << 0,
-        OWNER_WRITE : 1 << 1,
-        OWNER_EXECUTE : 1 << 2,
-        GROUP_READ : 1 << 3,
-        GROUP_WRITE : 1 << 4,
-        GROUP_EXECUTE : 1 << 5,
-        SYSTEM_READ : 1 << 6,
-        SYSTEM_WRITE : 1 << 7,
-        SYSTEM_EXECUTE : 1 << 8,
-        EVERYBODY : (1 << 9) - 1,
-    }
-})
+namespace testsuite {
+    EM_JS(void, djinni_init_access_flags, (), {
+        Module.AccessFlags =  {
+            NOBODY : 0,
+            OWNER_READ : 1 << 0,
+            OWNER_WRITE : 1 << 1,
+            OWNER_EXECUTE : 1 << 2,
+            GROUP_READ : 1 << 3,
+            GROUP_WRITE : 1 << 4,
+            GROUP_EXECUTE : 1 << 5,
+            SYSTEM_READ : 1 << 6,
+            SYSTEM_WRITE : 1 << 7,
+            SYSTEM_EXECUTE : 1 << 8,
+            EVERYBODY : (1 << 9) - 1,
+        }
+    })
+}
 
 EMSCRIPTEN_BINDINGS(access_flags) {
-    djinni_init_testsuite_access_flags();
+    testsuite::djinni_init_access_flags();
 }
 
 }  // namespace djinni_generated

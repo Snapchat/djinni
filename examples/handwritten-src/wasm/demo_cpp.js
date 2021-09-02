@@ -102,6 +102,12 @@ Module['ready'] = new Promise(function(resolve, reject) {
       }
     
 
+      if (!Object.getOwnPropertyDescriptor(Module['ready'], '_releaseDirectBuffer')) {
+        Object.defineProperty(Module['ready'], '_releaseDirectBuffer', { configurable: true, get: function() { abort('You are getting _releaseDirectBuffer on the Promise object, instead of the instance. Use .then() to get called back with the instance, see the MODULARIZE docs in src/settings.js') } });
+        Object.defineProperty(Module['ready'], '_releaseDirectBuffer', { configurable: true, set: function() { abort('You are setting _releaseDirectBuffer on the Promise object, instead of the instance. Use .then() to get called back with the instance, see the MODULARIZE docs in src/settings.js') } });
+      }
+    
+
       if (!Object.getOwnPropertyDescriptor(Module['ready'], '___getTypeName')) {
         Object.defineProperty(Module['ready'], '___getTypeName', { configurable: true, get: function() { abort('You are getting ___getTypeName on the Promise object, instead of the instance. Use .then() to get called back with the instance, see the MODULARIZE docs in src/settings.js') } });
         Object.defineProperty(Module['ready'], '___getTypeName', { configurable: true, set: function() { abort('You are setting ___getTypeName on the Promise object, instead of the instance. Use .then() to get called back with the instance, see the MODULARIZE docs in src/settings.js') } });
@@ -1800,8 +1806,8 @@ var tempI64;
 var ASM_CONSTS = {
   
 };
-function djinni_init(){ if (typeof Module.cppProxyFinalizerRegistry == 'undefined') { console.log("create cppProxyFinalizerRegistry"); Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => { console.log("finalizing cpp object"); nativeRef.nativeDestroy(); nativeRef.delete(); }); } if (typeof Module.DjinniCppProxy == 'undefined') { console.log("define cpp proxy class"); class DjinniCppProxy { constructor(nativeRef, methods) { console.log('new cpp proxy'); this._djinni_native_ref = nativeRef; let self = this; methods.forEach(function(method) { self[method] = function(...args) { return nativeRef[method](...args); } }); } } Module.DjinniCppProxy = DjinniCppProxy; } }
-function djinni_init_textsort_sort_order(){ Module.SortOrder = { ASCENDING: 0, DESCENDING: 1, RANDOM: 2 } }
+function djinni_init_sort_order(){ Module.SortOrder = { ASCENDING : 0, DESCENDING : 1, RANDOM : 2, } }
+function djinni_init_wasm(){ console.log("djinni_init_wasm"); Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => { console.log("finalizing cpp object"); nativeRef.nativeDestroy(); nativeRef.delete(); }); Module.directBufferFinalizerRegistry = new FinalizationRegistry(addr => { Module._releaseDirectBuffer(addr); }); class DjinniCppProxy { constructor(nativeRef, methods) { console.log('new cpp proxy'); this._djinni_native_ref = nativeRef; let self = this; methods.forEach(function(method) { self[method] = function(...args) { return nativeRef[method](...args); } }); } } Module.DjinniCppProxy = DjinniCppProxy; }
 
 
 
@@ -3332,6 +3338,23 @@ function djinni_init_textsort_sort_order(){ Module.SortOrder = { ASCENDING: 0, D
           'argPackAdvance': 8,
           'readValueFromPointer': floatReadValueFromPointer(name, shift),
           destructorFunction: null, // This type does not need a destructor
+      });
+    }
+
+  function __embind_register_function(name, argCount, rawArgTypesAddr, signature, rawInvoker, fn) {
+      var argTypes = heap32VectorToArray(argCount, rawArgTypesAddr);
+      name = readLatin1String(name);
+  
+      rawInvoker = embind__requireFunction(signature, rawInvoker);
+  
+      exposePublicSymbol(name, function() {
+          throwUnboundTypeError('Cannot call ' + name + ' due to unbound types', argTypes);
+      }, argCount - 1);
+  
+      whenDependentTypesAreResolved([], argTypes, function(argTypes) {
+          var invokerArgsArray = [argTypes[0] /* return value */, null /* no class 'this'*/].concat(argTypes.slice(1) /* actual params */);
+          replacePublicSymbol(name, craftInvokerFunction(name, invokerArgsArray, null /* no class 'this'*/, rawInvoker, fn), argCount - 1);
+          return [];
       });
     }
 
@@ -6860,6 +6883,7 @@ var asmLibraryArg = {
   "_embind_register_class_function": __embind_register_class_function,
   "_embind_register_emval": __embind_register_emval,
   "_embind_register_float": __embind_register_float,
+  "_embind_register_function": __embind_register_function,
   "_embind_register_integer": __embind_register_integer,
   "_embind_register_memory_view": __embind_register_memory_view,
   "_embind_register_smart_ptr": __embind_register_smart_ptr,
@@ -6885,8 +6909,8 @@ var asmLibraryArg = {
   "_emval_set_property": __emval_set_property,
   "_emval_take_value": __emval_take_value,
   "abort": _abort,
-  "djinni_init": djinni_init,
-  "djinni_init_textsort_sort_order": djinni_init_textsort_sort_order,
+  "djinni_init_sort_order": djinni_init_sort_order,
+  "djinni_init_wasm": djinni_init_wasm,
   "emscripten_memcpy_big": _emscripten_memcpy_big,
   "emscripten_resize_heap": _emscripten_resize_heap,
   "environ_get": _environ_get,
@@ -6900,6 +6924,9 @@ var asmLibraryArg = {
 var asm = createWasm();
 /** @type {function(...*):?} */
 var ___wasm_call_ctors = Module["___wasm_call_ctors"] = createExportWrapper("__wasm_call_ctors");
+
+/** @type {function(...*):?} */
+var _releaseDirectBuffer = Module["_releaseDirectBuffer"] = createExportWrapper("releaseDirectBuffer");
 
 /** @type {function(...*):?} */
 var _malloc = Module["_malloc"] = createExportWrapper("malloc");

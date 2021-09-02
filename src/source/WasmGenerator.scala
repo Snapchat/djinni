@@ -146,17 +146,19 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       w.wl(s"struct $helper: ::djinni::WasmEnum<$cls> {};")
     }), (w => {}))
     writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle, includePrefix())(wasmFilename(ident.name), origin, refs.cpp, (w => {
-      w.wl(s"EM_JS(void, djinni_init_${spec.cppNamespace}_${ident.name}, (), {").nested {
-        w.w(s"Module.${idJs.ty(ident)} = ").braced {
-          writeEnumOptionNone(w, e, idJs.enum, ":")
-          writeEnumOptions(w, e, idJs.enum, ":")
-          writeEnumOptionAll(w, e, idJs.enum, ":")
+      w.w(s"namespace ${spec.cppNamespace}").braced {
+        w.wl(s"EM_JS(void, djinni_init_${ident.name}, (), {").nested {
+          w.w(s"Module.${idJs.ty(ident)} = ").braced {
+            writeEnumOptionNone(w, e, idJs.enum, ":")
+            writeEnumOptions(w, e, idJs.enum, ":")
+            writeEnumOptionAll(w, e, idJs.enum, ":")
+          }
         }
+        w.wl("})")
       }
-      w.wl("})")
       w.wl
       w.w(s"EMSCRIPTEN_BINDINGS(${ident.name})").braced {
-        w.wl(s"djinni_init_${spec.cppNamespace}_${ident.name}();")
+        w.wl(s"${spec.cppNamespace}::djinni_init_${ident.name}();")
       }
     }))
   }

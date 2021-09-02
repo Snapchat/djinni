@@ -5,15 +5,17 @@
 
 namespace djinni_generated {
 
-EM_JS(void, djinni_init_testsuite_constant_enum, (), {
-    Module.ConstantEnum =  {
-        SOME_VALUE : 0,
-        SOME_OTHER_VALUE : 1,
-    }
-})
+namespace testsuite {
+    EM_JS(void, djinni_init_constant_enum, (), {
+        Module.ConstantEnum =  {
+            SOME_VALUE : 0,
+            SOME_OTHER_VALUE : 1,
+        }
+    })
+}
 
 EMSCRIPTEN_BINDINGS(constant_enum) {
-    djinni_init_testsuite_constant_enum();
+    testsuite::djinni_init_constant_enum();
 }
 
 }  // namespace djinni_generated

@@ -8,12 +8,12 @@
 namespace snapchat { namespace djinni { namespace benchmark {
 
 enum class EnumSixValue : int {
-    FIRST,
-    SECOND,
-    THIRD,
-    FOURTH,
-    FIFTH,
-    SIXTH,
+    FIRST = 0,
+    SECOND = 1,
+    THIRD = 2,
+    FOURTH = 3,
+    FIFTH = 4,
+    SIXTH = 5,
 };
 
 } } }  // namespace snapchat::djinni::benchmark

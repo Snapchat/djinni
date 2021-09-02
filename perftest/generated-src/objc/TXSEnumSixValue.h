@@ -5,10 +5,10 @@
 
 typedef NS_ENUM(NSInteger, TXSEnumSixValue)
 {
-    TXSEnumSixValueFirst,
-    TXSEnumSixValueSecond,
-    TXSEnumSixValueThird,
-    TXSEnumSixValueFourth,
-    TXSEnumSixValueFifth,
-    TXSEnumSixValueSixth,
+    TXSEnumSixValueFirst = 0,
+    TXSEnumSixValueSecond = 1,
+    TXSEnumSixValueThird = 2,
+    TXSEnumSixValueFourth = 3,
+    TXSEnumSixValueFifth = 4,
+    TXSEnumSixValueSixth = 5,
 };
