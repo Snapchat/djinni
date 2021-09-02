@@ -22,6 +22,8 @@ enum class color : int {
     VIOLET,
 };
 
+const char* to_string(color e) noexcept;
+
 }  // namespace testsuite
 
 namespace std {
