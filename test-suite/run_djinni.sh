@@ -182,6 +182,8 @@ cp "$base_dir/djinni/yaml-test.djinni" "$temp_out/yaml"
     --objcpp-out "$temp_out_relative/objc" \
     --objc-type-prefix DB \
     \
+    --wasm-out "$temp_out_relative/wasm" \
+    \
     --idl "$temp_out_relative/yaml/yaml-test.djinni" \
 )
 
