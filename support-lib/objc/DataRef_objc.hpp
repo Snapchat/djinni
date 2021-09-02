@@ -1,3 +1,5 @@
+#pragma once
+
 #include "DJIMarshal+Private.h"
 #include "DataRef.hpp"
 

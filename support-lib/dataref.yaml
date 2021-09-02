@@ -29,4 +29,4 @@ jni:
 wasm:
   typename: 'em::val'
   translator: '::snapchat::djinni::NativeDataRef'
-  header: 'djinni_wasm.hpp'
+  header: '"DataRef_wasm.hpp"'

@@ -38,17 +38,51 @@ const em::val& JsProxyBase::_jsRef() const {
     return _js;
 }
 
-EM_JS(void, djinni_init, (), {
-    if (typeof Module.cppProxyFinalizerRegistry == 'undefined') {
-        console.log("create cppProxyFinalizerRegistry");
+em::val getCppProxyFinalizerRegistry() {
+    static auto inst  = em::val::module_property("cppProxyFinalizerRegistry");
+    return inst;
+}
+
+em::val getCppProxyClass() {
+    static auto inst  = em::val::module_property("DjinniCppProxy");
+    return inst;
+}
+
+em::val getWasmMemoryBuffer() {
+    static auto memoryBuffer = em::val::module_property("HEAPU32")["buffer"];
+    return memoryBuffer;
+}
+
+em::val DataObject::createJsObject() {
+    static auto finalizerRegistry = em::val::module_property("directBufferFinalizerRegistry");
+    static auto uint8ArrayClass = em::val::global("Uint8Array");
+    em::val jsObj = uint8ArrayClass.new_(getWasmMemoryBuffer(), addr(), size());
+    finalizerRegistry.call<void>("register", jsObj, reinterpret_cast<unsigned>(this));
+    return jsObj;
+}
+
+em::val allocateDirectBuffer(unsigned size) {
+    auto* dbuf = new GenericBuffer<std::vector<uint8_t>>(size);
+    return dbuf->createJsObject();
+}
+
+extern "C" EMSCRIPTEN_KEEPALIVE
+void releaseDirectBuffer(unsigned addr) {
+    delete reinterpret_cast<DataObject*>(addr);
+}
+
+EM_JS(void, djinni_init_wasm, (), {
+        console.log("djinni_init_wasm");
         Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => {
             console.log("finalizing cpp object");
             nativeRef.nativeDestroy();
             nativeRef.delete();
         });
-    }
-    if (typeof Module.DjinniCppProxy == 'undefined') {
-        console.log("define cpp proxy class");
+
+        Module.directBufferFinalizerRegistry = new FinalizationRegistry(addr => {
+            Module._releaseDirectBuffer(addr);
+        });
+
         class DjinniCppProxy {
             constructor(nativeRef, methods) {
                 console.log('new cpp proxy');
@@ -62,23 +96,11 @@ EM_JS(void, djinni_init, (), {
             }
         }
         Module.DjinniCppProxy = DjinniCppProxy;
-    }
 });
 
-static em::val getJsHelper(const char* name) {
-    static std::once_flag djinniInitOnce;
-    std::call_once(djinniInitOnce, djinni_init);
-    return em::val::module_property(name);
-}
-
-em::val getCppProxyFinalizerRegistry() {
-    static auto inst  = getJsHelper("cppProxyFinalizerRegistry");
-    return inst;
-}
-
-em::val getCppProxyClass() {
-    static auto inst  = getJsHelper("DjinniCppProxy");
-    return inst;
+EMSCRIPTEN_BINDINGS(djinni_wasm) {
+    djinni_init_wasm();    
+    em::function("allocateDirectBuffer", &allocateDirectBuffer);
 }
 
 }

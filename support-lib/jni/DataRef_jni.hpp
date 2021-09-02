@@ -1,3 +1,5 @@
+#pragma once
+
 #include "djinni_support.hpp"
 #include "DataRef.hpp"
 

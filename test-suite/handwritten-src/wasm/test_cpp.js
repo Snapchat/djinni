@@ -102,6 +102,12 @@ Module['ready'] = new Promise(function(resolve, reject) {
       }
     
 
+      if (!Object.getOwnPropertyDescriptor(Module['ready'], '_releaseDirectBuffer')) {
+        Object.defineProperty(Module['ready'], '_releaseDirectBuffer', { configurable: true, get: function() { abort('You are getting _releaseDirectBuffer on the Promise object, instead of the instance. Use .then() to get called back with the instance, see the MODULARIZE docs in src/settings.js') } });
+        Object.defineProperty(Module['ready'], '_releaseDirectBuffer', { configurable: true, set: function() { abort('You are setting _releaseDirectBuffer on the Promise object, instead of the instance. Use .then() to get called back with the instance, see the MODULARIZE docs in src/settings.js') } });
+      }
+    
+
       if (!Object.getOwnPropertyDescriptor(Module['ready'], '___getTypeName')) {
         Object.defineProperty(Module['ready'], '___getTypeName', { configurable: true, get: function() { abort('You are getting ___getTypeName on the Promise object, instead of the instance. Use .then() to get called back with the instance, see the MODULARIZE docs in src/settings.js') } });
         Object.defineProperty(Module['ready'], '___getTypeName', { configurable: true, set: function() { abort('You are setting ___getTypeName on the Promise object, instead of the instance. Use .then() to get called back with the instance, see the MODULARIZE docs in src/settings.js') } });
@@ -1800,11 +1806,11 @@ var tempI64;
 var ASM_CONSTS = {
   
 };
-function djinni_init(){ if (typeof Module.cppProxyFinalizerRegistry == 'undefined') { console.log("create cppProxyFinalizerRegistry"); Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => { console.log("finalizing cpp object"); nativeRef.nativeDestroy(); nativeRef.delete(); }); } if (typeof Module.DjinniCppProxy == 'undefined') { console.log("define cpp proxy class"); class DjinniCppProxy { constructor(nativeRef, methods) { console.log('new cpp proxy'); this._djinni_native_ref = nativeRef; let self = this; methods.forEach(function(method) { self[method] = function(...args) { return nativeRef[method](...args); } }); } } Module.DjinniCppProxy = DjinniCppProxy; } }
 function djinni_init_testsuite_access_flags(){ Module.AccessFlags = { NOBODY : 0, OWNER_READ : 1 << 0, OWNER_WRITE : 1 << 1, OWNER_EXECUTE : 1 << 2, GROUP_READ : 1 << 3, GROUP_WRITE : 1 << 4, GROUP_EXECUTE : 1 << 5, SYSTEM_READ : 1 << 6, SYSTEM_WRITE : 1 << 7, SYSTEM_EXECUTE : 1 << 8, EVERYBODY : (1 << 9) - 1, } }
 function djinni_init_testsuite_color(){ Module.Color = { RED : 0, ORANGE : 1, YELLOW : 2, GREEN : 3, BLUE : 4, INDIGO : 5, VIOLET : 6, } }
 function djinni_init_testsuite_constant_enum(){ Module.ConstantEnum = { SOME_VALUE : 0, SOME_OTHER_VALUE : 1, } }
 function djinni_init_testsuite_empty_flags(){ Module.EmptyFlags = { NONE : 0, ALL : (1 << 0) - 1, } }
+function djinni_init_wasm(){ console.log("djinni_init_wasm"); Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => { console.log("finalizing cpp object"); nativeRef.nativeDestroy(); nativeRef.delete(); }); Module.directBufferFinalizerRegistry = new FinalizationRegistry(addr => { Module._releaseDirectBuffer(addr); }); class DjinniCppProxy { constructor(nativeRef, methods) { console.log('new cpp proxy'); this._djinni_native_ref = nativeRef; let self = this; methods.forEach(function(method) { self[method] = function(...args) { return nativeRef[method](...args); } }); } } Module.DjinniCppProxy = DjinniCppProxy; }
 
 
 
@@ -3338,6 +3344,23 @@ function djinni_init_testsuite_empty_flags(){ Module.EmptyFlags = { NONE : 0, AL
       });
     }
 
+  function __embind_register_function(name, argCount, rawArgTypesAddr, signature, rawInvoker, fn) {
+      var argTypes = heap32VectorToArray(argCount, rawArgTypesAddr);
+      name = readLatin1String(name);
+  
+      rawInvoker = embind__requireFunction(signature, rawInvoker);
+  
+      exposePublicSymbol(name, function() {
+          throwUnboundTypeError('Cannot call ' + name + ' due to unbound types', argTypes);
+      }, argCount - 1);
+  
+      whenDependentTypesAreResolved([], argTypes, function(argTypes) {
+          var invokerArgsArray = [argTypes[0] /* return value */, null /* no class 'this'*/].concat(argTypes.slice(1) /* actual params */);
+          replacePublicSymbol(name, craftInvokerFunction(name, invokerArgsArray, null /* no class 'this'*/, rawInvoker, fn), argCount - 1);
+          return [];
+      });
+    }
+
   function __embind_register_integer(primitiveType, name, size, minRange, maxRange) {
       name = readLatin1String(name);
       if (maxRange === -1) { // LLVM doesn't have signed and unsigned 32-bit types, so u32 literals come out as 'i32 -1'. Always treat those as max u32.
@@ -3712,6 +3735,12 @@ function djinni_init_testsuite_empty_flags(){ Module.EmptyFlags = { NONE : 0, AL
       caller(handle, methodName, null, args);
     }
 
+
+  function __emval_equals(first, second) {
+      first = requireHandle(first);
+      second = requireHandle(second);
+      return first == second;
+    }
 
   function emval_get_global() {
       if (typeof globalThis === 'object') {
@@ -6875,6 +6904,7 @@ var asmLibraryArg = {
   "_embind_register_class_function": __embind_register_class_function,
   "_embind_register_emval": __embind_register_emval,
   "_embind_register_float": __embind_register_float,
+  "_embind_register_function": __embind_register_function,
   "_embind_register_integer": __embind_register_integer,
   "_embind_register_memory_view": __embind_register_memory_view,
   "_embind_register_smart_ptr": __embind_register_smart_ptr,
@@ -6887,6 +6917,7 @@ var asmLibraryArg = {
   "_emval_call_method": __emval_call_method,
   "_emval_call_void_method": __emval_call_void_method,
   "_emval_decref": __emval_decref,
+  "_emval_equals": __emval_equals,
   "_emval_get_global": __emval_get_global,
   "_emval_get_method_caller": __emval_get_method_caller,
   "_emval_get_module_property": __emval_get_module_property,
@@ -6902,11 +6933,11 @@ var asmLibraryArg = {
   "_emval_set_property": __emval_set_property,
   "_emval_take_value": __emval_take_value,
   "abort": _abort,
-  "djinni_init": djinni_init,
   "djinni_init_testsuite_access_flags": djinni_init_testsuite_access_flags,
   "djinni_init_testsuite_color": djinni_init_testsuite_color,
   "djinni_init_testsuite_constant_enum": djinni_init_testsuite_constant_enum,
   "djinni_init_testsuite_empty_flags": djinni_init_testsuite_empty_flags,
+  "djinni_init_wasm": djinni_init_wasm,
   "emscripten_memcpy_big": _emscripten_memcpy_big,
   "emscripten_resize_heap": _emscripten_resize_heap,
   "environ_get": _environ_get,
@@ -6920,6 +6951,9 @@ var asmLibraryArg = {
 var asm = createWasm();
 /** @type {function(...*):?} */
 var ___wasm_call_ctors = Module["___wasm_call_ctors"] = createExportWrapper("__wasm_call_ctors");
+
+/** @type {function(...*):?} */
+var _releaseDirectBuffer = Module["_releaseDirectBuffer"] = createExportWrapper("releaseDirectBuffer");
 
 /** @type {function(...*):?} */
 var _malloc = Module["_malloc"] = createExportWrapper("malloc");

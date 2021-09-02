@@ -1,5 +1,3 @@
-#if (!defined(__EMSCRIPTEN__))
-
 #include "DataRefTest.hpp"
 
 namespace testsuite {
@@ -58,5 +56,3 @@ std::shared_ptr<DataRefTest> DataRefTest::create() {
 }
 
 }
-
-#endif

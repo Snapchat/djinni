@@ -345,6 +345,7 @@ extern std::mutex cppProxyCacheMutex;
 
 extern em::val getCppProxyFinalizerRegistry();
 extern em::val getCppProxyClass();
+extern em::val getWasmMemoryBuffer();
 
 template<typename I, typename Self>
 struct JsInterface {
@@ -426,6 +427,50 @@ struct JsInterface {
             return newJsProxy;
         }
     }
+};
+
+struct DataObject {
+    virtual ~DataObject() = default;
+    em::val createJsObject();
+    virtual unsigned addr() = 0;
+    virtual unsigned size() = 0;
+};
+
+template<typename T>
+class GenericBuffer: public DataObject {
+public:
+    GenericBuffer(size_t size) : _buffer(size, {}) {
+        std::cout << "allocate direct buffer:@" << this
+                  << " addr:" << reinterpret_cast<void*>(_buffer.data())
+                  << " size:" << _buffer.size()
+                  << std::endl;
+    }
+    GenericBuffer(const typename T::value_type* data, typename T::size_type size) :
+        _buffer(data, data + size) {
+        std::cout << "initialize direct buffer:@" << this
+                  << " addr:" << reinterpret_cast<void*>(_buffer.data())
+                  << " size:" << _buffer.size()
+                  << std::endl;
+    }
+    GenericBuffer(T&& toTakeOver) : _buffer(std::move(toTakeOver)) {
+        std::cout << "direct buffer takeover:@" << this
+                  << " addr:" << reinterpret_cast<void*>(_buffer.data())
+                  << " size:" << _buffer.size()
+                  << std::endl;
+    }
+    ~GenericBuffer() override {
+        std::cout << "free direct buffer:@" << this
+                  << " size:" << _buffer.size()
+                  << std::endl;
+    }
+    unsigned addr() override {
+        return reinterpret_cast<unsigned>(_buffer.data());
+    }
+    unsigned size() override {
+        return static_cast<unsigned>(_buffer.size());
+    }
+private:
+    T _buffer;
 };
 
 }

@@ -7,14 +7,14 @@ GEN_DIR=$(ROOT)/test-suite/generated-src
 IMP_DIR=$(ROOT)/test-suite/handwritten-src/cpp
 
 TARGET ?= test_cpp.js
-SRC_DIRS ?= $(LIB_DIR)/wasm $(GEN_DIR)/wasm $(IMP_DIR) .
+SRC_DIRS ?= $(LIB_DIR)/wasm $(LIB_DIR)/cpp $(GEN_DIR)/wasm $(IMP_DIR) .
 
 SRCS := $(shell find $(SRC_DIRS) -name *.cpp)
 OBJS := $(addsuffix .o,$(basename $(SRCS)))
 DEPS := $(OBJS:.o=.d)
 
 # INC_DIRS := $(shell find $(SRC_DIRS) -type d) $(LIB_DIR)
-INC_DIRS := $(GEN_DIR)/cpp $(LIB_DIR) $(LIB_DIR)/wasm $(IMP_DIR)
+INC_DIRS := $(GEN_DIR)/cpp $(LIB_DIR) $(LIB_DIR)/wasm $(LIB_DIR)/cpp $(IMP_DIR)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -std=c++17 --bind
