@@ -13,7 +13,7 @@ struct NativeClientReturnedRecord
     using CppType = ::testsuite::ClientReturnedRecord;
     using JsType = em::val;
     using Boxed = NativeClientReturnedRecord;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

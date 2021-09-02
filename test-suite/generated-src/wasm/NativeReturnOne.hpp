@@ -13,16 +13,16 @@ struct NativeReturnOne : ::djinni::JsInterface<::testsuite::ReturnOne, NativeRet
     using CppOptType = std::shared_ptr<::testsuite::ReturnOne>;
     using JsType = em::val;
     using Boxed = NativeReturnOne;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
+
     static em::val get_instance();
     static int8_t return_one(const CppType& self);
-    
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ReturnOne, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
         int8_t return_one() override;

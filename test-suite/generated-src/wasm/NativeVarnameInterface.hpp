@@ -13,16 +13,16 @@ struct NativeVarnameInterface : ::djinni::JsInterface<::testsuite::VarnameInterf
     using CppOptType = std::shared_ptr<::testsuite::VarnameInterface>;
     using JsType = em::val;
     using Boxed = NativeVarnameInterface;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
+
     static em::val _rmethod_(const CppType& self, const em::val& w__r_arg_);
     static em::val _imethod_(const CppType& self, const em::val& w__i_arg_);
-    
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::VarnameInterface, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
         ::testsuite::VarnameRecord _rmethod_(const ::testsuite::VarnameRecord & _r_arg_) override;

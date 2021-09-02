@@ -13,18 +13,18 @@ struct NativeUsesSingleLanguageListeners : ::djinni::JsInterface<::testsuite::Us
     using CppOptType = std::shared_ptr<::testsuite::UsesSingleLanguageListeners>;
     using JsType = em::val;
     using Boxed = NativeUsesSingleLanguageListeners;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
+
     static void callForObjC(const CppType& self, const em::val& w_l);
     static em::val returnForObjC(const CppType& self);
     static void callForJava(const CppType& self, const em::val& w_l);
     static em::val returnForJava(const CppType& self);
-    
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::UsesSingleLanguageListeners, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
         void callForObjC(const std::shared_ptr<::testsuite::ObjcOnlyListener> & l) override;

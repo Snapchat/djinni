@@ -13,13 +13,13 @@ struct NativeTestDuration : ::djinni::JsInterface<::testsuite::TestDuration, Nat
     using CppOptType = std::shared_ptr<::testsuite::TestDuration>;
     using JsType = em::val;
     using Boxed = NativeTestDuration;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
+
     static std::string hoursString(const em::val& w_dt);
     static std::string minutesString(const em::val& w_dt);
     static std::string secondsString(const em::val& w_dt);
@@ -40,7 +40,7 @@ struct NativeTestDuration : ::djinni::JsInterface<::testsuite::TestDuration, Nat
     static em::val nanosf(double w_count);
     static em::val box(int64_t w_count);
     static int64_t unbox(const em::val& w_dt);
-    
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::TestDuration, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
     };

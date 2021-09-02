@@ -2,6 +2,26 @@ class EnumTest {
     constructor(module) {
         this.m = module;
     }
+
+    enumToString(v, e) {
+        for (var k in e) {
+            if (e[k] == v) {
+                return k;
+            }
+        }
+        return v;
+    }
+    
+    testEnumToString() {
+        assertEq(this.enumToString(this.m.Color.RED, this.m.Color), "RED");
+        assertEq(this.enumToString(this.m.Color.ORANGE, this.m.Color), "ORANGE");
+        assertEq(this.enumToString(this.m.Color.YELLOW, this.m.Color), "YELLOW");
+        assertEq(this.enumToString(this.m.Color.GREEN, this.m.Color), "GREEN");
+        assertEq(this.enumToString(this.m.Color.BLUE, this.m.Color), "BLUE");
+        assertEq(this.enumToString(this.m.Color.INDIGO, this.m.Color), "INDIGO");
+        assertEq(this.enumToString(this.m.Color.VIOLET, this.m.Color), "VIOLET");
+    }
+    
     testEnumKey() {
         var map = new Map();
         map.set(this.m.Color.RED, "red");

@@ -13,18 +13,18 @@ struct NativeTestArray : ::djinni::JsInterface<::testsuite::TestArray, NativeTes
     using CppOptType = std::shared_ptr<::testsuite::TestArray>;
     using JsType = em::val;
     using Boxed = NativeTestArray;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
+
     static em::val testStringArray(const em::val& w_a);
     static em::val testIntArray(const em::val& w_a);
     static em::val testRecordArray(const em::val& w_a);
     static em::val testArrayOfArray(const em::val& w_a);
-    
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::TestArray, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
     };

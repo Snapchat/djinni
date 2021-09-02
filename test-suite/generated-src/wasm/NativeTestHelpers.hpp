@@ -13,13 +13,13 @@ struct NativeTestHelpers : ::djinni::JsInterface<::testsuite::TestHelpers, Nativ
     using CppOptType = std::shared_ptr<::testsuite::TestHelpers>;
     using JsType = em::val;
     using Boxed = NativeTestHelpers;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
+
     static em::val get_set_record();
     static bool check_set_record(const em::val& w_rec);
     static em::val get_primitive_list();
@@ -45,7 +45,7 @@ struct NativeTestHelpers : ::djinni::JsInterface<::testsuite::TestHelpers, Nativ
     static em::val return_none();
     static em::val assorted_primitives_id(const em::val& w_i);
     static em::val id_binary(const em::val& w_b);
-    
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::TestHelpers, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
     };

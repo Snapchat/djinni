@@ -13,15 +13,15 @@ struct NativeSecondListener : ::djinni::JsInterface<::testsuite::SecondListener,
     using CppOptType = std::shared_ptr<::testsuite::SecondListener>;
     using JsType = em::val;
     using Boxed = NativeSecondListener;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
+
     static void second(const CppType& self);
-    
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::SecondListener, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
         void second() override;

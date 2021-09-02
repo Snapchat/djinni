@@ -13,7 +13,7 @@ struct NativeMapDateRecord
     using CppType = ::testsuite::MapDateRecord;
     using JsType = em::val;
     using Boxed = NativeMapDateRecord;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

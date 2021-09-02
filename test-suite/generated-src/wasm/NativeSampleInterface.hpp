@@ -13,14 +13,14 @@ struct NativeSampleInterface : ::djinni::JsInterface<::testsuite::SampleInterfac
     using CppOptType = std::shared_ptr<::testsuite::SampleInterface>;
     using JsType = em::val;
     using Boxed = NativeSampleInterface;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
-    
+
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::SampleInterface, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
     };

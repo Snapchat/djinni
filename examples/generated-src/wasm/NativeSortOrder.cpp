@@ -7,7 +7,9 @@ namespace djinni_generated {
 
 EM_JS(void, djinni_init_textsort_sort_order, (), {
     Module.SortOrder =  {
-        ASCENDING: 0, DESCENDING: 1, RANDOM: 2
+        ASCENDING : 0,
+        DESCENDING : 1,
+        RANDOM : 2,
     }
 })
 

@@ -13,7 +13,7 @@ struct NativeSetRecord
     using CppType = ::testsuite::SetRecord;
     using JsType = em::val;
     using Boxed = NativeSetRecord;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

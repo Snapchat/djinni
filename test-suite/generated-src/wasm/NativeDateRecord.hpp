@@ -13,7 +13,7 @@ struct NativeDateRecord
     using CppType = ::testsuite::DateRecord;
     using JsType = em::val;
     using Boxed = NativeDateRecord;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

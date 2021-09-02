@@ -13,7 +13,7 @@ struct NativeEmptyRecord
     using CppType = ::testsuite::EmptyRecord;
     using JsType = em::val;
     using Boxed = NativeEmptyRecord;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

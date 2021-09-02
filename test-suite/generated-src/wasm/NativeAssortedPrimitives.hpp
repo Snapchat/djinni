@@ -13,7 +13,7 @@ struct NativeAssortedPrimitives
     using CppType = ::testsuite::AssortedPrimitives;
     using JsType = em::val;
     using Boxed = NativeAssortedPrimitives;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

@@ -13,7 +13,7 @@ struct NativeWcharTestRec
     using CppType = ::testsuite::WcharTestRec;
     using JsType = em::val;
     using Boxed = NativeWcharTestRec;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

@@ -13,14 +13,14 @@ struct NativeConflict : ::djinni::JsInterface<::testsuite::Conflict, NativeConfl
     using CppOptType = std::shared_ptr<::testsuite::Conflict>;
     using JsType = em::val;
     using Boxed = NativeConflict;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
-    
+
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::Conflict, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
     };

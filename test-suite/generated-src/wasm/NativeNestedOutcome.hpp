@@ -13,7 +13,7 @@ struct NativeNestedOutcome
     using CppType = ::testsuite::NestedOutcome;
     using JsType = em::val;
     using Boxed = NativeNestedOutcome;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

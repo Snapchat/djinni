@@ -13,7 +13,7 @@ struct NativeSupportCopying
     using CppType = ::testsuite::SupportCopying;
     using JsType = em::val;
     using Boxed = NativeSupportCopying;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

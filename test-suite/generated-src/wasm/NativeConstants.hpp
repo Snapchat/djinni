@@ -13,7 +13,7 @@ struct NativeConstants
     using CppType = ::testsuite::Constants;
     using JsType = em::val;
     using Boxed = NativeConstants;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

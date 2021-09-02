@@ -13,7 +13,7 @@ struct NativeVec2
     using CppType = ::testsuite::Vec2;
     using JsType = em::val;
     using Boxed = NativeVec2;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

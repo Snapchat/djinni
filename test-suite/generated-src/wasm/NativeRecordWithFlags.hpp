@@ -13,7 +13,7 @@ struct NativeRecordWithFlags
     using CppType = ::testsuite::RecordWithFlags;
     using JsType = em::val;
     using Boxed = NativeRecordWithFlags;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

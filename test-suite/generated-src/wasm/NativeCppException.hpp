@@ -13,16 +13,16 @@ struct NativeCppException : ::djinni::JsInterface<::testsuite::CppException, Nat
     using CppOptType = std::shared_ptr<::testsuite::CppException>;
     using JsType = em::val;
     using Boxed = NativeCppException;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
+
     static int32_t throw_an_exception(const CppType& self);
     static em::val get();
-    
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::CppException, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
         int32_t throw_an_exception() override;

@@ -148,13 +148,13 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle, includePrefix())(wasmFilename(ident.name), origin, refs.cpp, (w => {
       w.wl(s"EM_JS(void, djinni_init_${spec.cppNamespace}_${ident.name}, (), {").nested {
         w.w(s"Module.${idJs.ty(ident)} = ").braced {
-          writeEnumOptionNone(w, e, idJs.enum(_), ":")
-          writeEnumOptions(w, e, idJs.enum(_), ":")
-          writeEnumOptionAll(w, e, idJs.enum(_), ":")
+          writeEnumOptionNone(w, e, idJs.enum, ":")
+          writeEnumOptions(w, e, idJs.enum, ":")
+          writeEnumOptionAll(w, e, idJs.enum, ":")
         }
       }
       w.wl("})")
-      w.wl("")
+      w.wl
       w.w(s"EMSCRIPTEN_BINDINGS(${ident.name})").braced {
         w.wl(s"djinni_init_${spec.cppNamespace}_${ident.name}();")
       }
@@ -179,15 +179,15 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl(s"using CppOptType = std::shared_ptr<$cls>;")
         w.wl("using JsType = em::val;")
         w.wl(s"using Boxed = $helper;")
-        w.wl("")
+        w.wl
         // mashalling
         w.wl("static CppType toCpp(JsType j) { return _fromJs(j); }")
         w.wl("static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }")
         w.wl("static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }")
-        w.wl("")
+        w.wl
         // method list
         w.wl("static em::val cppProxyMethods();")
-        w.wl("")
+        w.wl
         // stubs
         for (m <- i.methods) {
           val selfRef = if (m.static) "" else if (m.params.isEmpty) "const CppType& self" else "const CppType& self, "
@@ -197,7 +197,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
           }).mkString(","))
           w.wl(");")
         }
-        w.wl("")
+        w.wl
         // js proxy
         w.w(s"struct JsProxy: ::djinni::JsProxyBase, $cls, ::djinni::InstanceTracker<JsProxy>").bracedSemi {
           w.wl("JsProxy(const em::val& v) : JsProxyBase(v) {}")
@@ -225,7 +225,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         }
         w.wl("return methods;")
       }
-      w.wl("")
+      w.wl
       // stub methods
       for (m <- i.methods) {
         val selfRef = if (m.static) "" else if (m.params.isEmpty) "const CppType& self" else "const CppType& self, "
@@ -243,7 +243,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
           w.wl(";")
         }
       }
-      w.wl("")
+      w.wl
       // js proxy methods
       for (m <- i.methods) {
         if (!m.static) {
@@ -261,7 +261,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
             })
             w.wl(";")
           }
-          w.wl("")
+          w.wl
         }
       }
       // embind
@@ -293,7 +293,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl(s"using CppType = $cls;")
         w.wl("using JsType = em::val;")
         w.wl(s"using Boxed = $helper;")
-        w.wl("")
+        w.wl
         w.wl("static CppType toCpp(const JsType& j);")
         w.wl("static JsType fromCpp(const CppType& c);")
       }

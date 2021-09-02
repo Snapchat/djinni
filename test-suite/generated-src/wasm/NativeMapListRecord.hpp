@@ -13,7 +13,7 @@ struct NativeMapListRecord
     using CppType = ::testsuite::MapListRecord;
     using JsType = em::val;
     using Boxed = NativeMapListRecord;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

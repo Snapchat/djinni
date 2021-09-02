@@ -13,15 +13,15 @@ struct NativeFirstListener : ::djinni::JsInterface<::testsuite::FirstListener, N
     using CppOptType = std::shared_ptr<::testsuite::FirstListener>;
     using JsType = em::val;
     using Boxed = NativeFirstListener;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
+
     static void first(const CppType& self);
-    
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::FirstListener, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
         void first() override;

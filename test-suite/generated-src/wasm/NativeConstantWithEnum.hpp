@@ -13,7 +13,7 @@ struct NativeConstantWithEnum
     using CppType = ::testsuite::ConstantWithEnum;
     using JsType = em::val;
     using Boxed = NativeConstantWithEnum;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

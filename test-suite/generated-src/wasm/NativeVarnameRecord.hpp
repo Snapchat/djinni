@@ -13,7 +13,7 @@ struct NativeVarnameRecord
     using CppType = ::testsuite::VarnameRecord;
     using JsType = em::val;
     using Boxed = NativeVarnameRecord;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

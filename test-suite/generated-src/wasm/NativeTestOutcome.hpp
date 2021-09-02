@@ -13,13 +13,13 @@ struct NativeTestOutcome : ::djinni::JsInterface<::testsuite::TestOutcome, Nativ
     using CppOptType = std::shared_ptr<::testsuite::TestOutcome>;
     using JsType = em::val;
     using Boxed = NativeTestOutcome;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
+
     static em::val getSuccessOutcome();
     static em::val getErrorOutcome();
     static std::string putSuccessOutcome(const em::val& w_x);
@@ -28,7 +28,7 @@ struct NativeTestOutcome : ::djinni::JsInterface<::testsuite::TestOutcome, Nativ
     static em::val getNestedErrorOutcome();
     static int32_t putNestedSuccessOutcome(const em::val& w_x);
     static std::string putNestedErrorOutcome(const em::val& w_x);
-    
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::TestOutcome, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
     };

@@ -13,7 +13,7 @@ struct NativeNestedCollection
     using CppType = ::testsuite::NestedCollection;
     using JsType = em::val;
     using Boxed = NativeNestedCollection;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

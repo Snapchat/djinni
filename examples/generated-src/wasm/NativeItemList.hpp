@@ -13,7 +13,7 @@ struct NativeItemList
     using CppType = ::textsort::ItemList;
     using JsType = em::val;
     using Boxed = NativeItemList;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

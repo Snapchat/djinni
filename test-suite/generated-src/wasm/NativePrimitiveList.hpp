@@ -13,7 +13,7 @@ struct NativePrimitiveList
     using CppType = ::testsuite::PrimitiveList;
     using JsType = em::val;
     using Boxed = NativePrimitiveList;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

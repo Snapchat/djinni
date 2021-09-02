@@ -13,7 +13,7 @@ struct NativeRecordWithDurationAndDerivings
     using CppType = ::testsuite::RecordWithDurationAndDerivings;
     using JsType = em::val;
     using Boxed = NativeRecordWithDurationAndDerivings;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

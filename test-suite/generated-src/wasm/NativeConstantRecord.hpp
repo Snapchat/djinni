@@ -13,7 +13,7 @@ struct NativeConstantRecord
     using CppType = ::testsuite::ConstantRecord;
     using JsType = em::val;
     using Boxed = NativeConstantRecord;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

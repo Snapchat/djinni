@@ -13,14 +13,14 @@ struct NativeObjcOnlyListener : ::djinni::JsInterface<::testsuite::ObjcOnlyListe
     using CppOptType = std::shared_ptr<::testsuite::ObjcOnlyListener>;
     using JsType = em::val;
     using Boxed = NativeObjcOnlyListener;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
-    
+
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ObjcOnlyListener, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
     };

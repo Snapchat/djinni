@@ -13,7 +13,7 @@ struct NativeEnumUsageRecord
     using CppType = ::testsuite::EnumUsageRecord;
     using JsType = em::val;
     using Boxed = NativeEnumUsageRecord;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };

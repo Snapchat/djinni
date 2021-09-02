@@ -13,18 +13,18 @@ struct NativeFlagRoundtrip : ::djinni::JsInterface<::testsuite::FlagRoundtrip, N
     using CppOptType = std::shared_ptr<::testsuite::FlagRoundtrip>;
     using JsType = em::val;
     using Boxed = NativeFlagRoundtrip;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
+
     static int32_t roundtrip_access(int32_t w_flag);
     static int32_t roundtrip_empty(int32_t w_flag);
     static em::val roundtrip_access_boxed(const em::val& w_flag);
     static em::val roundtrip_empty_boxed(const em::val& w_flag);
-    
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::FlagRoundtrip, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
     };

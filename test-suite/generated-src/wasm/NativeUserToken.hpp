@@ -13,15 +13,15 @@ struct NativeUserToken : ::djinni::JsInterface<::testsuite::UserToken, NativeUse
     using CppOptType = std::shared_ptr<::testsuite::UserToken>;
     using JsType = em::val;
     using Boxed = NativeUserToken;
-    
+
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
-    
+
     static em::val cppProxyMethods();
-    
+
     static std::string whoami(const CppType& self);
-    
+
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::UserToken, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
         std::string whoami() override;

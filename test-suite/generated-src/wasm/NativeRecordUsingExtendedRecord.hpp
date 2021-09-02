@@ -13,7 +13,7 @@ struct NativeRecordUsingExtendedRecord
     using CppType = ::testsuite::RecordUsingExtendedRecord;
     using JsType = em::val;
     using Boxed = NativeRecordUsingExtendedRecord;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };
