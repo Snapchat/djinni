@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Djinni/WASM PerfTest</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="perftest.js"></script>
+    <script src="perftest_cpp.js"></script>
+  </head>
+  <body>
+    <h1>Djinni/WASM PerfTest</h1>
+    <table id='tbl'>
+      <tr>
+        <th>name</th>
+        <th>average</th>
+        <th>sd</th>
+        <th>min</th>
+        <th>p50</th>
+        <th>p90</th>
+        <th>max</th>
+      </tr>
+    </table>
+    <script>
+      var perftest;
+      perftest().then(module => {
+          perftest = module;
+          main();
+      })
+    </script>
+  </body>
+</html>
