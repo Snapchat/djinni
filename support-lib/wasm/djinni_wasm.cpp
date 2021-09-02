@@ -74,7 +74,7 @@ void releaseDirectBuffer(unsigned addr) {
 EM_JS(void, djinni_init_wasm, (), {
         console.log("djinni_init_wasm");
         Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => {
-            console.log("finalizing cpp object");
+            // console.log("finalizing cpp object @" + nativeRef);
             nativeRef.nativeDestroy();
             nativeRef.delete();
         });
@@ -85,7 +85,7 @@ EM_JS(void, djinni_init_wasm, (), {
 
         class DjinniCppProxy {
             constructor(nativeRef, methods) {
-                console.log('new cpp proxy');
+                // console.log('new cpp proxy');
                 this._djinni_native_ref = nativeRef;
                 let self = this;
                 methods.forEach(function(method) {

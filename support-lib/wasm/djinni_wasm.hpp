@@ -24,10 +24,10 @@ class InstanceTracker {
     }
 public:
     InstanceTracker() {
-        std::cout << "++" << typeid(this).name() << " => " << ++count() << std::endl;
+        // std::cout << "++" << typeid(this).name() << " => " << ++count() << std::endl;
     }
     virtual ~InstanceTracker() {
-        std::cout << "--" << typeid(this).name() << " => " << --count() << std::endl;
+        // std::cout << "--" << typeid(this).name() << " => " << --count() << std::endl;
     }
 };
 
@@ -350,7 +350,7 @@ extern em::val getWasmMemoryBuffer();
 template<typename I, typename Self>
 struct JsInterface {
     static void nativeDestroy(const std::shared_ptr<I>& cpp) {
-        std::cout << "delete entry from cppProxyCache" << std::endl;
+        // std::cout << "delete entry from cppProxyCache" << std::endl;
         std::lock_guard lk(cppProxyCacheMutex);
         assert(cppProxyCache.find(cpp.get()) != cppProxyCache.end());
         cppProxyCache.erase(cpp.get());
@@ -370,7 +370,7 @@ struct JsInterface {
             auto i = cppProxyCache.find(c.get());
             if (i != cppProxyCache.end()) {
                 // found existing cpp proxy
-                std::cout << "already has cpp proxy" << std::endl;
+                // std::cout << "already has cpp proxy" << std::endl;
                 auto strongRef = i->second.template call<em::val>("deref");
                 if (!strongRef.isUndefined()) {
                     // and it's not expired
@@ -406,7 +406,7 @@ struct JsInterface {
             if (idProp.isUndefined()) {
                 // no id, assign a new id
                 id = nextId++;
-                std::cout << "assign proxy id " << id << std::endl;
+                // std::cout << "assign proxy id " << id << std::endl;
                 js.set("_djinni_js_proxy_id", id);
             } else {
                 // already has id, look up in js proxy cache
