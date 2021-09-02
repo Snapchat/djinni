@@ -9,11 +9,10 @@ IMP_DIR=$(ROOT)/test-suite/handwritten-src/cpp
 TARGET ?= test_cpp.js
 SRC_DIRS ?= $(LIB_DIR)/wasm $(LIB_DIR)/cpp $(GEN_DIR)/wasm $(IMP_DIR) .
 
-SRCS := $(shell find $(SRC_DIRS) -name *.cpp)
+SRCS := $(shell find $(SRC_DIRS) -name *.cpp ! -name *Proto*)
 OBJS := $(addsuffix .o,$(basename $(SRCS)))
 DEPS := $(OBJS:.o=.d)
 
-# INC_DIRS := $(shell find $(SRC_DIRS) -type d) $(LIB_DIR)
 INC_DIRS := $(GEN_DIR)/cpp $(LIB_DIR) $(LIB_DIR)/wasm $(LIB_DIR)/cpp $(IMP_DIR)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
