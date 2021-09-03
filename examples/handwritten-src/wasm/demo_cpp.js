@@ -1,10 +1,10 @@
 
-var client = (function() {
+var Module = (function() {
   var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
   if (typeof __filename !== 'undefined') _scriptDir = _scriptDir || __filename;
   return (
-function(client) {
-  client = client || {};
+function(Module) {
+  Module = Module || {};
 
 
 
@@ -21,7 +21,7 @@ function(client) {
 // after the generated code, you will need to define   var Module = {};
 // before the code. Then that object will be used in the code, and you
 // can continue to use Module afterwards as well.
-var Module = typeof client !== 'undefined' ? client : {};
+var Module = typeof Module !== 'undefined' ? Module : {};
 
 // Set up the promise that indicates the Module is initialized
 var readyPromiseResolve, readyPromiseReject;
@@ -1807,7 +1807,7 @@ var ASM_CONSTS = {
   
 };
 function djinni_init_sort_order(){ Module.SortOrder = { ASCENDING : 0, DESCENDING : 1, RANDOM : 2, } }
-function djinni_init_wasm(){ console.log("djinni_init_wasm"); Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => { console.log("finalizing cpp object"); nativeRef.nativeDestroy(); nativeRef.delete(); }); Module.directBufferFinalizerRegistry = new FinalizationRegistry(addr => { Module._releaseDirectBuffer(addr); }); class DjinniCppProxy { constructor(nativeRef, methods) { console.log('new cpp proxy'); this._djinni_native_ref = nativeRef; let self = this; methods.forEach(function(method) { self[method] = function(...args) { return nativeRef[method](...args); } }); } } Module.DjinniCppProxy = DjinniCppProxy; }
+function djinni_init_wasm(){ console.log("djinni_init_wasm"); Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => { nativeRef.nativeDestroy(); nativeRef.delete(); }); Module.directBufferFinalizerRegistry = new FinalizationRegistry(addr => { Module._releaseDirectBuffer(addr); }); class DjinniCppProxy { constructor(nativeRef, methods) { this._djinni_native_ref = nativeRef; let self = this; methods.forEach(function(method) { self[method] = function(...args) { return nativeRef[method](...args); } }); } } Module.DjinniCppProxy = DjinniCppProxy; }
 
 
 
@@ -7458,13 +7458,13 @@ run();
 
 
 
-  return client.ready
+  return Module.ready
 }
 );
 })();
 if (typeof exports === 'object' && typeof module === 'object')
-  module.exports = client;
+  module.exports = Module;
 else if (typeof define === 'function' && define['amd'])
-  define([], function() { return client; });
+  define([], function() { return Module; });
 else if (typeof exports === 'object')
-  exports["client"] = client;
+  exports["Module"] = Module;
