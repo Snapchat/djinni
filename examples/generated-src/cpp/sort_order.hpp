@@ -13,7 +13,14 @@ enum class sort_order : int {
     RANDOM,
 };
 
-const char* to_string(sort_order e) noexcept;
+constexpr const char* to_string(sort_order e) noexcept {
+    constexpr const char* names[] = {
+        "ascending",
+        "descending",
+        "random",
+    };
+    return names[static_cast<int>(e)];
+}
 
 }  // namespace textsort
 
