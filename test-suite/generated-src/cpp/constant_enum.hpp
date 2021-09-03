@@ -12,6 +12,14 @@ enum class constant_enum : int {
     SOME_OTHER_VALUE,
 };
 
+constexpr const char* to_string(constant_enum e) noexcept {
+    constexpr const char* names[] = {
+        "some_value",
+        "some_other_value",
+    };
+    return names[static_cast<int>(e)];
+}
+
 }  // namespace testsuite
 
 namespace std {
