@@ -94,7 +94,14 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
       } else {
         w.wl
         // Define a toString function
-        w.wl("const char* "+ idCpp.method("to_string") + "(" + self + " e) noexcept;")
+        w.w("constexpr const char* "+ idCpp.method("to_string") + "(" + self + " e) noexcept").braced {
+          w.w("constexpr const char* names[] =").bracedSemi {
+            for(o <- e.options) {
+              w.wl(s""""${o.ident.name}",""")
+            }
+          }
+          w.wl(s"return names[static_cast<$underlyingType>(e)];");
+        }
       }
     },
     w => {
@@ -114,18 +121,6 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
         )
       }
     })
-    if(!e.flags) {
-      writeCppFile(ident, origin, refs.cpp, w => {
-        w.w("const char* "+ idCpp.method("to_string") + "(" + self + " e) noexcept").braced {
-          w.w("static const char* names[] =").bracedSemi {
-            for(o <- e.options) {
-              w.wl(s""""${o.ident.name}",""")
-            }
-          }
-          w.wl(s"return names[static_cast<$underlyingType>(e)];");
-        }
-      })
-    }
   }
 
   def shouldConstexpr(c: Const) = {
