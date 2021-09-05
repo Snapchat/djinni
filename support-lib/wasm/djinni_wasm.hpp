@@ -325,7 +325,7 @@ struct Array<F64> : PrimitiveArray<F64> {
     }
 };
 
-using JsProxyId = int32_t;
+using JsProxyId = uint64_t;
 
 class JsProxyBase {
 public:

@@ -12,7 +12,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
 
   val cppMarshal = new CppMarshal(spec)
 
-  private def wasmFilename(name: String): String = {
+  private def wasmFilenameStyle(name: String): String = {
     return spec.jniFileIdentStyle(name)
   }
   private def helperNamespace(): String = {
@@ -103,7 +103,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
 
   private def stubParamName(name: String): String = s"w_${idCpp.local(name)}"
 
-  def include(ident: String) = q(spec.jniIncludePrefix + spec.jniFileIdentStyle(ident) + "." + spec.cppHeaderExt)
+  def include(ident: String) = q(spec.jniIncludePrefix + wasmFilenameStyle(ident) + "." + spec.cppHeaderExt)
 
   def references(m: Meta, exclude: String = ""): Seq[SymbolReference] = m match {
     case d: MDef => List(ImportRef(include(d.name)))
@@ -142,10 +142,10 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     val refs = new WasmRefs(ident.name)
     val cls = cppMarshal.fqTypename(ident, e)
     val helper = helperClass(ident)
-    writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle)(wasmFilename(ident.name), origin, refs.hpp, Nil, (w => {
+    writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.wl(s"struct $helper: ::djinni::WasmEnum<$cls> {};")
     }), (w => {}))
-    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle, includePrefix())(wasmFilename(ident.name), origin, refs.cpp, (w => {
+    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, includePrefix())(ident.name, origin, refs.cpp, (w => {
       w.w(s"namespace ${spec.cppNamespace}").braced {
         w.wl(s"EM_JS(void, djinni_init_${ident.name}, (), {").nested {
           w.w(s"Module.${idJs.ty(ident)} = ").braced {
@@ -174,7 +174,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     val cls = withNs(Some(spec.cppNamespace), idCpp.ty(ident))
     val helper = helperClass(ident)
 
-    writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle)(wasmFilename(ident.name), origin, refs.hpp, Nil, (w => {
+    writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.w(s"struct $helper : ::djinni::JsInterface<$cls, $helper>").bracedSemi {
         // types
         w.wl(s"using CppType = std::shared_ptr<$cls>;")
@@ -217,7 +217,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       }
     }), (w => {}))
 
-    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle, includePrefix())(wasmFilename(ident.name), origin, refs.cpp, (w => {
+    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, includePrefix())(ident.name, origin, refs.cpp, (w => {
       // method list
       w.w(s"em::val $helper::cppProxyMethods()").braced {
         w.w("static const em::val methods = em::val::array(std::vector<std::string>").bracedEnd(");") {
@@ -290,7 +290,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
 
     // TODO: consts in records
 
-    writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle)(wasmFilename(ident.name), origin, refs.hpp, Nil, (w => {
+    writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.wl(s"struct $helper").bracedSemi {
         w.wl(s"using CppType = $cls;")
         w.wl("using JsType = em::val;")
@@ -301,7 +301,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       }
     }), (w => {}))
 
-    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), spec.cppFileIdentStyle, includePrefix())(wasmFilename(ident.name), origin, refs.cpp, (w => {
+    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, includePrefix())(ident.name, origin, refs.cpp, (w => {
         w.w(s"auto $helper::toCpp(const JsType& j) -> CppType").braced {
           writeAlignedCall(w, "return {", r.fields, "}", f => {
             s"""${helperClass(f.ty.resolved)}::Boxed::toCpp(j["${idJs.field(f.ident.name)}"])"""

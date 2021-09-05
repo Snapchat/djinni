@@ -16,37 +16,9 @@ item5
 item2
 item4</textarea>
     </p>
-    <script>
-      var m;
-      var sorter;
-      Module().then(module => {
-          m = module;
-          sorter = module.SortItems.createWithListener(new SortListener())
-      });
-      class SortListener {
-          update(itemList) {
-              document.getElementById('txt').value = itemList.items.join('\n')
-          }
-      }
-      function sort(order) {
-          var lines = document.getElementById('txt').value.split('\n');
-          var itemList = {
-              items: lines
-          };
-          sorter.sort(order, itemList);
-      }
-      function onSortAsc() {
-          sort(m.SortOrder.ASCENDING)
-      }
-      function onSortDesc() {
-          sort(m.SortOrder.DESCENDING)
-      }
-      function onSortRandom() {
-          sort(m.SortOrder.RANDOM)
-      }
-    </script>
-    <button onclick="onSortAsc()">Sort Asc</button> 
-    <button onclick="onSortDesc()">Sort Desc</button> 
-    <button onclick="onSortRandom()">Sort Random</button> 
+    <button id="btnAsc">Sort Asc</button>
+    <button id="btnDesc">Sort Desc</button>
+    <button id="btnRandom">Sort Random</button>
+    <script src="bundle.js"> </script>
   </body>
 </html>

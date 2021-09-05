@@ -86,6 +86,7 @@ object Main {
     var objcBaseLibIncludePrefix: String = ""
     var wasmOutFolder: Option[File] = None
     var jsIdentStyle = IdentStyle.jsDefault
+    var tsOutFolder: Option[File] = None
     var inFileListPath: Option[File] = None
     var outFileListPath: Option[File] = None
     var skipGeneration: Boolean = false
@@ -218,6 +219,8 @@ object Main {
       note("")
       opt[File]("wasm-out").valueName("<out-folder>").foreach(x => wasmOutFolder = Some(x))
         .text("The output for the WASM bridge C++ files (Generator disabled if unspecified).")
+      opt[File]("ts-out").valueName("<out-folder>").foreach(x => tsOutFolder = Some(x))
+        .text("The output for the TypeScript interface files (Generator disabled if unspecified).")
       note("")
       opt[File]("yaml-out").valueName("<out-folder>").foreach(x => yamlOutFolder = Some(x))
         .text("The output folder for YAML files (Generator disabled if unspecified).")
@@ -391,6 +394,7 @@ object Main {
       objcClosedEnums,
       wasmOutFolder,
       jsIdentStyle,
+      tsOutFolder,
       outFileListWriter,
       skipGeneration,
       yamlOutFolder,

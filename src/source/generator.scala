@@ -88,6 +88,7 @@ package object generatorTools {
                    objcClosedEnums: Boolean,
                    wasmOutFolder: Option[File],
                    jsIdentStyle: JsIdentStyle,
+                   tsOutFolder: Option[File],
                    outFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],
@@ -245,6 +246,12 @@ package object generatorTools {
           createFolder("WASM", spec.wasmOutFolder.get)
         }
         new WasmGenerator(spec).generate(idl)
+      }
+      if (spec.tsOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("TypeScript", spec.tsOutFolder.get)
+        }
+        new TsGenerator(spec).generate(idl)
       }
       if (spec.yamlOutFolder.isDefined) {
         if (!spec.skipGeneration) {
