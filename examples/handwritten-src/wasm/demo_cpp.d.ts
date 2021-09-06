@@ -1,4 +1,9 @@
-export enum SortOrder {
+export = Module;
+declare function Module(): Promise<Module.ModuleStatics>;
+
+declare namespace Module {
+
+export const enum SortOrder {
     ASCENDING,
     DESCENDING,
     RANDOM,
@@ -25,10 +30,4 @@ export interface ModuleStatics {
     SortItems: SortItemsStatics;
 }
 
-declare global {
-    function Module(): Promise<ModuleStatics>;
-}
-
-export function load(): Promise<ModuleStatics> {
-    return Module();
 }

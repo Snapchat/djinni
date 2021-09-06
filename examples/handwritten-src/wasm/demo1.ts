@@ -1,9 +1,10 @@
-import * as example from "./example";
+import example = require("./demo_cpp");
 
 var sorter: example.SortItems;
 
-example.load().then(m => {
+example().then(m => {
     sorter = m.SortItems.createWithListener(new SortListener());
+    console.log(example);
 })
 
 class SortListener implements example.TextboxListener {

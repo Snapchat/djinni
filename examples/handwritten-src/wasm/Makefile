@@ -17,8 +17,8 @@ DEPS := $(OBJS:.o=.d)
 INC_DIRS := $(GEN_DIR)/cpp $(LIB_DIR) $(LIB_DIR)/wasm $(IMP_DIR)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
-CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -std=c++17 --bind
-LDFLAGS ?= --bind -s WASM=1 -s MODULARIZE=1 -s WASM_BIGINT=1 # -s EXPORT_ES6=1
+CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -std=c++17 --bind -Os
+LDFLAGS ?= --bind -s WASM=1 -s MODULARIZE=1 -s WASM_BIGINT=1 -Os # -s EXPORT_ES6=1
 
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $@ $(LOADLIBES) $(LDLIBS)

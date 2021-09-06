@@ -1,9 +1,10 @@
 "use strict";
 exports.__esModule = true;
-var example = require("./example");
+var example = require("./demo_cpp");
 var sorter;
-example.load().then(function (m) {
+example().then(function (m) {
     sorter = m.SortItems.createWithListener(new SortListener());
+    console.log(example);
 });
 var SortListener = /** @class */ (function () {
     function SortListener() {
@@ -21,11 +22,11 @@ function sort(order) {
     sorter.sort(order, itemList);
 }
 document.getElementById('btnAsc').addEventListener('click', function (e) {
-    sort(example.SortOrder.ASCENDING);
+    sort(0 /* ASCENDING */);
 });
 document.getElementById('btnDesc').addEventListener('click', function (e) {
-    sort(example.SortOrder.DESCENDING);
+    sort(1 /* DESCENDING */);
 });
 document.getElementById('btnRandom').addEventListener('click', function (e) {
-    sort(example.SortOrder.RANDOM);
+    sort(2 /* RANDOM */);
 });
