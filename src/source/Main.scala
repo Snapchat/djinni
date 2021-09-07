@@ -87,6 +87,7 @@ object Main {
     var wasmOutFolder: Option[File] = None
     var jsIdentStyle = IdentStyle.jsDefault
     var tsOutFolder: Option[File] = None
+    var tsModule: String = "module"
     var inFileListPath: Option[File] = None
     var outFileListPath: Option[File] = None
     var skipGeneration: Boolean = false
@@ -221,6 +222,8 @@ object Main {
         .text("The output for the WASM bridge C++ files (Generator disabled if unspecified).")
       opt[File]("ts-out").valueName("<out-folder>").foreach(x => tsOutFolder = Some(x))
         .text("The output for the TypeScript interface files (Generator disabled if unspecified).")
+      opt[String]("ts-module").valueName("<name>").foreach(tsModule = _)
+        .text("TypeScript declaration module name (default: \"module\").")
       note("")
       opt[File]("yaml-out").valueName("<out-folder>").foreach(x => yamlOutFolder = Some(x))
         .text("The output folder for YAML files (Generator disabled if unspecified).")
@@ -395,6 +398,7 @@ object Main {
       wasmOutFolder,
       jsIdentStyle,
       tsOutFolder,
+      tsModule,
       outFileListWriter,
       skipGeneration,
       yamlOutFolder,

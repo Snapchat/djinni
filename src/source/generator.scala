@@ -89,6 +89,7 @@ package object generatorTools {
                    wasmOutFolder: Option[File],
                    jsIdentStyle: JsIdentStyle,
                    tsOutFolder: Option[File],
+                   tsModule: String,
                    outFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],

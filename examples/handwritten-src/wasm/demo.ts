@@ -1,10 +1,11 @@
-import example = require("./demo_cpp");
+import * as example from "../../generated-src/ts/example";
+
+declare function Module(): Promise<example.Module_statics>;
 
 var sorter: example.SortItems;
 
-example().then(m => {
+Module().then(m => {
     sorter = m.SortItems.createWithListener(new SortListener());
-    console.log(example);
 })
 
 class SortListener implements example.TextboxListener {

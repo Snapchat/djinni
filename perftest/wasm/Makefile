@@ -17,7 +17,7 @@ INC_DIRS := $(GEN_DIR)/cpp $(LIB_DIR) $(LIB_DIR)/wasm $(LIB_DIR)/cpp $(IMP_DIR)
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -std=c++17 --bind -Os
-LDFLAGS ?= --bind -s WASM=1 -s MODULARIZE=1 -s EXPORT_NAME=perftest -s WASM_BIGINT=1 -Os
+LDFLAGS ?= --bind -s WASM=1 -s MODULARIZE=1 -s WASM_BIGINT=1 -Os
 
 $(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $@ $(LOADLIBES) $(LDLIBS)

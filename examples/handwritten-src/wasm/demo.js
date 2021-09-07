@@ -1,29 +1,30 @@
-var m;
+"use strict";
+exports.__esModule = true;
 var sorter;
-
-Module().then(module => {
-    m = module;
-    sorter = m.SortItems.createWithListener(new SortListener())
+Module().then(function (m) {
+    sorter = m.SortItems.createWithListener(new SortListener());
 });
-
-class SortListener {
-    update(itemList) {
-        document.getElementById('txt').value = itemList.items.join('\n')
+var SortListener = /** @class */ (function () {
+    function SortListener() {
     }
-}
-function sort(order) {
-    var lines = document.getElementById('txt').value.split('\n');
-    var itemList = {
-        items: lines
+    SortListener.prototype.update = function (itemList) {
+        var txt = document.getElementById('txt');
+        txt.value = itemList.items.join('\n');
     };
+    return SortListener;
+}());
+function sort(order) {
+    var txt = document.getElementById('txt');
+    var lines = txt.value.split('\n');
+    var itemList = { items: lines };
     sorter.sort(order, itemList);
 }
-function onSortAsc() {
-    sort(m.SortOrder.ASCENDING)
-}
-function onSortDesc() {
-    sort(m.SortOrder.DESCENDING)
-}
-function onSortRandom() {
-    sort(m.SortOrder.RANDOM)
-}
+document.getElementById('btnAsc').addEventListener('click', function (e) {
+    sort(0 /* ASCENDING */);
+});
+document.getElementById('btnDesc').addEventListener('click', function (e) {
+    sort(1 /* DESCENDING */);
+});
+document.getElementById('btnRandom').addEventListener('click', function (e) {
+    sort(2 /* RANDOM */);
+});

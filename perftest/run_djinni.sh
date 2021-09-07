@@ -24,6 +24,7 @@ jni_out="$base_dir/generated-src/jni"
 objc_out="$base_dir/generated-src/objc"
 java_out="$base_dir/generated-src/java/com/snapchat/djinni/benchmark"
 wasm_out="$base_dir/generated-src/wasm"
+ts_out="$base_dir/generated-src/ts"
 
 java_package="com.snapchat.djinni.benchmark"
 
@@ -73,6 +74,8 @@ fi
     --objc-swift-bridging-header "Benchmark-Bridging-Header" \
     \
     --wasm-out "$temp_out/wasm" \
+    --ts-out "$temp_out/ts" \
+    --ts-module "perftest_d" \
     \
     --idl "$in"
 
@@ -92,6 +95,7 @@ mirror "java" "$temp_out/java" "$java_out"
 mirror "jni" "$temp_out/jni" "$jni_out"
 mirror "objc" "$temp_out/objc" "$objc_out"
 mirror "wasm" "$temp_out/wasm" "$wasm_out"
+mirror "ts" "$temp_out/ts" "$ts_out"
 
 date > "$gen_stamp"
 

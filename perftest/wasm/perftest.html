@@ -5,7 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Djinni/WASM PerfTest</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="perftest.js"></script>
     <script src="perftest_cpp.js"></script>
   </head>
   <body>
@@ -21,12 +20,6 @@
         <th>max</th>
       </tr>
     </table>
-    <script>
-      var perftest;
-      perftest().then(module => {
-          perftest = module;
-          main();
-      })
-    </script>
+    <script src="bundle.js"></script>
   </body>
 </html>

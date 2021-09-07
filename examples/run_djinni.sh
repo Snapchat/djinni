@@ -75,6 +75,7 @@ fi
     \
     --wasm-out "$temp_out/wasm" \
     --ts-out "$temp_out/ts" \
+    --ts-module "example" \
     \
     --idl "$in"
 
