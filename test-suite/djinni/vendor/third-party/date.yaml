@@ -34,3 +34,6 @@ wasm:
   typename: 'em::val'
   translator: '::djinni::Date'
   header: '"djinni_wasm.hpp"'
+ts:
+  typename: 'Date'
+  module: ''

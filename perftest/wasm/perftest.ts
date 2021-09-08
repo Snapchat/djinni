@@ -9,7 +9,7 @@ function percentileFromSortedArray(samples, percentile) {
     return samples[Math.round((samples.length - 1) * percentile)];
 }
 
-function measure(name, func, times = 1000) {
+function measure(name, func, times = 10) {
     var tbl = <HTMLTableElement>(document.getElementById('tbl'));
     var row = <HTMLTableRowElement>(tbl.insertRow(-1));
     row.align = 'right';
@@ -25,8 +25,10 @@ function measure(name, func, times = 1000) {
     var samples = [];
     for (var i = 0; i < times; ++i) {
         var t0 = performance.now();
-        func();
-        samples.push(performance.now() - t0);
+        for (var j = 0; j < 100; ++j) {
+            func();
+        }
+        samples.push((performance.now() - t0)/100);
     }
     samples.sort(function(a, b){return a - b});
 
@@ -79,9 +81,15 @@ function main (module: perftest.Module_statics) {
     for (var i = 0; i < (hugeCount/highCount); ++i) {sg = sg + sh;}
     measure("argString " + hugeCount, function() {dpb.argString(sg)});
 
-    [lowCount, highCount, hugeCount].forEach(function(count) {
-        measure("argBinary " + count, function(){dpb.argBinary(new Uint8Array(count))});
+    [/*lowCount, highCount,*/ hugeCount].forEach(function(count) {
+        var u8array = new Uint8Array(count);
+        measure("argBinary " + count, function(){dpb.argBinary(u8array)});
     });
+
+    var li = [];
+    for (var i = 0; i < highCount; ++i) {li.push(BigInt(i));}
+    var ai = new BigInt64Array(li);
+    measure("argArrayInt " + highCount, function() {dpb.argArrayInt(ai)});
 
     var e = perftest.EnumSixValue.FIRST;
     measure("argEnumSixValue", function() {dpb.argEnumSixValue(e)});
@@ -89,7 +97,7 @@ function main (module: perftest.Module_statics) {
     var r = i64Array;
     measure("argRecordSixInt", function() {dpb.argRecordSixInt(r)});
 
-    var li = []
+    var li = [];
     for (var i = 0; i < lowCount; ++i) {li.push(BigInt(i));}
     measure("argListInt " + lowCount, function() {dpb.argListInt(li)});
 
@@ -114,7 +122,7 @@ function main (module: perftest.Module_statics) {
         measure("returnListInt " + count, function(){ var rli = dpb.returnListInt(count)});
     });
 
-    [1, 10, lowCount].forEach(function(count) {
+    [1, 10, lowCount, highCount].forEach(function(count) {
         measure("returnArrayInt " + count, function(){ var rai = dpb.returnArrayInt(count)});
     });
 

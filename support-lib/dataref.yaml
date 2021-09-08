@@ -30,3 +30,6 @@ wasm:
   typename: 'em::val'
   translator: '::snapchat::djinni::NativeDataRef'
   header: '"DataRef_wasm.hpp"'
+ts:
+  typename: 'Uint8Array'
+  module: ''

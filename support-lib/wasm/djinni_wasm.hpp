@@ -97,6 +97,8 @@ public:
     
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
+
+    static em::val getArrayClass();
 };
 
 class Date {
@@ -256,6 +258,26 @@ struct Outcome
     }
 };
 
+// TODO
+template<typename CPP_PROTO>
+class Protobuf {
+public:
+    using CppType = CPP_PROTO;
+    using JsType = em::val;
+
+    using Boxed = Protobuf;
+
+    static CppType toCpp(JsType j)
+    {
+        return {};
+    }
+        
+    static JsType fromCpp(const CppType& c)
+    {
+        return em::val::object();
+    }
+};
+
 template <typename T>
 struct Array {
     using CppType = std::vector<typename T::CppType>;
@@ -269,24 +291,25 @@ struct Array {
         return List<T>::fromCpp(c);
     }
 };
-template <typename T>
+
+template <typename T, typename U = Array<T>>
 struct PrimitiveArray {
     using CppType = std::vector<typename T::CppType>;
     using JsType = em::val;
     using Boxed = PrimitiveArray;
 
     static CppType toCpp(const JsType& j) {
-        static em::val arrayBufferClass = em::val::global("ArrayBuffer");
-        assert(j["buffer"].instanceof(arrayBufferClass));
-        std::cout << "typed array to vector" << std::endl;
-        return em::convertJSArrayToNumberVector<typename T::CppType>(j);
+        const size_t length = j["length"].as<size_t>();
+        std::vector<typename T::CppType> c(length);
+        static em::val writeNativeMemory = em::val::module_property("writeNativeMemory");
+        writeNativeMemory(j, reinterpret_cast<uint32_t>(c.data()),
+                          static_cast<uint32_t>(c.size() * sizeof(typename T::CppType)));
+        return c;
     }
     static JsType fromCpp(const CppType& c) {
-        em::val arrayClass = Array<T>::getArrayClass();
-        std::cout << "vector to typed array" << std::endl;
-        em::val memoryView{ em::typed_memory_view(c.size(), c.data()) };
-        em::val buffer = memoryView.call<em::val>("slice", 0);
-        return arrayClass.new_(buffer);
+        static em::val readNativeMemory = em::val::module_property("readNativeMemory");
+        return readNativeMemory(U::getArrayClass(), reinterpret_cast<uint32_t>(c.data()),
+                                static_cast<uint32_t>(c.size() * sizeof(typename T::CppType)));
     }
 };
 template <>
@@ -307,6 +330,13 @@ template <>
 struct Array<I32> : PrimitiveArray<I32> {
     static em::val getArrayClass() {
         static em::val arrayClass = em::val::global("Int32Array");
+        return arrayClass;
+    }
+};
+template <>
+struct Array<I64> : PrimitiveArray<I64> {
+    static em::val getArrayClass() {
+        static em::val arrayClass = em::val::global("BigInt64Array");
         return arrayClass;
     }
 };

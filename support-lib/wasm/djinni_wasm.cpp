@@ -3,11 +3,15 @@
 namespace djinni {
 
 Binary::CppType Binary::toCpp(const JsType& j) {
-    return em::convertJSArrayToNumberVector<uint8_t>(j);
+    return PrimitiveArray<Primitive<uint8_t>, Binary>::toCpp(j);
 }
 Binary::JsType Binary::fromCpp(const CppType& c) {
-    em::val memoryView{ em::typed_memory_view(c.size(), c.data()) };
-    return memoryView.call<em::val>("slice", 0);
+    static em::val arrayClass = em::val::global("Uint8Array");
+    return PrimitiveArray<Primitive<uint8_t>, Binary>::fromCpp(c);
+}
+em::val Binary::getArrayClass() {
+    static em::val arrayClass = em::val::global("Uint8Array");
+    return arrayClass;
 }
 
 Date::CppType Date::toCpp(const JsType& j) {
@@ -61,13 +65,13 @@ em::val DataObject::createJsObject() {
     return jsObj;
 }
 
-em::val allocateDirectBuffer(unsigned size) {
+em::val allocateWasmBuffer(unsigned size) {
     auto* dbuf = new GenericBuffer<std::vector<uint8_t>>(size);
     return dbuf->createJsObject();
 }
 
 extern "C" EMSCRIPTEN_KEEPALIVE
-void releaseDirectBuffer(unsigned addr) {
+void releaseWasmBuffer(unsigned addr) {
     delete reinterpret_cast<DataObject*>(addr);
 }
 
@@ -80,7 +84,7 @@ EM_JS(void, djinni_init_wasm, (), {
         });
 
         Module.directBufferFinalizerRegistry = new FinalizationRegistry(addr => {
-            Module._releaseDirectBuffer(addr);
+            Module._releaseWasmBuffer(addr);
         });
 
         class DjinniCppProxy {
@@ -96,11 +100,19 @@ EM_JS(void, djinni_init_wasm, (), {
             }
         }
         Module.DjinniCppProxy = DjinniCppProxy;
+
+        Module.writeNativeMemory = function(src, nativePtr, nativeSize) {
+            var srcByteView = new Uint8Array(src.buffer, src.byteOffset, src.byteLength);
+            Module.HEAPU8.set(srcByteView, nativePtr);
+        };
+        Module.readNativeMemory = function(cls, nativePtr, nativeSize) {
+            return new cls(Module.HEAPU8.buffer.slice(nativePtr, nativePtr + nativeSize));
+        };
 });
 
 EMSCRIPTEN_BINDINGS(djinni_wasm) {
     djinni_init_wasm();    
-    em::function("allocateDirectBuffer", &allocateDirectBuffer);
+    em::function("allocateWasmBuffer", &allocateWasmBuffer);
 }
 
 }

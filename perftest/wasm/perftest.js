@@ -7,7 +7,7 @@ function percentileFromSortedArray(samples, percentile) {
     return samples[Math.round((samples.length - 1) * percentile)];
 }
 function measure(name, func, times) {
-    if (times === void 0) { times = 1000; }
+    if (times === void 0) { times = 10; }
     var tbl = (document.getElementById('tbl'));
     var row = (tbl.insertRow(-1));
     row.align = 'right';
@@ -22,8 +22,10 @@ function measure(name, func, times) {
     var samples = [];
     for (var i = 0; i < times; ++i) {
         var t0 = performance.now();
-        func();
-        samples.push(performance.now() - t0);
+        for (var j = 0; j < 100; ++j) {
+            func();
+        }
+        samples.push((performance.now() - t0) / 100);
     }
     samples.sort(function (a, b) { return a - b; });
     var sum = samples.reduce(function (a, b) { return a + b; }, 0);
@@ -74,9 +76,16 @@ function main(module) {
         sg = sg + sh;
     }
     measure("argString " + hugeCount, function () { dpb.argString(sg); });
-    [lowCount, highCount, hugeCount].forEach(function (count) {
-        measure("argBinary " + count, function () { dpb.argBinary(new Uint8Array(count)); });
+    [/*lowCount, highCount,*/ hugeCount].forEach(function (count) {
+        var u8array = new Uint8Array(count);
+        measure("argBinary " + count, function () { dpb.argBinary(u8array); });
     });
+    var li = [];
+    for (var i = 0; i < highCount; ++i) {
+        li.push(BigInt(i));
+    }
+    var ai = new BigInt64Array(li);
+    measure("argArrayInt " + highCount, function () { dpb.argArrayInt(ai); });
     var e = 0 /* FIRST */;
     measure("argEnumSixValue", function () { dpb.argEnumSixValue(e); });
     var r = i64Array;
@@ -107,7 +116,7 @@ function main(module) {
     [1, 10, lowCount].forEach(function (count) {
         measure("returnListInt " + count, function () { var rli = dpb.returnListInt(count); });
     });
-    [1, 10, lowCount].forEach(function (count) {
+    [1, 10, lowCount, highCount].forEach(function (count) {
         measure("returnArrayInt " + count, function () { var rai = dpb.returnArrayInt(count); });
     });
     [minCount, lowCount, highCount, hugeCount].forEach(function (count) {

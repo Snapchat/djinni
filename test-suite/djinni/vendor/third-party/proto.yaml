@@ -6,7 +6,9 @@ java:
 objc:
     header: '"proto/objc/test.pbobjc.h"'
     prefix: 'DJTest'
- 
+ts:
+  module: 'proto/ts/prototest'
+
 messages:
     - Person
     - AddressBook

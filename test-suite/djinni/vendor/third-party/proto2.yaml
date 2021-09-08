@@ -3,6 +3,8 @@ cpp:
     namespace: 'djinni::test2'
 java:
     class: 'djinni.test2.Test2'
+ts:
+  module: 'proto/ts/prototest2'
  
 messages:
     - PersistingState

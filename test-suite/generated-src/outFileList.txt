@@ -546,4 +546,5 @@ djinni-output-temp/wasm/NativeRecordWithNestedDerivings.hpp
 djinni-output-temp/wasm/NativeRecordWithNestedDerivings.cpp
 djinni-output-temp/wasm/NativeSetRecord.hpp
 djinni-output-temp/wasm/NativeSetRecord.cpp
+djinni-output-temp/ts/test.ts
 djinni-output-temp/yaml/yaml-test.yaml

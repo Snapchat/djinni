@@ -9,7 +9,7 @@ class DataTest {
 
     testSend() {
         var input = [0, 1, 2, 3];
-        var buf = this.m.allocateDirectBuffer(4);
+        var buf = this.m.allocateWasmBuffer(4);
         buf.set(input);
         this.test.sendData(buf);
         var output = this.test.retriveAsBin();
@@ -18,7 +18,7 @@ class DataTest {
 
     testSendMutable() {
         var input = [0, 1, 2, 3];
-        var buf = this.m.allocateDirectBuffer(4);
+        var buf = this.m.allocateWasmBuffer(4);
         buf.set(input);
         this.test.sendMutableData(buf);
         assertArrayEq([3, 2, 1, 0], buf);
@@ -42,7 +42,7 @@ class DataTest {
 
     testSendDataView() {
         var input = [0, 1, 2, 3];
-        var buf = this.m.allocateDirectBuffer(4);
+        var buf = this.m.allocateWasmBuffer(4);
         buf.set(input);
         var output = this.test.sendDataView(buf);
         assertArrayEq(input, output);
