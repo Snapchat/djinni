@@ -103,7 +103,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
   //------------------------------------------------------------------------
   private def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum, w: IndentWriter) {
     w.wl
-    w.w(s"export const enum ${idJs.ty(ident)}").braced {
+    w.w(s"export enum ${idJs.ty(ident)}").braced {
       writeEnumOptionNone(w, e, idJs.enum, "=")
       writeEnumOptions(w, e, idJs.enum, "=")
       writeEnumOptionAll(w, e, idJs.enum, "=")

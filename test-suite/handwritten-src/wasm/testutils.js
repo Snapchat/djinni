@@ -38,14 +38,14 @@ function runTests(module, tests) {
                 println('[ RUN      ] ' + currentTest)
                 var failedBefore = failed.length;
                 var t0 = performance.now();
-                if (t['setUp'] !== undefined) {t.setUp();}
                 try {
+                    if (t['setUp'] !== undefined) {t.setUp();}
                     t[m]();
+                    if (t['tearDown'] !== undefined) {t.tearDown();}
                 } catch (err) {
                     console.log(err);
                     assertTrue(false);
                 }
-                if (t['tearDown'] !== undefined) {t.tearDown();}
                 var status = failed.length > failedBefore ? '[  FAILED  ] ' : '[       OK ] ';
                 println(status + cls.name + '.' + m + ' (' + (performance.now() - t0) + ' ms)')
                 count++;

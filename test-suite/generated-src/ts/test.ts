@@ -99,7 +99,7 @@ export interface DataRefTest_statics {
     create(): DataRefTest;
 }
 
-export const enum ConstantEnum {
+export enum ConstantEnum {
     SOME_VALUE = 0,
     SOME_OTHER_VALUE = 1,
 }
@@ -110,7 +110,7 @@ export interface /*record*/ ConstantWithEnum {
 export interface ConstantInterfaceWithEnum {
 }
 
-export const enum AccessFlags {
+export enum AccessFlags {
     NOBODY = 0,
     OWNER_READ = 1 << 0,
     OWNER_WRITE = 1 << 1,
@@ -124,7 +124,7 @@ export const enum AccessFlags {
     EVERYBODY = (1 << 9) - 1,
 }
 
-export const enum EmptyFlags {
+export enum EmptyFlags {
     NONE = 0,
     ALL = (1 << 0) - 1,
 }
@@ -301,7 +301,7 @@ export interface UserToken {
     whoami(): string;
 }
 
-export const enum Color {
+export enum Color {
     RED = 0,
     ORANGE = 1,
     YELLOW = 2,
