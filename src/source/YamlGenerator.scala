@@ -112,7 +112,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     td.body match {
       case i: Interface => "interface" + ext(i.ext)
       case r: Record => "record" + ext(r.ext) + deriving(r)
-      case ProtobufMessage(_,_,_) => "protobuf"
+      case p: ProtobufMessage => "protobuf"
       case Enum(_, false) => "enum"
       case Enum(_, true) => "flags"
     }

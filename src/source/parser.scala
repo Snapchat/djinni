@@ -315,6 +315,8 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
   //   - `cpp.namespace` key must be present
   // - `java` key must be present
   //   - `java.class` key must be present
+  // - `ts` key must be present
+  //   - `ts.module` key must be present
   // - `objc` key is optional
   //   - if `objc` is present then `objc.header` must be present
   //   - if `objc` is present then `objc.prefix` must be present
@@ -328,6 +330,10 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
     case Some(properties) => properties.asInstanceOf[JMap[String, String]].toMap
     case None => return Left(Error(Loc(fileStack.top, 1, 1), "'java' properties not found"))
   }
+  val ts = Option(doc.get("ts")) match {
+    case Some(properties) => properties.asInstanceOf[JMap[String, String]].toMap
+    case None => return Left(Error(Loc(fileStack.top, 1, 1), "'ts' properties not found"))
+  }
   // ObjC is optional, if it's not present, then ObjC will use C++ protos
   val o = Option(doc.get("objc")) match {
     case Some(properties) => Some(properties.asInstanceOf[JMap[String, String]].toMap)
@@ -337,7 +343,8 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
     ProtobufMessage.Java(j("class")),
     o match {
       case Some(oo) => Some(ProtobufMessage.Objc(oo("header"), oo("prefix")))
-      case None => None}
+      case None => None},
+    ProtobufMessage.Ts(ts("module"))
   )
   for(message <- doc.get("messages").asInstanceOf[java.util.List[String]]) {
     val ident = Ident(message, fileStack.top, Loc(fileStack.top, 1, 1))

@@ -76,27 +76,11 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
     f(tm)
   }
 
-  // def references(m: Meta): Seq[SymbolReference] = m match {
-  //   case e: MExtern => List(ImportRef(s"""import { ${idJs.ty(e.name)} } from "${e.ts.module}""""))
-  //   case _ => List()
-  // }
-
-  // class TsRefs() {
-  //   var imports = mutable.TreeSet[String]()
-
-  //   def find(ty: TypeRef) { find(ty.resolved) }
-  //   def find(tm: MExpr) {
-  //     tm.args.foreach(find)
-  //     find(tm.base)
-  //   }
-  //   def find(m: Meta) = for(r <- references(m)) r match {
-  //     case ImportRef(arg) => imports.add(arg)
-  //     case _ =>
-  //   }
-  // }
   case class TsSymbolRef(sym: String, module: String)
   def references(m: Meta): Seq[TsSymbolRef] = m match {
     case e: MExtern => List(TsSymbolRef(idJs.ty(e.name), e.ts.module))
+    case p: MProtobuf => List(TsSymbolRef(p.name, p.body.ts.module))
+    case MOutcome => List(TsSymbolRef("Outcome", "@djinni_support/Outcome"))
     case _ => List()
   }
   class TsRefs() {
@@ -177,7 +161,9 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
       }
       // write external references
       for ((module, syms) <- refs.imports) {
-        w.wl(s"""import { ${syms.mkString(", ")} } from "$module"""")
+        if (module != "") {
+          w.wl(s"""import { ${syms.mkString(", ")} } from "$module"""")
+        }
       }
 
       var interfacesWithStatics = new ListBuffer[String]()
