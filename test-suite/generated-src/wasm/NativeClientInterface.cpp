@@ -6,36 +6,6 @@
 
 namespace djinni_generated {
 
-em::val NativeClientInterface::cppProxyMethods() {
-    static const em::val methods = em::val::array(std::vector<std::string> {
-        "getRecord",
-        "identifierCheck",
-        "returnStr",
-        "methTakingInterface",
-        "methTakingOptionalInterface",
-    });
-    return methods;
-}
-
-em::val NativeClientInterface::get_record(const CppType& self, int64_t w_record_id,const std::string& w_utf8string,const em::val& w_misc) {
-    return ::djinni_generated::NativeClientReturnedRecord::fromCpp(self->get_record(::djinni::I64::toCpp(w_record_id),
-                                                                                    ::djinni::String::toCpp(w_utf8string),
-                                                                                    ::djinni::Optional<std::experimental::optional, ::djinni::String>::toCpp(w_misc)));
-}
-double NativeClientInterface::identifier_check(const CppType& self, const em::val& w_data,int32_t w_r,int64_t w_jret) {
-    return ::djinni::F64::fromCpp(self->identifier_check(::djinni::Binary::toCpp(w_data),
-                                                         ::djinni::I32::toCpp(w_r),
-                                                         ::djinni::I64::toCpp(w_jret)));
-}
-std::string NativeClientInterface::return_str(const CppType& self) {
-    return ::djinni::String::fromCpp(self->return_str());
-}
-std::string NativeClientInterface::meth_taking_interface(const CppType& self, const em::val& w_i) {
-    return ::djinni::String::fromCpp(self->meth_taking_interface(::djinni_generated::NativeClientInterface::toCpp(w_i)));
-}
-std::string NativeClientInterface::meth_taking_optional_interface(const CppType& self, const em::val& w_i) {
-    return ::djinni::String::fromCpp(self->meth_taking_optional_interface(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeClientInterface>::toCpp(w_i)));
-}
 
 ::testsuite::ClientReturnedRecord NativeClientInterface::JsProxy::get_record(int64_t record_id,const std::string & utf8string,const std::experimental::optional<std::string> & misc) {
     return ::djinni_generated::NativeClientReturnedRecord::toCpp(_jsRef().call<em::val>("getRecord", ::djinni::I64::fromCpp(record_id),
@@ -65,11 +35,6 @@ EMSCRIPTEN_BINDINGS(client_interface) {
     em::class_<::testsuite::ClientInterface>("ClientInterface")
         .smart_ptr<std::shared_ptr<::testsuite::ClientInterface>>("ClientInterface")
         .function("nativeDestroy", &NativeClientInterface::nativeDestroy)
-        .function("getRecord", NativeClientInterface::get_record)
-        .function("identifierCheck", NativeClientInterface::identifier_check)
-        .function("returnStr", NativeClientInterface::return_str)
-        .function("methTakingInterface", NativeClientInterface::meth_taking_interface)
-        .function("methTakingOptionalInterface", NativeClientInterface::meth_taking_optional_interface)
         ;
 }
 

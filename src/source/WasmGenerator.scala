@@ -188,29 +188,35 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl("static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }")
         w.wl
         // method list
-        w.wl("static em::val cppProxyMethods();")
-        w.wl
-        // stubs
-        for (m <- i.methods) {
-          val selfRef = if (m.static) "" else if (m.params.isEmpty) "const CppType& self" else "const CppType& self, "
-          w.w(s"static ${stubRetType(m)} ${idCpp.method(m.ident)}(${selfRef}")
-          w.w(m.params.map(p => {
-            s"${stubParamType(p.ty)} ${stubParamName(idCpp.local(p.ident))}"
-          }).mkString(","))
-          w.wl(");")
+        if (i.ext.cpp) {
+          w.wl("static em::val cppProxyMethods();")
         }
         w.wl
-        // js proxy
-        w.w(s"struct JsProxy: ::djinni::JsProxyBase, $cls, ::djinni::InstanceTracker<JsProxy>").bracedSemi {
-          w.wl("JsProxy(const em::val& v) : JsProxyBase(v) {}")
+        // stubs
+        if (i.ext.cpp) {
           for (m <- i.methods) {
-            if (!m.static) {
-              w.w(s"${cppMarshal.fqReturnType(m.ret)} ${idCpp.method(m.ident)}(")
-              w.w(m.params.map(p => {
-                s"${cppMarshal.fqParamType(p.ty)} ${idCpp.local(p.ident)}"
-              }).mkString(","))
-              val constModifier = if (m.const) " const" else ""
-              w.wl(s")$constModifier override;")
+            val selfRef = if (m.static) "" else if (m.params.isEmpty) "const CppType& self" else "const CppType& self, "
+            w.w(s"static ${stubRetType(m)} ${idCpp.method(m.ident)}(${selfRef}")
+            w.w(m.params.map(p => {
+              s"${stubParamType(p.ty)} ${stubParamName(idCpp.local(p.ident))}"
+            }).mkString(","))
+            w.wl(");")
+          }
+          w.wl
+        }
+        // js proxy
+        if (i.ext.js) {
+          w.w(s"struct JsProxy: ::djinni::JsProxyBase, $cls, ::djinni::InstanceTracker<JsProxy>").bracedSemi {
+            w.wl("JsProxy(const em::val& v) : JsProxyBase(v) {}")
+            for (m <- i.methods) {
+              if (!m.static) {
+                w.w(s"${cppMarshal.fqReturnType(m.ret)} ${idCpp.method(m.ident)}(")
+                w.w(m.params.map(p => {
+                  s"${cppMarshal.fqParamType(p.ty)} ${idCpp.local(p.ident)}"
+                }).mkString(","))
+                val constModifier = if (m.const) " const" else ""
+                w.wl(s")$constModifier override;")
+              }
             }
           }
         }
@@ -219,51 +225,57 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
 
     writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, includePrefix())(ident.name, origin, refs.cpp, (w => {
       // method list
-      w.w(s"em::val $helper::cppProxyMethods()").braced {
-        w.w("static const em::val methods = em::val::array(std::vector<std::string>").bracedEnd(");") {
-          for (m <- i.methods) {
-            w.wl(s""""${idJs.method(m.ident)}",""")
+      if (i.ext.cpp) {
+        w.w(s"em::val $helper::cppProxyMethods()").braced {
+          w.w("static const em::val methods = em::val::array(std::vector<std::string>").bracedEnd(");") {
+            for (m <- i.methods) {
+              w.wl(s""""${idJs.method(m.ident)}",""")
+            }
           }
+          w.wl("return methods;")
         }
-        w.wl("return methods;")
       }
       w.wl
       // stub methods
-      for (m <- i.methods) {
-        val selfRef = if (m.static) "" else if (m.params.isEmpty) "const CppType& self" else "const CppType& self, "
-        w.w(s"${stubRetType(m)} $helper::${idCpp.method(m.ident)}(${selfRef}")
-        w.w(m.params.map(p => {
-          s"${stubParamType(p.ty)} ${stubParamName(p.ident)}"
-        }).mkString(","))
-        w.w(")").braced {
-          val retPrefix = if (m.ret.isEmpty) "" else s"${helperClass(m.ret.get.resolved)}::fromCpp("
-          val retSuffix = if (m.ret.isEmpty) "" else ")"
-          val callPrefix = if (m.static) s"$cls::" else "self->"
-          writeAlignedCall(w, s"""return ${retPrefix}${callPrefix}${idCpp.method(m.ident)}(""", m.params, s")${retSuffix}", p => {
-            s"${helperClass(p.ty.resolved)}::toCpp(${stubParamName(p.ident)})"
-          })
-          w.wl(";")
-        }
-      }
-      w.wl
-      // js proxy methods
-      for (m <- i.methods) {
-        if (!m.static) {
-          val constModifier = if (m.const) " const" else ""
-          w.w(s"${cppMarshal.fqReturnType(m.ret)} ${helper}::JsProxy::${idCpp.method(m.ident)}(")
+      if (i.ext.cpp) {
+        for (m <- i.methods) {
+          val selfRef = if (m.static) "" else if (m.params.isEmpty) "const CppType& self" else "const CppType& self, "
+          w.w(s"${stubRetType(m)} $helper::${idCpp.method(m.ident)}(${selfRef}")
           w.w(m.params.map(p => {
-            s"${cppMarshal.fqParamType(p.ty)} ${idCpp.local(p.ident)}"
+            s"${stubParamType(p.ty)} ${stubParamName(p.ident)}"
           }).mkString(","))
-          w.w(s")$constModifier").braced {
-            val retPrefix = if (m.ret.isEmpty) "" else s"${helperClass(m.ret.get.resolved)}::toCpp("
+          w.w(")").braced {
+            val retPrefix = if (m.ret.isEmpty) "" else s"${helperClass(m.ret.get.resolved)}::fromCpp("
             val retSuffix = if (m.ret.isEmpty) "" else ")"
-            val methodName = q(idJs.method(m.ident.name)) + (if (m.params.isEmpty) "" else ", ")
-            writeAlignedCall(w, s"""return ${retPrefix}_jsRef().call<${stubRetType(m)}>($methodName""", m.params, s")${retSuffix}", p => {
-              s"${helperClass(p.ty.resolved)}::fromCpp(${idCpp.local(p.ident)})"
+            val callPrefix = if (m.static) s"$cls::" else "self->"
+            writeAlignedCall(w, s"""return ${retPrefix}${callPrefix}${idCpp.method(m.ident)}(""", m.params, s")${retSuffix}", p => {
+              s"${helperClass(p.ty.resolved)}::toCpp(${stubParamName(p.ident)})"
             })
             w.wl(";")
           }
-          w.wl
+        }
+        w.wl
+      }
+      // js proxy methods
+      if (i.ext.js) {
+        for (m <- i.methods) {
+          if (!m.static) {
+            val constModifier = if (m.const) " const" else ""
+            w.w(s"${cppMarshal.fqReturnType(m.ret)} ${helper}::JsProxy::${idCpp.method(m.ident)}(")
+            w.w(m.params.map(p => {
+              s"${cppMarshal.fqParamType(p.ty)} ${idCpp.local(p.ident)}"
+            }).mkString(","))
+            w.w(s")$constModifier").braced {
+              val retPrefix = if (m.ret.isEmpty) "" else s"${helperClass(m.ret.get.resolved)}::toCpp("
+              val retSuffix = if (m.ret.isEmpty) "" else ")"
+              val methodName = q(idJs.method(m.ident.name)) + (if (m.params.isEmpty) "" else ", ")
+              writeAlignedCall(w, s"""return ${retPrefix}_jsRef().call<${stubRetType(m)}>($methodName""", m.params, s")${retSuffix}", p => {
+                s"${helperClass(p.ty.resolved)}::fromCpp(${idCpp.local(p.ident)})"
+              })
+              w.wl(";")
+            }
+            w.wl
+          }
         }
       }
       // embind
@@ -271,9 +283,11 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl(s"""em::class_<$cls>("${idJs.ty(ident.name)}")""").nested {
           w.wl(s""".smart_ptr<std::shared_ptr<$cls>>("${idJs.ty(ident.name)}")""")
           w.wl(s""".function("${idJs.method("native_destroy")}", &$helper::nativeDestroy)""")
-          for (m <- i.methods) {
-            val funcType = if (m.static) "class_function" else "function"
-            w.wl(s""".$funcType("${idJs.method(m.ident.name)}", $helper::${idCpp.method(m.ident)})""")
+          if (i.ext.cpp) {
+            for (m <- i.methods) {
+              val funcType = if (m.static) "class_function" else "function"
+              w.wl(s""".$funcType("${idJs.method(m.ident.name)}", $helper::${idCpp.method(m.ident)})""")
+            }
           }
           w.wl(";")
         }

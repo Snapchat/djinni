@@ -34,9 +34,6 @@ struct NativeProtoTests : ::djinni::JsInterface<::testsuite::ProtoTests, NativeP
     static em::val stringToOptionalProto(const std::string& w_x);
     static em::val stringToProtoOutcome(const std::string& w_x);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ProtoTests, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-    };
 };
 
 }  // namespace djinni_generated

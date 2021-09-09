@@ -18,14 +18,7 @@ struct NativeFirstListener : ::djinni::JsInterface<::testsuite::FirstListener, N
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
 
-    static em::val cppProxyMethods();
 
-    static void first(const CppType& self);
-
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::FirstListener, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        void first() override;
-    };
 };
 
 }  // namespace djinni_generated

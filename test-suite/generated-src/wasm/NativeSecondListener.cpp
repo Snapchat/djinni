@@ -5,26 +5,11 @@
 
 namespace djinni_generated {
 
-em::val NativeSecondListener::cppProxyMethods() {
-    static const em::val methods = em::val::array(std::vector<std::string> {
-        "second",
-    });
-    return methods;
-}
-
-void NativeSecondListener::second(const CppType& self) {
-    return self->second();
-}
-
-void NativeSecondListener::JsProxy::second() {
-    return _jsRef().call<void>("second");
-}
 
 EMSCRIPTEN_BINDINGS(second_listener) {
     em::class_<::testsuite::SecondListener>("SecondListener")
         .smart_ptr<std::shared_ptr<::testsuite::SecondListener>>("SecondListener")
         .function("nativeDestroy", &NativeSecondListener::nativeDestroy)
-        .function("second", NativeSecondListener::second)
         ;
 }
 

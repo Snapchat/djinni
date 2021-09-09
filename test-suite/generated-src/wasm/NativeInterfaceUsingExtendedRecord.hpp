@@ -22,10 +22,6 @@ struct NativeInterfaceUsingExtendedRecord : ::djinni::JsInterface<::testsuite::I
 
     static em::val meth(const CppType& self, const em::val& w_er);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::InterfaceUsingExtendedRecord, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        ::testsuite::ExtendedRecord meth(const ::testsuite::ExtendedRecord & er) override;
-    };
 };
 
 }  // namespace djinni_generated

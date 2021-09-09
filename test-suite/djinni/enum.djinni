@@ -19,7 +19,7 @@ enum_usage_record = record {
     m: map<color, color>;
 } deriving(parcelable)
 
-enum_usage_interface = interface +c +j +o {
+enum_usage_interface = interface +c +j +o +w {
     e(e: color): color;
     o(o: optional<color>): optional<color>;
     l(l: list<color>): list<color>;

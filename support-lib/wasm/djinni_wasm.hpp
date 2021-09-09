@@ -385,16 +385,15 @@ struct JsInterface {
         assert(cppProxyCache.find(cpp.get()) != cppProxyCache.end());
         cppProxyCache.erase(cpp.get());
     }
-    static em::val _toJs(const std::shared_ptr<I>& c) {
-        if (c == nullptr) {
-            // null object
-            return em::val::null();
-        }
-        else if (auto* p = dynamic_cast<JsProxyBase*>(c.get())) {
-            // unwrap existing js proxy
-            std::cout << "unwrap js object" << std::endl;
-            return p->_jsRef();
-        } else {
+    // enable this only when the derived class has `cppProxyMethods` defined
+    // (interface +c)
+    template <typename, typename>
+    struct GetOrCreateCppProxy {
+        em::val operator() (const std::shared_ptr<I>& c) { return em::val::undefined(); }
+    };
+    template <typename T>
+    struct GetOrCreateCppProxy<T, std::void_t<decltype(T::cppProxyMethods)>> {
+        em::val operator() (const std::shared_ptr<I>& c) {
             // look up in cpp proxy cache
             std::lock_guard lk(cppProxyCacheMutex);
             auto i = cppProxyCache.find(c.get());
@@ -417,18 +416,29 @@ struct JsInterface {
             getCppProxyFinalizerRegistry().call<void>("register", cppProxy, nativeRef);
             return cppProxy;
         }
-    }
-    static std::shared_ptr<I> _fromJs(em::val js) {
-        static const em::val nativeRef("_djinni_native_ref");
-        // null object
-        if (js.isUndefined() || js.isNull()) {
-            return {};
+    };
+    static em::val _toJs(const std::shared_ptr<I>& c) {
+        if (c == nullptr) {
+            // null object
+            return em::val::null();
         }
-        else if (nativeRef.in(js)) {
-            // existing cpp proxy
-            std::cout << "getting cpp object" << std::endl;
-            return js[nativeRef].as<std::shared_ptr<I>>();
+        else if (auto* p = dynamic_cast<JsProxyBase*>(c.get())) {
+            // unwrap existing js proxy
+            std::cout << "unwrap js object" << std::endl;
+            return p->_jsRef();
         } else {
+            return GetOrCreateCppProxy<Self, void>()(c);
+        }
+    }
+    // enable this only when the derived class has `JsProxy` defined
+    // (interface +w)
+    template <typename, typename>
+    struct GetOrCreateJsProxy {
+        std::shared_ptr<I> operator() (em::val js) { return {}; }
+    };
+    template <typename T>
+    struct GetOrCreateJsProxy<T, std::void_t<typename T::JsProxy>> {
+        std::shared_ptr<I> operator() (em::val js) {
             std::lock_guard lk(jsProxyCacheMutex);
             // check prsence of proxy id in js object
             JsProxyId id;
@@ -455,6 +465,21 @@ struct JsInterface {
             auto newJsProxy = std::make_shared<typename Self::JsProxy>(js);
             jsProxyCache.emplace(id, newJsProxy);
             return newJsProxy;
+        }
+    };
+
+    static std::shared_ptr<I> _fromJs(em::val js) {
+        static const em::val nativeRef("_djinni_native_ref");
+        // null object
+        if (js.isUndefined() || js.isNull()) {
+            return {};
+        }
+        else if (nativeRef.in(js)) {
+            // existing cpp proxy
+            std::cout << "getting cpp object" << std::endl;
+            return js[nativeRef].as<std::shared_ptr<I>>();
+        } else {
+            return GetOrCreateJsProxy<Self, void>()(js);
         }
     }
 };

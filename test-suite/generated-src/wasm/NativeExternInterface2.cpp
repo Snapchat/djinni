@@ -7,16 +7,6 @@
 
 namespace djinni_generated {
 
-em::val NativeExternInterface2::cppProxyMethods() {
-    static const em::val methods = em::val::array(std::vector<std::string> {
-        "foo",
-    });
-    return methods;
-}
-
-em::val NativeExternInterface2::foo(const CppType& self, const em::val& w_i) {
-    return ::djinni_generated::NativeExternRecordWithDerivings::fromCpp(self->foo(::djinni_generated::NativeTestHelpers::toCpp(w_i)));
-}
 
 ::ExternRecordWithDerivings NativeExternInterface2::JsProxy::foo(const std::shared_ptr<::testsuite::TestHelpers> & i) {
     return ::djinni_generated::NativeExternRecordWithDerivings::toCpp(_jsRef().call<em::val>("foo", ::djinni_generated::NativeTestHelpers::fromCpp(i)));
@@ -26,7 +16,6 @@ EMSCRIPTEN_BINDINGS(extern_interface_2) {
     em::class_<::ExternInterface2>("ExternInterface2")
         .smart_ptr<std::shared_ptr<::ExternInterface2>>("ExternInterface2")
         .function("nativeDestroy", &NativeExternInterface2::nativeDestroy)
-        .function("foo", NativeExternInterface2::foo)
         ;
 }
 

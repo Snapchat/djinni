@@ -27,14 +27,6 @@ void NativeListenerCaller::callSecond(const CppType& self) {
     return self->callSecond();
 }
 
-void NativeListenerCaller::JsProxy::callFirst() {
-    return _jsRef().call<void>("callFirst");
-}
-
-void NativeListenerCaller::JsProxy::callSecond() {
-    return _jsRef().call<void>("callSecond");
-}
-
 EMSCRIPTEN_BINDINGS(listener_caller) {
     em::class_<::testsuite::ListenerCaller>("ListenerCaller")
         .smart_ptr<std::shared_ptr<::testsuite::ListenerCaller>>("ListenerCaller")

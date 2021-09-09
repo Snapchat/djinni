@@ -22,10 +22,6 @@ struct NativeConstantsInterface : ::djinni::JsInterface<::testsuite::ConstantsIn
 
     static void dummy(const CppType& self);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ConstantsInterface, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        void dummy() override;
-    };
 };
 
 }  // namespace djinni_generated

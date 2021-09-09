@@ -18,9 +18,6 @@ struct NativeExternInterface2 : ::djinni::JsInterface<::ExternInterface2, Native
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
 
-    static em::val cppProxyMethods();
-
-    static em::val foo(const CppType& self, const em::val& w_i);
 
     struct JsProxy: ::djinni::JsProxyBase, ::ExternInterface2, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}

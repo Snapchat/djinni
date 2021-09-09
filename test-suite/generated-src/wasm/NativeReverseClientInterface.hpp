@@ -25,12 +25,6 @@ struct NativeReverseClientInterface : ::djinni::JsInterface<::testsuite::Reverse
     static std::string meth_taking_optional_interface(const CppType& self, const em::val& w_i);
     static em::val create();
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ReverseClientInterface, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        std::string return_str() const override;
-        std::string meth_taking_interface(const std::shared_ptr<::testsuite::ReverseClientInterface> & i) override;
-        std::string meth_taking_optional_interface(const std::shared_ptr<::testsuite::ReverseClientInterface> & i) override;
-    };
 };
 
 }  // namespace djinni_generated

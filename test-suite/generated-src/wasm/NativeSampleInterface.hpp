@@ -21,9 +21,6 @@ struct NativeSampleInterface : ::djinni::JsInterface<::testsuite::SampleInterfac
     static em::val cppProxyMethods();
 
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::SampleInterface, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-    };
 };
 
 }  // namespace djinni_generated

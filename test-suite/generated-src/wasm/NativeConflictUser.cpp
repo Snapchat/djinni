@@ -21,14 +21,6 @@ bool NativeConflictUser::conflict_arg(const CppType& self, const em::val& w_cs) 
     return ::djinni::Bool::fromCpp(self->conflict_arg(::djinni::Set<::djinni_generated::NativeConflict>::toCpp(w_cs)));
 }
 
-std::shared_ptr<::testsuite::Conflict> NativeConflictUser::JsProxy::Conflict() {
-    return ::djinni_generated::NativeConflict::toCpp(_jsRef().call<em::val>("Conflict"));
-}
-
-bool NativeConflictUser::JsProxy::conflict_arg(const std::unordered_set<std::shared_ptr<::testsuite::Conflict>> & cs) {
-    return ::djinni::Bool::toCpp(_jsRef().call<bool>("conflictArg", ::djinni::Set<::djinni_generated::NativeConflict>::fromCpp(cs)));
-}
-
 EMSCRIPTEN_BINDINGS(conflict_user) {
     em::class_<::testsuite::ConflictUser>("ConflictUser")
         .smart_ptr<std::shared_ptr<::testsuite::ConflictUser>>("ConflictUser")

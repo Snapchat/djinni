@@ -23,10 +23,6 @@ struct NativeCppException : ::djinni::JsInterface<::testsuite::CppException, Nat
     static int32_t throw_an_exception(const CppType& self);
     static em::val get();
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::CppException, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        int32_t throw_an_exception() override;
-    };
 };
 
 }  // namespace djinni_generated

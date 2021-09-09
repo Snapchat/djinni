@@ -23,10 +23,6 @@ struct NativeReturnOne : ::djinni::JsInterface<::testsuite::ReturnOne, NativeRet
     static em::val get_instance();
     static int8_t return_one(const CppType& self);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ReturnOne, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        int8_t return_one() override;
-    };
 };
 
 }  // namespace djinni_generated

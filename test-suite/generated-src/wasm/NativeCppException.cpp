@@ -20,10 +20,6 @@ em::val NativeCppException::get() {
     return ::djinni_generated::NativeCppException::fromCpp(::testsuite::CppException::get());
 }
 
-int32_t NativeCppException::JsProxy::throw_an_exception() {
-    return ::djinni::I32::toCpp(_jsRef().call<int32_t>("throwAnException"));
-}
-
 EMSCRIPTEN_BINDINGS(cpp_exception) {
     em::class_<::testsuite::CppException>("CppException")
         .smart_ptr<std::shared_ptr<::testsuite::CppException>>("CppException")

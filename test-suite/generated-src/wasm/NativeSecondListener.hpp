@@ -18,14 +18,7 @@ struct NativeSecondListener : ::djinni::JsInterface<::testsuite::SecondListener,
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
 
-    static em::val cppProxyMethods();
 
-    static void second(const CppType& self);
-
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::SecondListener, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        void second() override;
-    };
 };
 
 }  // namespace djinni_generated

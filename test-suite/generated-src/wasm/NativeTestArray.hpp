@@ -25,9 +25,6 @@ struct NativeTestArray : ::djinni::JsInterface<::testsuite::TestArray, NativeTes
     static em::val testRecordArray(const em::val& w_a);
     static em::val testArrayOfArray(const em::val& w_a);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::TestArray, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-    };
 };
 
 }  // namespace djinni_generated

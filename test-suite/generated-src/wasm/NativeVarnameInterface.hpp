@@ -23,11 +23,6 @@ struct NativeVarnameInterface : ::djinni::JsInterface<::testsuite::VarnameInterf
     static em::val _rmethod_(const CppType& self, const em::val& w__r_arg_);
     static em::val _imethod_(const CppType& self, const em::val& w__i_arg_);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::VarnameInterface, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        ::testsuite::VarnameRecord _rmethod_(const ::testsuite::VarnameRecord & _r_arg_) override;
-        std::shared_ptr<::testsuite::VarnameInterface> _imethod_(const std::shared_ptr<::testsuite::VarnameInterface> & _i_arg_) override;
-    };
 };
 
 }  // namespace djinni_generated

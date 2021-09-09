@@ -21,14 +21,6 @@ em::val NativeVarnameInterface::_imethod_(const CppType& self, const em::val& w_
     return ::djinni_generated::NativeVarnameInterface::fromCpp(self->_imethod_(::djinni_generated::NativeVarnameInterface::toCpp(w__i_arg_)));
 }
 
-::testsuite::VarnameRecord NativeVarnameInterface::JsProxy::_rmethod_(const ::testsuite::VarnameRecord & _r_arg_) {
-    return ::djinni_generated::NativeVarnameRecord::toCpp(_jsRef().call<em::val>("Rmethod", ::djinni_generated::NativeVarnameRecord::fromCpp(_r_arg_)));
-}
-
-std::shared_ptr<::testsuite::VarnameInterface> NativeVarnameInterface::JsProxy::_imethod_(const std::shared_ptr<::testsuite::VarnameInterface> & _i_arg_) {
-    return ::djinni_generated::NativeVarnameInterface::toCpp(_jsRef().call<em::val>("Imethod", ::djinni_generated::NativeVarnameInterface::fromCpp(_i_arg_)));
-}
-
 EMSCRIPTEN_BINDINGS(_varname_interface_) {
     em::class_<::testsuite::VarnameInterface>("VarnameInterface")
         .smart_ptr<std::shared_ptr<::testsuite::VarnameInterface>>("VarnameInterface")

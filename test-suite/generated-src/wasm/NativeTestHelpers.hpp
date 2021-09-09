@@ -46,9 +46,6 @@ struct NativeTestHelpers : ::djinni::JsInterface<::testsuite::TestHelpers, Nativ
     static em::val assorted_primitives_id(const em::val& w_i);
     static em::val id_binary(const em::val& w_b);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::TestHelpers, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-    };
 };
 
 }  // namespace djinni_generated

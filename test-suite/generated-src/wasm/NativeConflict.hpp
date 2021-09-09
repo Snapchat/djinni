@@ -21,9 +21,6 @@ struct NativeConflict : ::djinni::JsInterface<::testsuite::Conflict, NativeConfl
     static em::val cppProxyMethods();
 
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::Conflict, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-    };
 };
 
 }  // namespace djinni_generated

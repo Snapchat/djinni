@@ -23,10 +23,6 @@ struct NativeReturnTwo : ::djinni::JsInterface<::testsuite::ReturnTwo, NativeRet
     static em::val get_instance();
     static int8_t return_two(const CppType& self);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ReturnTwo, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        int8_t return_two() override;
-    };
 };
 
 }  // namespace djinni_generated

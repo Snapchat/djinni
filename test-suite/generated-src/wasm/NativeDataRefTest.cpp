@@ -50,38 +50,6 @@ em::val NativeDataRefTest::create() {
     return ::djinni_generated::NativeDataRefTest::fromCpp(::testsuite::DataRefTest::create());
 }
 
-void NativeDataRefTest::JsProxy::sendData(const ::snapchat::djinni::DataRef & data) {
-    return _jsRef().call<void>("sendData", ::snapchat::djinni::NativeDataRef::fromCpp(data));
-}
-
-std::vector<uint8_t> NativeDataRefTest::JsProxy::retriveAsBin() {
-    return ::djinni::Binary::toCpp(_jsRef().call<em::val>("retriveAsBin"));
-}
-
-void NativeDataRefTest::JsProxy::sendMutableData(const ::snapchat::djinni::DataRef & data) {
-    return _jsRef().call<void>("sendMutableData", ::snapchat::djinni::NativeDataRef::fromCpp(data));
-}
-
-::snapchat::djinni::DataRef NativeDataRefTest::JsProxy::generateData() {
-    return ::snapchat::djinni::NativeDataRef::toCpp(_jsRef().call<em::val>("generateData"));
-}
-
-::snapchat::djinni::DataRef NativeDataRefTest::JsProxy::dataFromVec() {
-    return ::snapchat::djinni::NativeDataRef::toCpp(_jsRef().call<em::val>("dataFromVec"));
-}
-
-::snapchat::djinni::DataRef NativeDataRefTest::JsProxy::dataFromStr() {
-    return ::snapchat::djinni::NativeDataRef::toCpp(_jsRef().call<em::val>("dataFromStr"));
-}
-
-std::vector<uint8_t> NativeDataRefTest::JsProxy::sendDataView(const ::snapchat::djinni::DataView & data) {
-    return ::djinni::Binary::toCpp(_jsRef().call<em::val>("sendDataView", ::snapchat::djinni::NativeDataView::fromCpp(data)));
-}
-
-::snapchat::djinni::DataView NativeDataRefTest::JsProxy::recvDataView() {
-    return ::snapchat::djinni::NativeDataView::toCpp(_jsRef().call<em::val>("recvDataView"));
-}
-
 EMSCRIPTEN_BINDINGS(DataRefTest) {
     em::class_<::testsuite::DataRefTest>("DataRefTest")
         .smart_ptr<std::shared_ptr<::testsuite::DataRefTest>>("DataRefTest")

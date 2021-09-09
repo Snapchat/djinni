@@ -22,10 +22,6 @@ struct NativeExternInterface1 : ::djinni::JsInterface<::ExternInterface1, Native
 
     static em::val foo(const CppType& self, const em::val& w_i);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::ExternInterface1, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        ::testsuite::ClientReturnedRecord foo(const std::shared_ptr<::testsuite::ClientInterface> & i) override;
-    };
 };
 
 }  // namespace djinni_generated

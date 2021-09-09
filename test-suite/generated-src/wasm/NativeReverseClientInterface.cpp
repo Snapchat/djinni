@@ -28,18 +28,6 @@ em::val NativeReverseClientInterface::create() {
     return ::djinni_generated::NativeReverseClientInterface::fromCpp(::testsuite::ReverseClientInterface::create());
 }
 
-std::string NativeReverseClientInterface::JsProxy::return_str() const {
-    return ::djinni::String::toCpp(_jsRef().call<std::string>("returnStr"));
-}
-
-std::string NativeReverseClientInterface::JsProxy::meth_taking_interface(const std::shared_ptr<::testsuite::ReverseClientInterface> & i) {
-    return ::djinni::String::toCpp(_jsRef().call<std::string>("methTakingInterface", ::djinni_generated::NativeReverseClientInterface::fromCpp(i)));
-}
-
-std::string NativeReverseClientInterface::JsProxy::meth_taking_optional_interface(const std::shared_ptr<::testsuite::ReverseClientInterface> & i) {
-    return ::djinni::String::toCpp(_jsRef().call<std::string>("methTakingOptionalInterface", ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeReverseClientInterface>::fromCpp(i)));
-}
-
 EMSCRIPTEN_BINDINGS(reverse_client_interface) {
     em::class_<::testsuite::ReverseClientInterface>("ReverseClientInterface")
         .smart_ptr<std::shared_ptr<::testsuite::ReverseClientInterface>>("ReverseClientInterface")

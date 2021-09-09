@@ -21,9 +21,6 @@ struct NativeConstantInterfaceWithEnum : ::djinni::JsInterface<::testsuite::Cons
     static em::val cppProxyMethods();
 
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ConstantInterfaceWithEnum, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-    };
 };
 
 }  // namespace djinni_generated

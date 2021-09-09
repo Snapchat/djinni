@@ -16,10 +16,6 @@ void NativeConstantsInterface::dummy(const CppType& self) {
     return self->dummy();
 }
 
-void NativeConstantsInterface::JsProxy::dummy() {
-    return _jsRef().call<void>("dummy");
-}
-
 EMSCRIPTEN_BINDINGS(constants_interface) {
     em::class_<::testsuite::ConstantsInterface>("ConstantsInterface")
         .smart_ptr<std::shared_ptr<::testsuite::ConstantsInterface>>("ConstantsInterface")

@@ -29,9 +29,6 @@ struct NativeTestOutcome : ::djinni::JsInterface<::testsuite::TestOutcome, Nativ
     static int32_t putNestedSuccessOutcome(const em::val& w_x);
     static std::string putNestedErrorOutcome(const em::val& w_x);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::TestOutcome, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-    };
 };
 
 }  // namespace djinni_generated

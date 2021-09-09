@@ -18,10 +18,6 @@ em::val NativeExternInterface1::foo(const CppType& self, const em::val& w_i) {
     return ::djinni_generated::NativeClientReturnedRecord::fromCpp(self->foo(::djinni_generated::NativeClientInterface::toCpp(w_i)));
 }
 
-::testsuite::ClientReturnedRecord NativeExternInterface1::JsProxy::foo(const std::shared_ptr<::testsuite::ClientInterface> & i) {
-    return ::djinni_generated::NativeClientReturnedRecord::toCpp(_jsRef().call<em::val>("foo", ::djinni_generated::NativeClientInterface::fromCpp(i)));
-}
-
 EMSCRIPTEN_BINDINGS(extern_interface_1) {
     em::class_<::ExternInterface1>("ExternInterface1")
         .smart_ptr<std::shared_ptr<::ExternInterface1>>("ExternInterface1")

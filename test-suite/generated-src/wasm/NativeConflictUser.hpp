@@ -23,11 +23,6 @@ struct NativeConflictUser : ::djinni::JsInterface<::testsuite::ConflictUser, Nat
     static em::val Conflict(const CppType& self);
     static bool conflict_arg(const CppType& self, const em::val& w_cs);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ConflictUser, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        std::shared_ptr<::testsuite::Conflict> Conflict() override;
-        bool conflict_arg(const std::unordered_set<std::shared_ptr<::testsuite::Conflict>> & cs) override;
-    };
 };
 
 }  // namespace djinni_generated

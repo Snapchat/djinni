@@ -18,13 +18,6 @@ struct NativeClientInterface : ::djinni::JsInterface<::testsuite::ClientInterfac
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
 
-    static em::val cppProxyMethods();
-
-    static em::val get_record(const CppType& self, int64_t w_record_id,const std::string& w_utf8string,const em::val& w_misc);
-    static double identifier_check(const CppType& self, const em::val& w_data,int32_t w_r,int64_t w_jret);
-    static std::string return_str(const CppType& self);
-    static std::string meth_taking_interface(const CppType& self, const em::val& w_i);
-    static std::string meth_taking_optional_interface(const CppType& self, const em::val& w_i);
 
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ClientInterface, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}

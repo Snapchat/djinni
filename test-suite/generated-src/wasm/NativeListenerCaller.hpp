@@ -24,11 +24,6 @@ struct NativeListenerCaller : ::djinni::JsInterface<::testsuite::ListenerCaller,
     static void callFirst(const CppType& self);
     static void callSecond(const CppType& self);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ListenerCaller, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        void callFirst() override;
-        void callSecond() override;
-    };
 };
 
 }  // namespace djinni_generated

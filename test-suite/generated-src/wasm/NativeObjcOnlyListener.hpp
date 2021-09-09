@@ -18,12 +18,7 @@ struct NativeObjcOnlyListener : ::djinni::JsInterface<::testsuite::ObjcOnlyListe
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
 
-    static em::val cppProxyMethods();
 
-
-    struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ObjcOnlyListener, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-    };
 };
 
 }  // namespace djinni_generated

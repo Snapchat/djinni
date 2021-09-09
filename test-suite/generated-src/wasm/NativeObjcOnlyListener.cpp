@@ -5,12 +5,6 @@
 
 namespace djinni_generated {
 
-em::val NativeObjcOnlyListener::cppProxyMethods() {
-    static const em::val methods = em::val::array(std::vector<std::string> {
-    });
-    return methods;
-}
-
 
 EMSCRIPTEN_BINDINGS(objc_only_listener) {
     em::class_<::testsuite::ObjcOnlyListener>("ObjcOnlyListener")

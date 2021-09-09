@@ -20,10 +20,6 @@ int8_t NativeReturnTwo::return_two(const CppType& self) {
     return ::djinni::I8::fromCpp(self->return_two());
 }
 
-int8_t NativeReturnTwo::JsProxy::return_two() {
-    return ::djinni::I8::toCpp(_jsRef().call<int8_t>("returnTwo"));
-}
-
 EMSCRIPTEN_BINDINGS(return_two) {
     em::class_<::testsuite::ReturnTwo>("ReturnTwo")
         .smart_ptr<std::shared_ptr<::testsuite::ReturnTwo>>("ReturnTwo")
