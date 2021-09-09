@@ -6,17 +6,19 @@ export interface /*record*/ ItemList {
     items: Array<string>;
 }
 
-export const enum SortOrder {
+export enum SortOrder {
     ASCENDING = 0,
     DESCENDING = 1,
     RANDOM = 2,
 }
 
 export interface SortItems {
+    /** For the iOS / Android demo */
     sort(order: SortOrder, items: ItemList): void;
 }
 export interface SortItems_statics {
     createWithListener(listener: TextboxListener): SortItems;
+    /** For the localhost / command-line demo */
     runSort(items: ItemList): ItemList;
 }
 
