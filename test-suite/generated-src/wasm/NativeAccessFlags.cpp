@@ -5,7 +5,7 @@
 
 namespace djinni_generated {
 
-namespace testsuite {
+namespace {
     EM_JS(void, djinni_init_access_flags, (), {
         Module.AccessFlags =  {
             NOBODY : 0,
@@ -24,7 +24,7 @@ namespace testsuite {
 }
 
 EMSCRIPTEN_BINDINGS(access_flags) {
-    testsuite::djinni_init_access_flags();
+    djinni_init_access_flags();
 }
 
 }  // namespace djinni_generated

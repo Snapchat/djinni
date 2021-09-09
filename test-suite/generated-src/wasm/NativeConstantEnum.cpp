@@ -5,7 +5,7 @@
 
 namespace djinni_generated {
 
-namespace testsuite {
+namespace {
     EM_JS(void, djinni_init_constant_enum, (), {
         Module.ConstantEnum =  {
             SOME_VALUE : 0,
@@ -15,7 +15,7 @@ namespace testsuite {
 }
 
 EMSCRIPTEN_BINDINGS(constant_enum) {
-    testsuite::djinni_init_constant_enum();
+    djinni_init_constant_enum();
 }
 
 }  // namespace djinni_generated

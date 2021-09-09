@@ -5,7 +5,7 @@
 
 namespace djinni_generated {
 
-namespace testsuite {
+namespace {
     EM_JS(void, djinni_init_empty_flags, (), {
         Module.EmptyFlags =  {
             NONE : 0,
@@ -15,7 +15,7 @@ namespace testsuite {
 }
 
 EMSCRIPTEN_BINDINGS(empty_flags) {
-    testsuite::djinni_init_empty_flags();
+    djinni_init_empty_flags();
 }
 
 }  // namespace djinni_generated

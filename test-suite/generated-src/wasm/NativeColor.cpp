@@ -5,7 +5,7 @@
 
 namespace djinni_generated {
 
-namespace testsuite {
+namespace {
     EM_JS(void, djinni_init_color, (), {
         Module.Color =  {
             RED : 0,
@@ -25,7 +25,7 @@ namespace testsuite {
 }
 
 EMSCRIPTEN_BINDINGS(color) {
-    testsuite::djinni_init_color();
+    djinni_init_color();
 }
 
 }  // namespace djinni_generated
