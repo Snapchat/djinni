@@ -136,55 +136,55 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  private def generateWasmConstants(w: IndentWriter, ident: Ident, consts: Seq[Const]) {
-    def writeJsConst(w: IndentWriter, ty: TypeRef, v: Any): Unit = v match {
-      case l: Long if wasmType(ty).equalsIgnoreCase("int64_t") => w.w(l.toString + "n")
-      case l: Long => w.w(l.toString)
-      case d: Double => w.w(d.toString)
-      case b: Boolean => w.w(if (b) "true" else "false")
-      case s: String => w.w(s)
-      case e: EnumValue =>  w.w(s"${idJs.ty(ty.expr.ident)}.${idJs.enum(e)}")
-      case v: ConstRef => w.w(idJs.const(v))
-      case z: Map[_, _] => { // Value is record
-        val recordMdef = ty.resolved.base.asInstanceOf[MDef]
-        val record = recordMdef.body.asInstanceOf[Record]
-        val vMap = z.asInstanceOf[Map[String, Any]]
-        w.w("").braced {
-          // Use exact sequence
-          val skipFirst = SkipFirst()
-          for (f <- record.fields) {
-            skipFirst {w.wl(",")}
-            w.w(s"${idJs.field(f.ident)}: ")
-            writeJsConst(w, f.ty, vMap.apply(f.ident.name))
-          }
-          w.wl
-        }
-      }
-    }
-    w.wl
-    w.w(s"namespace").braced {
-      w.wl(s"EM_JS(void, djinni_init_${ident.name}_consts, (), {").nested {
-        w.w("var constants =").bracedSemi {
-          val skipFirst = SkipFirst()
-          for (c <- consts) {
-            skipFirst {w.wl(",")}
-            w.w(s"${idJs.const(c.ident)}: ")
-            writeJsConst(w, c.ty, c.value)
-          }
-        }
-        w.w(s"if ('${idJs.ty(ident)}' in Module)").braced {
-          w.wl(s"Object.assign(Module.${idJs.ty(ident)}, constants);")
-        }
-        w.w("else").braced {
-          w.wl(s"Module.${idJs.ty(ident)} = constants;")
-        }
-      }
-      w.wl("})")
-    }
-    w.w(s"EMSCRIPTEN_BINDINGS(${ident.name}_consts)").braced {
-      w.wl(s"djinni_init_${ident.name}_consts();")
-    }
-  }
+  // private def generateWasmConstants(w: IndentWriter, ident: Ident, consts: Seq[Const]) {
+  //   def writeJsConst(w: IndentWriter, ty: TypeRef, v: Any): Unit = v match {
+  //     case l: Long if wasmType(ty).equalsIgnoreCase("int64_t") => w.w(l.toString + "n")
+  //     case l: Long => w.w(l.toString)
+  //     case d: Double => w.w(d.toString)
+  //     case b: Boolean => w.w(if (b) "true" else "false")
+  //     case s: String => w.w(s)
+  //     case e: EnumValue =>  w.w(s"${idJs.ty(ty.expr.ident)}.${idJs.enum(e)}")
+  //     case v: ConstRef => w.w(idJs.const(v))
+  //     case z: Map[_, _] => { // Value is record
+  //       val recordMdef = ty.resolved.base.asInstanceOf[MDef]
+  //       val record = recordMdef.body.asInstanceOf[Record]
+  //       val vMap = z.asInstanceOf[Map[String, Any]]
+  //       w.w("").braced {
+  //         // Use exact sequence
+  //         val skipFirst = SkipFirst()
+  //         for (f <- record.fields) {
+  //           skipFirst {w.wl(",")}
+  //           w.w(s"${idJs.field(f.ident)}: ")
+  //           writeJsConst(w, f.ty, vMap.apply(f.ident.name))
+  //         }
+  //         w.wl
+  //       }
+  //     }
+  //   }
+  //   w.wl
+  //   w.w(s"namespace").braced {
+  //     w.wl(s"EM_JS(void, djinni_init_${ident.name}_consts, (), {").nested {
+  //       w.w("var constants =").bracedSemi {
+  //         val skipFirst = SkipFirst()
+  //         for (c <- consts) {
+  //           skipFirst {w.wl(",")}
+  //           w.w(s"${idJs.const(c.ident)}: ")
+  //           writeJsConst(w, c.ty, c.value)
+  //         }
+  //       }
+  //       w.w(s"if ('${idJs.ty(ident)}' in Module)").braced {
+  //         w.wl(s"Object.assign(Module.${idJs.ty(ident)}, constants);")
+  //       }
+  //       w.w("else").braced {
+  //         w.wl(s"Module.${idJs.ty(ident)} = constants;")
+  //       }
+  //     }
+  //     w.wl("})")
+  //   }
+  //   w.w(s"EMSCRIPTEN_BINDINGS(${ident.name}_consts)").braced {
+  //     w.wl(s"djinni_init_${ident.name}_consts();")
+  //   }
+  // }
 
   //------------------------------------------------------------------------------
 
