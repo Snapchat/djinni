@@ -103,6 +103,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
   //------------------------------------------------------------------------
   private def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum, w: IndentWriter) {
     w.wl
+    writeDoc(w, doc)
     w.w(s"export enum ${idJs.ty(ident)}").braced {
       writeEnumOptionNone(w, e, idJs.enum, "=")
       writeEnumOptions(w, e, idJs.enum, "=")
@@ -111,18 +112,22 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
   }
   private def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: Record, w: IndentWriter) {
     w.wl
+    writeDoc(w, doc)
     w.w(s"export interface /*record*/ ${idJs.ty(ident)}").braced {
       for (f <- r.fields) {
+        writeDoc(w, f.doc)
         w.wl(s"${idJs.field(f.ident)}: ${toTsType(f.ty.resolved)};")
       }
     }
   }
   private def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface, w: IndentWriter) {
     w.wl
+    writeDoc(w, doc)
     w.w(s"export interface ${idJs.ty(ident)}").braced {
       for (m <- i.methods.filter(!_.static)) {
+        writeMethodDoc(w, m, idJs.local)
         w.w(s"${idJs.method(m.ident)}(")
-        w.w(m.params.map(p => s"${idJs.method(p.ident)}: ${toTsType(p.ty.resolved)}").mkString(", "))
+        w.w(m.params.map(p => s"${idJs.local(p.ident)}: ${toTsType(p.ty.resolved)}").mkString(", "))
         w.wl(s"): ${tsRetType(m)};")
       }
     }
@@ -130,6 +135,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
     if (!staticMethods.isEmpty) {
       w.w(s"export interface ${idJs.ty(ident)}_statics").braced {
         for (m <- staticMethods) {
+          writeMethodDoc(w, m, idJs.local)
           w.w(s"${idJs.method(m.ident)}(")
           w.w(m.params.map(p => s"${idJs.method(p.ident)}: ${toTsType(p.ty.resolved)}").mkString(", "))
           w.wl(s"): ${tsRetType(m)};")

@@ -3,6 +3,7 @@
 
 import { ClientInterface, ClientReturnedRecord, Color, RecordWithDerivings, SampleInterface, TestHelpers } from "test"
 
+/** This file tests YAML dumped by Djinni can be parsed back in */
 export interface /*record*/ ExternRecordWithDerivings {
     member: RecordWithDerivings;
     e: Color;

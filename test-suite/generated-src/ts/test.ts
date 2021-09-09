@@ -99,14 +99,17 @@ export interface DataRefTest_statics {
     create(): DataRefTest;
 }
 
+/** enum for use in constants */
 export enum ConstantEnum {
     SOME_VALUE = 0,
     SOME_OTHER_VALUE = 1,
 }
 
+/** Record containing enum constant */
 export interface /*record*/ ConstantWithEnum {
 }
 
+/** Interface containing enum constant */
 export interface ConstantInterfaceWithEnum {
 }
 
@@ -160,15 +163,26 @@ export interface TestArray_statics {
     testArrayOfArray(a: Array<Int32Array>): Array<Int32Array>;
 }
 
+/**
+ * Underscore is used as a separator in Djinni names, so we don't really
+ * anticipate it to be used as a prefix/suffix.  Some name styles behave
+ * badly when it is.  However this test case ensures we at least don't crash.
+ */
 export interface /*record*/ VarnameRecord {
     Field: number;
 }
 
 export interface VarnameInterface {
+    /**
+     * We should also rewrite parameter names in docstrings.
+     * RArg should be rewritten.
+     * _i_arg_ should not.
+     */
     Rmethod(RArg: VarnameRecord): VarnameRecord;
     Imethod(IArg: VarnameInterface): VarnameInterface;
 }
 
+/** Extended record */
 export interface /*record*/ ExtendedRecord {
     foo: boolean;
 }
@@ -187,6 +201,10 @@ export interface ObjcOnlyListener {
 export interface JavaOnlyListener {
 }
 
+/**
+ * Generating and compiling this makes sure other languages don't break
+ * on references to interfaces they don't need.
+ */
 export interface UsesSingleLanguageListeners {
     callForObjC(l: ObjcOnlyListener): void;
     returnForObjC(): ObjcOnlyListener;
@@ -194,14 +212,22 @@ export interface UsesSingleLanguageListeners {
     returnForJava(): JavaOnlyListener;
 }
 
+/** Used for ObjC multiple inheritance tests */
 export interface FirstListener {
     first(): void;
 }
 
+/** Used for ObjC multiple inheritance tests */
 export interface SecondListener {
     second(): void;
 }
 
+/**
+ * Tester for the ability to call two interfaces which might be
+ * implemented on the same object.  That's not relevant in all
+ * languages, due to the details of multiple inheritance and object
+ * comparison.
+ */
 export interface ListenerCaller {
     callFirst(): void;
     callSecond(): void;
@@ -210,6 +236,7 @@ export interface ListenerCaller_statics {
     init(firstL: FirstListener, secondL: SecondListener): ListenerCaller;
 }
 
+/** Used for C++ multiple inheritance tests */
 export interface ReturnOne {
     returnOne(): number;
 }
@@ -217,6 +244,7 @@ export interface ReturnOne_statics {
     getInstance(): ReturnOne;
 }
 
+/** Used for C++ multiple inheritance tests */
 export interface ReturnTwo {
     returnTwo(): number;
 }
@@ -224,15 +252,23 @@ export interface ReturnTwo_statics {
     getInstance(): ReturnTwo;
 }
 
+/** Record for use in constants */
 export interface /*record*/ ConstantRecord {
     someInteger: number;
     someString: string;
 }
 
+/** Record containing constants */
 export interface /*record*/ Constants {
 }
 
+/** Interface containing constants */
 export interface ConstantsInterface {
+    /**
+     * No support for null optional constants
+     * No support for optional constant records
+     * No support for constant binary, list, set, map
+     */
     dummy(): void;
 }
 
@@ -253,10 +289,21 @@ export interface /*record*/ AssortedPrimitives {
     oFsixtyfour: (number | null);
 }
 
+/**
+ * Helper methods used by various different tests.
+ * (Second line of multi-line documentation.
+ *   Indented third line of multi-line documentation.)
+ */
 export interface TestHelpers {
 }
 export interface TestHelpers_statics {
+    /** Method with documentation */
     getSetRecord(): SetRecord;
+    /**
+     * Method with long documentation
+     * (Second line of multi-line documentation.
+     *   Indented third line of multi-line documentation.)
+     */
     checkSetRecord(rec: SetRecord): boolean;
     getPrimitiveList(): PrimitiveList;
     checkPrimitiveList(pl: PrimitiveList): boolean;
@@ -279,13 +326,23 @@ export interface TestHelpers_statics {
     cppTokenId(t: UserToken): bigint;
     checkTokenType(t: UserToken, type: string): void;
     returnNone(): (number | null);
+    /** Ensures that we generate integer translation code */
     assortedPrimitivesId(i: AssortedPrimitives): AssortedPrimitives;
     idBinary(b: Uint8Array): Uint8Array;
 }
 
+/**
+ * Empty record
+ * (Second line of multi-line documentation.
+ *   Indented third line of multi-line documentation.)
+ */
 export interface /*record*/ EmptyRecord {
 }
 
+/**
+ * Test for conflict of method name with an interface name.
+ * See the comments about scopeSymbols in CppMarshal.scala for more info.
+ */
 export interface Conflict {
 }
 
@@ -294,6 +351,10 @@ export interface ConflictUser {
     conflictArg(cs: Set<Conflict>): boolean;
 }
 
+/**
+ * we need to test optional interface
+ * this one will be used
+ */
 export interface SampleInterface {
 }
 
@@ -332,13 +393,16 @@ export interface EnumUsageInterface {
     m(m: Map<Color, Color>): Map<Color, Color>;
 }
 
+/** Record returned by a client */
 export interface /*record*/ ClientReturnedRecord {
     recordId: bigint;
     content: string;
     misc: string;
 }
 
+/** Client interface */
 export interface ClientInterface {
+    /** Returns record of given string */
     getRecord(recordId: bigint, utf8string: string, misc: string): ClientReturnedRecord;
     identifierCheck(data: Uint8Array, r: number, jret: bigint): number;
     returnStr(): string;
