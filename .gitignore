@@ -10,3 +10,9 @@ djinni-output-temp/
 *.d
 *.o
 /support-lib/ts/*.js
+*.wasm
+*/generated-src/ts/*.js
+/examples/typescript/*.js
+/perftest/typescript/*.js
+test-suite/handwritten-src/js/test_cpp.js
+test-suite/handwritten-src/ts/*.js
