@@ -23,7 +23,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     return "";
   }
 
-  private def helperClass(name: String) = "Native" + idCpp.ty(name)
+  private def helperClass(name: String) = spec.jniClassIdentStyle(name)
   private def helperClass(tm: MExpr): String = helperName(tm) + helperTemplates(tm)
   def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => withNs(Some(helperNamespace()), helperClass(d.name))
