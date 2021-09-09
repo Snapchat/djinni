@@ -1,4 +1,4 @@
-import * as example from "../../generated-src/ts/example";
+import * as example from "../generated-src/ts/example";
 
 declare function Module(): Promise<example.Module_statics>;
 
