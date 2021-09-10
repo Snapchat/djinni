@@ -136,68 +136,85 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  // private def generateWasmConstants(w: IndentWriter, ident: Ident, consts: Seq[Const]) {
-  //   def writeJsConst(w: IndentWriter, ty: TypeRef, v: Any): Unit = v match {
-  //     case l: Long if wasmType(ty).equalsIgnoreCase("int64_t") => w.w(l.toString + "n")
-  //     case l: Long => w.w(l.toString)
-  //     case d: Double => w.w(d.toString)
-  //     case b: Boolean => w.w(if (b) "true" else "false")
-  //     case s: String => w.w(s)
-  //     case e: EnumValue =>  w.w(s"${idJs.ty(ty.expr.ident)}.${idJs.enum(e)}")
-  //     case v: ConstRef => w.w(idJs.const(v))
-  //     case z: Map[_, _] => { // Value is record
-  //       val recordMdef = ty.resolved.base.asInstanceOf[MDef]
-  //       val record = recordMdef.body.asInstanceOf[Record]
-  //       val vMap = z.asInstanceOf[Map[String, Any]]
-  //       w.w("").braced {
-  //         // Use exact sequence
-  //         val skipFirst = SkipFirst()
-  //         for (f <- record.fields) {
-  //           skipFirst {w.wl(",")}
-  //           w.w(s"${idJs.field(f.ident)}: ")
-  //           writeJsConst(w, f.ty, vMap.apply(f.ident.name))
-  //         }
-  //         w.wl
-  //       }
-  //     }
-  //   }
-  //   w.wl
-  //   w.w(s"namespace").braced {
-  //     w.wl(s"EM_JS(void, djinni_init_${ident.name}_consts, (), {").nested {
-  //       w.w("var constants =").bracedSemi {
-  //         val skipFirst = SkipFirst()
-  //         for (c <- consts) {
-  //           skipFirst {w.wl(",")}
-  //           w.w(s"${idJs.const(c.ident)}: ")
-  //           writeJsConst(w, c.ty, c.value)
-  //         }
-  //       }
-  //       w.w(s"if ('${idJs.ty(ident)}' in Module)").braced {
-  //         w.wl(s"Object.assign(Module.${idJs.ty(ident)}, constants);")
-  //       }
-  //       w.w("else").braced {
-  //         w.wl(s"Module.${idJs.ty(ident)} = constants;")
-  //       }
-  //     }
-  //     w.wl("})")
-  //   }
-  //   w.w(s"EMSCRIPTEN_BINDINGS(${ident.name}_consts)").braced {
-  //     w.wl(s"djinni_init_${ident.name}_consts();")
-  //   }
-  // }
+  private def generateWasmConstants(w: IndentWriter, ident: Ident, consts: Seq[Const]) {
+    println("generateWasmConstants " + ident.name)
+    val nsprefix = spec.cppNamespace.replaceAll("::", "_")
+    val helper = helperClass(ident)
+    var dependentTypes = mutable.TreeSet[String]()
+    def writeJsConst(w: IndentWriter, ty: TypeRef, v: Any): Unit = v match {
+      case l: Long if wasmType(ty).equalsIgnoreCase("int64_t") => w.w(l.toString + "n")
+      case l: Long => w.w(l.toString)
+      case d: Double => w.w(d.toString)
+      case b: Boolean => w.w(if (b) "true" else "false")
+      case s: String => w.w(s)
+      case e: EnumValue => {
+        w.w(s"Module.${idJs.ty(ty.expr.ident)}.${idJs.enum(e)}")
+        dependentTypes.add(helperClass(ty.expr.ident))
+      }
+      case v: ConstRef => {
+        println(idJs.const(v))
+        w.w(s"Module.${idJs.ty(ident)}.${idJs.const(v)}")
+      }
+      case z: Map[_, _] => { // Value is record
+        val recordMdef = ty.resolved.base.asInstanceOf[MDef]
+        val record = recordMdef.body.asInstanceOf[Record]
+        val vMap = z.asInstanceOf[Map[String, Any]]
+        w.w("").braced {
+          // Use exact sequence
+          val skipFirst = SkipFirst()
+          for (f <- record.fields) {
+            skipFirst {w.wl(",")}
+            w.w(s"${idJs.field(f.ident)}: ")
+            writeJsConst(w, f.ty, vMap.apply(f.ident.name))
+          }
+          w.wl
+        }
+      }
+    }
+    w.wl
+    w.w(s"namespace").braced {
+      w.wl(s"EM_JS(void, djinni_init_${nsprefix}_${ident.name}_consts, (), {").nested {
+        w.w(s"if (!('${idJs.ty(ident)}' in Module))").braced {
+          w.wl(s"Module.${idJs.ty(ident)} = {};")
+        }
+        for (c <- consts) {
+          w.w(s"Module.${idJs.ty(ident)}.${idJs.const(c.ident)} = ")
+          writeJsConst(w, c.ty, c.value)
+          w.wl(";")
+        }
+      }
+      w.wl("})")
+    }
+    w.w(s"void $helper::staticInitialize()").braced {
+      w.wl("static std::once_flag initOnce;")
+      w.wl(s"std::call_once(initOnce, djinni_init_${nsprefix}_${ident.name}_consts);")
+    }
+    w.wl
+    w.w(s"EMSCRIPTEN_BINDINGS(${nsprefix}_${ident.name}_consts)").braced {
+      for (d <- dependentTypes) {
+        if (d != helper)
+          w.wl(s"$d::staticInitialize();");
+      }
+      w.wl(s"$helper::staticInitialize();");
+    }
+  }
 
   //------------------------------------------------------------------------------
 
   override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
+    val nsprefix = spec.cppNamespace.replaceAll("::", "_")
     val refs = new WasmRefs(ident.name)
+    refs.cpp.add("#include <mutex>")
     val cls = cppMarshal.fqTypename(ident, e)
     val helper = helperClass(ident)
     writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
-      w.wl(s"struct $helper: ::djinni::WasmEnum<$cls> {};")
+      w.w(s"struct $helper: ::djinni::WasmEnum<$cls>").bracedSemi{
+        w.wl("static void staticInitialize();");
+      }
     }), (w => {}))
     writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, includePrefix())(ident.name, origin, refs.cpp, (w => {
       w.w(s"namespace").braced {
-        w.wl(s"EM_JS(void, djinni_init_${ident.name}, (), {").nested {
+        w.wl(s"EM_JS(void, djinni_init_${nsprefix}_${ident.name}, (), {").nested {
           w.w(s"Module.${idJs.ty(ident)} = ").braced {
             writeEnumOptionNone(w, e, idJs.enum, ":")
             writeEnumOptions(w, e, idJs.enum, ":")
@@ -207,15 +224,20 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl("})")
       }
       w.wl
-      w.w(s"EMSCRIPTEN_BINDINGS(${ident.name})").braced {
-        w.wl(s"djinni_init_${ident.name}();")
+      w.w(s"void $helper::staticInitialize()").braced {
+        w.wl("static std::once_flag initOnce;")
+        w.wl(s"std::call_once(initOnce, djinni_init_${nsprefix}_${ident.name});")
+      }
+      w.wl
+      w.w(s"EMSCRIPTEN_BINDINGS(${nsprefix}_${ident.name})").braced {
+        w.wl(s"$helper::staticInitialize();")
       }
     }))
   }
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface) {
     val refs = new WasmRefs(ident.name)
-
+    i.consts.foreach(c => refs.find(c.ty))
     i.methods.foreach(m => {
       m.params.foreach(p => refs.find(p.ty))
       m.ret.foreach(refs.find)
@@ -269,6 +291,10 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
               }
             }
           }
+        }
+        // init consts
+        if (!i.consts.isEmpty) {
+          w.wl("static void staticInitialize();");
         }
       }
     }), (w => {}))
@@ -329,6 +355,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         }
       }
       // embind
+      //val nsprefix = spec.cppNamespace.replaceAll("::", "_")
       w.w(s"EMSCRIPTEN_BINDINGS(${ident.name})").braced {
         w.wl(s"""em::class_<$cls>("${idJs.ty(ident.name)}")""").nested {
           w.wl(s""".smart_ptr<std::shared_ptr<$cls>>("${idJs.ty(ident.name)}")""")
@@ -342,15 +369,20 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
           w.wl(";")
         }
       }
+      // constants
+      if (!i.consts.isEmpty) {
+        generateWasmConstants(w, ident, i.consts);
+      }
     }))
   }
 
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: Record) {
     val refs = new WasmRefs(ident.name)
     r.fields.foreach(f => refs.find(f.ty))
+    r.consts.foreach(c => refs.find(c.ty))
 
     val cls = withNs(Some(spec.cppNamespace), idCpp.ty(ident.name))
-    val helper = helperClass(ident.name)
+    val helper = helperClass(ident)
 
     // TODO: consts in records
 
@@ -362,23 +394,31 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl
         w.wl("static CppType toCpp(const JsType& j);")
         w.wl("static JsType fromCpp(const CppType& c);")
+        // init consts
+        if (!r.consts.isEmpty) {
+          w.wl("static void staticInitialize();");
+        }
       }
     }), (w => {}))
 
     writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, includePrefix())(ident.name, origin, refs.cpp, (w => {
-        w.w(s"auto $helper::toCpp(const JsType& j) -> CppType").braced {
-          writeAlignedCall(w, "return {", r.fields, "}", f => {
-            s"""${helperClass(f.ty.resolved)}::Boxed::toCpp(j["${idJs.field(f.ident.name)}"])"""
-          })
-          w.wl(";")
+      w.w(s"auto $helper::toCpp(const JsType& j) -> CppType").braced {
+        writeAlignedCall(w, "return {", r.fields, "}", f => {
+          s"""${helperClass(f.ty.resolved)}::Boxed::toCpp(j["${idJs.field(f.ident.name)}"])"""
+        })
+        w.wl(";")
+      }
+      w.w(s"auto $helper::fromCpp(const CppType& c) -> JsType").braced {
+        w.wl("em::val js = em::val::object();")
+        for (f <- r.fields) {
+          w.wl(s"""js.set("${idJs.field(f.ident.name)}", ${helperClass(f.ty.resolved)}::Boxed::fromCpp(c.${idCpp.field(f.ident)}));""")
         }
-        w.w(s"auto $helper::fromCpp(const CppType& c) -> JsType").braced {
-          w.wl("em::val js = em::val::object();")
-          for (f <- r.fields) {
-            w.wl(s"""js.set("${idJs.field(f.ident.name)}", ${helperClass(f.ty.resolved)}::Boxed::fromCpp(c.${idCpp.field(f.ident)}));""")
-          }
-          w.wl("return js;")
-        }
+        w.wl("return js;")
+      }
+      // constants
+      if (!r.consts.isEmpty) {
+        generateWasmConstants(w, ident, r.consts);
+      }
     }))
   }
 }

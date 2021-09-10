@@ -8,6 +8,8 @@
 
 namespace djinni_generated {
 
-struct NativeEmptyFlags: ::djinni::WasmEnum<::testsuite::empty_flags> {};
+struct NativeEmptyFlags: ::djinni::WasmEnum<::testsuite::empty_flags> {
+    static void staticInitialize();
+};
 
 }  // namespace djinni_generated

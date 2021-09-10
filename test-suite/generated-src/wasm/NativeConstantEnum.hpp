@@ -8,6 +8,8 @@
 
 namespace djinni_generated {
 
-struct NativeConstantEnum: ::djinni::WasmEnum<::testsuite::constant_enum> {};
+struct NativeConstantEnum: ::djinni::WasmEnum<::testsuite::constant_enum> {
+    static void staticInitialize();
+};
 
 }  // namespace djinni_generated

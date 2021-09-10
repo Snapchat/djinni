@@ -21,6 +21,7 @@ struct NativeConstantInterfaceWithEnum : ::djinni::JsInterface<::testsuite::Cons
     static em::val cppProxyMethods();
 
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

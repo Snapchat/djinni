@@ -8,6 +8,8 @@
 
 namespace djinni_generated {
 
-struct NativeColor: ::djinni::WasmEnum<::testsuite::color> {};
+struct NativeColor: ::djinni::WasmEnum<::testsuite::color> {
+    static void staticInitialize();
+};
 
 }  // namespace djinni_generated

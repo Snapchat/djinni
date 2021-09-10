@@ -8,6 +8,8 @@
 
 namespace djinni_generated {
 
-struct NativeAccessFlags: ::djinni::WasmEnum<::testsuite::access_flags> {};
+struct NativeAccessFlags: ::djinni::WasmEnum<::testsuite::access_flags> {
+    static void staticInitialize();
+};
 
 }  // namespace djinni_generated

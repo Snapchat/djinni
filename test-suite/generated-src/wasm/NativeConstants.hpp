@@ -16,6 +16,7 @@ struct NativeConstants
 
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

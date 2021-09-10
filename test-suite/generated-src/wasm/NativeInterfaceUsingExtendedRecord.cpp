@@ -3,6 +3,7 @@
 
 #include "NativeInterfaceUsingExtendedRecord.hpp"  // my header
 #include "NativeExtendedRecord.hpp"
+#include "NativeRecordUsingExtendedRecord.hpp"
 
 namespace djinni_generated {
 
@@ -23,6 +24,29 @@ EMSCRIPTEN_BINDINGS(interface_using_extended_record) {
         .function("nativeDestroy", &NativeInterfaceUsingExtendedRecord::nativeDestroy)
         .function("meth", NativeInterfaceUsingExtendedRecord::meth)
         ;
+}
+
+namespace {
+    EM_JS(void, djinni_init_testsuite_interface_using_extended_record_consts, (), {
+        if (!('InterfaceUsingExtendedRecord' in Module)) {
+            Module.InterfaceUsingExtendedRecord = {};
+        }
+        Module.InterfaceUsingExtendedRecord.CR =  {
+            er:  {
+                foo: false
+            }
+
+        }
+        ;
+    })
+}
+void NativeInterfaceUsingExtendedRecord::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init_testsuite_interface_using_extended_record_consts);
+}
+
+EMSCRIPTEN_BINDINGS(testsuite_interface_using_extended_record_consts) {
+    NativeInterfaceUsingExtendedRecord::staticInitialize();
 }
 
 }  // namespace djinni_generated

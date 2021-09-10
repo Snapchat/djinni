@@ -15,4 +15,27 @@ auto NativeRecordUsingExtendedRecord::fromCpp(const CppType& c) -> JsType {
     return js;
 }
 
+namespace {
+    EM_JS(void, djinni_init_testsuite_record_using_extended_record_consts, (), {
+        if (!('RecordUsingExtendedRecord' in Module)) {
+            Module.RecordUsingExtendedRecord = {};
+        }
+        Module.RecordUsingExtendedRecord.CR =  {
+            er:  {
+                foo: false
+            }
+
+        }
+        ;
+    })
+}
+void NativeRecordUsingExtendedRecord::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init_testsuite_record_using_extended_record_consts);
+}
+
+EMSCRIPTEN_BINDINGS(testsuite_record_using_extended_record_consts) {
+    NativeRecordUsingExtendedRecord::staticInitialize();
+}
+
 }  // namespace djinni_generated
