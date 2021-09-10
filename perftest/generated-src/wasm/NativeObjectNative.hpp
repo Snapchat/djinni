@@ -22,10 +22,6 @@ struct NativeObjectNative : ::djinni::JsInterface<::snapchat::djinni::benchmark:
 
     static void baseline(const CppType& self);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::snapchat::djinni::benchmark::ObjectNative, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        void baseline() override;
-    };
 };
 
 }  // namespace djinni_generated

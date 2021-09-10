@@ -24,10 +24,6 @@ struct NativeSortItems : ::djinni::JsInterface<::textsort::SortItems, NativeSort
     static em::val create_with_listener(const em::val& w_listener);
     static em::val run_sort(const em::val& w_items);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::textsort::SortItems, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        void sort(::textsort::sort_order order,const ::textsort::ItemList & items) override;
-    };
 };
 
 }  // namespace djinni_generated

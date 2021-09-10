@@ -16,10 +16,6 @@ void NativeObjectNative::baseline(const CppType& self) {
     return self->baseline();
 }
 
-void NativeObjectNative::JsProxy::baseline() {
-    return _jsRef().call<void>("baseline");
-}
-
 EMSCRIPTEN_BINDINGS(ObjectNative) {
     em::class_<::snapchat::djinni::benchmark::ObjectNative>("ObjectNative")
         .smart_ptr<std::shared_ptr<::snapchat::djinni::benchmark::ObjectNative>>("ObjectNative")

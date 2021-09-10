@@ -18,9 +18,6 @@ struct NativeObjectPlatform : ::djinni::JsInterface<::snapchat::djinni::benchmar
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
 
-    static em::val cppProxyMethods();
-
-    static void onDone(const CppType& self);
 
     struct JsProxy: ::djinni::JsProxyBase, ::snapchat::djinni::benchmark::ObjectPlatform, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}

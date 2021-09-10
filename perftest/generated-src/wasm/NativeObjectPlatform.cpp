@@ -5,16 +5,6 @@
 
 namespace djinni_generated {
 
-em::val NativeObjectPlatform::cppProxyMethods() {
-    static const em::val methods = em::val::array(std::vector<std::string> {
-        "onDone",
-    });
-    return methods;
-}
-
-void NativeObjectPlatform::onDone(const CppType& self) {
-    return self->onDone();
-}
 
 void NativeObjectPlatform::JsProxy::onDone() {
     return _jsRef().call<void>("onDone");
@@ -24,7 +14,6 @@ EMSCRIPTEN_BINDINGS(ObjectPlatform) {
     em::class_<::snapchat::djinni::benchmark::ObjectPlatform>("ObjectPlatform")
         .smart_ptr<std::shared_ptr<::snapchat::djinni::benchmark::ObjectPlatform>>("ObjectPlatform")
         .function("nativeDestroy", &NativeObjectPlatform::nativeDestroy)
-        .function("onDone", NativeObjectPlatform::onDone)
         ;
 }
 

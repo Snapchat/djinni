@@ -8,6 +8,8 @@
 
 namespace djinni_generated {
 
-struct NativeEnumSixValue: ::djinni::WasmEnum<::snapchat::djinni::benchmark::EnumSixValue> {};
+struct NativeEnumSixValue: ::djinni::WasmEnum<::snapchat::djinni::benchmark::EnumSixValue> {
+    static void staticInitialize();
+};
 
 }  // namespace djinni_generated

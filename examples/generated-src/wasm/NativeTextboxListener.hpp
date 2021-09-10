@@ -18,9 +18,6 @@ struct NativeTextboxListener : ::djinni::JsInterface<::textsort::TextboxListener
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
 
-    static em::val cppProxyMethods();
-
-    static void update(const CppType& self, const em::val& w_items);
 
     struct JsProxy: ::djinni::JsProxyBase, ::textsort::TextboxListener, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}

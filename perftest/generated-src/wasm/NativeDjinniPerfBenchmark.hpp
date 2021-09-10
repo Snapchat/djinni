@@ -44,31 +44,6 @@ struct NativeDjinniPerfBenchmark : ::djinni::JsInterface<::snapchat::djinni::ben
     static em::val returnArrayRecord(const CppType& self, int32_t w_size);
     static std::string roundTripString(const CppType& self, const std::string& w_s);
 
-    struct JsProxy: ::djinni::JsProxyBase, ::snapchat::djinni::benchmark::DjinniPerfBenchmark, ::djinni::InstanceTracker<JsProxy> {
-        JsProxy(const em::val& v) : JsProxyBase(v) {}
-        int64_t cppTests() override;
-        void baseline() override;
-        void argString(const std::string & s) override;
-        void argBinary(const std::vector<uint8_t> & b) override;
-        void argEnumSixValue(::snapchat::djinni::benchmark::EnumSixValue e) override;
-        void argRecordSixInt(const ::snapchat::djinni::benchmark::RecordSixInt & r) override;
-        void argListInt(const std::vector<int64_t> & v) override;
-        void argArrayInt(const std::vector<int64_t> & v) override;
-        void argObject(const std::shared_ptr<::snapchat::djinni::benchmark::ObjectPlatform> & c) override;
-        void argListObject(const std::vector<std::shared_ptr<::snapchat::djinni::benchmark::ObjectPlatform>> & l) override;
-        void argListRecord(const std::vector<::snapchat::djinni::benchmark::RecordSixInt> & l) override;
-        void argArrayRecord(const std::vector<::snapchat::djinni::benchmark::RecordSixInt> & a) override;
-        int64_t returnInt(int64_t i) override;
-        std::string returnString(int32_t size) override;
-        std::vector<uint8_t> returnBinary(int32_t size) override;
-        std::shared_ptr<::snapchat::djinni::benchmark::ObjectNative> returnObject() override;
-        std::vector<int64_t> returnListInt(int32_t size) override;
-        std::vector<int64_t> returnArrayInt(int32_t size) override;
-        std::vector<std::shared_ptr<::snapchat::djinni::benchmark::ObjectNative>> returnListObject(int32_t size) override;
-        std::vector<::snapchat::djinni::benchmark::RecordSixInt> returnListRecord(int32_t size) override;
-        std::vector<::snapchat::djinni::benchmark::RecordSixInt> returnArrayRecord(int32_t size) override;
-        std::string roundTripString(const std::string & s) override;
-    };
 };
 
 }  // namespace djinni_generated

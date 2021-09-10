@@ -22,7 +22,7 @@ ObjectNative = interface +c {
 }
 
 # interfaces for platform Java or Objective-C objects, to be passed to C++
-ObjectPlatform = interface +j +o {
+ObjectPlatform = interface +j +o +w {
     onDone();
 }
 

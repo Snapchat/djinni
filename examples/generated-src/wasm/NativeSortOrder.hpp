@@ -8,6 +8,8 @@
 
 namespace djinni_generated {
 
-struct NativeSortOrder: ::djinni::WasmEnum<::textsort::sort_order> {};
+struct NativeSortOrder: ::djinni::WasmEnum<::textsort::sort_order> {
+    static void staticInitialize();
+};
 
 }  // namespace djinni_generated
