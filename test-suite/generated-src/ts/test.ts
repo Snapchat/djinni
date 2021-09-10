@@ -108,9 +108,15 @@ export enum ConstantEnum {
 /** Record containing enum constant */
 export interface /*record*/ ConstantWithEnum {
 }
+export namespace ConstantWithEnum {
+    export const CONST_ENUM = ConstantEnum.SOME_VALUE;
+}
 
 /** Interface containing enum constant */
 export interface ConstantInterfaceWithEnum {
+}
+export namespace ConstantInterfaceWithEnum {
+    export const CONST_ENUM = ConstantEnum.SOME_VALUE;
 }
 
 export enum AccessFlags {
@@ -186,13 +192,37 @@ export interface VarnameInterface {
 export interface /*record*/ ExtendedRecord {
     foo: boolean;
 }
+export namespace ExtendedRecord {
+    export const EXTENDED_RECORD_CONST =  {
+        foo: true
+    }
+    ;
+}
 
 export interface /*record*/ RecordUsingExtendedRecord {
     er: ExtendedRecord;
 }
+export namespace RecordUsingExtendedRecord {
+    export const CR =  {
+        er:  {
+            foo: false
+        }
+
+    }
+    ;
+}
 
 export interface InterfaceUsingExtendedRecord {
     meth(er: ExtendedRecord): ExtendedRecord;
+}
+export namespace InterfaceUsingExtendedRecord {
+    export const CR =  {
+        er:  {
+            foo: false
+        }
+
+    }
+    ;
 }
 
 export interface ObjcOnlyListener {
@@ -261,6 +291,47 @@ export interface /*record*/ ConstantRecord {
 /** Record containing constants */
 export interface /*record*/ Constants {
 }
+export namespace Constants {
+    /** bool_constant has documentation. */
+    export const BOOL_CONSTANT = true;
+    export const I8_CONSTANT = 1;
+    export const I16_CONSTANT = 2;
+    export const I32_CONSTANT = 3;
+    export const I64_CONSTANT = BigInt("4");
+    export const F32_CONSTANT = 5.0;
+    /**
+     * f64_constant has long documentation.
+     * (Second line of multi-line documentation.
+     *   Indented third line of multi-line documentation.)
+     */
+    export const F64_CONSTANT = 5.0;
+    export const OPT_BOOL_CONSTANT = true;
+    export const OPT_I8_CONSTANT = 1;
+    /** opt_i16_constant has documentation. */
+    export const OPT_I16_CONSTANT = 2;
+    export const OPT_I32_CONSTANT = 3;
+    export const OPT_I64_CONSTANT = 4;
+    /**
+     * opt_f32_constant has long documentation.
+     * (Second line of multi-line documentation.
+     *   Indented third line of multi-line documentation.)
+     */
+    export const OPT_F32_CONSTANT = 5.0;
+    export const OPT_F64_CONSTANT = 5.0;
+    export const STRING_CONSTANT = "string-constant";
+    export const OPT_STRING_CONSTANT = "string-constant";
+    export const OBJECT_CONSTANT =  {
+        someInteger: I32_CONSTANT,
+        someString: STRING_CONSTANT
+    }
+    ;
+    /**
+     * No support for null optional constants
+     * No support for optional constant records
+     * No support for constant binary, list, set, map
+     */
+    export const DUMMY = false;
+}
 
 /** Interface containing constants */
 export interface ConstantsInterface {
@@ -270,6 +341,41 @@ export interface ConstantsInterface {
      * No support for constant binary, list, set, map
      */
     dummy(): void;
+}
+export namespace ConstantsInterface {
+    export const BOOL_CONSTANT = true;
+    export const I8_CONSTANT = 1;
+    export const I16_CONSTANT = 2;
+    /** i32_constant has documentation. */
+    export const I32_CONSTANT = 3;
+    /**
+     * i64_constant has long documentation.
+     * (Second line of multi-line documentation.
+     *   Indented third line of multi-line documentation.)
+     */
+    export const I64_CONSTANT = BigInt("4");
+    export const F32_CONSTANT = 5.0;
+    export const F64_CONSTANT = 5.0;
+    export const OPT_BOOL_CONSTANT = true;
+    export const OPT_I8_CONSTANT = 1;
+    /** opt_i16_constant has documentation. */
+    export const OPT_I16_CONSTANT = 2;
+    export const OPT_I32_CONSTANT = 3;
+    export const OPT_I64_CONSTANT = 4;
+    /**
+     * opt_f32_constant has long documentation.
+     * (Second line of multi-line documentation.
+     *   Indented third line of multi-line documentation.)
+     */
+    export const OPT_F32_CONSTANT = 5.0;
+    export const OPT_F64_CONSTANT = 5.0;
+    export const STRING_CONSTANT = "string-constant";
+    export const OPT_STRING_CONSTANT = "string-constant";
+    export const OBJECT_CONSTANT =  {
+        someInteger: I32_CONSTANT,
+        someString: STRING_CONSTANT
+    }
+    ;
 }
 
 export interface /*record*/ AssortedPrimitives {

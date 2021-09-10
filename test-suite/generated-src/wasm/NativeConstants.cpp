@@ -23,7 +23,7 @@ namespace {
         Module.Constants.I8_CONSTANT = 1;
         Module.Constants.I16_CONSTANT = 2;
         Module.Constants.I32_CONSTANT = 3;
-        Module.Constants.I64_CONSTANT = 4n;
+        Module.Constants.I64_CONSTANT = BigInt("4");
         Module.Constants.F32_CONSTANT = 5.0;
         Module.Constants.F64_CONSTANT = 5.0;
         Module.Constants.OPT_BOOL_CONSTANT = true;

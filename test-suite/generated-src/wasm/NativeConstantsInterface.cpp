@@ -34,7 +34,7 @@ namespace {
         Module.ConstantsInterface.I8_CONSTANT = 1;
         Module.ConstantsInterface.I16_CONSTANT = 2;
         Module.ConstantsInterface.I32_CONSTANT = 3;
-        Module.ConstantsInterface.I64_CONSTANT = 4n;
+        Module.ConstantsInterface.I64_CONSTANT = BigInt("4");
         Module.ConstantsInterface.F32_CONSTANT = 5.0;
         Module.ConstantsInterface.F64_CONSTANT = 5.0;
         Module.ConstantsInterface.OPT_BOOL_CONSTANT = true;

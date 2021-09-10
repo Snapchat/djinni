@@ -137,12 +137,11 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
   }
 
   private def generateWasmConstants(w: IndentWriter, ident: Ident, consts: Seq[Const]) {
-    println("generateWasmConstants " + ident.name)
     val nsprefix = spec.cppNamespace.replaceAll("::", "_")
     val helper = helperClass(ident)
     var dependentTypes = mutable.TreeSet[String]()
     def writeJsConst(w: IndentWriter, ty: TypeRef, v: Any): Unit = v match {
-      case l: Long if wasmType(ty).equalsIgnoreCase("int64_t") => w.w(l.toString + "n")
+      case l: Long if wasmType(ty).equalsIgnoreCase("int64_t") => w.w(s"""BigInt("${l.toString}")""")
       case l: Long => w.w(l.toString)
       case d: Double => w.w(d.toString)
       case b: Boolean => w.w(if (b) "true" else "false")
@@ -152,7 +151,6 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         dependentTypes.add(helperClass(ty.expr.ident))
       }
       case v: ConstRef => {
-        println(idJs.const(v))
         w.w(s"Module.${idJs.ty(ident)}.${idJs.const(v)}")
       }
       case z: Map[_, _] => { // Value is record

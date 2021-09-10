@@ -8,7 +8,6 @@ import djinni.meta._
 import djinni.writer.IndentWriter
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.TreeSet
-import scala.collection.mutable.Map
 
 // TODO Refs
 // TODO Yaml export and import
@@ -84,7 +83,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
     case _ => List()
   }
   class TsRefs() {
-    var imports = Map[String, TreeSet[String]]()
+    var imports = scala.collection.mutable.Map[String, TreeSet[String]]()
 
     def find(ty: TypeRef) { find(ty.resolved) }
     def find(tm: MExpr) {
@@ -97,6 +96,41 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
         syms += (sym)
       }
       case _ =>
+    }
+  }
+
+  private def generateTsConstants(w: IndentWriter, ident: Ident, consts: Seq[Const]) = {
+    def writeJsConst(w: IndentWriter, ty: TypeRef, v: Any): Unit = v match {
+      case l: Long if (toTsType(ty.resolved) == "bigint") => w.w(s"""BigInt("${l.toString}")""")
+      case l: Long => w.w(l.toString)
+      case d: Double => w.w(d.toString)
+      case b: Boolean => w.w(if (b) "true" else "false")
+      case s: String => w.w(s)
+      case e: EnumValue => w.w(s"${idJs.ty(ty.expr.ident)}.${idJs.enum(e)}")
+      case v: ConstRef => w.w(s"${idJs.const(v)}")
+      case z: Any => { // Value is record
+        val recordMdef = ty.resolved.base.asInstanceOf[MDef]
+        val record = recordMdef.body.asInstanceOf[Record]
+        val vMap = z.asInstanceOf[Map[String, Any]]
+        w.w("").braced {
+          // Use exact sequence
+          val skipFirst = SkipFirst()
+          for (f <- record.fields) {
+            skipFirst {w.wl(",")}
+            w.w(s"${idJs.field(f.ident)}: ")
+            writeJsConst(w, f.ty, vMap.apply(f.ident.name))
+          }
+          w.wl
+        }
+      }
+    }
+    w.w(s"export namespace ${idJs.ty(ident)}").braced {
+      for (c <- consts) {
+        writeDoc(w, c.doc)
+        w.w(s"export const ${idJs.const(c.ident)} = ")
+        writeJsConst(w, c.ty, c.value)
+        w.wl(";")
+      }
     }
   }
 
@@ -119,6 +153,9 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
         w.wl(s"${idJs.field(f.ident)}: ${toTsType(f.ty.resolved)};")
       }
     }
+    if (!r.consts.isEmpty) {
+      generateTsConstants(w, ident, r.consts);
+    }
   }
   private def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface, w: IndentWriter) {
     w.wl
@@ -130,6 +167,9 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
         w.w(m.params.map(p => s"${idJs.local(p.ident)}: ${toTsType(p.ty.resolved)}").mkString(", "))
         w.wl(s"): ${tsRetType(m)};")
       }
+    }
+    if (!i.consts.isEmpty) {
+      generateTsConstants(w, ident, i.consts);
     }
     val staticMethods = i.methods.filter(_.static)
     if (!staticMethods.isEmpty) {
@@ -156,12 +196,14 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
       for (td <- decls) td.body match {
         case r: Record => {
           r.fields.foreach(f => refs.find(f.ty))
+          r.consts.foreach(c => refs.find(c.ty))
         }
         case i: Interface => {
           i.methods.foreach(m => {
             m.params.foreach(p => refs.find(p.ty))
             m.ret.foreach(refs.find)
           })
+          i.consts.foreach(c => refs.find(c.ty))
         }
         case _ =>
       }

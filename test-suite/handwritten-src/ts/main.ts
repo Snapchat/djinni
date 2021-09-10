@@ -1,6 +1,7 @@
 import {runTests, allTests} from "./testutils"
 import "./ArrayTest"
 import "./ClientInterfaceTest"
+import "./ConstantsTest"
 import "./CppExceptionTest"
 import "./DataTest"
 import "./DurationTest"
