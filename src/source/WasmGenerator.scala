@@ -103,7 +103,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
 
   private def stubParamName(name: String): String = s"w_${idCpp.local(name)}"
 
-  def include(ident: String) = q(spec.jniIncludePrefix + wasmFilenameStyle(ident) + "." + spec.cppHeaderExt)
+  def include(ident: String) = q(spec.wasmIncludePrefix + wasmFilenameStyle(ident) + "." + spec.cppHeaderExt)
 
   def references(m: Meta, exclude: String = ""): Seq[SymbolReference] = m match {
     case d: MDef => List(ImportRef(include(d.name)))
@@ -115,11 +115,9 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     var hpp = mutable.TreeSet[String]()
     var cpp = mutable.TreeSet[String]()
 
-    // TODO: base lib prefix from spec
-    // TODO: fix jni*
-    val cppPrefix = cppPrefixOverride.getOrElse(spec.jniIncludeCppPrefix)
+    val cppPrefix = cppPrefixOverride.getOrElse(spec.wasmIncludeCppPrefix)
     hpp.add("#include " + q(cppPrefix + spec.cppFileIdentStyle(name) + "." + spec.cppHeaderExt))
-    hpp.add("#include " + q(spec.jniBaseLibIncludePrefix + "djinni_wasm.hpp"))
+    hpp.add("#include " + q(spec.wasmBaseLibIncludePrefix + "djinni_wasm.hpp"))
     spec.cppNnHeader match {
       case Some(nnHdr) => hpp.add("#include " + nnHdr)
       case _ =>
