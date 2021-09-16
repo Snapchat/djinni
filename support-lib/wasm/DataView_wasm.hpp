@@ -19,12 +19,11 @@ struct NativeDataView {
     }
 
     static JsType fromCpp(const CppType& c) {
-        static auto memory = em::val::module_property("HEAPU32")["buffer"];
         static auto uint8ArrayClass = em::val::global("Uint8Array");
 
         unsigned addr = reinterpret_cast<unsigned>(c.buf());
         unsigned size = static_cast<unsigned>(c.len());
-        em::val uint8ArrayObj = uint8ArrayClass.new_(memory, addr, size);
+        em::val uint8ArrayObj = uint8ArrayClass.new_(::djinni::getWasmMemoryBuffer(), addr, size);
 
         return uint8ArrayObj;
     }

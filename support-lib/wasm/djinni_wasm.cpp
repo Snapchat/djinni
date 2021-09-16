@@ -101,7 +101,7 @@ EM_JS(void, djinni_init_wasm, (), {
         }
         Module.DjinniCppProxy = DjinniCppProxy;
 
-        Module.writeNativeMemory = function(src, nativePtr, nativeSize) {
+        Module.writeNativeMemory = function(src, nativePtr) {
             var srcByteView = new Uint8Array(src.buffer, src.byteOffset, src.byteLength);
             Module.HEAPU8.set(srcByteView, nativePtr);
         };

@@ -18,17 +18,19 @@ namespace djinni {
 
 template<typename T>
 class InstanceTracker {
+#ifdef DJINNI_WASM_TRACK_INSTANCES
     static int& count() {
         static int theCount = 0;
         return theCount;
     }
 public:
     InstanceTracker() {
-        // std::cout << "++" << typeid(this).name() << " => " << ++count() << std::endl;
+        std::cout << "++" << typeid(this).name() << " => " << ++count() << std::endl;
     }
     virtual ~InstanceTracker() {
-        // std::cout << "--" << typeid(this).name() << " => " << --count() << std::endl;
+        std::cout << "--" << typeid(this).name() << " => " << --count() << std::endl;
     }
+#endif
 };
 
 template<typename T>
@@ -302,8 +304,7 @@ struct PrimitiveArray {
         const size_t length = j["length"].as<size_t>();
         std::vector<typename T::CppType> c(length);
         static em::val writeNativeMemory = em::val::module_property("writeNativeMemory");
-        writeNativeMemory(j, reinterpret_cast<uint32_t>(c.data()),
-                          static_cast<uint32_t>(c.size() * sizeof(typename T::CppType)));
+        writeNativeMemory(j, reinterpret_cast<uint32_t>(c.data()));
         return c;
     }
     static JsType fromCpp(const CppType& c) {
@@ -380,7 +381,6 @@ extern em::val getWasmMemoryBuffer();
 template<typename I, typename Self>
 struct JsInterface {
     static void nativeDestroy(const std::shared_ptr<I>& cpp) {
-        // std::cout << "delete entry from cppProxyCache" << std::endl;
         std::lock_guard lk(cppProxyCacheMutex);
         assert(cppProxyCache.find(cpp.get()) != cppProxyCache.end());
         cppProxyCache.erase(cpp.get());
@@ -399,7 +399,6 @@ struct JsInterface {
             auto i = cppProxyCache.find(c.get());
             if (i != cppProxyCache.end()) {
                 // found existing cpp proxy
-                // std::cout << "already has cpp proxy" << std::endl;
                 auto strongRef = i->second.template call<em::val>("deref");
                 if (!strongRef.isUndefined()) {
                     // and it's not expired
@@ -424,7 +423,6 @@ struct JsInterface {
         }
         else if (auto* p = dynamic_cast<JsProxyBase*>(c.get())) {
             // unwrap existing js proxy
-            std::cout << "unwrap js object" << std::endl;
             return p->_jsRef();
         } else {
             return GetOrCreateCppProxy<Self, void>()(c);
@@ -446,7 +444,6 @@ struct JsInterface {
             if (idProp.isUndefined()) {
                 // no id, assign a new id
                 id = nextId++;
-                // std::cout << "assign proxy id " << id << std::endl;
                 js.set("_djinni_js_proxy_id", id);
             } else {
                 // already has id, look up in js proxy cache
@@ -455,7 +452,6 @@ struct JsInterface {
                 if (i != jsProxyCache.end()) {
                     auto strongProxyRef = i->second.lock();
                     if (strongProxyRef) {
-                        std::cout << "existing js proxy" << std::endl;
                         return std::dynamic_pointer_cast<typename Self::JsProxy>(strongProxyRef);
                     }
                 }
@@ -476,7 +472,6 @@ struct JsInterface {
         }
         else if (nativeRef.in(js)) {
             // existing cpp proxy
-            std::cout << "getting cpp object" << std::endl;
             return js[nativeRef].as<std::shared_ptr<I>>();
         } else {
             return GetOrCreateJsProxy<Self, void>()(js);
@@ -494,30 +489,11 @@ struct DataObject {
 template<typename T>
 class GenericBuffer: public DataObject {
 public:
-    GenericBuffer(size_t size) : _buffer(size, {}) {
-        std::cout << "allocate direct buffer:@" << this
-                  << " addr:" << reinterpret_cast<void*>(_buffer.data())
-                  << " size:" << _buffer.size()
-                  << std::endl;
-    }
+    GenericBuffer(size_t size) : _buffer(size, {}) {}
     GenericBuffer(const typename T::value_type* data, typename T::size_type size) :
-        _buffer(data, data + size) {
-        std::cout << "initialize direct buffer:@" << this
-                  << " addr:" << reinterpret_cast<void*>(_buffer.data())
-                  << " size:" << _buffer.size()
-                  << std::endl;
-    }
-    GenericBuffer(T&& toTakeOver) : _buffer(std::move(toTakeOver)) {
-        std::cout << "direct buffer takeover:@" << this
-                  << " addr:" << reinterpret_cast<void*>(_buffer.data())
-                  << " size:" << _buffer.size()
-                  << std::endl;
-    }
-    ~GenericBuffer() override {
-        std::cout << "free direct buffer:@" << this
-                  << " size:" << _buffer.size()
-                  << std::endl;
-    }
+        _buffer(data, data + size) {}
+    GenericBuffer(T&& toTakeOver) : _buffer(std::move(toTakeOver)) {}
+    ~GenericBuffer() override {}
     unsigned addr() override {
         return reinterpret_cast<unsigned>(_buffer.data());
     }

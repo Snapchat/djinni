@@ -22,7 +22,7 @@
   #include <CoreFoundation/CFData.h>
   using PlatformObject = const void*;
 #elif DATAREF_WASM
-  #include <emscripten/bind.h>
+  #include <emscripten/val.h>
   using PlatformObject = emscripten::val;
 #else
   using PlatformObject = const void*;

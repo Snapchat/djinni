@@ -13,7 +13,7 @@ SRCS := $(shell find $(SRC_DIRS) -name *.cpp ! -name *Proto*)
 OBJS := $(addsuffix .o,$(basename $(SRCS)))
 DEPS := $(OBJS:.o=.d)
 
-INC_DIRS := $(GEN_DIR)/cpp $(LIB_DIR) $(LIB_DIR)/wasm $(LIB_DIR)/cpp $(IMP_DIR)
+INC_DIRS := $(GEN_DIR)/cpp $(LIB_DIR) $(LIB_DIR)/wasm $(LIB_DIR)/cpp $(IMP_DIR) .
 INC_FLAGS := $(addprefix -I,$(INC_DIRS))
 
 CPPFLAGS ?= $(INC_FLAGS) -MMD -MP -std=c++17 --bind -Os
