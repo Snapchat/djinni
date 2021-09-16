@@ -194,8 +194,8 @@ static void DataRefHelper_nativeDestroy(JNIEnv* /*unused*/, jclass /*unused*/, j
 }
 
 static const JNINativeMethod kNativeMethods[] = {{
-    (char*) "nativeDestroy",
-    (char*) "(J)V",
+    const_cast<char*>("nativeDestroy"),
+    const_cast<char*>("(J)V"),
     reinterpret_cast<void*>(&DataRefHelper_nativeDestroy),
 }};
 
