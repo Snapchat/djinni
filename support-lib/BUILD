@@ -54,3 +54,21 @@ java_library(
     srcs = glob(["java/**/*.java"]),
     visibility = ["//visibility:public"],
 )
+
+cc_library(
+    name = "djinni-support-wasm",
+    srcs = glob(["wasm/*.cpp"]) + ["cpp/DataRef.cpp"],
+    hdrs = glob(["wasm/*.hpp"]),
+    includes = ["wasm"],
+    defines = ["DATAREF_WASM=1"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//support-lib:djinni-support-common",
+    ],
+)
+
+sh_library(
+    name = "djinni-support-ts",
+    data = glob(["ts/*.ts"]),
+    visibility = ["//visibility:public"],
+)

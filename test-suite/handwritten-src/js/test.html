@@ -6,7 +6,7 @@
     <title>Djinni/WASM Test</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="testutils.js"></script>
-    <script src="test_cpp.js"></script>
+    <script src="test-wasm.js"></script>
   </head>
   <body>
     <h1>Djinni/WASM Test</h1>
@@ -34,7 +34,7 @@
          * Protobuf (not yet)
       -->
     <script>
-      tests().then(module => {
+      Module().then(module => {
           runTests(module, allTests);
       })
     </script>
