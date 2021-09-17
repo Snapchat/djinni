@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+set -eu
 cd examples/ts
 tsc
 browserify demo.js -o bundle.js

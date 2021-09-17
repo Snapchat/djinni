@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+set -eu
 cd test-suite/handwritten-src/ts
 tsc
 browserify main.js -o bundle.js

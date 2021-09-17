@@ -1,4 +1,5 @@
 #! /usr/bin/env bash
+set -eu
 cd perftest/ts
 tsc
 browserify perftest.js -o bundle.js
