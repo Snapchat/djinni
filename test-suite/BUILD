@@ -148,8 +148,6 @@ EMSCRIPTEN_LINKOPTS = [
     "-s MALLOC=emmalloc",  # Switch to using the much smaller implementation
     "-s MODULARIZE=1",  # Allows us to manually invoke the initialization of wasm
     "-s WASM_BIGINT=1", # We need to pass int64_t
-    "-s DISABLE_EXCEPTION_THROWING=0",  # Allow exception throwing
-    "-s DISABLE_EXCEPTION_CATCHING=0",  # Allow exception catching
 ]
 
 cc_binary(
