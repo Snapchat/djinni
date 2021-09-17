@@ -1,3 +1,3 @@
 #! /usr/bin/env bash
-protoc --objc_out=objc --java_out=java --cpp_out=cpp test.proto
-protoc --java_out=java --cpp_out=cpp test2.proto
+protoc --plugin=$(which protoc-gen-ts_proto) --objc_out=objc --java_out=java --cpp_out=cpp --ts_proto_out=ts test.proto
+protoc --plugin=$(which protoc-gen-ts_proto) --java_out=java --cpp_out=cpp --ts_proto_out=ts test2.proto

@@ -6,11 +6,11 @@
 namespace djinni_generated {
 
 auto NativeRecordWithEmbeddedProto::toCpp(const JsType& j) -> CppType {
-    return {::djinni::Protobuf<::djinni::test::Person>::Boxed::toCpp(j["person"])};
+    return {::djinni::Protobuf<::djinni::test::Person, ::djinni::JsClassName<'p','r','o','t','o','t','e','s','t','.','P','e','r','s','o','n'>>::Boxed::toCpp(j["person"])};
 }
 auto NativeRecordWithEmbeddedProto::fromCpp(const CppType& c) -> JsType {
     em::val js = em::val::object();
-    js.set("person", ::djinni::Protobuf<::djinni::test::Person>::Boxed::fromCpp(c.person));
+    js.set("person", ::djinni::Protobuf<::djinni::test::Person, ::djinni::JsClassName<'p','r','o','t','o','t','e','s','t','.','P','e','r','s','o','n'>>::Boxed::fromCpp(c.person));
     return js;
 }
 

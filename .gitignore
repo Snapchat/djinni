@@ -16,3 +16,4 @@ djinni-output-temp/
 /perftest/typescript/*.js
 test-suite/handwritten-src/js/test_cpp.js
 test-suite/handwritten-src/ts/*.js
+test-suite/djinni/vendor/third-party/proto/ts/*.js

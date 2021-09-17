@@ -68,8 +68,8 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         f
       case p: MProtobuf =>
         assert(tm.args.size == 0)
-        val fqJavaProtoClass = p.body.java.pkg.replaceAllLiterally(".", "/") + "$" + p.name
-        s"""<${withNs(Some(p.body.cpp.ns), p.name)}>"""
+        val tsname = if (p.body.ts.ns.isEmpty) p.name else p.body.ts.ns + "." + p.name
+        s"""<${withNs(Some(p.body.cpp.ns), p.name)}, ${jsClassNameAsCppType(tsname)}>"""
       case MArray =>
         assert(tm.args.size == 1)
         s"""<${helperClass(tm.args.head)}>"""
@@ -102,6 +102,11 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
   }
 
   private def stubParamName(name: String): String = s"w_${idCpp.local(name)}"
+
+  def jsClassNameAsCppType(jsClass: String): String = {
+    val classNameChars = jsClass.toList.map(c => s"'$c'")
+    s"""::djinni::JsClassName<${classNameChars.mkString(",")}>"""
+  }
 
   def include(ident: String) = q(spec.wasmIncludePrefix + wasmFilenameStyle(ident) + "." + spec.cppHeaderExt)
 

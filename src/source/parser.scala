@@ -349,7 +349,7 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
     o match {
       case Some(oo) => Some(ProtobufMessage.Objc(oo("header"), oo("prefix")))
       case None => None},
-    ProtobufMessage.Ts(ts("module"))
+    ProtobufMessage.Ts(ts("module"), ts("namespace"))
   )
   for(message <- doc.get("messages").asInstanceOf[java.util.List[String]]) {
     val ident = Ident(message, fileStack.top, Loc(fileStack.top, 1, 1))

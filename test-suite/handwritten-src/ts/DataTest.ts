@@ -3,14 +3,12 @@ import * as test from "../../generated-src/ts/test";
 import {DjinniModule} from "@djinni_support/DjinniModule"
 
 class DataTest extends TestCase {
-    m: test.Module_statics;
-    djinni: DjinniModule;
+    m: test.Module_statics & DjinniModule;
     test: test.DataRefTest;
 
     constructor(module: any) {
         super(module);
-        this.m = <test.Module_statics>module;
-        this.djinni = <DjinniModule>module;
+        this.m = <test.Module_statics & DjinniModule>module;
     }
 
     setUp() {
@@ -19,7 +17,7 @@ class DataTest extends TestCase {
 
     testSend() {
         var input = [0, 1, 2, 3];
-        var buf = this.djinni.allocateWasmBuffer(4);
+        var buf = this.m.allocateWasmBuffer(4);
         buf.set(input);
         this.test.sendData(buf);
         var output = this.test.retriveAsBin();
@@ -28,7 +26,7 @@ class DataTest extends TestCase {
 
     testSendMutable() {
         var input = [0, 1, 2, 3];
-        var buf = this.djinni.allocateWasmBuffer(4);
+        var buf = this.m.allocateWasmBuffer(4);
         buf.set(input);
         this.test.sendMutableData(buf);
         assertArrayEq([3, 2, 1, 0], buf);
@@ -52,7 +50,7 @@ class DataTest extends TestCase {
 
     testSendDataView() {
         var input = [0, 1, 2, 3];
-        var buf = this.djinni.allocateWasmBuffer(4);
+        var buf = this.m.allocateWasmBuffer(4);
         buf.set(input);
         var output = this.test.sendDataView(buf);
         assertArrayEq(input, output);

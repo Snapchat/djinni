@@ -93,5 +93,5 @@ object ProtobufMessage {
   case class Cpp(header: String, ns: String)
   case class Java(pkg: String)
   case class Objc(header: String, prefix: String)
-  case class Ts(module: String)
+  case class Ts(module: String, ns: String)
 }

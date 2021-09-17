@@ -180,7 +180,8 @@ sh_binary(
     data = glob(["handwritten-src/ts/*.html",
                  "handwritten-src/ts/*.ts",
                  "handwritten-src/ts/*.json",
-                 "handwritten-src/ts/proto/ts/*.ts",
+                 "djinni/vendor/third-party/proto/ts/*.ts",
+                 "djinni/vendor/third-party/proto/ts/node_modules/**",
                  "generated-src/ts/*.ts"]) + [":wasm"]
 )
 

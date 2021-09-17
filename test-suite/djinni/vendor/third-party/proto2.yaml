@@ -4,7 +4,8 @@ cpp:
 java:
     class: 'djinni.test2.Test2'
 ts:
-  module: 'proto/ts/prototest2'
+    module: '../../djinni/vendor/third-party/proto/ts/test2'
+    namespace: 'prototest2'
  
 messages:
     - PersistingState

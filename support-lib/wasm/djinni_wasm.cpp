@@ -108,6 +108,11 @@ EM_JS(void, djinni_init_wasm, (), {
         Module.readNativeMemory = function(cls, nativePtr, nativeSize) {
             return new cls(Module.HEAPU8.buffer.slice(nativePtr, nativePtr + nativeSize));
         };
+
+        Module.protobuf = {};
+        Module.registerProtobufLib = function(name, proto) {
+            Module.protobuf[name] = proto;
+        }
 });
 
 EMSCRIPTEN_BINDINGS(djinni_wasm) {

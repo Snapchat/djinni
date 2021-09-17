@@ -16,6 +16,10 @@ namespace em = emscripten;
 
 namespace djinni {
 
+extern em::val getCppProxyFinalizerRegistry();
+extern em::val getCppProxyClass();
+extern em::val getWasmMemoryBuffer();
+
 template<typename T>
 class InstanceTracker {
 #ifdef DJINNI_WASM_TRACK_INSTANCES
@@ -260,8 +264,27 @@ struct Outcome
     }
 };
 
-// TODO
-template<typename CPP_PROTO>
+template<char... chars>
+class JsClassName {
+public:
+    static em::val resolve() {
+        static em::val cls = [] {
+            std::string name = {chars...};
+            em::val ns = em::val::module_property("protobuf");
+            std::string::size_type i = 0;
+            std::string::size_type j = name.find('.', i);
+            while (j != std::string::npos) {
+                ns = ns[name.substr(i, j - i)];
+                i = j + 1;
+                j = name.find('.', i);
+            }
+            return ns[name.substr(i)];
+        }();
+        return cls;
+    }
+};
+
+template<typename CPP_PROTO, typename JS_PROTO>
 class Protobuf {
 public:
     using CppType = CPP_PROTO;
@@ -271,12 +294,31 @@ public:
 
     static CppType toCpp(JsType j)
     {
-        return {};
+        em::val jsClass = JS_PROTO::resolve();
+        auto writer = jsClass.call<em::val>("encode", j);
+        auto bytes = writer.call<em::val>("finish");
+        size_t length = bytes["byteLength"].as<int>();
+        std::vector<uint8_t> cbuf(length);
+        static em::val writeNativeMemory = em::val::module_property("writeNativeMemory");
+        writeNativeMemory(bytes, reinterpret_cast<uint32_t>(cbuf.data()));
+        CPP_PROTO ret;
+        [[maybe_unused]]
+        bool success = ret.ParseFromArray(cbuf.data(), static_cast<int>(length));
+        assert(success);
+        return ret;
     }
         
     static JsType fromCpp(const CppType& c)
     {
-        return em::val::object();
+        std::vector<uint8_t> cbuf(c.ByteSizeLong());
+        c.SerializeToArray(cbuf.data(), static_cast<int>(cbuf.size()));
+
+        unsigned addr = reinterpret_cast<unsigned>(cbuf.data());
+        unsigned size = static_cast<unsigned>(cbuf.size());
+        static auto uint8ArrayClass = em::val::global("Uint8Array");
+        em::val array = uint8ArrayClass.new_(::djinni::getWasmMemoryBuffer(), addr, size);
+        em::val jsClass = JS_PROTO::resolve();
+        return jsClass.call<em::val>("decode", array);
     }
 };
 
@@ -373,10 +415,6 @@ extern std::unordered_map<JsProxyId, std::weak_ptr<JsProxyBase>> jsProxyCache;
 extern std::unordered_map<void*, em::val> cppProxyCache;
 extern std::mutex jsProxyCacheMutex;
 extern std::mutex cppProxyCacheMutex;
-
-extern em::val getCppProxyFinalizerRegistry();
-extern em::val getCppProxyClass();
-extern em::val getWasmMemoryBuffer();
 
 template<typename I, typename Self>
 struct JsInterface {
