@@ -2,13 +2,20 @@ import {TestCase, allTests, assertArrayEq, assertEq} from "./testutils"
 import * as test from "../../generated-src/ts/test";
 import * as prototest from "../../djinni/vendor/third-party/proto/ts/test"
 import {DjinniModule} from "@djinni_support/DjinniModule"
+import { Writer } from "protobufjs/minimal";
 
 export class ProtoTest extends TestCase {
-    m: test.Module_statics & DjinniModule;
-    constructor(module: any) {
+    m: test.Module_statics;
+    constructor(module: test.Module_statics & DjinniModule) {
         super(module);
-        this.m = <test.Module_statics & DjinniModule>module;
-        this.m.registerProtobufLib("prototest", prototest);
+        this.m = module;
+        // register protobuf types with wasm module
+        module.registerProtobufLib("prototest", prototest);
+        // optional: override buffer allocator, make it avialble to wasm without
+        // copying.
+        Writer.alloc = function(size) {
+            return module.allocateWasmBuffer(size);
+        }
     }
 
     testJsToNative() {

@@ -179,7 +179,7 @@ sh_binary(
                  "handwritten-src/ts/*.ts",
                  "handwritten-src/ts/*.json",
                  "djinni/vendor/third-party/proto/ts/*.ts",
-                 "djinni/vendor/third-party/proto/ts/node_modules/**",
+                 "node_modules/**",
                  "generated-src/ts/*.ts"]) + [":wasm"]
 )
 

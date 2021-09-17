@@ -298,13 +298,16 @@ public:
         auto writer = jsClass.call<em::val>("encode", j);
         auto bytes = writer.call<em::val>("finish");
         size_t length = bytes["byteLength"].as<int>();
-        std::vector<uint8_t> cbuf(length);
-        static em::val writeNativeMemory = em::val::module_property("writeNativeMemory");
-        writeNativeMemory(bytes, reinterpret_cast<uint32_t>(cbuf.data()));
         CPP_PROTO ret;
-        [[maybe_unused]]
-        bool success = ret.ParseFromArray(cbuf.data(), static_cast<int>(length));
-        assert(success);
+        if (bytes["buffer"] == getWasmMemoryBuffer()) {
+            const void* pbytes = reinterpret_cast<void*>(bytes["byteOffset"].as<unsigned>());
+            ret.ParseFromArray(pbytes, static_cast<int>(length));
+        } else {
+            std::vector<uint8_t> cbuf(length);
+            static em::val writeNativeMemory = em::val::module_property("writeNativeMemory");
+            writeNativeMemory(bytes, reinterpret_cast<uint32_t>(cbuf.data()));
+            ret.ParseFromArray(cbuf.data(), static_cast<int>(length));
+        }
         return ret;
     }
         

@@ -6,9 +6,9 @@ class DataTest extends TestCase {
     m: test.Module_statics & DjinniModule;
     test: test.DataRefTest;
 
-    constructor(module: any) {
+    constructor(module: test.Module_statics & DjinniModule) {
         super(module);
-        this.m = <test.Module_statics & DjinniModule>module;
+        this.m = module;
     }
 
     setUp() {
