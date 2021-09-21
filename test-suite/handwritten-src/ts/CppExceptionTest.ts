@@ -1,13 +1,14 @@
-import {TestCase, allTests, assertNe} from "./testutils"
+import {TestCase, allTests, assertEq} from "./testutils"
 import * as test from "../../generated-src/ts/test";
+import {DjinniModule} from "@djinni_support/DjinniModule"
 
 class CppExceptionTest extends TestCase  {
-    m: test.Module_statics;
+    m: test.Module_statics & DjinniModule;
     cppInterface: test.CppException;
 
-    constructor(module) {
+    constructor(module: test.Module_statics & DjinniModule) {
         super(module);
-        this.m = <test.Module_statics>module;
+        this.m = module;
     }
 
     setUp() {
@@ -19,11 +20,9 @@ class CppExceptionTest extends TestCase  {
         try {
             this.cppInterface.throwAnException();
         } catch (e) {
-            thrown = e;
+            thrown = this.m.getExceptionMessage(e);
         }
-        // In JS all we get is a number (probably a pointer)
-        // Don't know how to get to the actual exception object.
-        assertNe(thrown, null);
+        assertEq(thrown, "Exception Thrown");
     }
 }
 

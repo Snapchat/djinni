@@ -65,7 +65,7 @@ em::val DataObject::createJsObject() {
     return jsObj;
 }
 
-em::val allocateWasmBuffer(unsigned size) {
+static em::val allocateWasmBuffer(unsigned size) {
     auto* dbuf = new GenericBuffer<std::vector<uint8_t>>(size);
     return dbuf->createJsObject();
 }
@@ -73,6 +73,11 @@ em::val allocateWasmBuffer(unsigned size) {
 extern "C" EMSCRIPTEN_KEEPALIVE
 void releaseWasmBuffer(unsigned addr) {
     delete reinterpret_cast<DataObject*>(addr);
+}
+
+static std::string getExceptionMessage(int eptr)
+{
+    return reinterpret_cast<std::exception*>(eptr)->what();
 }
 
 EM_JS(void, djinni_init_wasm, (), {
@@ -118,6 +123,7 @@ EM_JS(void, djinni_init_wasm, (), {
 EMSCRIPTEN_BINDINGS(djinni_wasm) {
     djinni_init_wasm();    
     em::function("allocateWasmBuffer", &allocateWasmBuffer);
+    em::function("getExceptionMessage", &getExceptionMessage);
 }
 
 }
