@@ -1,0 +1,9 @@
+{
+  "name": "test-suite",
+  "version": "1.0.0",
+  "description": "djinni test suite",
+  "dependencies": {
+    "ts-proto": "^1.83.1"
+  },
+  "devDependencies": {}
+}
