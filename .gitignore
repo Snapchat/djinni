@@ -17,3 +17,5 @@ djinni-output-temp/
 test-suite/handwritten-src/js/test_cpp.js
 test-suite/handwritten-src/ts/*.js
 test-suite/djinni/vendor/third-party/proto/ts/*.js
+/test-suite/node_modules/
+/test-suite/package-lock.json
