@@ -99,7 +99,11 @@ EM_JS(void, djinni_init_wasm, (), {
                 let self = this;
                 methods.forEach(function(method) {
                     self[method] = function(...args) {
-                        return nativeRef[method](...args);
+                        try {
+                            return nativeRef[method](...args);
+                        } catch (e) {
+                            throw new Error(Module.getExceptionMessage(e));
+                        }
                     }
                 });
             }

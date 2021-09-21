@@ -1,12 +1,11 @@
 import {TestCase, allTests, assertEq} from "./testutils"
 import * as test from "../../generated-src/ts/test";
-import {DjinniModule} from "@djinni_support/DjinniModule"
 
 class CppExceptionTest extends TestCase  {
-    m: test.Module_statics & DjinniModule;
+    m: test.Module_statics;
     cppInterface: test.CppException;
 
-    constructor(module: test.Module_statics & DjinniModule) {
+    constructor(module: test.Module_statics) {
         super(module);
         this.m = module;
     }
@@ -20,9 +19,9 @@ class CppExceptionTest extends TestCase  {
         try {
             this.cppInterface.throwAnException();
         } catch (e) {
-            thrown = this.m.getExceptionMessage(e);
+            thrown = e;
         }
-        assertEq(thrown, "Exception Thrown");
+        assertEq(thrown, new Error("Exception Thrown"));
     }
 }
 
