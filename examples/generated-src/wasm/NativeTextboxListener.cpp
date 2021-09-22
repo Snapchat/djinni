@@ -8,7 +8,8 @@ namespace djinni_generated {
 
 
 void NativeTextboxListener::JsProxy::update(const ::textsort::ItemList & items) {
-    return _jsRef().call<void>("update", ::djinni_generated::NativeItemList::fromCpp(items));
+    auto ret = callMethod("update", ::djinni_generated::NativeItemList::fromCpp(items));
+    checkError(ret);
 }
 
 EMSCRIPTEN_BINDINGS(textbox_listener) {

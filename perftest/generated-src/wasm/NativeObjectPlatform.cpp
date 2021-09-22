@@ -7,7 +7,8 @@ namespace djinni_generated {
 
 
 void NativeObjectPlatform::JsProxy::onDone() {
-    return _jsRef().call<void>("onDone");
+    auto ret = callMethod("onDone");
+    checkError(ret);
 }
 
 EMSCRIPTEN_BINDINGS(ObjectPlatform) {

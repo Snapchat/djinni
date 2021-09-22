@@ -84,6 +84,9 @@ cc_binary(
         "generated-src/wasm/*.cpp",
         "generated-src/wasm/*.hpp",
     ]),
+    copts = [
+        "-fexceptions",
+    ],
     linkopts = EMSCRIPTEN_LINKOPTS,
     deps = [
         ":benchmark-common",

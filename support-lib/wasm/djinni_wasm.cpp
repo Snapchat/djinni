@@ -42,6 +42,12 @@ const em::val& JsProxyBase::_jsRef() const {
     return _js;
 }
 
+void JsProxyBase::checkError(const em::val& v) {
+    if (v.instanceof(em::val::global("Error"))) {
+        throw JsException(v["message"].as<std::string>());
+    }
+}
+
 em::val getCppProxyFinalizerRegistry() {
     static auto inst  = em::val::module_property("cppProxyFinalizerRegistry");
     return inst;
@@ -117,7 +123,15 @@ EM_JS(void, djinni_init_wasm, (), {
         Module.protobuf = {};
         Module.registerProtobufLib = function(name, proto) {
             Module.protobuf[name] = proto;
-        }
+        };
+
+        Module.callJsProxyMethod = function(func, ...args) {
+            try {
+                return func(...args);
+            } catch (e) {
+                return e;
+            }
+        };
 });
 
 EMSCRIPTEN_BINDINGS(djinni_wasm) {

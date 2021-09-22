@@ -1,3 +1,4 @@
+import {DjinniModule} from "@djinni_support/DjinniModule"
 import {runTests, allTests} from "./testutils"
 import "./ArrayTest"
 import "./ClientInterfaceTest"
@@ -16,7 +17,7 @@ import "./SetRecordTest"
 import "./TokenTest"
 import "./WcharTest"
 
-declare function Module(): Promise<any>;
+declare function Module(): Promise<DjinniModule>;
 Module().then(m => {
     runTests(m, allTests);
 })

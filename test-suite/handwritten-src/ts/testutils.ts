@@ -1,3 +1,5 @@
+import {DjinniModule} from "@djinni_support/DjinniModule"
+
 var failed: string[];
 var currentTest: string;
 
@@ -30,7 +32,7 @@ export class TestCase {
     tearDown() {}
 }
 
-export function runTests(module: any, tests: Array<typeof TestCase>) {
+export function runTests(module: DjinniModule, tests: Array<typeof TestCase>) {
     failed = [];
     var totalTests = 0;
     let runStart = performance.now();
@@ -50,7 +52,7 @@ export function runTests(module: any, tests: Array<typeof TestCase>) {
                     testCase[methodName]();
                     testCase.tearDown();
                 }catch (err) {
-                    console.log(err);
+                    console.log('C++ exception: ' + module.getExceptionMessage(err));
                     assertTrue(false);
                 }
                 let status = failed.length > numberOfFailsBeforeThisTest ? '[  FAILED  ] ' : '[       OK ] ';

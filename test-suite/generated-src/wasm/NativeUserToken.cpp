@@ -17,7 +17,9 @@ std::string NativeUserToken::whoami(const CppType& self) {
 }
 
 std::string NativeUserToken::JsProxy::whoami() {
-    return ::djinni::String::toCpp(_jsRef().call<std::string>("whoami"));
+    auto ret = callMethod("whoami");
+    checkError(ret);
+    return ::djinni::String::toCpp(ret.as<std::string>());
 }
 
 EMSCRIPTEN_BINDINGS(user_token) {

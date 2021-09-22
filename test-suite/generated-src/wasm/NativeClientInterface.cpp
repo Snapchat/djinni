@@ -8,27 +8,37 @@ namespace djinni_generated {
 
 
 ::testsuite::ClientReturnedRecord NativeClientInterface::JsProxy::get_record(int64_t record_id,const std::string & utf8string,const std::experimental::optional<std::string> & misc) {
-    return ::djinni_generated::NativeClientReturnedRecord::toCpp(_jsRef().call<em::val>("getRecord", ::djinni::I64::fromCpp(record_id),
-                                                                                                     ::djinni::String::fromCpp(utf8string),
-                                                                                                     ::djinni::Optional<std::experimental::optional, ::djinni::String>::fromCpp(misc)));
+    auto ret = callMethod("getRecord", ::djinni::I64::fromCpp(record_id),
+                                       ::djinni::String::fromCpp(utf8string),
+                                       ::djinni::Optional<std::experimental::optional, ::djinni::String>::fromCpp(misc));
+    checkError(ret);
+    return ::djinni_generated::NativeClientReturnedRecord::toCpp(ret);
 }
 
 double NativeClientInterface::JsProxy::identifier_check(const std::vector<uint8_t> & data,int32_t r,int64_t jret) {
-    return ::djinni::F64::toCpp(_jsRef().call<double>("identifierCheck", ::djinni::Binary::fromCpp(data),
-                                                                         ::djinni::I32::fromCpp(r),
-                                                                         ::djinni::I64::fromCpp(jret)));
+    auto ret = callMethod("identifierCheck", ::djinni::Binary::fromCpp(data),
+                                             ::djinni::I32::fromCpp(r),
+                                             ::djinni::I64::fromCpp(jret));
+    checkError(ret);
+    return ::djinni::F64::toCpp(ret.as<double>());
 }
 
 std::string NativeClientInterface::JsProxy::return_str() {
-    return ::djinni::String::toCpp(_jsRef().call<std::string>("returnStr"));
+    auto ret = callMethod("returnStr");
+    checkError(ret);
+    return ::djinni::String::toCpp(ret.as<std::string>());
 }
 
 std::string NativeClientInterface::JsProxy::meth_taking_interface(const std::shared_ptr<::testsuite::ClientInterface> & i) {
-    return ::djinni::String::toCpp(_jsRef().call<std::string>("methTakingInterface", ::djinni_generated::NativeClientInterface::fromCpp(i)));
+    auto ret = callMethod("methTakingInterface", ::djinni_generated::NativeClientInterface::fromCpp(i));
+    checkError(ret);
+    return ::djinni::String::toCpp(ret.as<std::string>());
 }
 
 std::string NativeClientInterface::JsProxy::meth_taking_optional_interface(const std::shared_ptr<::testsuite::ClientInterface> & i) {
-    return ::djinni::String::toCpp(_jsRef().call<std::string>("methTakingOptionalInterface", ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeClientInterface>::fromCpp(i)));
+    auto ret = callMethod("methTakingOptionalInterface", ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeClientInterface>::fromCpp(i));
+    checkError(ret);
+    return ::djinni::String::toCpp(ret.as<std::string>());
 }
 
 EMSCRIPTEN_BINDINGS(client_interface) {

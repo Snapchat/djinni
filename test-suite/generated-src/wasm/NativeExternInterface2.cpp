@@ -9,7 +9,9 @@ namespace djinni_generated {
 
 
 ::ExternRecordWithDerivings NativeExternInterface2::JsProxy::foo(const std::shared_ptr<::testsuite::TestHelpers> & i) {
-    return ::djinni_generated::NativeExternRecordWithDerivings::toCpp(_jsRef().call<em::val>("foo", ::djinni_generated::NativeTestHelpers::fromCpp(i)));
+    auto ret = callMethod("foo", ::djinni_generated::NativeTestHelpers::fromCpp(i));
+    checkError(ret);
+    return ::djinni_generated::NativeExternRecordWithDerivings::toCpp(ret);
 }
 
 EMSCRIPTEN_BINDINGS(extern_interface_2) {

@@ -403,11 +403,23 @@ struct Array<F64> : PrimitiveArray<F64> {
 
 using JsProxyId = uint64_t;
 
+class JsException : public std::runtime_error {
+public:
+    JsException(const std::string& what): std::runtime_error(what) {}
+};
+
 class JsProxyBase {
 public:
     JsProxyBase(const em::val& v);
     virtual ~JsProxyBase();
     const em::val& _jsRef() const;
+    template<typename ...Args>
+    em::val callMethod(const char* name, Args&&... args) {
+        em::val caller = em::val::module_property("callJsProxyMethod");
+        return caller(_js[name], std::forward<Args>(args)...);
+    }
+protected:
+    void checkError(const em::val& v);
 private:
     em::val _js;
     JsProxyId _id;

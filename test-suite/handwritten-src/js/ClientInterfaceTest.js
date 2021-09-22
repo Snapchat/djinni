@@ -1,6 +1,7 @@
 class ClientInterfaceImpl {
     getRecord(id, utf8String, misc) {
         if (utf8String != "Non-ASCII /\0 非 ASCII 字符" && utf8String != "Hello World!") {
+            throw new Error("Unexpected string. Check UTF-8?");
         }
         return {recordId: id,
                 content: utf8String,

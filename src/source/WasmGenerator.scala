@@ -343,20 +343,23 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
               s"${cppMarshal.fqParamType(p.ty)} ${idCpp.local(p.ident)}"
             }).mkString(","))
             w.w(s")$constModifier").braced {
-              val retPrefix = if (m.ret.isEmpty) "" else s"${helperClass(m.ret.get.resolved)}::toCpp("
-              val retSuffix = if (m.ret.isEmpty) "" else ")"
               val methodName = q(idJs.method(m.ident.name)) + (if (m.params.isEmpty) "" else ", ")
-              writeAlignedCall(w, s"""return ${retPrefix}_jsRef().call<${stubRetType(m)}>($methodName""", m.params, s")${retSuffix}", p => {
+              writeAlignedCall(w, s"auto ret = callMethod($methodName", m.params, s")", p => {
                 s"${helperClass(p.ty.resolved)}::fromCpp(${idCpp.local(p.ident)})"
               })
               w.wl(";")
+              w.wl("checkError(ret);")
+              stubRetType(m) match {
+                case "void" =>
+                case "em::val" => w.wl(s"return ${helperClass(m.ret.get.resolved)}::toCpp(ret);")
+                case _ => w.wl(s"return ${helperClass(m.ret.get.resolved)}::toCpp(ret.as<${stubRetType(m)}>());")
+              }
             }
             w.wl
           }
         }
       }
       // embind
-      //val nsprefix = spec.cppNamespace.replaceAll("::", "_")
       w.w(s"EMSCRIPTEN_BINDINGS(${ident.name})").braced {
         w.wl(s"""em::class_<$cls>("${idJs.ty(ident.name)}")""").nested {
           w.wl(s""".smart_ptr<std::shared_ptr<$cls>>("${idJs.ty(ident.name)}")""")

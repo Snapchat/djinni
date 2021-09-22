@@ -62,6 +62,9 @@ cc_library(
     includes = ["wasm"],
     defines = ["DATAREF_WASM=1"],
     visibility = ["//visibility:public"],
+    copts = [
+        "-fexceptions",
+    ],
     deps = [
         "//support-lib:djinni-support-common",
     ],

@@ -34,23 +34,33 @@ em::val NativeEnumUsageInterface::m(const CppType& self, const em::val& w_m) {
 }
 
 ::testsuite::color NativeEnumUsageInterface::JsProxy::e(::testsuite::color e) {
-    return ::djinni_generated::NativeColor::toCpp(_jsRef().call<int32_t>("e", ::djinni_generated::NativeColor::fromCpp(e)));
+    auto ret = callMethod("e", ::djinni_generated::NativeColor::fromCpp(e));
+    checkError(ret);
+    return ::djinni_generated::NativeColor::toCpp(ret.as<int32_t>());
 }
 
 std::experimental::optional<::testsuite::color> NativeEnumUsageInterface::JsProxy::o(std::experimental::optional<::testsuite::color> o) {
-    return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeColor>::toCpp(_jsRef().call<em::val>("o", ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeColor>::fromCpp(o)));
+    auto ret = callMethod("o", ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeColor>::fromCpp(o));
+    checkError(ret);
+    return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeColor>::toCpp(ret);
 }
 
 std::vector<::testsuite::color> NativeEnumUsageInterface::JsProxy::l(const std::vector<::testsuite::color> & l) {
-    return ::djinni::List<::djinni_generated::NativeColor>::toCpp(_jsRef().call<em::val>("l", ::djinni::List<::djinni_generated::NativeColor>::fromCpp(l)));
+    auto ret = callMethod("l", ::djinni::List<::djinni_generated::NativeColor>::fromCpp(l));
+    checkError(ret);
+    return ::djinni::List<::djinni_generated::NativeColor>::toCpp(ret);
 }
 
 std::unordered_set<::testsuite::color> NativeEnumUsageInterface::JsProxy::s(const std::unordered_set<::testsuite::color> & s) {
-    return ::djinni::Set<::djinni_generated::NativeColor>::toCpp(_jsRef().call<em::val>("s", ::djinni::Set<::djinni_generated::NativeColor>::fromCpp(s)));
+    auto ret = callMethod("s", ::djinni::Set<::djinni_generated::NativeColor>::fromCpp(s));
+    checkError(ret);
+    return ::djinni::Set<::djinni_generated::NativeColor>::toCpp(ret);
 }
 
 std::unordered_map<::testsuite::color, ::testsuite::color> NativeEnumUsageInterface::JsProxy::m(const std::unordered_map<::testsuite::color, ::testsuite::color> & m) {
-    return ::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::toCpp(_jsRef().call<em::val>("m", ::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::fromCpp(m)));
+    auto ret = callMethod("m", ::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::fromCpp(m));
+    checkError(ret);
+    return ::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::toCpp(ret);
 }
 
 EMSCRIPTEN_BINDINGS(enum_usage_interface) {
