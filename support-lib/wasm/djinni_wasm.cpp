@@ -15,13 +15,13 @@ em::val Binary::getArrayClass() {
 }
 
 Date::CppType Date::toCpp(const JsType& j) {
-    auto nanosSinceEpoch = std::chrono::nanoseconds(static_cast<int64_t>(j.call<em::val>("getTime").as<double>() * 1000000));
+    auto nanosSinceEpoch = std::chrono::nanoseconds(static_cast<int64_t>(j.call<em::val>("getTime").as<double>() * 1'000'000));
     return CppType(std::chrono::duration_cast<std::chrono::system_clock::duration>(nanosSinceEpoch));
 }
 Date::JsType Date::fromCpp(const CppType& c) {
     auto nanosSinceEpoch = std::chrono::duration_cast<std::chrono::nanoseconds>(c.time_since_epoch());
     static em::val dateType = em::val::global("Date");
-    return dateType.new_(static_cast<double>(nanosSinceEpoch.count()) / 1000000.0);
+    return dateType.new_(static_cast<double>(nanosSinceEpoch.count()) / 1'000'000.0);
 }
 
 JsProxyId nextId = 0;

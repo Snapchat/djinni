@@ -234,31 +234,31 @@ public:
 // { result: ...}
 // js error type:
 // { error: ...}
-template <class RESULT, class ERROR>
+template <class Result, class Error>
 struct Outcome
 {
-    using CppType = expected<typename RESULT::CppType, typename ERROR::CppType>;
+    using CppType = expected<typename Result::CppType, typename Error::CppType>;
     using JsType = em::val;
     using Boxed = Outcome;
     
     static CppType toCpp(const JsType& j) {
         em::val res = j["result"];
         if (!res.isUndefined()) {
-            return RESULT::Boxed::toCpp(res);
+            return Result::Boxed::toCpp(res);
         } else {
             em::val err = j["error"];
             assert(!err.isUndefined());
-            return make_unexpected(ERROR::Boxed::toCpp(err));
+            return make_unexpected(Error::Boxed::toCpp(err));
         }
     }
     static JsType fromCpp(const CppType& c) {
         if (c.has_value()) {
             em::val res = em::val::object();
-            res.set("result", RESULT::Boxed::fromCpp(c.value()));
+            res.set("result", Result::Boxed::fromCpp(c.value()));
             return res;
         } else {
             em::val err = em::val::object();
-            err.set("error", ERROR::Boxed::fromCpp(c.error()));
+            err.set("error", Error::Boxed::fromCpp(c.error()));
             return err;
         }
     }
@@ -284,21 +284,21 @@ public:
     }
 };
 
-template<typename CPP_PROTO, typename JS_PROTO>
+template<typename CppProto, typename JsProto>
 class Protobuf {
 public:
-    using CppType = CPP_PROTO;
+    using CppType = CppProto;
     using JsType = em::val;
 
     using Boxed = Protobuf;
 
     static CppType toCpp(JsType j)
     {
-        em::val jsClass = JS_PROTO::resolve();
+        em::val jsClass = JsProto::resolve();
         auto writer = jsClass.call<em::val>("encode", j);
         auto bytes = writer.call<em::val>("finish");
         size_t length = bytes["byteLength"].as<int>();
-        CPP_PROTO ret;
+        CppProto ret;
         if (bytes["buffer"] == getWasmMemoryBuffer()) {
             const void* pbytes = reinterpret_cast<void*>(bytes["byteOffset"].as<unsigned>());
             ret.ParseFromArray(pbytes, static_cast<int>(length));
@@ -320,7 +320,7 @@ public:
         unsigned size = static_cast<unsigned>(cbuf.size());
         static auto uint8ArrayClass = em::val::global("Uint8Array");
         em::val array = uint8ArrayClass.new_(::djinni::getWasmMemoryBuffer(), addr, size);
-        em::val jsClass = JS_PROTO::resolve();
+        em::val jsClass = JsProto::resolve();
         return jsClass.call<em::val>("decode", array);
     }
 };
@@ -546,7 +546,6 @@ public:
     GenericBuffer(const typename T::value_type* data, typename T::size_type size) :
         _buffer(data, data + size) {}
     GenericBuffer(T&& toTakeOver) : _buffer(std::move(toTakeOver)) {}
-    ~GenericBuffer() override {}
     unsigned addr() override {
         return reinterpret_cast<unsigned>(_buffer.data());
     }
