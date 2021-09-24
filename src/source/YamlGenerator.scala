@@ -216,7 +216,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
 }
 
 object YamlGenerator {
-  def metaFromYaml(td: ExternTypeDecl) = try { MExtern(
+  def metaFromYaml(td: ExternTypeDecl) = MExtern(
     td.ident.name.stripPrefix(td.properties("prefix").toString), // Make sure the generator uses this type with its original name for all intents and purposes
     td.params.size,
     defType(td),
@@ -249,21 +249,16 @@ object YamlGenerator {
       nested(td, "jni")("typename").toString,
       nested(td, "jni")("typeSignature").toString),
     MExtern.Wasm(
-      nested(td, "wasm")("typename").toString,
-      nested(td, "wasm")("translator").toString,
-      nested(td, "wasm")("header").toString),
+      nested(td, "wasm").getOrElse("typename", "[unspecified]").toString,
+      nested(td, "wasm").getOrElse("translator", "[unspecified]").toString,
+      nested(td, "wasm").getOrElse("header", "[unspecified]").toString),
     MExtern.Ts(
-      nested(td, "ts")("typename").toString,
-      nested(td, "ts")("module").toString)
-  )} catch {
-    case e: java.util.NoSuchElementException => {
-      println(s"in ${td.origin}")
-      throw e
-    }
-  }
+      nested(td, "ts").getOrElse("typename", "[unspecified]").toString,
+      nested(td, "ts").getOrElse("module", "[unspecified]").toString)
+  )
 
   private def nested(td: ExternTypeDecl, key: String) = {
-    Some(td.properties(key)).collect { case m: JMap[_, _] => m.collect { case (k: String, v: Any) => (k, v) } } getOrElse(Map[String, Any]())
+    td.properties.get(key).collect { case m: JMap[_, _] => m.collect { case (k: String, v: Any) => (k, v) } } getOrElse(Map[String, Any]())
   }
 
   private def defType(td: ExternTypeDecl) = td.body match {
