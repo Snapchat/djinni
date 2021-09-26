@@ -249,16 +249,27 @@ object YamlGenerator {
       nested(td, "jni")("typename").toString,
       nested(td, "jni")("typeSignature").toString),
     MExtern.Wasm(
-      nested(td, "wasm").getOrElse("typename", "[unspecified]").toString,
-      nested(td, "wasm").getOrElse("translator", "[unspecified]").toString,
-      nested(td, "wasm").getOrElse("header", "[unspecified]").toString),
+      getOptionalField(td, "wasm", "typename"),
+      getOptionalField(td, "wasm", "translator"),
+      getOptionalField(td, "wasm", "header")),
     MExtern.Ts(
-      nested(td, "ts").getOrElse("typename", "[unspecified]").toString,
-      nested(td, "ts").getOrElse("module", "[unspecified]").toString)
+      getOptionalField(td, "ts", "typename"),
+      getOptionalField(td, "ts", "module"))
   )
 
   private def nested(td: ExternTypeDecl, key: String) = {
     td.properties.get(key).collect { case m: JMap[_, _] => m.collect { case (k: String, v: Any) => (k, v) } } getOrElse(Map[String, Any]())
+  }
+
+  private def getOptionalField(td: ExternTypeDecl, key: String, subKey: String) = {
+    try {
+      nested(td, key)(subKey).toString
+    } catch {
+      case e: java.util.NoSuchElementException => {
+        println(s"Warning: in ${td.origin}, missing field $key/$subKey")
+        "[unspecified]"
+      }
+    }
   }
 
   private def defType(td: ExternTypeDecl) = td.body match {
