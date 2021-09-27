@@ -1,4 +1,5 @@
 #include "DataRef.hpp"
+#include <cassert>
 
 #if DATAREF_JNI
   #include "djinni_support.hpp"
