@@ -27,6 +27,8 @@ public:
     void baseline() override;
     void argString(const std::string& s) override;
     void argBinary(const std::vector<uint8_t>& b) override;
+    void argDataRef(const ::snapchat::djinni::DataRef& r) override;
+    void argDataView(const ::snapchat::djinni::DataView& d) override;
     void argEnumSixValue(EnumSixValue e) override;
     void argRecordSixInt(const RecordSixInt& r) override;
     void argListInt(const std::vector<int64_t>& v) override;

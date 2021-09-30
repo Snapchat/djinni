@@ -1,3 +1,6 @@
+@extern "../support-lib/dataref.yaml"
+@extern "../support-lib/dataview.yaml"
+
 EnumSixValue = enum {
     First;
     Second;
@@ -36,6 +39,8 @@ djinni_perf_benchmark = interface +c {
 
     argString(s: string);
     argBinary(b: binary);
+    argDataRef(r: DataRef);
+    argDataView(d: DataView);
     argEnumSixValue(e: EnumSixValue);
     argRecordSixInt(r: RecordSixInt);
     argListInt(v: list<i64>);

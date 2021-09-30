@@ -6,6 +6,8 @@
 #import "DJICppWrapperCache+Private.h"
 #import "DJIError.h"
 #import "DJIMarshal+Private.h"
+#import "DataRef_objc.hpp"
+#import "DataView_objc.hpp"
 #import "TXSEnumSixValue+Private.h"
 #import "TXSObjectNative+Private.h"
 #import "TXSObjectPlatform+Private.h"
@@ -63,6 +65,18 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
 - (void)argBinary:(nonnull NSData *)b {
     try {
         _cppRefHandle.get()->argBinary(::djinni::Binary::toCpp(b));
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
+- (void)argDataRef:(nonnull NSData *)r {
+    try {
+        _cppRefHandle.get()->argDataRef(::snapchat::djinni::NativeDataRef::toCpp(r));
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
+- (void)argDataView:(nonnull NSData *)d {
+    try {
+        _cppRefHandle.get()->argDataView(::snapchat::djinni::NativeDataView::toCpp(d));
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 

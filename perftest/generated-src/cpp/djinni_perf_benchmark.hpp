@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "DataRef.hpp"
+#include "DataView.hpp"
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -29,6 +31,10 @@ public:
     virtual void argString(const std::string & s) = 0;
 
     virtual void argBinary(const std::vector<uint8_t> & b) = 0;
+
+    virtual void argDataRef(const ::snapchat::djinni::DataRef & r) = 0;
+
+    virtual void argDataView(const ::snapchat::djinni::DataView & d) = 0;
 
     virtual void argEnumSixValue(EnumSixValue e) = 0;
 

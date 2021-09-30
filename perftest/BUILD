@@ -102,5 +102,6 @@ wasm_cc_binary(
 sh_binary(
     name = "server",
     srcs = ["ts/run.sh"],
+    deps = ["//support-lib:djinni-support-ts"],
     data = glob(["ts/*.html", "ts/*.ts", "ts/*.json", "generated-src/ts/*.ts"]) + [":wasm"]
 )

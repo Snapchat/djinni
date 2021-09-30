@@ -1,5 +1,6 @@
 import * as perftest from "../generated-src/ts/perftest_d";
-declare function Module(): Promise<perftest.Module_statics>;
+import {DjinniModule} from "@djinni_support/DjinniModule"
+declare function Module(): Promise<perftest.Module_statics & DjinniModule>;
 
 Module().then(module => {
     main(module);
@@ -54,7 +55,7 @@ class ObjectPlatformImpl {
     onDone() {}
 }
 
-function main (module: perftest.Module_statics) {
+function main (module: perftest.Module_statics & DjinniModule) {
     var minCount = 16;
     var lowCount = 128;
     var highCount = 4096;
@@ -65,6 +66,18 @@ function main (module: perftest.Module_statics) {
     var dpb = module.DjinniPerfBenchmark.getInstance();
     measure('memcpy256b', function(){ dpb.cppTests(); });
     measure("baseline", function() { dpb.baseline(); });
+
+    [lowCount, highCount, hugeCount].forEach(function(count) {
+        let bb = module.allocateWasmBuffer(count);
+        for (let i = 0; i < count; i++) { bb[i] = i; }
+        measure("argDataView " + count, function() {dpb.argDataView(bb);});
+    });
+    
+    [lowCount, highCount, hugeCount].forEach(function(count) {
+        let bb = module.allocateWasmBuffer(count);
+        for (let i = 0; i < count; i++) { bb[i] = i; }
+        measure("argDataRef " + count, function() {dpb.argDataRef(bb);});
+    });
 
     var s = "1234567890ABCDEF" // minCount
     measure("argString " + minCount, function() { dpb.argString(s); });

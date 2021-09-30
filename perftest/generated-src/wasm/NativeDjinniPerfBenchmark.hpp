@@ -25,6 +25,8 @@ struct NativeDjinniPerfBenchmark : ::djinni::JsInterface<::snapchat::djinni::ben
     static void baseline(const CppType& self);
     static void argString(const CppType& self, const std::string& w_s);
     static void argBinary(const CppType& self, const em::val& w_b);
+    static void argDataRef(const CppType& self, const em::val& w_r);
+    static void argDataView(const CppType& self, const em::val& w_d);
     static void argEnumSixValue(const CppType& self, int32_t w_e);
     static void argRecordSixInt(const CppType& self, const em::val& w_r);
     static void argListInt(const CppType& self, const em::val& w_v);

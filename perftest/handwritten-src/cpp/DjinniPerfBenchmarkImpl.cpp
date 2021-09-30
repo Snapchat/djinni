@@ -28,6 +28,10 @@ void DjinniPerfBenchmarkImpl::argString(const std::string& /* s */) {}
 
 void DjinniPerfBenchmarkImpl::argBinary(const std::vector<uint8_t>& /* b */) {}
 
+void DjinniPerfBenchmarkImpl::argDataRef(const ::snapchat::djinni::DataRef& /* r */) {}
+
+void DjinniPerfBenchmarkImpl::argDataView(const ::snapchat::djinni::DataView& /* d */) {}
+
 void DjinniPerfBenchmarkImpl::argEnumSixValue(EnumSixValue /* e */) {}
 
 void DjinniPerfBenchmarkImpl::argRecordSixInt(const RecordSixInt& /* r */) {}

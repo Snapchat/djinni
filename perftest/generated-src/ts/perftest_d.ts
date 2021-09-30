@@ -36,6 +36,8 @@ export interface DjinniPerfBenchmark {
     baseline(): void;
     argString(s: string): void;
     argBinary(b: Uint8Array): void;
+    argDataRef(r: Uint8Array): void;
+    argDataView(d: Uint8Array): void;
     argEnumSixValue(e: EnumSixValue): void;
     argRecordSixInt(r: RecordSixInt): void;
     argListInt(v: Array<bigint>): void;
