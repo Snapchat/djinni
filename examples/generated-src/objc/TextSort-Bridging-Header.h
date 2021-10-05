@@ -12,6 +12,7 @@ FOUNDATION_EXPORT double TextSortBridgingHeaderVersionNumber;
 //! Project version string for TextSortBridgingHeader.
 FOUNDATION_EXPORT const unsigned char TextSortBridgingHeaderVersionString[];
 
+#import "TXSConversation.h"
 #import "TXSItemList.h"
 #import "TXSSortOrder.h"
 #import "TXSSortItems.h"

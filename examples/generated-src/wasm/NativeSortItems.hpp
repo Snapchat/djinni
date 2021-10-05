@@ -23,6 +23,7 @@ struct NativeSortItems : ::djinni::JsInterface<::textsort::SortItems, NativeSort
     static void sort(const CppType& self, int32_t w_order,const em::val& w_items);
     static em::val create_with_listener(const em::val& w_listener);
     static em::val run_sort(const em::val& w_items);
+    static em::val create_conversation();
 
 };
 

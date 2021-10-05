@@ -9,6 +9,7 @@ namespace textsort {
 
 class TextboxListener;
 enum class sort_order;
+struct Conversation;
 struct ItemList;
 
 class SortItems {
@@ -22,6 +23,8 @@ public:
 
     /** For the localhost / command-line demo */
     static ItemList run_sort(const ItemList & items);
+
+    static Conversation create_conversation();
 };
 
 }  // namespace textsort

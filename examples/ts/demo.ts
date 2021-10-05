@@ -3,8 +3,10 @@ import * as example from "../generated-src/ts/example";
 declare function Module(): Promise<example.Module_statics>;
 
 var sorter: example.SortItems;
+var mod: example.Module_statics;
 
 Module().then(m => {
+    mod = m;
     sorter = m.SortItems.createWithListener(new SortListener());
 })
 
@@ -30,4 +32,11 @@ document.getElementById('btnDesc').addEventListener('click', e => {
 })
 document.getElementById('btnRandom').addEventListener('click', e => {
     sort(example.SortOrder.RANDOM)
+})
+document.getElementById('test').addEventListener('click', e => {
+    const conv = mod.SortItems.createConversation();
+    const inner = conv.id;
+    setTimeout(function() {
+        console.log(inner);
+    }, 100);
 })

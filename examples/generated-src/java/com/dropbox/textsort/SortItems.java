@@ -19,6 +19,9 @@ import javax.annotation.Nonnull;
     @Nonnull
     public static native ItemList runSort(@Nonnull ItemList items);
 
+    @Nonnull
+    public static native Conversation createConversation();
+
     public static final class CppProxy extends SortItems
     {
         private final long nativeRef;

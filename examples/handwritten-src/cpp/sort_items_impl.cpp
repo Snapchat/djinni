@@ -5,8 +5,16 @@
 #include "sort_order.hpp"
 
 #include "sort_items_impl.hpp"
+#include "conversation.hpp"
 
 namespace textsort {
+
+Conversation SortItems::create_conversation() {
+    static uint8_t x = 1;
+    Conversation conv({x, x, x, x});
+    x++;
+    return conv;
+}
 
 std::shared_ptr<SortItems> SortItems::create_with_listener(const std::shared_ptr<TextboxListener>& listener) {
     return std::make_shared<SortItemsImpl>(listener);
