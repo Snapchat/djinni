@@ -30,3 +30,7 @@ jobs:
 
         - name: Test
           run: bazel test //test-suite:all
+
+        - name: External Test
+          working-directory: external-test
+          run: bazel run @djinni//src:djinni -- --help
