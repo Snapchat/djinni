@@ -9,4 +9,5 @@ scala_binary(
         "@maven//:org_scala_lang_modules_scala_parser_combinators_2_11",
         "@maven//:org_yaml_snakeyaml",
     ],
+    visibility = ["//visibility:public"],
 )
