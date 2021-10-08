@@ -66,6 +66,7 @@ verify the build and binary from the command line.
  - Local flags with `@flag` directive
  - DataView for copy free data passing
  - DateRef for copy free data passing with ownership
+ - Generating string names for C++ enums
  - Bug fixes
 
 ## Using new features
@@ -245,7 +246,50 @@ DataRef has a special optimization to take over the data from
 R-value reference of these types, then `DataRef` can steal the buffer from them
 without copying the bytes.
 
-### FAQ
+### String names for C++ enums
+
+Djinni now generates a `to_string()` function that you can use to convert C++
+enums to their string names. This makes printing enums in debugging traces a lot
+more convenient. This function is `constexpr` so if you call it with an enum
+value known to the compiler at compile time, then there is no runtime
+overhead. You may also call it with a dynamic value, in that case it's a fast
+array indexing operation.
+
+## Experimantal WASM support
+
+Djinni can generate code that bridges C++ (that compiles to Web Assembly) and
+Javascript/TypeScript in web browsers. This feature is currently experimental.
+
+For WASM, Djinni generates:
+- C++ code, which should be compiled into the WASM bindary
+- TypeScript code, provides optional TypeScript interface definitions
+
+The generated code can be used with both plain Javascript and TypeScript.
+
+New command line switches:
+
+- `--wasm-out`: wasm bridge code output folder
+- `--wasm-include-prefix`: path prefix to be added to include lines in generated
+  hpp files
+- `--wasm-include-cpp-prefix`: path prefix to be added to include lines in
+  generated cpp files
+- `--wasm-base-lib-include-prefix`: path prefix to be added to djinni support
+  library inlcude lines in generated files
+- `--ts-out`: typescript output folder
+- `--ts-module`: typescript module(file) name
+
+Almost all Djinni features are supported, including importing external types via
+yaml and zero-copy buffer passing.
+
+Notable differences when comparing to the Java/ObjC support:
+
+- deriving(ord, eq, hash) is not applicable to Javascript because JS doesn't
+  support overloading standard comparison methods.
+- Extended records generate the same code as regular records. Because JS can
+  easily add extension methods (by add functions to prototype) without having to
+  derive from a base class.
+
+## FAQ
 
 Q. Do I need to use Bazel to build my project?
 
