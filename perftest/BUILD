@@ -27,7 +27,7 @@ java_library(
     srcs = glob(["generated-src/java/**/*.java"]),
     deps = [
         "//support-lib:djinni-support-java",
-        "@maven//:com_google_code_findbugs_jsr305",
+        "@maven_djinni//:com_google_code_findbugs_jsr305",
     ],
 )
 
