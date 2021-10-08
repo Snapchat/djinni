@@ -68,9 +68,8 @@ http_archive(
     sha256 = "e0194dba792a978bd2dfd5ba3b5855e8ff391d48be76238bc9faec1e95ba1d31",
 )
 
-load("@emsdk//:deps.bzl", "deps")
-deps()
+load("@emsdk//:deps.bzl", emsdk_deps = "deps")
+emsdk_deps()
 
-load("@emsdk//:emscripten_deps.bzl", "emscripten_deps")
-
-emscripten_deps(emscripten_version = "2.0.29")
+load("@emsdk//:emscripten_deps.bzl", emsdk_emscripten_deps = "emscripten_deps")
+emsdk_emscripten_deps()
