@@ -91,6 +91,17 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
         w.w(s"constexpr $self operator~($self x) noexcept").braced {
           w.wl(s"return static_cast<$self>(~static_cast<$flagsType>(x));")
         }
+      } else {
+        w.wl
+        // Define a toString function
+        w.w("constexpr const char* "+ idCpp.method("to_string") + "(" + self + " e) noexcept").braced {
+          w.w("constexpr const char* names[] =").bracedSemi {
+            for(o <- e.options) {
+              w.wl(s""""${o.ident.name}",""")
+            }
+          }
+          w.wl(s"return names[static_cast<$underlyingType>(e)];");
+        }
       }
     },
     w => {

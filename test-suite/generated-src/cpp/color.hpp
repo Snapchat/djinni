@@ -22,6 +22,19 @@ enum class color : int {
     VIOLET = 6,
 };
 
+constexpr const char* to_string(color e) noexcept {
+    constexpr const char* names[] = {
+        "red",
+        "orange",
+        "yellow",
+        "green",
+        "blue",
+        "indigo",
+        "violet",
+    };
+    return names[static_cast<int>(e)];
+}
+
 }  // namespace testsuite
 
 namespace std {

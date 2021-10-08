@@ -1,0 +1,12 @@
+workspace(name = "djinni_external_test")
+
+local_repository(
+    name = "djinni",
+    path = "../",
+)
+
+load("@djinni//bzl:deps.bzl", "djinni_deps")
+djinni_deps()
+
+load("@djinni//bzl:setup_deps.bzl", "djinni_setup_deps")
+djinni_setup_deps()

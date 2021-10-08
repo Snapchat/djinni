@@ -141,16 +141,11 @@ std::experimental::optional<int32_t> TestHelpers::return_none() {
 }
 
 void TestHelpers::check_enum_map(const std::unordered_map<color, std::string> & m) {
-    std::unordered_map<color, std::string> expected = {
-        { color::RED,    "red"    },
-        { color::ORANGE, "orange" },
-        { color::YELLOW, "yellow" },
-        { color::GREEN,  "green"  },
-        { color::BLUE,   "blue"   },
-        { color::INDIGO, "indigo" },
-        { color::VIOLET, "violet" },
-    };
-
+    std::unordered_map<color, std::string> expected;
+    // test the to_string conversion here
+    for (auto c: {color::RED, color::ORANGE, color::YELLOW, color::GREEN, color::BLUE, color::INDIGO, color::VIOLET}) {
+        expected[c] = to_string(c);
+    }
     if (m != expected) {
         throw std::invalid_argument("map mismatch");
     }
