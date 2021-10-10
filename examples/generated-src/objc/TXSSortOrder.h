@@ -5,7 +5,7 @@
 
 typedef NS_ENUM(NSInteger, TXSSortOrder)
 {
-    TXSSortOrderAscending,
-    TXSSortOrderDescending,
-    TXSSortOrderRandom,
+    TXSSortOrderAscending = 0,
+    TXSSortOrderDescending = 1,
+    TXSSortOrderRandom = 2,
 };

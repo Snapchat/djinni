@@ -84,13 +84,14 @@ private object IdlParser extends RegexParsers {
   }
 
   def ext(default: Ext) = (rep1("+" ~> ident) >> checkExts) | success(default)
-  def extRecord = ext(Ext(false, false, false))
-  def extInterface = ext(Ext(true, true, true))
+  def extRecord = ext(Ext(false, false, false, false))
+  def extInterface = ext(Ext(true, true, true, true))
 
   def checkExts(parts: List[Ident]): Parser[Ext] = {
     var foundCpp = false
     var foundJava = false
     var foundObjc = false
+    var foundJavascript = false
 
     for (part <- parts)
       part.name match {
@@ -106,9 +107,13 @@ private object IdlParser extends RegexParsers {
           if (foundObjc) return err("Found multiple \"o\" modifiers.")
           foundObjc = true
         }
+        case "w" => {
+          if (foundJavascript) return err("Found multiple \"w\" modifiers.")
+          foundJavascript = true
+        }
         case _ => return err("Invalid modifier \"" + part.name + "\"")
       }
-    success(Ext(foundJava, foundCpp, foundObjc))
+    success(Ext(foundJava, foundCpp, foundObjc, foundJavascript))
   }
 
   def typeDef: Parser[TypeDef] = record | enum | flags | interface
@@ -315,6 +320,8 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
   //   - `cpp.namespace` key must be present
   // - `java` key must be present
   //   - `java.class` key must be present
+  // - `ts` key must be present
+  //   - `ts.module` key must be present
   // - `objc` key is optional
   //   - if `objc` is present then `objc.header` must be present
   //   - if `objc` is present then `objc.prefix` must be present
@@ -328,6 +335,10 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
     case Some(properties) => properties.asInstanceOf[JMap[String, String]].toMap
     case None => return Left(Error(Loc(fileStack.top, 1, 1), "'java' properties not found"))
   }
+  val ts = Option(doc.get("ts")) match {
+    case Some(properties) => properties.asInstanceOf[JMap[String, String]].toMap
+    case None => return Left(Error(Loc(fileStack.top, 1, 1), "'ts' properties not found"))
+  }
   // ObjC is optional, if it's not present, then ObjC will use C++ protos
   val o = Option(doc.get("objc")) match {
     case Some(properties) => Some(properties.asInstanceOf[JMap[String, String]].toMap)
@@ -337,7 +348,8 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
     ProtobufMessage.Java(j("class")),
     o match {
       case Some(oo) => Some(ProtobufMessage.Objc(oo("header"), oo("prefix")))
-      case None => None}
+      case None => None},
+    ProtobufMessage.Ts(ts("module"), ts("namespace"))
   )
   for(message <- doc.get("messages").asInstanceOf[java.util.List[String]]) {
     val ident = Ident(message, fileStack.top, Loc(fileStack.top, 1, 1))

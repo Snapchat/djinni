@@ -84,6 +84,13 @@ object Main {
     var objcFileIdentStyleOptional: Option[IdentConverter] = None
     var objcppNamespace: String = "djinni_generated"
     var objcBaseLibIncludePrefix: String = ""
+    var wasmOutFolder: Option[File] = None
+    var wasmIncludePrefix: String = ""
+    var wasmIncludeCppPrefix: String = ""
+    var wasmBaseLibIncludePrefix: String = ""
+    var jsIdentStyle = IdentStyle.jsDefault
+    var tsOutFolder: Option[File] = None
+    var tsModule: String = "module"
     var inFileListPath: Option[File] = None
     var outFileListPath: Option[File] = None
     var skipGeneration: Boolean = false
@@ -214,6 +221,19 @@ object Main {
       opt[String]("objc-base-lib-include-prefix").valueName("...").foreach(x => objcBaseLibIncludePrefix = x)
         .text("The Objective-C++ base library's include path, relative to the Objective-C++ classes.")
       note("")
+      opt[File]("wasm-out").valueName("<out-folder>").foreach(x => wasmOutFolder = Some(x))
+        .text("The output for the WASM bridge C++ files (Generator disabled if unspecified).")
+      opt[String]("wasm-include-prefix").valueName("<prefix>").foreach(wasmIncludePrefix = _)
+        .text("The prefix for #includes of WASM header files from WASM C++ files.")
+      opt[String]("wasm-include-cpp-prefix").valueName("<prefix>").foreach(wasmIncludeCppPrefix = _)
+        .text("The prefix for #includes of the main header files from WASM C++ files.")
+      opt[String]("wasm-base-lib-include-prefix").valueName("...").foreach(x => wasmBaseLibIncludePrefix = x)
+        .text("The WASM base library's include path, relative to the WASM C++ classes.")
+      opt[File]("ts-out").valueName("<out-folder>").foreach(x => tsOutFolder = Some(x))
+        .text("The output for the TypeScript interface files (Generator disabled if unspecified).")
+      opt[String]("ts-module").valueName("<name>").foreach(tsModule = _)
+        .text("TypeScript declaration module name (default: \"module\").")
+      note("")
       opt[File]("yaml-out").valueName("<out-folder>").foreach(x => yamlOutFolder = Some(x))
         .text("The output folder for YAML files (Generator disabled if unspecified).")
       opt[String]("yaml-out-file").valueName("<out-file>").foreach(x => yamlOutFile = Some(x))
@@ -249,7 +269,6 @@ object Main {
       identStyle("ident-objc-type-param", c => { objcIdentStyle = objcIdentStyle.copy(typeParam = c) })
       identStyle("ident-objc-local",      c => { objcIdentStyle = objcIdentStyle.copy(local = c) })
       identStyle("ident-objc-file",       c => { objcFileIdentStyleOptional = Some(c) })
-
     }
 
     if (!argParser.parse(args)) {
@@ -385,6 +404,13 @@ object Main {
       objcGenProtocol,
       objcDisableClassCtor,
       objcClosedEnums,
+      wasmOutFolder,
+      wasmIncludePrefix,
+      wasmIncludeCppPrefix,
+      wasmBaseLibIncludePrefix,
+      jsIdentStyle,
+      tsOutFolder,
+      tsModule,
       outFileListWriter,
       skipGeneration,
       yamlOutFolder,

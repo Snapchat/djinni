@@ -5,16 +5,16 @@
 
 typedef NS_ENUM(NSInteger, DBColor)
 {
-    DBColorRed,
-    DBColorOrange,
-    DBColorYellow,
-    DBColorGreen,
-    DBColorBlue,
+    DBColorRed = 0,
+    DBColorOrange = 1,
+    DBColorYellow = 2,
+    DBColorGreen = 3,
+    DBColorBlue = 4,
     /**
      * "It is customary to list indigo as a color lying between blue and violet, but it has
      * never seemed to me that indigo is worth the dignity of being considered a separate
      * color. To my eyes it seems merely deep blue." --Isaac Asimov
      */
-    DBColorIndigo,
-    DBColorViolet,
+    DBColorIndigo = 5,
+    DBColorViolet = 6,
 };

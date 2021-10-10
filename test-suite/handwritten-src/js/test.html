@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Djinni/WASM Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="testutils.js"></script>
+    <script src="test-wasm.js"></script>
+  </head>
+  <body>
+    <h1>Djinni/WASM Test</h1>
+    <pre id="output"></pre>
+    <script src="ConstantsTest.js"></script>
+    <script src="ClientInterfaceTest.js"></script>
+    <script src="ArrayTests.js"></script>
+    <script src="CppExceptionTest.js"></script>
+    <script src="DataTest.js"></script>
+    <script src="DurationTest.js"></script>
+    <script src="EnumTest.js"></script>
+    <script src="MapRecordTest.js"></script>
+    <script src="NestedCollectionTest.js"></script>
+    <script src="OutcomeTest.js"></script>
+    <script src="PrimitiveListTest.js"></script>
+    <script src="PrimitivesTest.js"></script>
+    <script src="SetRecordTest.js"></script>
+    <script src="TokenTest.js"></script>
+    <script src="WcharTest.js"></script>
+    <!-- Things we can't test in JS:
+         * Android parcelable
+         * Deriving ord hash nscopy
+         * Catching C++ exception (incomplete)
+         * Function prologue (not yet)
+         * Protobuf (not yet)
+      -->
+    <script>
+      Module().then(module => {
+          runTests(module, allTests);
+      })
+    </script>
+  </body>
+</html>

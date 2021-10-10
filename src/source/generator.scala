@@ -86,6 +86,13 @@ package object generatorTools {
                    objcGenProtocol: Boolean,
                    objcDisableClassCtor: Boolean,
                    objcClosedEnums: Boolean,
+                   wasmOutFolder: Option[File],
+                   wasmIncludePrefix: String,
+                   wasmIncludeCppPrefix: String,
+                   wasmBaseLibIncludePrefix: String,
+                   jsIdentStyle: JsIdentStyle,
+                   tsOutFolder: Option[File],
+                   tsModule: String,
                    outFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],
@@ -115,6 +122,10 @@ package object generatorTools {
                             method: IdentConverter, field: IdentConverter, local: IdentConverter,
                             enum: IdentConverter, const: IdentConverter)
 
+  case class JsIdentStyle(ty: IdentConverter, typeParam: IdentConverter,
+                          method: IdentConverter, field: IdentConverter, local: IdentConverter,
+                          enum: IdentConverter, const: IdentConverter)
+
   object IdentStyle {
     val camelUpper = (s: String) => s.split("[-_]").map(firstUpper).mkString
     val camelLower = (s: String) => {
@@ -129,6 +140,7 @@ package object generatorTools {
     val javaDefault = JavaIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, underCaps, underCaps)
     val cppDefault = CppIdentStyle(camelUpper, camelUpper, camelUpper, underLower, underLower, underLower, underCaps, underCaps)
     val objcDefault = ObjcIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, camelUpper, camelUpper)
+    val jsDefault = JsIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, underCaps, underCaps)
 
     val styles = Map(
       "FooBar" -> camelUpper,
@@ -233,6 +245,18 @@ package object generatorTools {
         SwiftBridgingHeaderGenerator.writeBridgingVars(spec.objcSwiftBridgingHeaderName.get, spec.objcSwiftBridgingHeaderWriter.get)
         new SwiftBridgingHeaderGenerator(spec).generate(idl)
       }
+      if (spec.wasmOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("WASM", spec.wasmOutFolder.get)
+        }
+        new WasmGenerator(spec).generate(idl)
+      }
+      if (spec.tsOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("TypeScript", spec.tsOutFolder.get)
+        }
+        new TsGenerator(spec).generate(idl)
+      }
       if (spec.yamlOutFolder.isDefined) {
         if (!spec.skipGeneration) {
           createFolder("YAML", spec.yamlOutFolder.get)
@@ -292,6 +316,7 @@ abstract class Generator(spec: Spec)
   val idCpp = spec.cppIdentStyle
   val idJava = spec.javaIdentStyle
   val idObjc = spec.objcIdentStyle
+  val idJs = spec.jsIdentStyle
 
   def wrapNamespace(w: IndentWriter, ns: String, f: IndentWriter => Unit) {
     ns match {
@@ -407,28 +432,27 @@ abstract class Generator(spec: Spec)
 
   def normalEnumOptions(e: Enum) = e.options.filter(_.specialFlag == None)
 
-  def writeEnumOptionNone(w: IndentWriter, e: Enum, ident: IdentConverter) {
+  def writeEnumOptionNone(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=") {
     for (o <- e.options.find(_.specialFlag == Some(Enum.SpecialFlag.NoFlags))) {
       writeDoc(w, o.doc)
-      w.wl(ident(o.ident.name) + " = 0,")
+      w.wl(ident(o.ident.name) + s" $delim 0,")
     }
   }
 
-  def writeEnumOptions(w: IndentWriter, e: Enum, ident: IdentConverter) {
+  def writeEnumOptions(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=") {
     var shift = 0
     for (o <- normalEnumOptions(e)) {
       writeDoc(w, o.doc)
-      w.wl(ident(o.ident.name) + (if(e.flags) s" = 1 << $shift" else "") + ",")
+      w.wl(ident(o.ident.name) + (if(e.flags) s" $delim 1 << $shift" else s" $delim $shift") + ",")
       shift += 1
     }
   }
 
-  def writeEnumOptionAll(w: IndentWriter, e: Enum, ident: IdentConverter) {
+  def writeEnumOptionAll(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=") {
     for (o <- e.options.find(_.specialFlag == Some(Enum.SpecialFlag.AllFlags))) {
       writeDoc(w, o.doc)
-      w.w(ident(o.ident.name) + " = ")
-      w.w(normalEnumOptions(e).map(o => ident(o.ident.name)).fold("0")((acc, o) => acc + " | " + o))
-      w.wl(",")
+      w.w(ident(o.ident.name) + s" $delim ")
+      w.wl(s"(1 << ${normalEnumOptions(e).size}) - 1,")
     }
   }
 

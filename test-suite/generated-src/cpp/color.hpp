@@ -8,18 +8,18 @@
 namespace testsuite {
 
 enum class color : int {
-    RED,
-    ORANGE,
-    YELLOW,
-    GREEN,
-    BLUE,
+    RED = 0,
+    ORANGE = 1,
+    YELLOW = 2,
+    GREEN = 3,
+    BLUE = 4,
     /**
      * "It is customary to list indigo as a color lying between blue and violet, but it has
      * never seemed to me that indigo is worth the dignity of being considered a separate
      * color. To my eyes it seems merely deep blue." --Isaac Asimov
      */
-    INDIGO,
-    VIOLET,
+    INDIGO = 5,
+    VIOLET = 6,
 };
 
 constexpr const char* to_string(color e) noexcept {

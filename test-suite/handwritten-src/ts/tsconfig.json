@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "lib": ["es2020", "dom"],
+        "baseUrl": ".",
+        "paths": {
+            "@djinni_support/*": ["../../../support-lib/ts/*"]
+        }
+    },
+    "include": ["./*.ts"],
+}

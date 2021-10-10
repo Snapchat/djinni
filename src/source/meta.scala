@@ -31,7 +31,7 @@ abstract sealed class Meta
 
 case class MParam(name: String) extends Meta { val numParams = 0 }
 case class MDef(name: String, override val numParams: Int, defType: DefType, body: TypeDef) extends Meta
-case class MExtern(name: String, override val numParams: Int, defType: DefType, body: TypeDef, cpp: MExtern.Cpp, objc: MExtern.Objc, objcpp: MExtern.Objcpp, java: MExtern.Java, jni: MExtern.Jni) extends Meta
+case class MExtern(name: String, override val numParams: Int, defType: DefType, body: TypeDef, cpp: MExtern.Cpp, objc: MExtern.Objc, objcpp: MExtern.Objcpp, java: MExtern.Java, jni: MExtern.Jni, wasm: MExtern.Wasm, ts: MExtern.Ts) extends Meta
 object MExtern {
   // These hold the information marshals need to interface with existing types correctly
   // All include paths are complete including quotation marks "a/b/c" or angle brackets <a/b/c>.
@@ -68,6 +68,15 @@ object MExtern {
     header: String, // Where to find the translator class
     typename: String, // The JNI type to use (e.g. jobject, jstring)
     typeSignature: String // The mangled Java type signature (e.g. "Ljava/lang/String;")
+  )
+  case class Wasm(
+    typename: String, // The JNI type to use (e.g. em::val, int32_t)
+    translator: String, // C++ typename containing toCpp/fromCpp methods
+    header: String // Where to find the translator class
+  )
+  case class Ts(
+    typename: String,
+    module: String
   )
 }
 case class MProtobuf(name: String, override val numParams: Int, body: ProtobufMessage) extends Meta

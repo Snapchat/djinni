@@ -6,11 +6,13 @@
 #include <vector>
 #include <cstring>
 
-#if !defined(DATAREF_JNI) && !defined(DATAREF_OBJC)
+#if !defined(DATAREF_JNI) && !defined(DATAREF_OBJC) && !defined(DATAREF_WASM)
   #if defined(__ANDROID__)
     #define DATAREF_JNI 1
   #elif defined(__APPLE__)
     #define DATAREF_OBJC 1
+  #elif defined(__EMSCRIPTEN__)
+    #define DATAREF_WASM 1
   #endif
 #endif
 
@@ -19,6 +21,9 @@
 #elif DATAREF_OBJC
   #include <CoreFoundation/CFData.h>
   using PlatformObject = const void*;
+#elif DATAREF_WASM
+  #include <emscripten/val.h>
+  using PlatformObject = emscripten::val;
 #else
   using PlatformObject = const void*;
 #endif
@@ -58,8 +63,10 @@ public:
 #if DATAREF_JNI
     explicit DataRef(void* platformObj);
 #elif DATAREF_OBJC
-    DataRef(CFDataRef platformObj);
-    DataRef(CFMutableDataRef platformObj);
+    explicit DataRef(CFDataRef platformObj);
+    explicit DataRef(CFMutableDataRef platformObj);
+#elif DATAREF_WASM
+    explicit DataRef(PlatformObject platformObj);
 #endif
 
     DataRef& operator=(const DataRef&) = default;
@@ -75,7 +82,11 @@ public:
         return _impl ? _impl->mutableBuf() : nullptr;
     }
     PlatformObject platformObj() const {
+#if DATAREF_WASM
+        return _impl ? _impl->platformObj() : emscripten::val::null();
+#else
         return _impl ? _impl->platformObj() : nullptr;
+#endif
     }
 
 private:

@@ -31,6 +31,13 @@ jni:
   header: '"Duration-jni.hpp"'
   typename: jobject
   typeSignature: 'Ljava/time/Duration;'
+wasm:
+  typename: 'em::val'
+  translator: '::djinni::Duration'
+  header: '"Duration-wasm.hpp"'
+ts:
+  typename: 'number'
+  module: ''
 ---
 name: h
 typedef: 'record'
@@ -60,6 +67,13 @@ jni:
   header: '"Duration-jni.hpp"'
   typename: jobject
   typeSignature: 'Ljava/time/Duration;'
+wasm:
+  typename: 'em::val'
+  translator: '::djinni::Duration_h'
+  header: '"Duration-wasm.hpp"'
+ts:
+  typename: 'number'
+  module: ''
 ---
 name: min
 typedef: 'record'
@@ -89,6 +103,13 @@ jni:
   header: '"Duration-jni.hpp"'
   typename: jobject
   typeSignature: 'Ljava/time/Duration;'
+wasm:
+  typename: 'em::val'
+  translator: '::djinni::Duration_min'
+  header: '"Duration-wasm.hpp"'
+ts:
+  typename: 'number'
+  module: ''
 ---
 name: s
 typedef: 'record'
@@ -118,6 +139,13 @@ jni:
   header: '"Duration-jni.hpp"'
   typename: jobject
   typeSignature: 'Ljava/time/Duration;'
+wasm:
+  typename: 'em::val'
+  translator: '::djinni::Duration_s'
+  header: '"Duration-wasm.hpp"'
+ts:
+  typename: 'number'
+  module: ''
 ---
 name: ms
 typedef: 'record'
@@ -147,6 +175,13 @@ jni:
   header: '"Duration-jni.hpp"'
   typename: jobject
   typeSignature: 'Ljava/time/Duration;'
+wasm:
+  typename: 'em::val'
+  translator: '::djinni::Duration_ms'
+  header: '"Duration-wasm.hpp"'
+ts:
+  typename: 'number'
+  module: ''
 ---
 name: us
 typedef: 'record'
@@ -176,6 +211,13 @@ jni:
   header: '"Duration-jni.hpp"'
   typename: jobject
   typeSignature: 'Ljava/time/Duration;'
+wasm:
+  typename: 'em::val'
+  translator: '::djinni::Duration_us'
+  header: '"Duration-wasm.hpp"'
+ts:
+  typename: 'number'
+  module: ''
 ---
 name: ns
 typedef: 'record'
@@ -205,3 +247,10 @@ jni:
   header: '"Duration-jni.hpp"'
   typename: jobject
   typeSignature: 'Ljava/time/Duration;'
+wasm:
+  typename: 'em::val'
+  translator: '::djinni::Duration_ns'
+  header: '"Duration-wasm.hpp"'
+ts:
+  typename: 'number'
+  module: ''

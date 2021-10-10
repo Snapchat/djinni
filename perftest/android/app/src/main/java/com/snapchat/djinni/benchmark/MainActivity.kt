@@ -100,6 +100,18 @@ class MainActivity : Activity() {
         measure("cppTests", {ns = dpb.cppTests()})
         measure("baseline", {dpb.baseline()})
 
+        for (count in listOf(lowCount, highCount, hugeCount)) {
+            val bb = ByteBuffer.allocateDirect(count)
+            for (i in 0..count - 1) bb.put(i, i.toByte())
+            measure("argDataView " + count, {dpb.argDataView(bb)})
+        }
+
+        for (count in listOf(lowCount, highCount, hugeCount)) {
+            val bb = ByteBuffer.allocateDirect(count)
+            for (i in 0..count - 1) bb.put(i, i.toByte())
+            measure("argDataRef " + count, {dpb.argDataRef(bb)})
+        }
+
         val s = "1234567890ABCDEF" // minCount
         measure("argString " + minCount, {dpb.argString(s)})
 

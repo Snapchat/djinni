@@ -19,6 +19,10 @@ import javax.annotation.Nonnull;
 
     public abstract void argBinary(@Nonnull byte[] b);
 
+    public abstract void argDataRef(@Nonnull java.nio.ByteBuffer r);
+
+    public abstract void argDataView(@Nonnull java.nio.ByteBuffer d);
+
     public abstract void argEnumSixValue(@Nonnull EnumSixValue e);
 
     public abstract void argRecordSixInt(@Nonnull RecordSixInt r);
@@ -111,6 +115,22 @@ import javax.annotation.Nonnull;
             native_argBinary(this.nativeRef, b);
         }
         private native void native_argBinary(long _nativeRef, byte[] b);
+
+        @Override
+        public void argDataRef(java.nio.ByteBuffer r)
+        {
+            assert !this.destroyed.get() : "trying to use a destroyed object";
+            native_argDataRef(this.nativeRef, r);
+        }
+        private native void native_argDataRef(long _nativeRef, java.nio.ByteBuffer r);
+
+        @Override
+        public void argDataView(java.nio.ByteBuffer d)
+        {
+            assert !this.destroyed.get() : "trying to use a destroyed object";
+            native_argDataView(this.nativeRef, d);
+        }
+        private native void native_argDataView(long _nativeRef, java.nio.ByteBuffer d);
 
         @Override
         public void argEnumSixValue(EnumSixValue e)

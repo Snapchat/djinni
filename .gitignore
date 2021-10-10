@@ -7,3 +7,15 @@
 # djinni output directories
 djinni-output-temp/
 .bazelversion
+*.d
+*.o
+/support-lib/ts/*.js
+*.wasm
+*/generated-src/ts/*.js
+/examples/typescript/*.js
+/perftest/typescript/*.js
+test-suite/handwritten-src/js/test_cpp.js
+test-suite/handwritten-src/ts/*.js
+test-suite/djinni/vendor/third-party/proto/ts/*.js
+/test-suite/node_modules/
+/test-suite/package-lock.json

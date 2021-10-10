@@ -8,9 +8,9 @@
 namespace textsort {
 
 enum class sort_order : int {
-    ASCENDING,
-    DESCENDING,
-    RANDOM,
+    ASCENDING = 0,
+    DESCENDING = 1,
+    RANDOM = 2,
 };
 
 constexpr const char* to_string(sort_order e) noexcept {

@@ -22,6 +22,10 @@
 
 - (void)argBinary:(nonnull NSData *)b;
 
+- (void)argDataRef:(nonnull NSData *)r;
+
+- (void)argDataView:(nonnull NSData *)d;
+
 - (void)argEnumSixValue:(TXSEnumSixValue)e;
 
 - (void)argRecordSixInt:(nonnull TXSRecordSixInt *)r;

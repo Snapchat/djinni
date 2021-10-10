@@ -26,3 +26,10 @@ jni:
   header: '"DataView_jni.hpp"'
   typename: jobject
   typeSignature: 'Ljava/nio/ByteBuffer;'
+wasm:
+  typename: 'em::val'
+  translator: '::snapchat::djinni::NativeDataView'
+  header: '"DataView_wasm.hpp"'
+ts:
+  typename: 'Uint8Array'
+  module: ''

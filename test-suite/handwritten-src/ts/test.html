@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Djinni/WASM Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="test-wasm.js"></script>
+  </head>
+  <body>
+    <h1>Djinni/WASM Test</h1>
+    <pre id="output"></pre>
+    <!-- Things we can't test in JS:
+         * Android parcelable
+         * Deriving ord hash nscopy
+         * Catching C++ exception (incomplete)
+         * Function prologue (not yet)
+         * Protobuf (not yet)
+      -->
+    <script src="bundle.js"></script>
+  </body>
+</html>

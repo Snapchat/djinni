@@ -13,7 +13,7 @@ extern_interface_1 = interface +c
 	foo(i: test_client_interface): test_client_returned_record;
 }
 
-extern_interface_2 = interface +j +o
+extern_interface_2 = interface +j +o +w
 {
 	foo(i: test_test_helpers): extern_record_with_derivings;
 }

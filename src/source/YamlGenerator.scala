@@ -16,6 +16,8 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   val objcppMarshal = new ObjcppMarshal(spec)
   val javaMarshal = new JavaMarshal(spec)
   val jniMarshal = new JNIMarshal(spec)
+  val wasmMarshal = new WasmGenerator(spec)
+  val tsMarshal = new TsGenerator(spec)
 
   case class QuotedString(str: String) // For anything that migt require escaping
 
@@ -51,6 +53,8 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     w.wl("objcpp:").nested { write(w, objcpp(td)) }
     w.wl("java:").nested { write(w, java(td)) }
     w.wl("jni:").nested { write(w, jni(td)) }
+    w.wl("wasm:").nested { write(w, wasm(td)) }
+    w.wl("ts:").nested {write(w, ts(td)) }
   }
 
   private def write(w: IndentWriter, m: Map[String, Any]) {
@@ -92,7 +96,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   )
 
   private def typeDef(td: TypeDecl) = {
-    def ext(e: Ext): String = (if(e.cpp) " +c" else "") + (if(e.objc) " +o" else "") + (if(e.java) " +j" else "")
+    def ext(e: Ext): String = (if(e.cpp) " +c" else "") + (if(e.objc) " +o" else "") + (if(e.java) " +j" else "") + (if(e.js) " +w" else "")
     def deriving(r: Record) = {
       if(r.derivingTypes.isEmpty) {
         ""
@@ -108,7 +112,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     td.body match {
       case i: Interface => "interface" + ext(i.ext)
       case r: Record => "record" + ext(r.ext) + deriving(r)
-      case ProtobufMessage(_,_,_) => "protobuf"
+      case p: ProtobufMessage => "protobuf"
       case Enum(_, false) => "enum"
       case Enum(_, true) => "flags"
     }
@@ -157,6 +161,17 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     "header" -> QuotedString(jniMarshal.include(td.ident)),
     "typename" -> jniMarshal.fqParamType(mexpr(td)),
     "typeSignature" -> QuotedString(jniMarshal.fqTypename(td.ident, td.body))
+  )
+
+  private def wasm(td: TypeDecl) = Map[String, Any](
+    "translator" -> QuotedString(wasmMarshal.helperName(mexpr(td))),
+    "header" -> QuotedString(wasmMarshal.include(td.ident)),
+    "typename" -> wasmMarshal.wasmType(mexpr(td))
+  )
+
+  private def ts(td: TypeDecl) = Map[String, Any](
+    "typename" -> tsMarshal.toTsType(mexpr(td)),
+    "module" -> QuotedString(spec.tsModule)
   )
 
   // TODO: there has to be a way to do all this without the MExpr/Meta conversions?
@@ -232,11 +247,29 @@ object YamlGenerator {
       nested(td, "jni")("translator").toString,
       nested(td, "jni")("header").toString,
       nested(td, "jni")("typename").toString,
-      nested(td, "jni")("typeSignature").toString)
+      nested(td, "jni")("typeSignature").toString),
+    MExtern.Wasm(
+      getOptionalField(td, "wasm", "typename"),
+      getOptionalField(td, "wasm", "translator"),
+      getOptionalField(td, "wasm", "header")),
+    MExtern.Ts(
+      getOptionalField(td, "ts", "typename"),
+      getOptionalField(td, "ts", "module"))
   )
 
   private def nested(td: ExternTypeDecl, key: String) = {
     td.properties.get(key).collect { case m: JMap[_, _] => m.collect { case (k: String, v: Any) => (k, v) } } getOrElse(Map[String, Any]())
+  }
+
+  private def getOptionalField(td: ExternTypeDecl, key: String, subKey: String) = {
+    try {
+      nested(td, key)(subKey).toString
+    } catch {
+      case e: java.util.NoSuchElementException => {
+        println(s"Warning: in ${td.origin}, missing field $key/$subKey")
+        "[unspecified]"
+      }
+    }
   }
 
   private def defType(td: ExternTypeDecl) = td.body match {

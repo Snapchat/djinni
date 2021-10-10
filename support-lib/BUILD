@@ -10,7 +10,7 @@ cc_library(
 
 cc_library(
     name = "djinni-support-jni",
-    srcs = glob(["jni/*.cpp"]) + ["cpp/DataRef.cpp"],
+    srcs = glob(["jni/*.cpp", "cpp/*.cpp"]),
     hdrs = glob(["jni/*.hpp"]),
     includes = ["jni"],
     defines = ["DATAREF_JNI=1"],
@@ -25,7 +25,7 @@ cc_library(
 
 cc_library(
     name = "djinni-support-android",
-    srcs = glob(["jni/*.cpp"]) + ["cpp/DataRef.cpp"],
+    srcs = glob(["jni/*.cpp", "cpp/*.cpp"]),
     hdrs = glob(["jni/*.hpp"]),
     includes = ["jni"],
     defines = ["DATAREF_JNI=1"],
@@ -38,7 +38,7 @@ cc_library(
 
 objc_library(
     name = "djinni-support-objc",
-    srcs = glob(["objc/*.mm"]) + ["cpp/DataRef.cpp"],
+    srcs = glob(["objc/*.mm", "cpp/*.cpp"]),
     hdrs = glob(["objc/*.h", "objc/*.hpp"]),
     copts = [
         "-ObjC++",
@@ -52,5 +52,26 @@ objc_library(
 java_library(
     name = "djinni-support-java",
     srcs = glob(["java/**/*.java"]),
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "djinni-support-wasm",
+    srcs = glob(["wasm/*.cpp", "cpp/*.cpp"]),
+    hdrs = glob(["wasm/*.hpp"]),
+    includes = ["wasm"],
+    defines = ["DATAREF_WASM=1"],
+    visibility = ["//visibility:public"],
+    copts = [
+        "-fexceptions",
+    ],
+    deps = [
+        "//support-lib:djinni-support-common",
+    ],
+)
+
+sh_library(
+    name = "djinni-support-ts",
+    data = glob(["ts/*.ts"]),
     visibility = ["//visibility:public"],
 )

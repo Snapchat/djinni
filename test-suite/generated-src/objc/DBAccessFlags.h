@@ -15,5 +15,5 @@ typedef NS_OPTIONS(NSUInteger, DBAccessFlags)
     DBAccessFlagsSystemRead = 1 << 6,
     DBAccessFlagsSystemWrite = 1 << 7,
     DBAccessFlagsSystemExecute = 1 << 8,
-    DBAccessFlagsEverybody = 0 | DBAccessFlagsOwnerRead | DBAccessFlagsOwnerWrite | DBAccessFlagsOwnerExecute | DBAccessFlagsGroupRead | DBAccessFlagsGroupWrite | DBAccessFlagsGroupExecute | DBAccessFlagsSystemRead | DBAccessFlagsSystemWrite | DBAccessFlagsSystemExecute,
+    DBAccessFlagsEverybody = (1 << 9) - 1,
 };

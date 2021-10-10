@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary", "objc_library")
 load("@rules_java//java:defs.bzl", "java_test")
 load("@build_bazel_rules_apple//apple:macos.bzl", "macos_unit_test")
+load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
 
 cc_library(
     name = "djinni-tests-common",
@@ -18,6 +19,9 @@ cc_library(
         "generated-src/cpp",
         "handwritten-src/cpp",
         "djinni/vendor/third-party",
+    ],
+    copts = [
+        "-fexceptions",
     ],
     deps = [
         "//support-lib:djinni-support-common",
@@ -137,4 +141,51 @@ macos_unit_test(
         "djinni-tests-objcxx",
         "djinni-tests-objc-proto",
     ],
+)
+
+EMSCRIPTEN_LINKOPTS = [
+    "--bind",  # Compiles the source code using the Embind bindings to connect C/C++ and JavaScript
+    "-s MALLOC=emmalloc",  # Switch to using the much smaller implementation
+    "-s MODULARIZE=1",  # Allows us to manually invoke the initialization of wasm
+    "-s WASM_BIGINT=1", # We need to pass int64_t
+]
+
+cc_binary(
+    name = "test-wasm",
+    srcs = glob([
+        "generated-src/wasm/*.cpp",
+        "generated-src/wasm/*.hpp",
+    ]),
+    copts = [
+        "-fexceptions",
+    ],
+    linkopts = EMSCRIPTEN_LINKOPTS + ["-fexceptions"],
+    deps = [
+        ":djinni-tests-common",
+        "//support-lib:djinni-support-wasm",
+    ],
+)
+
+wasm_cc_binary(
+    name = "wasm",
+    cc_target = ":test-wasm",
+)
+
+sh_binary(
+    name = "server-ts",
+    srcs = ["handwritten-src/ts/run.sh"],
+    deps = ["//support-lib:djinni-support-ts"],
+    data = glob(["handwritten-src/ts/*.html",
+                 "handwritten-src/ts/*.ts",
+                 "handwritten-src/ts/*.json",
+                 "djinni/vendor/third-party/proto/ts/*.ts",
+                 "node_modules/**",
+                 "generated-src/ts/*.ts"]) + [":wasm"]
+)
+
+sh_binary(
+    name = "server-js",
+    srcs = ["handwritten-src/js/run.sh"],
+    data = glob(["handwritten-src/js/*.html",
+                 "handwritten-src/js/*.js"]) + [":wasm"]
 )
