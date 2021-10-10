@@ -1,6 +1,7 @@
+#include "DataRef.hpp"
+
 #if !(DATAREF_JNI || DATAREF_OBJC || DATAREF_WASM)
 
-#include "DataRef.hpp"
 #include <cassert>
 
 namespace snapchat {
