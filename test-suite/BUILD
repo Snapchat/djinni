@@ -126,8 +126,8 @@ java_test(
     deps = [
         ":djinni-tests-jni",
         "//support-lib:djinni-support-java",
-        "@maven//:com_google_code_findbugs_jsr305",
-        "@maven//:junit_junit",
+        "@maven_djinni//:com_google_code_findbugs_jsr305",
+        "@maven_djinni//:junit_junit",
         "@com_google_protobuf//java/core:core",
     ],
     jvm_flags = ["-Ddjinni.native_libs_dirs=./test-suite/libdjinni-tests-jni.so"],
