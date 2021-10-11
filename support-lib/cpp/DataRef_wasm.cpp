@@ -1,6 +1,7 @@
+#include "DataRef.hpp"
+
 #if DATAREF_WASM
 
-#include "DataRef.hpp"
 #include "djinni_wasm.hpp"
 #include <cassert>
 
