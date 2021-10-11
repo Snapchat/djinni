@@ -16,10 +16,17 @@
 
 package com.snapchat.djinni;
 
-import java.util.function.Function;
 import java.util.Objects;
 
 public abstract class Outcome<Result, Error> {
+
+    public interface ResultHandler<R, Result> {
+        public R apply(Result r);
+    }
+    public interface ErrorHandler<R, Error> {
+        public R apply(Error e);
+    }
+    
     // No default construction. This object can only be created via the static
     // factory methods.
     private Outcome() {}
@@ -42,8 +49,8 @@ public abstract class Outcome<Result, Error> {
     }
     
     // Provide access to result or error through functions
-    public abstract <R> R match(Function<? super Result, ? extends R> handleResult,
-                                Function<? super Error, ? extends R> handleError);
+    public abstract <R> R match(ResultHandler<R, Result> handleResult,
+                                ErrorHandler<R, Error> handleError);
 
     // Returns either result or default value
     public Result resultOr(Result defaultResult) {
@@ -58,8 +65,8 @@ public abstract class Outcome<Result, Error> {
     public static <Result, Error> Outcome<Result, Error> fromResult(Result value) {
         return new Outcome<Result, Error>() {
             @Override
-            public <R> R match(Function<? super Result, ? extends R> handleResult,
-                               Function<? super Error, ? extends R> handleError) {
+            public <R> R match(ResultHandler<R, Result> handleResult,
+                               ErrorHandler<R, Error> handleError) {
                 return handleResult.apply(value);
             }
         };
@@ -68,8 +75,8 @@ public abstract class Outcome<Result, Error> {
     public static <Result, Error> Outcome<Result, Error> fromError(Error error) {
         return new Outcome<Result, Error>() {
             @Override
-            public <R> R match(Function<? super Result, ? extends R> handleResult,
-                               Function<? super Error, ? extends R> handleError) {
+            public <R> R match(ResultHandler<R, Result> handleResult,
+                               ErrorHandler<R, Error> handleError) {
                 return handleError.apply(error);
             }
         };
