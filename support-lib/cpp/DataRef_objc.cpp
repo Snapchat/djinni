@@ -14,9 +14,10 @@
   * limitations under the License.
   */
 
+#include "DataRef.hpp"
+
 #if DATAREF_OBJC
 
-#include "DataRef.hpp"
 #include <cassert>
 
 namespace snapchat {

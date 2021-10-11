@@ -10,6 +10,7 @@ def djinni_setup_deps():
     scala_repositories()
 
     maven_install(
+        name = "maven_djinni",
         artifacts = [
             "com.google.code.findbugs:jsr305:3.0.2",
             "junit:junit:4.12",

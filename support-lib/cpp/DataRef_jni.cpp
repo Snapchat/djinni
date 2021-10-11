@@ -14,12 +14,13 @@
   * limitations under the License.
   */
 
+#include "DataRef.hpp"
+
 #if DATAREF_JNI
 
-#include "DataRef.hpp"
-#include <cassert>
-
 #include "djinni_support.hpp"
+
+#include <cassert>
 #include <variant>
 
 namespace snapchat {
