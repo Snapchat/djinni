@@ -232,8 +232,8 @@ void jniExceptionCheck(JNIEnv * env) {
     if (!env) {
         abort();
     }
-    const LocalRef<jthrowable> e(env->ExceptionOccurred());
-    if (e) {
+    if (env->ExceptionCheck()) {
+        const LocalRef<jthrowable> e(env->ExceptionOccurred());
         env->ExceptionClear();
         jniThrowCppFromJavaException(env, e.get());
     }
