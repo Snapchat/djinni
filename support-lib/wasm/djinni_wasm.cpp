@@ -143,7 +143,7 @@ EM_JS(void, djinni_init_wasm, (), {
 
         Module.callJsProxyMethod = function(obj, method, ...args) {
             try {
-                return obj[method].bind(obj)(...args);
+                return obj[method].apply(obj, args);
             } catch (e) {
                 return e;
             }
