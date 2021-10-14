@@ -117,7 +117,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     }
     case e: MExtern => e.defType match {
       case DEnum => e.wasm.typename
-      case _ => "const " + e.wasm.typename + " &"
+      case _ => "const " + e.wasm.typename + "&"
     }
     case _ => "const em::val&"
   }

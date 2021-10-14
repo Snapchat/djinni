@@ -16,7 +16,7 @@ em::val NativeExternInterface1::cppProxyMethods() {
     return methods;
 }
 
-em::val NativeExternInterface1::foo(const CppType& self, const em::val & w_i) {
+em::val NativeExternInterface1::foo(const CppType& self, const em::val& w_i) {
     return ::djinni_generated::NativeClientReturnedRecord::fromCpp(self->foo(::djinni_generated::NativeClientInterface::toCpp(w_i)));
 }
 int32_t NativeExternInterface1::bar(const CppType& self, int32_t w_e) {

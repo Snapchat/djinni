@@ -32,22 +32,22 @@ em::val NativeTestDuration::cppProxyMethods() {
     return methods;
 }
 
-std::string NativeTestDuration::hoursString(const em::val & w_dt) {
+std::string NativeTestDuration::hoursString(const em::val& w_dt) {
     return ::djinni::String::fromCpp(::testsuite::TestDuration::hoursString(::djinni::Duration<::djinni::I32, ::djinni::Duration_h>::toCpp(w_dt)));
 }
-std::string NativeTestDuration::minutesString(const em::val & w_dt) {
+std::string NativeTestDuration::minutesString(const em::val& w_dt) {
     return ::djinni::String::fromCpp(::testsuite::TestDuration::minutesString(::djinni::Duration<::djinni::I32, ::djinni::Duration_min>::toCpp(w_dt)));
 }
-std::string NativeTestDuration::secondsString(const em::val & w_dt) {
+std::string NativeTestDuration::secondsString(const em::val& w_dt) {
     return ::djinni::String::fromCpp(::testsuite::TestDuration::secondsString(::djinni::Duration<::djinni::I32, ::djinni::Duration_s>::toCpp(w_dt)));
 }
-std::string NativeTestDuration::millisString(const em::val & w_dt) {
+std::string NativeTestDuration::millisString(const em::val& w_dt) {
     return ::djinni::String::fromCpp(::testsuite::TestDuration::millisString(::djinni::Duration<::djinni::I32, ::djinni::Duration_ms>::toCpp(w_dt)));
 }
-std::string NativeTestDuration::microsString(const em::val & w_dt) {
+std::string NativeTestDuration::microsString(const em::val& w_dt) {
     return ::djinni::String::fromCpp(::testsuite::TestDuration::microsString(::djinni::Duration<::djinni::I32, ::djinni::Duration_us>::toCpp(w_dt)));
 }
-std::string NativeTestDuration::nanosString(const em::val & w_dt) {
+std::string NativeTestDuration::nanosString(const em::val& w_dt) {
     return ::djinni::String::fromCpp(::testsuite::TestDuration::nanosString(::djinni::Duration<::djinni::I32, ::djinni::Duration_ns>::toCpp(w_dt)));
 }
 em::val NativeTestDuration::hours(int32_t w_count) {

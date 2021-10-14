@@ -22,13 +22,13 @@ em::val NativeDataRefTest::cppProxyMethods() {
     return methods;
 }
 
-void NativeDataRefTest::sendData(const CppType& self, const em::val & w_data) {
+void NativeDataRefTest::sendData(const CppType& self, const em::val& w_data) {
     return self->sendData(::snapchat::djinni::NativeDataRef::toCpp(w_data));
 }
 em::val NativeDataRefTest::retriveAsBin(const CppType& self) {
     return ::djinni::Binary::fromCpp(self->retriveAsBin());
 }
-void NativeDataRefTest::sendMutableData(const CppType& self, const em::val & w_data) {
+void NativeDataRefTest::sendMutableData(const CppType& self, const em::val& w_data) {
     return self->sendMutableData(::snapchat::djinni::NativeDataRef::toCpp(w_data));
 }
 em::val NativeDataRefTest::generateData(const CppType& self) {
@@ -40,7 +40,7 @@ em::val NativeDataRefTest::dataFromVec(const CppType& self) {
 em::val NativeDataRefTest::dataFromStr(const CppType& self) {
     return ::snapchat::djinni::NativeDataRef::fromCpp(self->dataFromStr());
 }
-em::val NativeDataRefTest::sendDataView(const CppType& self, const em::val & w_data) {
+em::val NativeDataRefTest::sendDataView(const CppType& self, const em::val& w_data) {
     return ::djinni::Binary::fromCpp(self->sendDataView(::snapchat::djinni::NativeDataView::toCpp(w_data)));
 }
 em::val NativeDataRefTest::recvDataView(const CppType& self) {
