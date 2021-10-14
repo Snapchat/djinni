@@ -5,6 +5,7 @@
 #import "DBExternInterface1.h"
 #import "DBClientInterface+Private.h"
 #import "DBClientReturnedRecord+Private.h"
+#import "DBColor+Private.h"
 #import "DJICppWrapperCache+Private.h"
 #import "DJIError.h"
 #include <exception>
@@ -35,6 +36,13 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     try {
         auto objcpp_result_ = _cppRefHandle.get()->foo(::djinni_generated::ClientInterface::toCpp(i));
         return ::djinni_generated::ClientReturnedRecord::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
+- (DBColor)bar:(DBColor)e {
+    try {
+        auto objcpp_result_ = _cppRefHandle.get()->bar(::djinni::Enum<::testsuite::color, DBColor>::toCpp(e));
+        return ::djinni::Enum<::testsuite::color, DBColor>::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 

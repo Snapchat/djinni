@@ -4,6 +4,7 @@
 #include "NativeExternInterface1.hpp"  // my header
 #include "NativeClientInterface.hpp"
 #include "NativeClientReturnedRecord.hpp"
+#include "NativeColor.hpp"
 
 namespace djinni_generated {
 
@@ -25,6 +26,15 @@ CJNIEXPORT ::djinni_generated::NativeClientReturnedRecord::JniType JNICALL Java_
         const auto& ref = ::djinni::objectFromHandleAddress<::ExternInterface1>(nativeRef);
         auto r = ref->foo(::djinni_generated::NativeClientInterface::toCpp(jniEnv, j_i));
         return ::djinni::release(::djinni_generated::NativeClientReturnedRecord::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT ::djinni_generated::NativeColor::JniType JNICALL Java_com_dropbox_djinni_test_ExternInterface1_00024CppProxy_native_1bar(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, ::djinni_generated::NativeColor::JniType j_e)
+{
+    try {
+        const auto& ref = ::djinni::objectFromHandleAddress<::ExternInterface1>(nativeRef);
+        auto r = ref->bar(::djinni_generated::NativeColor::toCpp(jniEnv, j_e));
+        return ::djinni::release(::djinni_generated::NativeColor::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 

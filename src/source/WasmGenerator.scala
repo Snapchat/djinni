@@ -100,6 +100,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       case DEnum => "int32_t"
       case _ => "em::val"
     }
+    case e: MExtern => e.wasm.typename
     case _ => "em::val"
   }
   def wasmType(t: TypeRef): String = wasmType(t.resolved)
@@ -113,6 +114,10 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     case d: MDef => d.defType match {
       case DEnum => "int32_t"
       case _ => "const em::val&"
+    }
+    case e: MExtern => e.defType match {
+      case DEnum => e.wasm.typename
+      case _ => "const " + e.wasm.typename + "&"
     }
     case _ => "const em::val&"
   }

@@ -5,6 +5,7 @@
 
 #include "client_interface.hpp"
 #include "client_returned_record.hpp"
+#include "color.hpp"
 #include <memory>
 
 class ExternInterface1 {
@@ -12,4 +13,6 @@ public:
     virtual ~ExternInterface1() {}
 
     virtual ::testsuite::ClientReturnedRecord foo(const std::shared_ptr<::testsuite::ClientInterface> & i) = 0;
+
+    virtual ::testsuite::color bar(::testsuite::color e) = 0;
 };
