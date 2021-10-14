@@ -269,10 +269,10 @@ The generated code can be used with both plain Javascript and TypeScript.
 New command line switches:
 
 - `--wasm-out`: wasm bridge code output folder
-- `--wasm-include-prefix`: path prefix to be added to include lines in generated
-  hpp files
-- `--wasm-include-cpp-prefix`: path prefix to be added to include lines in
-  generated cpp files
+- `--wasm-include-prefix`: path prefix to be added to include lines for WASM
+  bridge class header files
+- `--wasm-include-cpp-prefix`: path prefix to be added to include lines for main
+  C++ class header files
 - `--wasm-base-lib-include-prefix`: path prefix to be added to djinni support
   library inlcude lines in generated files
 - `--ts-out`: typescript output folder
