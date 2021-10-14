@@ -65,7 +65,6 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
             case m => f(arg)
           }
         case MArray => tsArrayType(tm.args.head)
-        // TODO Yaml extern
         case e: MExtern => e.ts.typename
         case p: MProtobuf => p.name
         case o =>
