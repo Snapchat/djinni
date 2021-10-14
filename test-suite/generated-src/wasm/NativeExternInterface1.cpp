@@ -4,18 +4,23 @@
 #include "NativeExternInterface1.hpp"  // my header
 #include "NativeClientInterface.hpp"
 #include "NativeClientReturnedRecord.hpp"
+#include "NativeColor.hpp"
 
 namespace djinni_generated {
 
 em::val NativeExternInterface1::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
         "foo",
+        "bar",
     });
     return methods;
 }
 
-em::val NativeExternInterface1::foo(const CppType& self, const em::val& w_i) {
+em::val NativeExternInterface1::foo(const CppType& self, const em::val & w_i) {
     return ::djinni_generated::NativeClientReturnedRecord::fromCpp(self->foo(::djinni_generated::NativeClientInterface::toCpp(w_i)));
+}
+int32_t NativeExternInterface1::bar(const CppType& self, int32_t w_e) {
+    return ::djinni_generated::NativeColor::fromCpp(self->bar(::djinni_generated::NativeColor::toCpp(w_e)));
 }
 
 EMSCRIPTEN_BINDINGS(extern_interface_1) {
@@ -23,6 +28,7 @@ EMSCRIPTEN_BINDINGS(extern_interface_1) {
         .smart_ptr<std::shared_ptr<::ExternInterface1>>("ExternInterface1")
         .function("nativeDestroy", &NativeExternInterface1::nativeDestroy)
         .function("foo", NativeExternInterface1::foo)
+        .function("bar", NativeExternInterface1::bar)
         ;
 }
 

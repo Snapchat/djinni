@@ -11,6 +11,7 @@ export interface /*record*/ ExternRecordWithDerivings {
 
 export interface ExternInterface1 {
     foo(i: ClientInterface): ClientReturnedRecord;
+    bar(e: Color): Color;
 }
 
 export interface ExternInterface2 {

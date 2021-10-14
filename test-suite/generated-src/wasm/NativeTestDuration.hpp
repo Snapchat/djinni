@@ -20,12 +20,12 @@ struct NativeTestDuration : ::djinni::JsInterface<::testsuite::TestDuration, Nat
 
     static em::val cppProxyMethods();
 
-    static std::string hoursString(const em::val& w_dt);
-    static std::string minutesString(const em::val& w_dt);
-    static std::string secondsString(const em::val& w_dt);
-    static std::string millisString(const em::val& w_dt);
-    static std::string microsString(const em::val& w_dt);
-    static std::string nanosString(const em::val& w_dt);
+    static std::string hoursString(const em::val & w_dt);
+    static std::string minutesString(const em::val & w_dt);
+    static std::string secondsString(const em::val & w_dt);
+    static std::string millisString(const em::val & w_dt);
+    static std::string microsString(const em::val & w_dt);
+    static std::string nanosString(const em::val & w_dt);
     static em::val hours(int32_t w_count);
     static em::val minutes(int32_t w_count);
     static em::val seconds(int32_t w_count);

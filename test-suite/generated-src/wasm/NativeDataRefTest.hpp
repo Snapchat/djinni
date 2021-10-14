@@ -20,13 +20,13 @@ struct NativeDataRefTest : ::djinni::JsInterface<::testsuite::DataRefTest, Nativ
 
     static em::val cppProxyMethods();
 
-    static void sendData(const CppType& self, const em::val& w_data);
+    static void sendData(const CppType& self, const em::val & w_data);
     static em::val retriveAsBin(const CppType& self);
-    static void sendMutableData(const CppType& self, const em::val& w_data);
+    static void sendMutableData(const CppType& self, const em::val & w_data);
     static em::val generateData(const CppType& self);
     static em::val dataFromVec(const CppType& self);
     static em::val dataFromStr(const CppType& self);
-    static em::val sendDataView(const CppType& self, const em::val& w_data);
+    static em::val sendDataView(const CppType& self, const em::val & w_data);
     static em::val recvDataView(const CppType& self);
     static em::val create();
 

@@ -3,11 +3,14 @@
 
 #import "DBClientInterface.h"
 #import "DBClientReturnedRecord.h"
+#import "DBColor.h"
 #import <Foundation/Foundation.h>
 
 
 @interface DBExternInterface1 : NSObject
 
 - (nonnull DBClientReturnedRecord *)foo:(nullable id<DBClientInterface>)i;
+
+- (DBColor)bar:(DBColor)e;
 
 @end

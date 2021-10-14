@@ -9,6 +9,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class ExternInterface1 {
     public abstract com.dropbox.djinni.test.ClientReturnedRecord foo(com.dropbox.djinni.test.ClientInterface i);
 
+    public abstract com.dropbox.djinni.test.Color bar(com.dropbox.djinni.test.Color e);
+
     public static final class CppProxy extends ExternInterface1
     {
         private final long nativeRef;
@@ -29,5 +31,13 @@ public abstract class ExternInterface1 {
             return native_foo(this.nativeRef, i);
         }
         private native com.dropbox.djinni.test.ClientReturnedRecord native_foo(long _nativeRef, com.dropbox.djinni.test.ClientInterface i);
+
+        @Override
+        public com.dropbox.djinni.test.Color bar(com.dropbox.djinni.test.Color e)
+        {
+            assert !this.destroyed.get() : "trying to use a destroyed object";
+            return native_bar(this.nativeRef, e);
+        }
+        private native com.dropbox.djinni.test.Color native_bar(long _nativeRef, com.dropbox.djinni.test.Color e);
     }
 }
