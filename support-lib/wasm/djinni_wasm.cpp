@@ -141,9 +141,9 @@ EM_JS(void, djinni_init_wasm, (), {
             Module.protobuf[name] = proto;
         };
 
-        Module.callJsProxyMethod = function(func, ...args) {
+        Module.callJsProxyMethod = function(obj, method, ...args) {
             try {
-                return func(...args);
+                return obj[method].apply(obj, args);
             } catch (e) {
                 return e;
             }

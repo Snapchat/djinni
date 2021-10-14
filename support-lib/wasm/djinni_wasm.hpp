@@ -430,9 +430,9 @@ public:
     virtual ~JsProxyBase();
     const em::val& _jsRef() const;
     template<typename ...Args>
-    em::val callMethod(const char* name, Args&&... args) {
+    em::val callMethod(const std::string& name, Args&&... args) {
         em::val caller = em::val::module_property("callJsProxyMethod");
-        return caller(_js[name], std::forward<Args>(args)...);
+        return caller(_js, name, std::forward<Args>(args)...);
     }
 protected:
     void checkError(const em::val& v);
