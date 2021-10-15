@@ -34,10 +34,6 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
   private def helperNamespace(): String = {
     return spec.jniNamespace;
   }
-  private def includePrefix(): String = {
-    // TODO: add include path prefix
-    return "";
-  }
 
   private def helperClass(name: String) = spec.jniClassIdentStyle(name)
   private def helperClass(tm: MExpr): String = helperName(tm) + helperTemplates(tm)
@@ -234,7 +230,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl("static void staticInitialize();");
       }
     }), (w => {}))
-    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, includePrefix())(ident.name, origin, refs.cpp, (w => {
+    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, spec.wasmIncludePrefix)(ident.name, origin, refs.cpp, (w => {
       w.w(s"namespace").braced {
         w.wl(s"EM_JS(void, djinni_init_${nsprefix}_${ident.name}, (), {").nested {
           w.w(s"Module.${idJs.ty(ident)} = ").braced {
@@ -321,7 +317,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       }
     }), (w => {}))
 
-    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, includePrefix())(ident.name, origin, refs.cpp, (w => {
+    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, spec.wasmIncludePrefix)(ident.name, origin, refs.cpp, (w => {
       // method list
       if (i.ext.cpp) {
         w.w(s"em::val $helper::cppProxyMethods()").braced {
@@ -426,7 +422,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       }
     }), (w => {}))
 
-    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, includePrefix())(ident.name, origin, refs.cpp, (w => {
+    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, spec.wasmIncludePrefix)(ident.name, origin, refs.cpp, (w => {
       w.w(s"auto $helper::toCpp(const JsType& j) -> CppType").braced {
         writeAlignedCall(w, "return {", r.fields, "}", f => {
           s"""${helperClass(f.ty.resolved)}::Boxed::toCpp(j["${idJs.field(f.ident.name)}"])"""
