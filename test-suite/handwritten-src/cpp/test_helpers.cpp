@@ -9,6 +9,7 @@
 #include "primitive_list.hpp"
 #include "set_record.hpp"
 #include <exception>
+#include <thread>
 
 namespace testsuite {
 
@@ -164,7 +165,13 @@ std::vector<uint8_t> TestHelpers::id_binary(const std::vector<uint8_t> & v) {
 djinni::Future<int32_t> TestHelpers::get_async_result() {
     auto p = djinni::Promise<int32_t>();
     auto f = p.getFuture();
-    p.setValue(42);
+
+    std::thread t([p = std::move(p)] () mutable {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        p.setValue(42);
+    });
+    t.detach();
+
     return f;
 }
 
