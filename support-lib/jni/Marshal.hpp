@@ -19,6 +19,7 @@
 #pragma once
 
 #include "djinni_support.hpp"
+#include "../cpp/Future.hpp"
 #include <array>
 #include <cassert>
 #include <chrono>
@@ -812,6 +813,56 @@ namespace djinni
     public:
         static jdoubleArray makePrimitiveArray(JNIEnv* jniEnv, jsize size) {
             return jniEnv->NewDoubleArray(size);
+        }
+    };
+
+    struct PromiseJniInfo
+    {
+        const GlobalRef<jclass> clazz { jniFindClass("com/snapchat/djinni/Promise") };
+        const jmethodID constructor { jniGetMethodID(clazz.get(), "<init>", "()V") };
+        const jmethodID method_get_future { jniGetMethodID(clazz.get(), "getFuture", "()Lcom/snapchat/djinni/Future;") };
+        const jmethodID method_set_value { jniGetMethodID(clazz.get(), "setValue", "(Ljava/lang/Object;)V") };
+    };
+    template <class RESULT>
+    class FutureAdaptor
+    {
+        using CppResType = typename RESULT::CppType;
+
+        struct PromiseHolder {
+            GlobalRef<jobject> promise;
+
+            void set(JNIEnv * env, jobject localRef) {
+                promise = GlobalRef<jobject>(env, localRef);
+            }
+            auto get() const { return promise.get(); }
+        };
+    public:
+        using CppType = Future<CppResType>;
+        using JniType = jobject;
+
+        using Boxed = FutureAdaptor;
+
+        static CppType toCpp(JNIEnv* jniEnv, JniType j)
+        {
+            return {};
+        }
+
+        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c)
+        {
+            const auto& promiseJniInfo = JniClass<PromiseJniInfo>::get();
+
+            auto promise = std::make_shared<PromiseHolder>();
+            promise->set(jniEnv, jniEnv->NewObject(promiseJniInfo.clazz.get(), promiseJniInfo.constructor));
+            auto future = LocalRef<jobject>(jniEnv, jniEnv->CallObjectMethod(promise->get(), promiseJniInfo.method_get_future));
+            jniExceptionCheck(jniEnv);
+            
+            c.then([promise, &promiseJniInfo] (CppResType res) {
+                JNIEnv* jniEnv = jniGetThreadEnv();
+                jniEnv->CallVoidMethod(promise->get(), promiseJniInfo.method_set_value, RESULT::Boxed::fromCpp(jniEnv, res).get());
+                jniExceptionCheck(jniEnv);
+            });
+            
+            return future;
         }
     };
 } // namespace djinni

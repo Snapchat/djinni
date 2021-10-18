@@ -161,4 +161,11 @@ std::vector<uint8_t> TestHelpers::id_binary(const std::vector<uint8_t> & v) {
     return v;
 }
 
+djinni::Future<int32_t> TestHelpers::get_async_result() {
+    auto p = djinni::Promise<int32_t>();
+    auto f = p.getFuture();
+    p.setValue(42);
+    return f;
+}
+
 } // namespace testsuite

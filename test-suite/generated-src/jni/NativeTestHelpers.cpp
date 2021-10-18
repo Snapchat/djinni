@@ -220,4 +220,12 @@ CJNIEXPORT jbyteArray JNICALL Java_com_dropbox_djinni_test_TestHelpers_idBinary(
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
+CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestHelpers_getAsyncResult(JNIEnv* jniEnv, jobject /*this*/)
+{
+    try {
+        auto r = ::testsuite::TestHelpers::get_async_result();
+        return ::djinni::release(::djinni::FutureAdaptor<::djinni::I32>::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
 }  // namespace djinni_generated

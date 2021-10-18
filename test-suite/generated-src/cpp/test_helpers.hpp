@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "Future.hpp"
 #include "../../handwritten-src/cpp/optional.hpp"
 #include <cstdint>
 #include <memory>
@@ -86,6 +87,8 @@ public:
     static AssortedPrimitives assorted_primitives_id(const AssortedPrimitives & i);
 
     static std::vector<uint8_t> id_binary(const std::vector<uint8_t> & b);
+
+    static djinni::Future<int32_t> get_async_result();
 };
 
 }  // namespace testsuite

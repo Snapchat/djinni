@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import com.snapchat.djinni.Future;
 
 /**
  * Helper methods used by various different tests.
@@ -82,6 +83,9 @@ public abstract class TestHelpers {
 
     @Nonnull
     public static native byte[] idBinary(@Nonnull byte[] b);
+
+    @Nonnull
+    public static native Future<Integer> getAsyncResult();
 
     public static final class CppProxy extends TestHelpers
     {

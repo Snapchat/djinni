@@ -41,6 +41,8 @@ test_helpers = interface +c {
     static assorted_primitives_id(i: assorted_primitives): assorted_primitives;
 
     static id_binary(b: binary): binary;
+
+    static async get_async_result(): i32;
 }
 
 # Empty record
