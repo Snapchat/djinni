@@ -89,7 +89,7 @@ function deepEqual(object1, object2) {
 }
 
 function isObject(object) {
-    return object != null && typeof object === 'object';
+    return object != undefined && object != null && typeof object === 'object';
 }
 
 function assertTrue(a) {
@@ -119,8 +119,8 @@ function assertArrayEq(a, b) {
         assertEq(a[i], b[i]);
     }
 }
-function assertNull(a) {
-    assertTrue (a === null);
+function assertUndefined(a) {
+    assertTrue (a === undefined);
 }
 
 var allTests = [];

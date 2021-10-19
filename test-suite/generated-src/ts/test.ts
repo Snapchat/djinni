@@ -26,8 +26,8 @@ export interface ProtoTests_statics {
     stringToEmbeddedCppProto(x: string): RecordWithEmbeddedCppProto;
     protoListToStrings(x: Array<Person>): Array<string>;
     stringsToProtoList(x: Array<string>): Array<Person>;
-    optionalProtoToString(x: (Person | null)): string;
-    stringToOptionalProto(x: string): (Person | null);
+    optionalProtoToString(x: (Person | undefined)): string;
+    stringToOptionalProto(x: string): (Person | undefined);
     stringToProtoOutcome(x: string): Outcome<Person, number>;
 }
 
@@ -69,8 +69,8 @@ export interface TestDuration_statics {
     millisf(count: number): number;
     microsf(count: number): number;
     nanosf(count: number): number;
-    box(count: bigint): (number | null);
-    unbox(dt: (number | null)): bigint;
+    box(count: bigint): (number | undefined);
+    unbox(dt: (number | undefined)): bigint;
 }
 
 export interface /*record*/ RecordWithDurationAndDerivings {
@@ -143,8 +143,8 @@ export interface FlagRoundtrip {
 export interface FlagRoundtrip_statics {
     roundtripAccess(flag: AccessFlags): AccessFlags;
     roundtripEmpty(flag: EmptyFlags): EmptyFlags;
-    roundtripAccessBoxed(flag: (AccessFlags | null)): (AccessFlags | null);
-    roundtripEmptyBoxed(flag: (EmptyFlags | null)): (EmptyFlags | null);
+    roundtripAccessBoxed(flag: (AccessFlags | undefined)): (AccessFlags | undefined);
+    roundtripEmptyBoxed(flag: (EmptyFlags | undefined)): (EmptyFlags | undefined);
 }
 
 export interface /*record*/ RecordWithFlags {
@@ -310,7 +310,7 @@ export namespace Constants {
     /** opt_i16_constant has documentation. */
     export const OPT_I16_CONSTANT = 2;
     export const OPT_I32_CONSTANT = 3;
-    export const OPT_I64_CONSTANT = 4;
+    export const OPT_I64_CONSTANT = BigInt("4");
     /**
      * opt_f32_constant has long documentation.
      * (Second line of multi-line documentation.
@@ -361,7 +361,7 @@ export namespace ConstantsInterface {
     /** opt_i16_constant has documentation. */
     export const OPT_I16_CONSTANT = 2;
     export const OPT_I32_CONSTANT = 3;
-    export const OPT_I64_CONSTANT = 4;
+    export const OPT_I64_CONSTANT = BigInt("4");
     /**
      * opt_f32_constant has long documentation.
      * (Second line of multi-line documentation.
@@ -386,13 +386,13 @@ export interface /*record*/ AssortedPrimitives {
     sixtyfour: bigint;
     fthirtytwo: number;
     fsixtyfour: number;
-    oB: (boolean | null);
-    oEight: (number | null);
-    oSixteen: (number | null);
-    oThirtytwo: (number | null);
-    oSixtyfour: (bigint | null);
-    oFthirtytwo: (number | null);
-    oFsixtyfour: (number | null);
+    oB?: boolean;
+    oEight?: number;
+    oSixteen?: number;
+    oThirtytwo?: number;
+    oSixtyfour?: bigint;
+    oFthirtytwo?: number;
+    oFsixtyfour?: number;
 }
 
 /**
@@ -431,7 +431,7 @@ export interface TestHelpers_statics {
     checkCppToken(t: UserToken): void;
     cppTokenId(t: UserToken): bigint;
     checkTokenType(t: UserToken, type: string): void;
-    returnNone(): (number | null);
+    returnNone(): (number | undefined);
     /** Ensures that we generate integer translation code */
     assortedPrimitivesId(i: AssortedPrimitives): AssortedPrimitives;
     idBinary(b: Uint8Array): Uint8Array;
@@ -485,7 +485,7 @@ export enum Color {
 
 export interface /*record*/ EnumUsageRecord {
     e: Color;
-    o: (Color | null);
+    o?: Color;
     l: Array<Color>;
     s: Set<Color>;
     m: Map<Color, Color>;
@@ -493,7 +493,7 @@ export interface /*record*/ EnumUsageRecord {
 
 export interface EnumUsageInterface {
     e(e: Color): Color;
-    o(o: (Color | null)): (Color | null);
+    o(o: (Color | undefined)): (Color | undefined);
     l(l: Array<Color>): Array<Color>;
     s(s: Set<Color>): Set<Color>;
     m(m: Map<Color, Color>): Map<Color, Color>;
@@ -503,23 +503,23 @@ export interface EnumUsageInterface {
 export interface /*record*/ ClientReturnedRecord {
     recordId: bigint;
     content: string;
-    misc: (string | null);
+    misc?: string;
 }
 
 /** Client interface */
 export interface ClientInterface {
     /** Returns record of given string */
-    getRecord(recordId: bigint, utf8string: string, misc: (string | null)): ClientReturnedRecord;
+    getRecord(recordId: bigint, utf8string: string, misc: (string | undefined)): ClientReturnedRecord;
     identifierCheck(data: Uint8Array, r: number, jret: bigint): number;
     returnStr(): string;
     methTakingInterface(i: ClientInterface): string;
-    methTakingOptionalInterface(i: (ClientInterface | null)): string;
+    methTakingOptionalInterface(i: (ClientInterface | undefined)): string;
 }
 
 export interface ReverseClientInterface {
     returnStr(): string;
     methTakingInterface(i: ReverseClientInterface): string;
-    methTakingOptionalInterface(i: (ReverseClientInterface | null)): string;
+    methTakingOptionalInterface(i: (ReverseClientInterface | undefined)): string;
 }
 export interface ReverseClientInterface_statics {
     create(): ReverseClientInterface;
