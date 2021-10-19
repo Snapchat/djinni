@@ -26,8 +26,8 @@ export interface ProtoTests_statics {
     stringToEmbeddedCppProto(x: string): RecordWithEmbeddedCppProto;
     protoListToStrings(x: Array<Person>): Array<string>;
     stringsToProtoList(x: Array<string>): Array<Person>;
-    optionalProtoToString(x: Person): string;
-    stringToOptionalProto(x: string): Person;
+    optionalProtoToString(x: (Person | null)): string;
+    stringToOptionalProto(x: string): (Person | null);
     stringToProtoOutcome(x: string): Outcome<Person, number>;
 }
 
@@ -69,8 +69,8 @@ export interface TestDuration_statics {
     millisf(count: number): number;
     microsf(count: number): number;
     nanosf(count: number): number;
-    box(count: bigint): number;
-    unbox(dt: number): bigint;
+    box(count: bigint): (number | null);
+    unbox(dt: (number | null)): bigint;
 }
 
 export interface /*record*/ RecordWithDurationAndDerivings {
@@ -143,8 +143,8 @@ export interface FlagRoundtrip {
 export interface FlagRoundtrip_statics {
     roundtripAccess(flag: AccessFlags): AccessFlags;
     roundtripEmpty(flag: EmptyFlags): EmptyFlags;
-    roundtripAccessBoxed(flag: AccessFlags): AccessFlags;
-    roundtripEmptyBoxed(flag: EmptyFlags): EmptyFlags;
+    roundtripAccessBoxed(flag: (AccessFlags | null)): (AccessFlags | null);
+    roundtripEmptyBoxed(flag: (EmptyFlags | null)): (EmptyFlags | null);
 }
 
 export interface /*record*/ RecordWithFlags {
@@ -485,7 +485,7 @@ export enum Color {
 
 export interface /*record*/ EnumUsageRecord {
     e: Color;
-    o: Color;
+    o: (Color | null);
     l: Array<Color>;
     s: Set<Color>;
     m: Map<Color, Color>;
@@ -493,7 +493,7 @@ export interface /*record*/ EnumUsageRecord {
 
 export interface EnumUsageInterface {
     e(e: Color): Color;
-    o(o: Color): Color;
+    o(o: (Color | null)): (Color | null);
     l(l: Array<Color>): Array<Color>;
     s(s: Set<Color>): Set<Color>;
     m(m: Map<Color, Color>): Map<Color, Color>;
@@ -503,23 +503,23 @@ export interface EnumUsageInterface {
 export interface /*record*/ ClientReturnedRecord {
     recordId: bigint;
     content: string;
-    misc: string;
+    misc: (string | null);
 }
 
 /** Client interface */
 export interface ClientInterface {
     /** Returns record of given string */
-    getRecord(recordId: bigint, utf8string: string, misc: string): ClientReturnedRecord;
+    getRecord(recordId: bigint, utf8string: string, misc: (string | null)): ClientReturnedRecord;
     identifierCheck(data: Uint8Array, r: number, jret: bigint): number;
     returnStr(): string;
     methTakingInterface(i: ClientInterface): string;
-    methTakingOptionalInterface(i: ClientInterface): string;
+    methTakingOptionalInterface(i: (ClientInterface | null)): string;
 }
 
 export interface ReverseClientInterface {
     returnStr(): string;
     methTakingInterface(i: ReverseClientInterface): string;
-    methTakingOptionalInterface(i: ReverseClientInterface): string;
+    methTakingOptionalInterface(i: (ReverseClientInterface | null)): string;
 }
 export interface ReverseClientInterface_statics {
     create(): ReverseClientInterface;

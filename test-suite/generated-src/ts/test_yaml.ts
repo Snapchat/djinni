@@ -19,7 +19,7 @@ export interface ExternInterface2 {
 }
 
 export interface /*record*/ TestOptionalExternInterfaceRecord {
-    sampleInterface: SampleInterface;
+    sampleInterface: (SampleInterface | null);
 }
 
 export interface Module_statics {
