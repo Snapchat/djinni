@@ -458,7 +458,13 @@ struct JsInterface {
     // (interface +c)
     template <typename, typename>
     struct GetOrCreateCppProxy {
-        em::val operator() (const std::shared_ptr<I>& c) { return em::val::undefined(); }
+        em::val operator() (const std::shared_ptr<I>& c) {
+            // Trying to create a C++ object from JS without a C++ impl will just give undefined.
+            // This is probably not what you want. Either expose the interface to C++ and implement it,
+            // or make sure this method does not end up being called.
+            static_assert(false, "attempting to create c++ proxy object for interface without +c");
+            return em::val::undefined();
+        }
     };
     template <typename T>
     struct GetOrCreateCppProxy<T, std::void_t<decltype(T::cppProxyMethods)>> {
@@ -501,7 +507,12 @@ struct JsInterface {
     // (interface +w)
     template <typename, typename>
     struct GetOrCreateJsProxy {
-        std::shared_ptr<I> operator() (em::val js) { return {}; }
+        std::shared_ptr<I> operator() (em::val js) {
+            // Trying to create a JS object from C++ without a JS impl will just give a nullptr.
+            // This is probably not what you want. Either expose the interface to JS or avoid calling this method.
+            static_assert(false, "attempting to create js proxy object for interface without +w");
+            return {};
+        }
     };
     template <typename T>
     struct GetOrCreateJsProxy<T, std::void_t<typename T::JsProxy>> {
