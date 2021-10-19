@@ -60,9 +60,8 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
           assert(tm.args.size == 1)
           val arg = tm.args.head
           arg.base match {
-            case p: MPrimitive => "(" + tsPrimitiveType(p) + " | null)"
             case MOptional => throw new AssertionError("nested optional?")
-            case m => f(arg)
+            case m => "(" + f(arg) + " | null)"
           }
         case MArray => tsArrayType(tm.args.head)
         case e: MExtern => e.ts.typename
