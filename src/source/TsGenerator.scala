@@ -243,7 +243,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
       }
       // add static factories
       w.wl
-      w.w("export interface Module_statics").braced {
+      w.w(s"export interface ${idJs.ty(spec.tsModule)}_statics").braced {
         for (i <- interfacesWithStatics.toList) {
           w.wl(i + ": " + i + "_statics;")
         }

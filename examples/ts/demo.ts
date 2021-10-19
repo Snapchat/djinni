@@ -1,6 +1,6 @@
 import * as example from "../generated-src/ts/example";
 
-declare function Module(): Promise<example.Module_statics>;
+declare function Module(): Promise<example.Example_statics>;
 
 var sorter: example.SortItems;
 

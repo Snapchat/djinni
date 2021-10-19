@@ -5,8 +5,8 @@ import {DjinniModule} from "@djinni_support/DjinniModule"
 import { Writer } from "protobufjs/minimal";
 
 export class ProtoTest extends TestCase {
-    m: test.Module_statics;
-    constructor(module: test.Module_statics & DjinniModule) {
+    m: test.Test_statics;
+    constructor(module: test.Test_statics & DjinniModule) {
         super(module);
         this.m = module;
         // register protobuf types with wasm module

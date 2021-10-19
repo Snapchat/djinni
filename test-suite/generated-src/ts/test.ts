@@ -570,7 +570,7 @@ export interface /*record*/ SetRecord {
     iset: Set<number>;
 }
 
-export interface Module_statics {
+export interface Test_statics {
     ProtoTests: ProtoTests_statics;
     TestOutcome: TestOutcome_statics;
     TestDuration: TestDuration_statics;

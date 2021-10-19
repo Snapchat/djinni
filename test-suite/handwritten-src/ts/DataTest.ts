@@ -3,10 +3,10 @@ import * as test from "../../generated-src/ts/test";
 import {DjinniModule} from "@djinni_support/DjinniModule"
 
 class DataTest extends TestCase {
-    m: test.Module_statics & DjinniModule;
+    m: test.Test_statics & DjinniModule;
     test: test.DataRefTest;
 
-    constructor(module: test.Module_statics & DjinniModule) {
+    constructor(module: test.Test_statics & DjinniModule) {
         super(module);
         this.m = module;
     }

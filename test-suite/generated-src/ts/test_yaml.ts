@@ -22,5 +22,5 @@ export interface /*record*/ TestOptionalExternInterfaceRecord {
     sampleInterface: SampleInterface;
 }
 
-export interface Module_statics {
+export interface TestYaml_statics {
 }

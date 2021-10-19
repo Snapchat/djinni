@@ -1,6 +1,6 @@
-import * as perftest from "../generated-src/ts/perftest_d";
+import * as perftest from "../generated-src/ts/perftest";
 import {DjinniModule} from "@djinni_support/DjinniModule"
-declare function Module(): Promise<perftest.Module_statics & DjinniModule>;
+declare function Module(): Promise<perftest.Perftest_statics & DjinniModule>;
 
 Module().then(module => {
     main(module);
@@ -55,7 +55,7 @@ class ObjectPlatformImpl {
     onDone() {}
 }
 
-function main (module: perftest.Module_statics & DjinniModule) {
+function main (module: perftest.Perftest_statics & DjinniModule) {
     var minCount = 16;
     var lowCount = 128;
     var highCount = 4096;

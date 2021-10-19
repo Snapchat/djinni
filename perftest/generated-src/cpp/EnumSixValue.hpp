@@ -16,6 +16,18 @@ enum class EnumSixValue : int {
     SIXTH = 5,
 };
 
+constexpr const char* to_string(EnumSixValue e) noexcept {
+    constexpr const char* names[] = {
+        "First",
+        "Second",
+        "Third",
+        "Fourth",
+        "Fifth",
+        "Sixth",
+    };
+    return names[static_cast<int>(e)];
+}
+
 } } }  // namespace snapchat::djinni::benchmark
 
 namespace std {

@@ -2,10 +2,10 @@ import {TestCase, allTests, assertArrayEq} from "./testutils"
 import * as test from "../../generated-src/ts/test";
 
 export class ArrayTest extends TestCase {
-    m: test.Module_statics;
+    m: test.Test_statics;
     constructor(module: any) {
         super(module);
-        this.m = <test.Module_statics>module;
+        this.m = <test.Test_statics>module;
     }
     testStringArray() {
         var inputStrings = ['1', '2', '3'];
