@@ -2,12 +2,12 @@ import {TestCase, allTests, assertEq, assertTrue} from "./testutils"
 import * as test from "../../generated-src/ts/test";
 
 class NestedCollectionTest extends TestCase {
-    m: test.Module_statics;
+    m: test.Test_statics;
     jsNestedCollection: test.NestedCollection;
 
     constructor(module: any) {
         super(module);
-        this.m = <test.Module_statics>module;
+        this.m = <test.Test_statics>module;
     }
     setUp() {
         var jsSet1 = new Set();

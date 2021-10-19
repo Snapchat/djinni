@@ -2,10 +2,10 @@ import {TestCase, allTests, assertEq, assertNe} from "./testutils"
 import * as test from "../../generated-src/ts/test";
 
 class OutcomeTest extends TestCase {
-    m: test.Module_statics;
+    m: test.Test_statics;
     constructor(module: any) {
         super(module);
-        this.m = <test.Module_statics>module;
+        this.m = <test.Test_statics>module;
     }
     test() {
         // construct result outcome in native and pass to js

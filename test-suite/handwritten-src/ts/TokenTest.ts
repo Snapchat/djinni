@@ -8,11 +8,11 @@ class JsToken {
 }
 
 export class TokenTest extends TestCase {
-    m: test.Module_statics;
+    m: test.Test_statics;
 
     constructor(module) {
         super(module);
-        this.m = <test.Module_statics>module;
+        this.m = <test.Test_statics>module;
     }
     
     testTokens() {
