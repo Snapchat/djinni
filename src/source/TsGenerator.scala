@@ -25,9 +25,6 @@ import djinni.writer.IndentWriter
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.TreeSet
 
-// TODO Refs
-// TODO Yaml export and import
-
 class TsGenerator(spec: Spec) extends Generator(spec) {
   private def tsRetType(m: Interface.Method): String = {
     return if (m.ret.isEmpty) "void" else toTsType(m.ret.get.resolved)
@@ -52,6 +49,21 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
     case _ => "Array<" + toTsType(tm) + ">"
   }
 
+  // return the base type if tm is optional otherwise None
+  private def optionalBase(tm: MExpr) : Option[MExpr] = {
+    tm.base match {
+      case MOptional => Some(tm.args.head)
+      case _ => None
+    }
+  }
+
+  private def removeOptional(tm: MExpr) : MExpr = {
+    tm.base match {
+      case MOptional => tm.args.head
+      case _ => tm
+    }
+  }
+
   def toTsType(tm: MExpr): String = {
     def args(tm: MExpr) = if (tm.args.isEmpty) "" else tm.args.map(f).mkString("<", ", ", ">")
     def f(tm: MExpr): String = {
@@ -60,9 +72,8 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
           assert(tm.args.size == 1)
           val arg = tm.args.head
           arg.base match {
-            case p: MPrimitive => "(" + tsPrimitiveType(p) + " | null)"
             case MOptional => throw new AssertionError("nested optional?")
-            case m => f(arg)
+            case m => f(arg) + " | undefined"
           }
         case MArray => tsArrayType(tm.args.head)
         case e: MExtern => e.ts.typename
@@ -116,7 +127,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
 
   private def generateTsConstants(w: IndentWriter, ident: Ident, consts: Seq[Const]) = {
     def writeJsConst(w: IndentWriter, ty: TypeRef, v: Any): Unit = v match {
-      case l: Long if (toTsType(ty.resolved) == "bigint") => w.w(s"""BigInt("${l.toString}")""")
+      case l: Long if (toTsType(removeOptional(ty.resolved)) == "bigint") => w.w(s"""BigInt("${l.toString}")""")
       case l: Long => w.w(l.toString)
       case d: Double => w.w(d.toString)
       case b: Boolean => w.w(if (b) "true" else "false")
@@ -165,7 +176,10 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
     w.w(s"export interface /*record*/ ${idJs.ty(ident)}").braced {
       for (f <- r.fields) {
         writeDoc(w, f.doc)
-        w.wl(s"${idJs.field(f.ident)}: ${toTsType(f.ty.resolved)};")
+        optionalBase(f.ty.resolved) match {
+          case Some(t) => w.wl(s"${idJs.field(f.ident)}?: ${toTsType(t)};")
+          case _ => w.wl(s"${idJs.field(f.ident)}: ${toTsType(f.ty.resolved)};")
+        }
       }
     }
     if (!r.consts.isEmpty) {

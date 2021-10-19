@@ -150,7 +150,7 @@ struct Optional
         }
     }
     static JsType fromCpp(const OptionalType<typename T::CppType>& c) {
-        return c ? T::Boxed::fromCpp(*c) : em::val::null();
+        return c ? T::Boxed::fromCpp(*c) : em::val::undefined();
     }
     template <typename C = T>
     static JsType fromCpp(const typename C::CppOptType& cppOpt) {
