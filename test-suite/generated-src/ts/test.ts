@@ -26,8 +26,8 @@ export interface ProtoTests_statics {
     stringToEmbeddedCppProto(x: string): RecordWithEmbeddedCppProto;
     protoListToStrings(x: Array<Person>): Array<string>;
     stringsToProtoList(x: Array<string>): Array<Person>;
-    optionalProtoToString(x: (Person | undefined)): string;
-    stringToOptionalProto(x: string): (Person | undefined);
+    optionalProtoToString(x: Person | undefined): string;
+    stringToOptionalProto(x: string): Person | undefined;
     stringToProtoOutcome(x: string): Outcome<Person, number>;
 }
 
@@ -69,8 +69,8 @@ export interface TestDuration_statics {
     millisf(count: number): number;
     microsf(count: number): number;
     nanosf(count: number): number;
-    box(count: bigint): (number | undefined);
-    unbox(dt: (number | undefined)): bigint;
+    box(count: bigint): number | undefined;
+    unbox(dt: number | undefined): bigint;
 }
 
 export interface /*record*/ RecordWithDurationAndDerivings {
@@ -143,8 +143,8 @@ export interface FlagRoundtrip {
 export interface FlagRoundtrip_statics {
     roundtripAccess(flag: AccessFlags): AccessFlags;
     roundtripEmpty(flag: EmptyFlags): EmptyFlags;
-    roundtripAccessBoxed(flag: (AccessFlags | undefined)): (AccessFlags | undefined);
-    roundtripEmptyBoxed(flag: (EmptyFlags | undefined)): (EmptyFlags | undefined);
+    roundtripAccessBoxed(flag: AccessFlags | undefined): AccessFlags | undefined;
+    roundtripEmptyBoxed(flag: EmptyFlags | undefined): EmptyFlags | undefined;
 }
 
 export interface /*record*/ RecordWithFlags {
@@ -431,7 +431,7 @@ export interface TestHelpers_statics {
     checkCppToken(t: UserToken): void;
     cppTokenId(t: UserToken): bigint;
     checkTokenType(t: UserToken, type: string): void;
-    returnNone(): (number | undefined);
+    returnNone(): number | undefined;
     /** Ensures that we generate integer translation code */
     assortedPrimitivesId(i: AssortedPrimitives): AssortedPrimitives;
     idBinary(b: Uint8Array): Uint8Array;
@@ -493,7 +493,7 @@ export interface /*record*/ EnumUsageRecord {
 
 export interface EnumUsageInterface {
     e(e: Color): Color;
-    o(o: (Color | undefined)): (Color | undefined);
+    o(o: Color | undefined): Color | undefined;
     l(l: Array<Color>): Array<Color>;
     s(s: Set<Color>): Set<Color>;
     m(m: Map<Color, Color>): Map<Color, Color>;
@@ -509,17 +509,17 @@ export interface /*record*/ ClientReturnedRecord {
 /** Client interface */
 export interface ClientInterface {
     /** Returns record of given string */
-    getRecord(recordId: bigint, utf8string: string, misc: (string | undefined)): ClientReturnedRecord;
+    getRecord(recordId: bigint, utf8string: string, misc: string | undefined): ClientReturnedRecord;
     identifierCheck(data: Uint8Array, r: number, jret: bigint): number;
     returnStr(): string;
     methTakingInterface(i: ClientInterface): string;
-    methTakingOptionalInterface(i: (ClientInterface | undefined)): string;
+    methTakingOptionalInterface(i: ClientInterface | undefined): string;
 }
 
 export interface ReverseClientInterface {
     returnStr(): string;
     methTakingInterface(i: ReverseClientInterface): string;
-    methTakingOptionalInterface(i: (ReverseClientInterface | undefined)): string;
+    methTakingOptionalInterface(i: ReverseClientInterface | undefined): string;
 }
 export interface ReverseClientInterface_statics {
     create(): ReverseClientInterface;

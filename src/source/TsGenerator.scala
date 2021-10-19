@@ -73,7 +73,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
           val arg = tm.args.head
           arg.base match {
             case MOptional => throw new AssertionError("nested optional?")
-            case m => "(" + f(arg) + " | undefined)"
+            case m => f(arg) + " | undefined"
           }
         case MArray => tsArrayType(tm.args.head)
         case e: MExtern => e.ts.typename
