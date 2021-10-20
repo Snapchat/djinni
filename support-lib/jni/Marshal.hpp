@@ -29,6 +29,7 @@
 #include <unordered_set>
 #include <vector>
 #include "../expected.hpp"
+#include <iostream>
 
 namespace djinni
 {
@@ -816,13 +817,25 @@ namespace djinni
         }
     };
 
-    struct PromiseJniInfo
-    {
+    struct PromiseJniInfo {
         const GlobalRef<jclass> clazz { jniFindClass("com/snapchat/djinni/Promise") };
         const jmethodID constructor { jniGetMethodID(clazz.get(), "<init>", "()V") };
         const jmethodID method_get_future { jniGetMethodID(clazz.get(), "getFuture", "()Lcom/snapchat/djinni/Future;") };
         const jmethodID method_set_value { jniGetMethodID(clazz.get(), "setValue", "(Ljava/lang/Object;)V") };
     };
+
+    struct FutureJniInfo {
+        const GlobalRef<jclass> clazz { jniFindClass("com/snapchat/djinni/Future") };
+        const jmethodID method_then { jniGetMethodID(clazz.get(), "then", "(Lcom/snapchat/djinni/FutureHandler;)V") };
+    };
+
+    struct NativeFutureHandlerJniInfo {
+        const GlobalRef<jclass> clazz { jniFindClass("com/snapchat/djinni/NativeFutureHandler") };
+        const jmethodID constructor { jniGetMethodID(clazz.get(), "<init>", "(JJ)V") };
+    };
+
+    using NativeFutureHandlerFunc = void (*)(JNIEnv* jniEnv, jlong nativePromise, jobject jres);
+
     template <class RESULT>
     class FutureAdaptor
     {
@@ -844,7 +857,35 @@ namespace djinni
 
         static CppType toCpp(JNIEnv* jniEnv, JniType j)
         {
-            return {};
+            using NativePromiseType = Promise<CppResType>;
+            std::cout << 3 << std::endl;
+            
+            auto p = std::make_unique<NativePromiseType>();
+            auto f = p->getFuture();
+            std::cout << 4 << std::endl;
+
+            NativeFutureHandlerFunc FutureHandler = [] (JNIEnv* jniEnv, jlong nativePromise, jobject jres) {
+                std::cout << 9 << std::endl;
+                std::unique_ptr<NativePromiseType> promise {
+                    reinterpret_cast<NativePromiseType*>(nativePromise)
+                };
+                std::cout << 10 << std::endl;
+                promise->setValue(RESULT::Boxed::toCpp(jniEnv, jres));
+                std::cout << 11 << std::endl;
+            };
+
+            const auto& nativeFutureHandlerJniInfo = JniClass<NativeFutureHandlerJniInfo>::get();
+            std::cout << 5 << std::endl;
+            auto handler = LocalRef<jobject>(jniEnv, jniEnv->NewObject(nativeFutureHandlerJniInfo.clazz.get(),
+                                                                       nativeFutureHandlerJniInfo.constructor,
+                                                                       reinterpret_cast<jlong>(FutureHandler),
+                                                                       reinterpret_cast<jlong>(p.release())));
+            std::cout << 6 << std::endl;
+            const auto& futureJniInfo = JniClass<FutureJniInfo>::get();
+            std::cout << 7 << std::endl;
+            jniEnv->CallObjectMethod(j, futureJniInfo.method_then, handler.get());
+            std::cout << 8 << std::endl;
+            return f;
         }
 
         static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c)

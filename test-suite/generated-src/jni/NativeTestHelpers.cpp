@@ -11,6 +11,9 @@
 #include "NativePrimitiveList.hpp"
 #include "NativeSetRecord.hpp"
 #include "NativeUserToken.hpp"
+#include "NativeAsyncInterface.hpp"
+
+#include <iostream>
 
 namespace djinni_generated {
 
@@ -225,6 +228,15 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestHelpers_getAsyncResu
     try {
         auto r = ::testsuite::TestHelpers::get_async_result();
         return ::djinni::release(::djinni::FutureAdaptor<::djinni::I32>::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jint JNICALL Java_com_dropbox_djinni_test_TestHelpers_checkAsyncInterface(JNIEnv* jniEnv, jobject /*this*/, jobject i)
+{
+    try {
+        std::cout << 1 << std::endl;
+        auto r = ::testsuite::TestHelpers::check_async_interface(NativeAsyncInterface::toCpp(jniEnv, i));
+        return ::djinni::release(::djinni::I32::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 

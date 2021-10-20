@@ -9,7 +9,22 @@ public class AsyncTest extends TestCase {
     static class ResultHolder {
         Integer res;
     }
-    public void test() {
+
+    static class JavaAsyncInterfaceImpl extends AsyncInterface {
+        public Future<Integer> getAsyncResult() {
+            final Promise<Integer> p = new Promise<Integer>();
+            Future<Integer> f = p.getFuture();
+            Thread thread = new Thread("New Thread") {
+                    public void run(){
+                        p.setValue(42);
+                    }
+                };
+            thread.start();
+            return f;
+        }
+    }
+    
+    public void testConsumeNativeFuture() {
         Future<Integer> f = TestHelpers.getAsyncResult();
         final ResultHolder r = new ResultHolder();
         f.then((res) -> {
@@ -27,5 +42,9 @@ public class AsyncTest extends TestCase {
         } catch (InterruptedException e) {
         }
         assertEquals(r.res, Integer.valueOf(42));
+    }
+    public void testConsumePlatformFuture() {
+        int r = TestHelpers.checkAsyncInterface(new JavaAsyncInterfaceImpl());
+        assertEquals(r, 42);
     }
 }

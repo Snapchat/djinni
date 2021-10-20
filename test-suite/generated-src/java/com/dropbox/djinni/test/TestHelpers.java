@@ -87,6 +87,9 @@ public abstract class TestHelpers {
     @Nonnull
     public static native Future<Integer> getAsyncResult();
 
+    @Nonnull
+    public static native int checkAsyncInterface(AsyncInterface i);
+
     public static final class CppProxy extends TestHelpers
     {
         private final long nativeRef;
