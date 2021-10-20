@@ -127,6 +127,7 @@ fi
     --wasm-out "$temp_out_relative/wasm" \
     --ts-out "$temp_out_relative/ts" \
     --ts-module "test" \
+    --ts-import-name "./test" \
     \
     --list-in-files "./generated-src/inFileList.txt" \
     --list-out-files "./generated-src/outFileList.txt"\

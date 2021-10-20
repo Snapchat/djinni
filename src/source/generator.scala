@@ -95,6 +95,7 @@ package object generatorTools {
                    jsIdentStyle: JsIdentStyle,
                    tsOutFolder: Option[File],
                    tsModule: String,
+                   tsImportName: String,
                    outFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],
