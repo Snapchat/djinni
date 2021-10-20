@@ -13,8 +13,6 @@
 #include "NativeUserToken.hpp"
 #include "NativeAsyncInterface.hpp"
 
-#include <iostream>
-
 namespace djinni_generated {
 
 NativeTestHelpers::NativeTestHelpers() : ::djinni::JniInterface<::testsuite::TestHelpers, NativeTestHelpers>("com/dropbox/djinni/test/TestHelpers$CppProxy") {}
@@ -234,7 +232,6 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestHelpers_getAsyncResu
 CJNIEXPORT jint JNICALL Java_com_dropbox_djinni_test_TestHelpers_checkAsyncInterface(JNIEnv* jniEnv, jobject /*this*/, jobject i)
 {
     try {
-        std::cout << 1 << std::endl;
         auto r = ::testsuite::TestHelpers::check_async_interface(NativeAsyncInterface::toCpp(jniEnv, i));
         return ::djinni::release(::djinni::I32::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)

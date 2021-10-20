@@ -29,7 +29,6 @@
 #include <unordered_set>
 #include <vector>
 #include "../expected.hpp"
-#include <iostream>
 
 namespace djinni
 {
@@ -858,33 +857,26 @@ namespace djinni
         static CppType toCpp(JNIEnv* jniEnv, JniType j)
         {
             using NativePromiseType = Promise<CppResType>;
-            std::cout << 3 << std::endl;
             
             auto p = std::make_unique<NativePromiseType>();
             auto f = p->getFuture();
-            std::cout << 4 << std::endl;
 
             NativeFutureHandlerFunc FutureHandler = [] (JNIEnv* jniEnv, jlong nativePromise, jobject jres) {
-                std::cout << 9 << std::endl;
                 std::unique_ptr<NativePromiseType> promise {
                     reinterpret_cast<NativePromiseType*>(nativePromise)
                 };
-                std::cout << 10 << std::endl;
                 promise->setValue(RESULT::Boxed::toCpp(jniEnv, jres));
-                std::cout << 11 << std::endl;
             };
 
             const auto& nativeFutureHandlerJniInfo = JniClass<NativeFutureHandlerJniInfo>::get();
-            std::cout << 5 << std::endl;
             auto handler = LocalRef<jobject>(jniEnv, jniEnv->NewObject(nativeFutureHandlerJniInfo.clazz.get(),
                                                                        nativeFutureHandlerJniInfo.constructor,
                                                                        reinterpret_cast<jlong>(FutureHandler),
                                                                        reinterpret_cast<jlong>(p.release())));
-            std::cout << 6 << std::endl;
+            jniExceptionCheck(jniEnv);
             const auto& futureJniInfo = JniClass<FutureJniInfo>::get();
-            std::cout << 7 << std::endl;
             jniEnv->CallObjectMethod(j, futureJniInfo.method_then, handler.get());
-            std::cout << 8 << std::endl;
+            jniExceptionCheck(jniEnv);
             return f;
         }
 
