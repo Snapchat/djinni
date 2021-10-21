@@ -7,7 +7,7 @@ namespace testsuite {
 
 class JavaOnlyListener {
 public:
-    virtual ~JavaOnlyListener() {}
+    virtual ~JavaOnlyListener() = default;
 };
 
 }  // namespace testsuite

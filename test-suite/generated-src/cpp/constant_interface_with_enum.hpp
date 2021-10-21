@@ -10,7 +10,7 @@ enum class constant_enum;
 /** Interface containing enum constant */
 class ConstantInterfaceWithEnum {
 public:
-    virtual ~ConstantInterfaceWithEnum() {}
+    virtual ~ConstantInterfaceWithEnum() = default;
 
     static constant_enum const CONST_ENUM;
 };

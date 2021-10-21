@@ -11,7 +11,7 @@ struct VarnameRecord;
 
 class VarnameInterface {
 public:
-    virtual ~VarnameInterface() {}
+    virtual ~VarnameInterface() = default;
 
     /**
      * We should also rewrite parameter names in docstrings.

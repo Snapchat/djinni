@@ -11,7 +11,7 @@ struct WcharTestRec;
 
 class WcharTestHelpers {
 public:
-    virtual ~WcharTestHelpers() {}
+    virtual ~WcharTestHelpers() = default;
 
     static WcharTestRec get_record();
 

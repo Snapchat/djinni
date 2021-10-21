@@ -22,6 +22,7 @@ struct RecordWithNestedDerivings final {
     friend bool operator<=(const RecordWithNestedDerivings& lhs, const RecordWithNestedDerivings& rhs);
     friend bool operator>=(const RecordWithNestedDerivings& lhs, const RecordWithNestedDerivings& rhs);
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     RecordWithNestedDerivings(int32_t key_,
                               RecordWithDerivings rec_)
     : key(std::move(key_))

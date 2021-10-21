@@ -15,6 +15,7 @@ struct Vec2 final {
     friend bool operator==(const Vec2& lhs, const Vec2& rhs);
     friend bool operator!=(const Vec2& lhs, const Vec2& rhs);
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     Vec2(int32_t x_,
          int32_t y_)
     : x(std::move(x_))

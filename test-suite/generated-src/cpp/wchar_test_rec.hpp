@@ -11,6 +11,7 @@ namespace testsuite {
 struct WcharTestRec final {
     std::wstring s;
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     WcharTestRec(std::wstring s_)
     : s(std::move(s_))
     {}

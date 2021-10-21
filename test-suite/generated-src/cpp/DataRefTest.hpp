@@ -13,7 +13,7 @@ namespace testsuite {
 
 class DataRefTest {
 public:
-    virtual ~DataRefTest() {}
+    virtual ~DataRefTest() = default;
 
     virtual void sendData(const ::snapchat::djinni::DataRef & data) = 0;
 

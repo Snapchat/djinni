@@ -28,7 +28,7 @@ struct SetRecord;
  */
 class TestHelpers {
 public:
-    virtual ~TestHelpers() {}
+    virtual ~TestHelpers() = default;
 
     /** Method with documentation */
     static SetRecord get_set_record();

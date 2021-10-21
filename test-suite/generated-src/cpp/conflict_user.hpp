@@ -12,7 +12,7 @@ class Conflict;
 
 class ConflictUser {
 public:
-    virtual ~ConflictUser() {}
+    virtual ~ConflictUser() = default;
 
     virtual std::shared_ptr<::testsuite::Conflict> Conflict() = 0;
 

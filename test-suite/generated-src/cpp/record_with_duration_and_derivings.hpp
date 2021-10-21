@@ -20,6 +20,7 @@ struct RecordWithDurationAndDerivings final {
     friend bool operator<=(const RecordWithDurationAndDerivings& lhs, const RecordWithDurationAndDerivings& rhs);
     friend bool operator>=(const RecordWithDurationAndDerivings& lhs, const RecordWithDurationAndDerivings& rhs);
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     RecordWithDurationAndDerivings(std::chrono::duration<double, std::nano> dt_)
     : dt(std::move(dt_))
     {}

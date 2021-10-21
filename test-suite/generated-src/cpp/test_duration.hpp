@@ -12,7 +12,7 @@ namespace testsuite {
 
 class TestDuration {
 public:
-    virtual ~TestDuration() {}
+    virtual ~TestDuration() = default;
 
     static std::string hoursString(std::chrono::duration<int32_t, std::ratio<3600>> dt);
 

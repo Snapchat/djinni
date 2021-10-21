@@ -21,6 +21,7 @@ struct ExternRecordWithDerivings final {
     friend bool operator<=(const ExternRecordWithDerivings& lhs, const ExternRecordWithDerivings& rhs);
     friend bool operator>=(const ExternRecordWithDerivings& lhs, const ExternRecordWithDerivings& rhs);
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     ExternRecordWithDerivings(::testsuite::RecordWithDerivings member_,
                               ::testsuite::color e_)
     : member(std::move(member_))

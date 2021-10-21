@@ -14,6 +14,7 @@ struct ConstantRecord final {
     int32_t some_integer;
     std::string some_string;
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     ConstantRecord(int32_t some_integer_,
                    std::string some_string_)
     : some_integer(std::move(some_integer_))

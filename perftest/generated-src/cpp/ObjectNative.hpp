@@ -8,7 +8,7 @@ namespace snapchat { namespace djinni { namespace benchmark {
 /** interfaces for native C++ objects, to be returned from C++ */
 class ObjectNative {
 public:
-    virtual ~ObjectNative() {}
+    virtual ~ObjectNative() = default;
 
     virtual void baseline() = 0;
 };

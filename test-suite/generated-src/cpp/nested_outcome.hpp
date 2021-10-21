@@ -16,6 +16,7 @@ struct NestedOutcome final {
     friend bool operator==(const NestedOutcome& lhs, const NestedOutcome& rhs);
     friend bool operator!=(const NestedOutcome& lhs, const NestedOutcome& rhs);
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     NestedOutcome(djinni::expected<int32_t, std::string> o_)
     : o(std::move(o_))
     {}
