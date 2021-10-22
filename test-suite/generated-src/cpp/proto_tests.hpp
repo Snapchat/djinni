@@ -18,7 +18,7 @@ struct RecordWithEmbeddedProto;
 
 class ProtoTests {
 public:
-    virtual ~ProtoTests() {}
+    virtual ~ProtoTests() = default;
 
     static std::vector<std::string> protoToStrings(const ::djinni::test::AddressBook & x);
 

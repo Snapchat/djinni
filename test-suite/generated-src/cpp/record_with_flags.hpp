@@ -11,6 +11,7 @@ namespace testsuite {
 struct RecordWithFlags final {
     access_flags access;
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     RecordWithFlags(access_flags access_)
     : access(std::move(access_))
     {}

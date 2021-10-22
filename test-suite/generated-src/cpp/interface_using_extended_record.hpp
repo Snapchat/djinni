@@ -10,7 +10,7 @@ struct RecordUsingExtendedRecord;
 
 class InterfaceUsingExtendedRecord {
 public:
-    virtual ~InterfaceUsingExtendedRecord() {}
+    virtual ~InterfaceUsingExtendedRecord() = default;
 
     static RecordUsingExtendedRecord const CR;
 

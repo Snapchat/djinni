@@ -12,6 +12,7 @@ namespace textsort {
 struct ItemList final {
     std::vector<std::string> items;
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     ItemList(std::vector<std::string> items_)
     : items(std::move(items_))
     {}

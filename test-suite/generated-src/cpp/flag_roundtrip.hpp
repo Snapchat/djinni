@@ -12,7 +12,7 @@ enum class empty_flags : unsigned;
 
 class FlagRoundtrip {
 public:
-    virtual ~FlagRoundtrip() {}
+    virtual ~FlagRoundtrip() = default;
 
     static access_flags roundtrip_access(access_flags flag);
 

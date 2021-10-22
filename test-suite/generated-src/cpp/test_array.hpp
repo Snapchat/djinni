@@ -13,7 +13,7 @@ struct Vec2;
 
 class TestArray {
 public:
-    virtual ~TestArray() {}
+    virtual ~TestArray() = default;
 
     static std::vector<std::string> testStringArray(const std::vector<std::string> & a);
 

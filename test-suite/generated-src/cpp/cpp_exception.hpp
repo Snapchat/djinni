@@ -10,7 +10,7 @@ namespace testsuite {
 
 class CppException {
 public:
-    virtual ~CppException() {}
+    virtual ~CppException() = default;
 
     virtual int32_t throw_an_exception() = 0;
 

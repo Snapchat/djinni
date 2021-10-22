@@ -13,6 +13,7 @@ struct RecordUsingExtendedRecord final {
     static RecordUsingExtendedRecord const CR;
     ExtendedRecord er;
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     RecordUsingExtendedRecord(ExtendedRecord er_)
     : er(std::move(er_))
     {}

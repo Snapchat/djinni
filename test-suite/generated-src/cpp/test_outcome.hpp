@@ -13,7 +13,7 @@ struct NestedOutcome;
 
 class TestOutcome {
 public:
-    virtual ~TestOutcome() {}
+    virtual ~TestOutcome() = default;
 
     static djinni::expected<std::string, int32_t> getSuccessOutcome();
 

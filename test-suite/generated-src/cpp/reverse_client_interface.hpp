@@ -11,7 +11,7 @@ namespace testsuite {
 
 class ReverseClientInterface {
 public:
-    virtual ~ReverseClientInterface() {}
+    virtual ~ReverseClientInterface() = default;
 
     virtual std::string return_str() const = 0;
 

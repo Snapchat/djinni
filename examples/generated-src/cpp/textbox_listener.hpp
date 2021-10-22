@@ -9,7 +9,7 @@ struct ItemList;
 
 class TextboxListener {
 public:
-    virtual ~TextboxListener() {}
+    virtual ~TextboxListener() = default;
 
     virtual void update(const ItemList & items) = 0;
 };

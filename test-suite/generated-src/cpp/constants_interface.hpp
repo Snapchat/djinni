@@ -14,7 +14,7 @@ struct ConstantRecord;
 /** Interface containing constants */
 class ConstantsInterface {
 public:
-    virtual ~ConstantsInterface() {}
+    virtual ~ConstantsInterface() = default;
 
     static constexpr bool BOOL_CONSTANT = true;
 

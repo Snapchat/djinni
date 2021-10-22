@@ -9,7 +9,7 @@ namespace testsuite {
 
 class FunctionPrologueHelper {
 public:
-    virtual ~FunctionPrologueHelper() {}
+    virtual ~FunctionPrologueHelper() = default;
 
     static std::string foo();
 };
