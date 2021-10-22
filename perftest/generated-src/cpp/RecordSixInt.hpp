@@ -16,7 +16,6 @@ struct RecordSixInt final {
     int64_t i5;
     int64_t i6;
 
-    //NOLINTNEXTLINE(google-explicit-constructor)
     RecordSixInt(int64_t i1_,
                  int64_t i2_,
                  int64_t i3_,
