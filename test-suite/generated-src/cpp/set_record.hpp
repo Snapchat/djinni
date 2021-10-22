@@ -14,7 +14,6 @@ struct SetRecord final {
     std::unordered_set<std::string> set;
     std::unordered_set<int32_t> iset;
 
-    //NOLINTNEXTLINE(google-explicit-constructor)
     SetRecord(std::unordered_set<std::string> set_,
               std::unordered_set<int32_t> iset_)
     : set(std::move(set_))

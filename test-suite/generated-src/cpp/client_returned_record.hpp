@@ -16,7 +16,6 @@ struct ClientReturnedRecord final {
     std::string content;
     std::experimental::optional<std::string> misc;
 
-    //NOLINTNEXTLINE(google-explicit-constructor)
     ClientReturnedRecord(int64_t record_id_,
                          std::string content_,
                          std::experimental::optional<std::string> misc_)

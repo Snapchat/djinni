@@ -19,7 +19,6 @@ struct EnumUsageRecord final {
     std::unordered_set<color> s;
     std::unordered_map<color, color> m;
 
-    //NOLINTNEXTLINE(google-explicit-constructor)
     EnumUsageRecord(color e_,
                     std::experimental::optional<color> o_,
                     std::vector<color> l_,

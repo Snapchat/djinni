@@ -28,7 +28,6 @@ struct AssortedPrimitives final {
     friend bool operator==(const AssortedPrimitives& lhs, const AssortedPrimitives& rhs);
     friend bool operator!=(const AssortedPrimitives& lhs, const AssortedPrimitives& rhs);
 
-    //NOLINTNEXTLINE(google-explicit-constructor)
     AssortedPrimitives(bool b_,
                        int8_t eight_,
                        int16_t sixteen_,

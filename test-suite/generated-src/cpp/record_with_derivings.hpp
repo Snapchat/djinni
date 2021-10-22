@@ -29,7 +29,6 @@ struct RecordWithDerivings final {
     friend bool operator<=(const RecordWithDerivings& lhs, const RecordWithDerivings& rhs);
     friend bool operator>=(const RecordWithDerivings& lhs, const RecordWithDerivings& rhs);
 
-    //NOLINTNEXTLINE(google-explicit-constructor)
     RecordWithDerivings(int8_t eight_,
                         int16_t sixteen_,
                         int32_t thirtytwo_,
