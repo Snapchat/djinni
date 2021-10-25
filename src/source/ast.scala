@@ -90,7 +90,7 @@ object Interface {
 
 case class Field(ident: Ident, ty: TypeRef, doc: Doc)
 
-case class ProtobufMessage(cpp: ProtobufMessage.Cpp, java: ProtobufMessage.Java, objc: Option[ProtobufMessage.Objc], ts: ProtobufMessage.Ts) extends TypeDef
+case class ProtobufMessage(cpp: ProtobufMessage.Cpp, java: ProtobufMessage.Java, objc: Option[ProtobufMessage.Objc], ts: Option[ProtobufMessage.Ts]) extends TypeDef
 object ProtobufMessage {
   case class Cpp(header: String, ns: String)
   case class Java(pkg: String)

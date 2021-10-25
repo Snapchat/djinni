@@ -104,7 +104,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
   case class TsSymbolRef(sym: String, module: String)
   def references(m: Meta): Seq[TsSymbolRef] = m match {
     case e: MExtern => List(TsSymbolRef(idJs.ty(e.name), e.ts.module))
-    case p: MProtobuf => List(TsSymbolRef(p.name, p.body.ts.module))
+    case MProtobuf(name, _, ProtobufMessage(_,_,_,Some(ts))) => List(TsSymbolRef(name, ts.module))
     case MOutcome => List(TsSymbolRef("Outcome", "@djinni_support/Outcome"))
     case _ => List()
   }
