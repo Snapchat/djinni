@@ -5,7 +5,7 @@
 
 
 /** interfaces for platform Java or Objective-C objects, to be passed to C++ */
-@protocol TXSObjectPlatform
+@protocol TXSObjectPlatform <NSObject>
 
 - (void)onDone;
 
