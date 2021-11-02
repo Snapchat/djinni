@@ -327,6 +327,8 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
   // - `objc` key is optional
   //   - if `objc` is present then `objc.header` must be present
   //   - if `objc` is present then `objc.prefix` must be present
+  // - `ts` key is optional
+  //   - if `ts` is present then `ts.module` must be present
   // - `messages` key must be present
   //   - `messages` must be a string list
   val c = Option(doc.get("cpp")) match {
@@ -337,21 +339,25 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
     case Some(properties) => properties.asInstanceOf[JMap[String, String]].toMap
     case None => return Left(Error(Loc(fileStack.top, 1, 1), "'java' properties not found"))
   }
-  val ts = Option(doc.get("ts")) match {
-    case Some(properties) => properties.asInstanceOf[JMap[String, String]].toMap
-    case None => return Left(Error(Loc(fileStack.top, 1, 1), "'ts' properties not found"))
-  }
-  // ObjC is optional, if it's not present, then ObjC will use C++ protos
-  val o = Option(doc.get("objc")) match {
-    case Some(properties) => Some(properties.asInstanceOf[JMap[String, String]].toMap)
-    case None => None}
   val proto = ProtobufMessage(
     ProtobufMessage.Cpp(c("header"), c("namespace")),
     ProtobufMessage.Java(j("class")),
-    o match {
-      case Some(oo) => Some(ProtobufMessage.Objc(oo("header"), oo("prefix")))
-      case None => None},
-    ProtobufMessage.Ts(ts("module"), ts("namespace"))
+    // ObjC is optional, if it's not present, then ObjC will use C++ protos
+    Option(doc.get("objc")) match {
+      case Some(properties) => {
+        val p = properties.asInstanceOf[JMap[String, String]].toMap
+        Some(ProtobufMessage.Objc(p("header"), p("prefix")))
+      }
+      case None => None
+    },
+    // TS is optional
+    Option(doc.get("ts")) match {
+      case Some(properties) => {
+        val p = properties.asInstanceOf[JMap[String, String]].toMap
+        Some(ProtobufMessage.Ts(p("module"), p("namespace")))
+      }
+      case None => None
+    }
   )
   for(message <- doc.get("messages").asInstanceOf[java.util.List[String]]) {
     val ident = Ident(message, fileStack.top, Loc(fileStack.top, 1, 1))
