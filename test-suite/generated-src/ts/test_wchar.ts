@@ -15,6 +15,6 @@ export interface WcharTestHelpers_statics {
     checkRecord(rec: WcharTestRec): boolean;
 }
 
-export interface Module_statics {
+export interface TestWchar_statics {
     WcharTestHelpers: WcharTestHelpers_statics;
 }

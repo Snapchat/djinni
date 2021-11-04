@@ -2,11 +2,11 @@ import {TestCase, allTests, assertArrayEq, assertTrue} from "./testutils"
 import * as test from "../../generated-src/ts/test";
 
 class PrimitiveListTest extends TestCase {
-    m: test.Module_statics;
+    m: test.Test_statics;
     jsPrimitiveList: test.PrimitiveList;
     constructor(module: any) {
         super(module);
-        this.m = <test.Module_statics>module;
+        this.m = <test.Test_statics>module;
     }
     setUp() {
         var list = [BigInt(1), BigInt(2), BigInt(3)];

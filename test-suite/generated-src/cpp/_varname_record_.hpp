@@ -16,6 +16,7 @@ namespace testsuite {
 struct VarnameRecord final {
     int8_t _field_;
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     VarnameRecord(int8_t _field__)
     : _field_(std::move(_field__))
     {}

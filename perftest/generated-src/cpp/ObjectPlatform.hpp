@@ -8,7 +8,7 @@ namespace snapchat { namespace djinni { namespace benchmark {
 /** interfaces for platform Java or Objective-C objects, to be passed to C++ */
 class ObjectPlatform {
 public:
-    virtual ~ObjectPlatform() {}
+    virtual ~ObjectPlatform() = default;
 
     virtual void onDone() = 0;
 };

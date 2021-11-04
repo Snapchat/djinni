@@ -20,7 +20,7 @@ struct RecordSixInt;
 /** djinni_perf_benchmark: This interface will be implemented in C++ and can be called from any language. */
 class DjinniPerfBenchmark {
 public:
-    virtual ~DjinniPerfBenchmark() {}
+    virtual ~DjinniPerfBenchmark() = default;
 
     static std::shared_ptr<DjinniPerfBenchmark> getInstance();
 

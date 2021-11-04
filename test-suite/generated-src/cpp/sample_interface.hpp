@@ -11,7 +11,7 @@ namespace testsuite {
  */
 class SampleInterface {
 public:
-    virtual ~SampleInterface() {}
+    virtual ~SampleInterface() = default;
 };
 
 }  // namespace testsuite

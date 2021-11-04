@@ -127,8 +127,8 @@ export function assertArrayEq(a, b) {
         assertEq(a[i], b[i]);
     }
 }
-export function assertNull(a) {
-    assertTrue (a === null);
+export function assertUndefined(a) {
+    assertTrue (a === undefined);
 }
 
 export var allTests: Array<typeof TestCase> = [];

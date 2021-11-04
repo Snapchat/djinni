@@ -11,6 +11,7 @@
 struct TestOptionalExternInterfaceRecord final {
     std::shared_ptr<::testsuite::SampleInterface> sample_interface;
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     TestOptionalExternInterfaceRecord(std::shared_ptr<::testsuite::SampleInterface> sample_interface_)
     : sample_interface(std::move(sample_interface_))
     {}

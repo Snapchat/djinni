@@ -78,10 +78,10 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       case MMap | MOutcome =>
         assert(tm.args.size == 2)
         f
-      case p: MProtobuf =>
+      case MProtobuf(name, _, ProtobufMessage(cpp,_,_,Some(ts))) =>
         assert(tm.args.size == 0)
-        val tsname = if (p.body.ts.ns.isEmpty) p.name else p.body.ts.ns + "." + p.name
-        s"""<${withNs(Some(p.body.cpp.ns), p.name)}, ${jsClassNameAsCppType(tsname)}>"""
+        val tsname = if (ts.ns.isEmpty) name else ts.ns + "." + name
+        s"""<${withNs(Some(cpp.ns), name)}, ${jsClassNameAsCppType(tsname)}>"""
       case MArray =>
         assert(tm.args.size == 1)
         s"""<${helperClass(tm.args.head)}>"""

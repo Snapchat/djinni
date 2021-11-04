@@ -13,7 +13,7 @@ struct ItemList;
 
 class SortItems {
 public:
-    virtual ~SortItems() {}
+    virtual ~SortItems() = default;
 
     /** For the iOS / Android demo */
     virtual void sort(sort_order order, const ItemList & items) = 0;

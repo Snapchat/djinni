@@ -11,7 +11,7 @@ namespace testsuite {
 /** Used for C++ multiple inheritance tests */
 class ReturnTwo {
 public:
-    virtual ~ReturnTwo() {}
+    virtual ~ReturnTwo() = default;
 
     static std::shared_ptr<ReturnTwo> get_instance();
 

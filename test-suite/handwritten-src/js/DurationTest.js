@@ -32,7 +32,7 @@ class DurationTest {
         assertEq(this.m.TestDuration.nanosf(1.0), nanos(1));
 
         assertEq(this.m.TestDuration.box(BigInt(1)), seconds(1));
-        assertNull(this.m.TestDuration.box(BigInt(-1)));
+        assertUndefined(this.m.TestDuration.box(BigInt(-1)));
 
         assertEq(this.m.TestDuration.unbox(seconds(1)), 1);
         assertEq(this.m.TestDuration.unbox(null), -1);

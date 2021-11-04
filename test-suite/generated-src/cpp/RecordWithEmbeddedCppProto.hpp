@@ -11,6 +11,7 @@ namespace testsuite {
 struct RecordWithEmbeddedCppProto final {
     ::djinni::test2::PersistingState state;
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     RecordWithEmbeddedCppProto(::djinni::test2::PersistingState state_)
     : state(std::move(state_))
     {}

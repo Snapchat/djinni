@@ -1,11 +1,11 @@
-import {TestCase, allTests, assertEq, assertNull} from "./testutils"
+import {TestCase, allTests, assertEq, assertUndefined} from "./testutils"
 import * as test from "../../generated-src/ts/test";
 
 class EnumTest extends TestCase {
-    m: test.Module_statics;
+    m: test.Test_statics;
     constructor(module: any) {
         super(module);
-        this.m = <test.Module_statics>module;
+        this.m = <test.Test_statics>module;
     }
 
     enumToString(v: test.Color) {
@@ -45,7 +45,7 @@ class EnumTest extends TestCase {
             assertEq(flags[i], this.m.FlagRoundtrip.roundtripAccess(flags[i]));
             assertEq(flags[i], this.m.FlagRoundtrip.roundtripAccessBoxed(flags[i]));
         }
-        assertNull(this.m.FlagRoundtrip.roundtripAccessBoxed(null));
+        assertUndefined(this.m.FlagRoundtrip.roundtripAccessBoxed(null));
     }
     testEmptyFlagRoundtrip() {
         var flags = [
@@ -56,7 +56,7 @@ class EnumTest extends TestCase {
             assertEq(flags[i], this.m.FlagRoundtrip.roundtripEmpty(flags[i]));
             assertEq(flags[i], this.m.FlagRoundtrip.roundtripEmptyBoxed(flags[i]));
         }
-        assertNull(this.m.FlagRoundtrip.roundtripEmptyBoxed(null));
+        assertUndefined(this.m.FlagRoundtrip.roundtripEmptyBoxed(null));
     }
 }
 

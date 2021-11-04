@@ -14,7 +14,7 @@ enum class color;
 
 class EnumUsageInterface {
 public:
-    virtual ~EnumUsageInterface() {}
+    virtual ~EnumUsageInterface() = default;
 
     virtual color e(color e) = 0;
 

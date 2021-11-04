@@ -2,10 +2,10 @@ import {TestCase, allTests, assertEq} from "./testutils"
 import * as test from "../../generated-src/ts/test_wchar";
 
 class WcharTest extends TestCase {
-    m: test.Module_statics;
+    m: test.TestWchar_statics;
     constructor(module: any) {
         super(module);
-        this.m = <test.Module_statics>module;
+        this.m = <test.TestWchar_statics>module;
     }
 
     static STR1 = "some string with unicode \u{0000}, \u{263A}, \u{D83D}\u{DCA9} symbols";

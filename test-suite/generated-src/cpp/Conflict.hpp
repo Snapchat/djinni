@@ -11,7 +11,7 @@ namespace testsuite {
  */
 class Conflict {
 public:
-    virtual ~Conflict() {}
+    virtual ~Conflict() = default;
 };
 
 }  // namespace testsuite

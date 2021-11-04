@@ -11,6 +11,7 @@ namespace testsuite {
 struct SupportCopying final {
     int32_t x;
 
+    //NOLINTNEXTLINE(google-explicit-constructor)
     SupportCopying(int32_t x_)
     : x(std::move(x_))
     {}

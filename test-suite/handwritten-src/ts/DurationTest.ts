@@ -1,4 +1,4 @@
-import {TestCase, allTests, assertEq, assertNull} from "./testutils"
+import {TestCase, allTests, assertEq, assertUndefined} from "./testutils"
 import * as test from "../../generated-src/ts/test";
 
 function nanos(x: number) { return x / 1000000; }
@@ -9,10 +9,10 @@ function minutes(x: number) { return x * 1000 * 60; }
 function hours(x: number) { return x * 1000 * 3600; }
 
 class DurationTest extends TestCase {
-    m: test.Module_statics;
+    m: test.Test_statics;
     constructor(module: any) {
         super(module);
-        this.m = <test.Module_statics>module;
+        this.m = <test.Test_statics>module;
     }
     test() {
         assertEq(this.m.TestDuration.hoursString(hours(1)), "1");
@@ -37,7 +37,7 @@ class DurationTest extends TestCase {
         assertEq(this.m.TestDuration.nanosf(1.0), nanos(1));
 
         assertEq(this.m.TestDuration.box(BigInt(1)), seconds(1));
-        assertNull(this.m.TestDuration.box(BigInt(-1)));
+        assertUndefined(this.m.TestDuration.box(BigInt(-1)));
 
         assertEq(this.m.TestDuration.unbox(seconds(1)), 1);
         assertEq(this.m.TestDuration.unbox(null), -1);

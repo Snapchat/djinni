@@ -9,7 +9,7 @@ namespace testsuite {
 
 class UserToken {
 public:
-    virtual ~UserToken() {}
+    virtual ~UserToken() = default;
 
     virtual std::string whoami() = 0;
 };

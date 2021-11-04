@@ -8,7 +8,7 @@ namespace testsuite {
 /** Used for ObjC multiple inheritance tests */
 class SecondListener {
 public:
-    virtual ~SecondListener() {}
+    virtual ~SecondListener() = default;
 
     virtual void second() = 0;
 };

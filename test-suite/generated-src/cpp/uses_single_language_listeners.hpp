@@ -16,7 +16,7 @@ class ObjcOnlyListener;
  */
 class UsesSingleLanguageListeners {
 public:
-    virtual ~UsesSingleLanguageListeners() {}
+    virtual ~UsesSingleLanguageListeners() = default;
 
     virtual void callForObjC(const std::shared_ptr<ObjcOnlyListener> & l) = 0;
 

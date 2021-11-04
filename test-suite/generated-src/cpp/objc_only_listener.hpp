@@ -7,7 +7,7 @@ namespace testsuite {
 
 class ObjcOnlyListener {
 public:
-    virtual ~ObjcOnlyListener() {}
+    virtual ~ObjcOnlyListener() = default;
 };
 
 }  // namespace testsuite

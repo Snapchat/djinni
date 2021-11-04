@@ -18,7 +18,7 @@ class SecondListener;
  */
 class ListenerCaller {
 public:
-    virtual ~ListenerCaller() {}
+    virtual ~ListenerCaller() = default;
 
     static std::shared_ptr<ListenerCaller> init(const std::shared_ptr<FirstListener> & first_l, const std::shared_ptr<SecondListener> & second_l);
 
