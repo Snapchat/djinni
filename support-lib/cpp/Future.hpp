@@ -24,16 +24,48 @@
 
 namespace djinni {
 
+template <typename T>
+struct ValueHolder {
+    using type = T;
+};
+template <>
+struct ValueHolder<void> {
+    using type = bool;
+};
+
 template<typename T>
 struct SharedState {
-    std::optional<T> value;
+    std::optional<typename ValueHolder<T>::type> value;
     std::condition_variable cv;
     std::mutex mutex;
-    std::function<void(T)> handler;
+    std::function<void(typename ValueHolder<T>::type)> handler;
 };
 
 template<typename T>
 using SharedStatePtr = std::shared_ptr<SharedState<T>>;
+
+template <typename T>
+class Future;
+
+template <typename T>
+class Promise {
+public:
+    Future<T> getFuture();
+
+    void setValue(typename ValueHolder<T>::type val) {
+        {
+            std::unique_lock lk(_sharedState->mutex);
+            _sharedState->value = val;
+            if (_sharedState->handler) {
+                // handler already assigned
+                _sharedState->handler(val);
+            }
+        }
+        _sharedState->cv.notify_all();
+    }
+private:
+    SharedStatePtr<T> _sharedState = std::make_shared<SharedState<T>>();
+};
 
 template<typename T>
 class Future {
@@ -42,6 +74,11 @@ class Future {
     
     Future(SharedStatePtr<T> sharedState) : _sharedState(sharedState) {}
 public:
+
+    bool isValid() const {
+        return _sharedState != nullptr;
+    }
+    
     bool isReady() const {
         std::unique_lock lk(_sharedState->mutex);
         return _sharedState->value.has_value();
@@ -53,12 +90,42 @@ public:
         return *(_sharedState->value);
     }
 
-    void then(std::function<void(T)> handler) const {
+    template<typename FUNC>
+    auto then(FUNC handler) const {
+        // TODO can only call once
         std::unique_lock lk(_sharedState->mutex);
-        if (_sharedState->value.has_value()) {
-            handler(*(_sharedState->value));
+
+        using HandlerReturnType = std::invoke_result_t<FUNC, T>;
+
+        if constexpr(std::is_void_v<HandlerReturnType>) {
+            Promise<void> nextPromise;
+            auto nextFuture = nextPromise.getFuture();
+            auto continuation = [handler, p = std::move(nextPromise)] (T x) mutable {
+                handler(x);
+                p.setValue(true);
+            };
+            if (_sharedState->value.has_value()) {
+                // result already available
+                continuation(*(_sharedState->value));
+            } else {
+                // result not yet available
+                _sharedState->handler = continuation;
+            }
+            return nextFuture;
         } else {
-            _sharedState->handler = handler;
+            Promise<HandlerReturnType> nextPromise;
+            auto nextFuture = nextPromise.getFuture();
+            auto continuation = [handler, p = std::move(nextPromise)] (T x) mutable {
+                p.setValue(handler(x));
+            };
+            if (_sharedState->value.has_value()) {
+                // result already available
+                continuation(*(_sharedState->value));
+            } else {
+                // result not yet available
+                _sharedState->handler = continuation;
+            }
+            return nextFuture;
         }
     }
 private:
@@ -66,24 +133,9 @@ private:
 };
 
 template <typename T>
-class Promise {
-public:
-    Future<T> getFuture() {
-        return Future<T>(_sharedState);
-    }
-    void setValue(T val) {
-        {
-            std::unique_lock lk(_sharedState->mutex);
-            if (_sharedState->handler) {
-                _sharedState->handler(val);
-            } else {
-                _sharedState->value = val;
-            }
-        }
-        _sharedState->cv.notify_all();
-    }
-private:
-    SharedStatePtr<T> _sharedState = std::make_shared<SharedState<T>>();
-};
+Future<T> Promise<T>::getFuture() {
+    // TODO can only call once
+    return Future<T>(_sharedState);
+}
 
 } // namespace djinni

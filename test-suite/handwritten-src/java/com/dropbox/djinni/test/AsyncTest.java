@@ -41,7 +41,7 @@ public class AsyncTest extends TestCase {
             }
         } catch (InterruptedException e) {
         }
-        assertEquals(r.res, Integer.valueOf(42));
+        assertEquals(Integer.valueOf(42), r.res);
     }
     public void testConsumePlatformFuture() {
         int r = TestHelpers.checkAsyncInterface(new JavaAsyncInterfaceImpl());

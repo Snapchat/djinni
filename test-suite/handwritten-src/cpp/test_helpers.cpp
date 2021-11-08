@@ -10,6 +10,7 @@
 #include "set_record.hpp"
 #include <exception>
 #include <thread>
+#include <future>
 
 namespace testsuite {
 
@@ -177,7 +178,16 @@ djinni::Future<int32_t> TestHelpers::get_async_result() {
 
 int32_t TestHelpers::check_async_interface(const std::shared_ptr<testsuite::AsyncInterface>& i) {
     auto f = i->get_async_result();
-    return f.get();
+    std::promise<int32_t> p;
+    // f.then([&p] (auto res) {
+    //     p.set_value(res);
+    // });
+    f.then([] (auto res) {
+        return std::to_string(res);
+    }).then([&p] (std::string s) {
+        p.set_value(std::stoi(s));
+    });
+    return p.get_future().get();
 }
 
 } // namespace testsuite
