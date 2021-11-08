@@ -825,7 +825,7 @@ namespace djinni
 
     struct FutureJniInfo {
         const GlobalRef<jclass> clazz { jniFindClass("com/snapchat/djinni/Future") };
-        const jmethodID method_then { jniGetMethodID(clazz.get(), "then", "(Lcom/snapchat/djinni/FutureHandler;)V") };
+        const jmethodID method_then { jniGetMethodID(clazz.get(), "then", "(Lcom/snapchat/djinni/FutureHandler;)Lcom/snapchat/djinni/Future;") };
     };
 
     struct NativeFutureHandlerJniInfo {

@@ -27,12 +27,16 @@ public class AsyncTest extends TestCase {
     public void testConsumeNativeFuture() {
         Future<Integer> f = TestHelpers.getAsyncResult();
         final ResultHolder r = new ResultHolder();
-        f.then((res) -> {
-                synchronized(r) {
-                    r.res = res;
-                    r.notifyAll();
-                }
-            });
+        f.then((Integer i) -> {
+                System.out.println(i.getClass().getName());
+                return i.toString();
+            }).then((String s) -> {
+                    System.out.println(s.getClass().getName());
+                    synchronized(r) {
+                        r.res = Integer.parseInt(s);
+                        r.notifyAll();
+                    }
+                });
         try {
             synchronized(r) {
                 while(r.res == null) {
@@ -43,6 +47,7 @@ public class AsyncTest extends TestCase {
         }
         assertEquals(Integer.valueOf(42), r.res);
     }
+    
     public void testConsumePlatformFuture() {
         int r = TestHelpers.checkAsyncInterface(new JavaAsyncInterfaceImpl());
         assertEquals(r, 42);

@@ -43,13 +43,41 @@ public class Future<T> {
         }
     }
 
-    public void then (FutureHandler<T> handler) {
+    public Future<Void> then (FutureHandler<T> handler) {
+        final Promise<Void> nextPromise = new Promise<Void>();
+        final Future<Void> nextFuture = nextPromise.getFuture();
+
+        final FutureHandler<T> continuation = (T res) -> {
+            handler.handleResult(res);
+            nextPromise.setValue(null);
+        };
+
         synchronized(sharedState) {
             if (sharedState.value != null) {
-                handler.handleResult(sharedState.value);
+                continuation.handleResult(sharedState.value);
             } else {
-                sharedState.handler = handler;
+                sharedState.handler = continuation;
             }
         }
+
+        return nextFuture;
+    }
+
+    public <R> Future<R> then (final FutureHandlerWithReturn<T, R> handler) {
+        final Promise<R> nextPromise = new Promise<R>();
+        final Future<R> nextFuture = nextPromise.getFuture();
+
+        final FutureHandler<T> continuation = (T res) -> {
+            nextPromise.setValue(handler.handleResult(res));
+        };
+        
+        synchronized(sharedState) {
+            if (sharedState.value != null) {
+                continuation.handleResult(sharedState.value);
+            } else {
+                sharedState.handler = continuation;
+            }
+        }
+        return nextFuture;
     }
 }
