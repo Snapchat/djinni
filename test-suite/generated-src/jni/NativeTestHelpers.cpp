@@ -237,4 +237,11 @@ CJNIEXPORT jint JNICALL Java_com_dropbox_djinni_test_TestHelpers_checkAsyncInter
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
+CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_TestHelpers_passFuture(JNIEnv* jniEnv, jobject /*this*/, jobject f)
+{
+    try {
+        ::testsuite::TestHelpers::pass_future(::djinni::FutureAdaptor<::djinni::I32>::toCpp(jniEnv, f));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
+}
+
 }  // namespace djinni_generated

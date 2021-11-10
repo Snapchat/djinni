@@ -84,7 +84,7 @@ public:
         return _sharedState->value.has_value();
     }
     
-    T get() {
+    T get() const {
         std::unique_lock lk(_sharedState->mutex);
         _sharedState->cv.wait(lk, [state = _sharedState] { return state->value.has_value(); });
         return *(_sharedState->value);

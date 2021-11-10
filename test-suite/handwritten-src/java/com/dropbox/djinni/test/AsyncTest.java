@@ -52,4 +52,14 @@ public class AsyncTest extends TestCase {
         int r = TestHelpers.checkAsyncInterface(new JavaAsyncInterfaceImpl());
         assertEquals(r, 42);
     }
+
+    public void testPassingFuture() {
+        final Promise<String> p = new Promise<String>();
+        Future<String> f = p.getFuture();
+        Future<Integer> f2 = f.then((s) -> {
+                return Integer.parseInt(s);
+            });
+        TestHelpers.passFuture(f2);
+        p.setValue("36");
+    }
 }

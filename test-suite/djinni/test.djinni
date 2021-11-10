@@ -1,5 +1,5 @@
 async_interface = interface +j {
-  async get_async_result(): i32;
+  get_async_result(): future<i32>;
 }
 
 # Helper methods used by various different tests.
@@ -46,8 +46,9 @@ test_helpers = interface +c {
 
     static id_binary(b: binary): binary;
 
-    static async get_async_result(): i32;
+    static get_async_result(): future<i32>;
     static check_async_interface(i: async_interface): i32;
+    static pass_future(f: future<i32>);
 }
 
 # Empty record

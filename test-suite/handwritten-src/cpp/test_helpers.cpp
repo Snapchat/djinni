@@ -190,4 +190,9 @@ int32_t TestHelpers::check_async_interface(const std::shared_ptr<testsuite::Asyn
     return p.get_future().get();
 }
 
+void TestHelpers::pass_future(djinni::Future<int32_t> f) {
+    f.then([] (int32_t i) {
+    });
+}
+
 } // namespace testsuite
