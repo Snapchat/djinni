@@ -458,7 +458,10 @@ struct JsInterface {
     // (interface +c)
     template <typename, typename>
     struct GetOrCreateCppProxy {
-        em::val operator() (const std::shared_ptr<I>& c) { return em::val::undefined(); }
+        em::val operator() (const std::shared_ptr<I>& c) {
+            assert(false && "Attempting to pass C++ object but interface lacks +c");
+            return em::val::undefined();
+        }
     };
     template <typename T>
     struct GetOrCreateCppProxy<T, std::void_t<decltype(T::cppProxyMethods)>> {
@@ -501,7 +504,10 @@ struct JsInterface {
     // (interface +w)
     template <typename, typename>
     struct GetOrCreateJsProxy {
-        std::shared_ptr<I> operator() (em::val js) { return {}; }
+        std::shared_ptr<I> operator() (em::val js) {
+            assert(false && "Attempting to pass JS object but interface lacks +w");
+            return {};
+        }
     };
     template <typename T>
     struct GetOrCreateJsProxy<T, std::void_t<typename T::JsProxy>> {
