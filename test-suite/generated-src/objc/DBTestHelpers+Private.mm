@@ -208,6 +208,11 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
++ (DJFuture<NSNumber*>* _Nonnull) getAsyncResult {
+    auto r = ::testsuite::TestHelpers::get_async_result();
+    return ::djinni::FutureAdaptor<::djinni::I32>::fromCpp(r);
+}
+
 namespace djinni_generated {
 
 auto TestHelpers::toCpp(ObjcType objc) -> CppType

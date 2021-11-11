@@ -7,6 +7,7 @@
 #import "DBNestedCollection.h"
 #import "DBPrimitiveList.h"
 #import "DBSetRecord.h"
+#import "DJFuture.h"
 #import <Foundation/Foundation.h>
 @protocol DBClientInterface;
 @protocol DBUserToken;
@@ -76,5 +77,7 @@
 + (nonnull DBAssortedPrimitives *)assortedPrimitivesId:(nonnull DBAssortedPrimitives *)i;
 
 + (nonnull NSData *)idBinary:(nonnull NSData *)b;
+
++ (DJFuture<NSNumber*>* _Nonnull) getAsyncResult;
 
 @end

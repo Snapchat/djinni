@@ -58,6 +58,7 @@ public:
             _sharedState->value = val;
             if (_sharedState->handler) {
                 // handler already assigned
+                // TODO call handler without lock
                 _sharedState->handler(val);
             }
         }

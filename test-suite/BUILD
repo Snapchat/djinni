@@ -54,6 +54,7 @@ objc_library(
     name = "djinni-tests-objcxx",
     copts = [
         "-ObjC++",
+        "-std=c++17",
     ],
     srcs = glob([
         "generated-src/objc/**/*.mm",

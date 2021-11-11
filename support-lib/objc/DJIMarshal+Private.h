@@ -17,6 +17,8 @@
 #include <unordered_map>
 #include <vector>
 #include "../expected.hpp"
+#import "DJFuture.h"
+#import "Future.hpp"
 
 static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for this file");
 
@@ -432,6 +434,28 @@ public:
     static const ObjcType& fromCpp(const CppType& c)
     {
         return c;
+    }
+};
+
+template <class RESULT>
+class FutureAdaptor
+{
+    using CppResType = typename RESULT::CppType;
+
+public:
+    using CppType = Future<CppResType>;
+    using ObjcType = DJFuture*;
+
+    using Boxed = FutureAdaptor;
+
+    static CppType toCpp(ObjcType o)
+    {
+        return {};
+    }
+
+    static ObjcType fromCpp(const CppType& c)
+    {
+        return {};
     }
 };
 
