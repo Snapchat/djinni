@@ -59,7 +59,8 @@ public class AsyncTest extends TestCase {
         Future<Integer> f2 = f.then((s) -> {
                 return Integer.parseInt(s);
             });
-        TestHelpers.passFuture(f2);
+        Future<String> f3 = TestHelpers.passFuture(f2);
         p.setValue("36");
+        assertEquals(f3.get(), "36");
     }
 }

@@ -179,9 +179,6 @@ djinni::Future<int32_t> TestHelpers::get_async_result() {
 int32_t TestHelpers::check_async_interface(const std::shared_ptr<testsuite::AsyncInterface>& i) {
     auto f = i->get_async_result();
     std::promise<int32_t> p;
-    // f.then([&p] (auto res) {
-    //     p.set_value(res);
-    // });
     f.then([] (auto res) {
         return std::to_string(res);
     }).then([&p] (std::string s) {
@@ -190,8 +187,9 @@ int32_t TestHelpers::check_async_interface(const std::shared_ptr<testsuite::Asyn
     return p.get_future().get();
 }
 
-void TestHelpers::pass_future(djinni::Future<int32_t> f) {
-    f.then([] (int32_t i) {
+djinni::Future<std::string> TestHelpers::pass_future(djinni::Future<int32_t> f) {
+    return f.then([] (int32_t i) {
+        return std::to_string(i);
     });
 }
 

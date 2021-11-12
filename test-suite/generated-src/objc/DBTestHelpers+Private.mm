@@ -5,6 +5,7 @@
 #import "DBTestHelpers.h"
 #import "DBAssortedPrimitives+Private.h"
 #import "DBClientInterface+Private.h"
+#import "DBAsyncInterface+Private.h"
 #import "DBColor+Private.h"
 #import "DBMapListRecord+Private.h"
 #import "DBNestedCollection+Private.h"
@@ -211,6 +212,16 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
 + (DJFuture<NSNumber*>* _Nonnull) getAsyncResult {
     auto r = ::testsuite::TestHelpers::get_async_result();
     return ::djinni::FutureAdaptor<::djinni::I32>::fromCpp(r);
+}
+
++ (int32_t) checkAsyncInterface:(nonnull id<DBAsyncInterface>)i {
+    auto r = ::testsuite::TestHelpers::check_async_interface(::djinni_generated::AsyncInterface::toCpp(i));
+    return ::djinni::I32::fromCpp(r);
+}
+
++ (DJFuture<NSString*>* _Nonnull) passFuture:(nonnull DJFuture<NSNumber*>*)f {
+    auto r = ::testsuite::TestHelpers::pass_future(djinni::FutureAdaptor<::djinni::I32>::toCpp(f));
+    return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(r);
 }
 
 namespace djinni_generated {

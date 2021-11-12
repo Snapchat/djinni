@@ -8,6 +8,7 @@
 #import "DBPrimitiveList.h"
 #import "DBSetRecord.h"
 #import "DJFuture.h"
+#import "DBAsyncInterface.h"
 #import <Foundation/Foundation.h>
 @protocol DBClientInterface;
 @protocol DBUserToken;
@@ -79,5 +80,9 @@
 + (nonnull NSData *)idBinary:(nonnull NSData *)b;
 
 + (DJFuture<NSNumber*>* _Nonnull) getAsyncResult;
+
++ (int32_t) checkAsyncInterface:(nonnull id<DBAsyncInterface>)i;
+
++ (DJFuture<NSString*>* _Nonnull) passFuture:(nonnull DJFuture<NSNumber*>*)f;
 
 @end

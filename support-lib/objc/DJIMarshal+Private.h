@@ -450,12 +450,24 @@ public:
 
     static CppType toCpp(ObjcType o)
     {
-        return {};
+        using NativePromiseType = Promise<CppResType>;
+
+        __block auto p = std::make_unique<NativePromiseType>();
+        auto f = p->getFuture();
+        [o then: ^id(id res) {p->setValue(RESULT::Boxed::toCpp(res)); return nil;}];
+        return f;
     }
 
     static ObjcType fromCpp(const CppType& c)
     {
-        return {};
+        DJPromise<typename RESULT::Boxed::ObjcType>* promise = [[DJPromise alloc] init];
+        DJFuture<typename RESULT::Boxed::ObjcType>* future = [promise getFuture];
+
+        c.then([promise] (CppResType res) {
+                [promise setValue:RESULT::Boxed::fromCpp(res)];
+            });
+        
+        return future;
     }
 };
 
