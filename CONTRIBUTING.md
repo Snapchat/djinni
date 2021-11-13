@@ -33,12 +33,13 @@ investigated. Bug reports should have:
 Pull requests are the best way to propose code changes:
 
 1. Fork the repo and create your branch from `master`.
-2. Add tests, if appropriate.
-3. If you add or change code generator command line options, update the
+2. Run `./examples/run_djinni.sh` and check in any changes to generated code.
+3. Add tests, if appropriate.
+4. If you add or change code generator command line options, update the
    documentation.
-4. Ensure the test suite passes with your change.
-5. Test the changes on actual devices if you can.
-6. Issue the pull request.
+5. Ensure the test suite passes with your change.
+6. Test the changes on actual devices if you can.
+7. Issue the pull request.
 
 ## Code style
 
