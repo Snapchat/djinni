@@ -5,8 +5,10 @@
 #import <Foundation/Foundation.h>
 
 @interface DBRecordWithNestedDerivings : NSObject
+- (nonnull instancetype)init NS_UNAVAILABLE;
++ (nonnull instancetype)new NS_UNAVAILABLE;
 - (nonnull instancetype)initWithKey:(int32_t)key
-                                rec:(nonnull DBRecordWithDerivings *)rec;
+                                rec:(nonnull DBRecordWithDerivings *)rec NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)recordWithNestedDerivingsWithKey:(int32_t)key
                                                      rec:(nonnull DBRecordWithDerivings *)rec;
 

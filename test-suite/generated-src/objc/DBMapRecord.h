@@ -4,8 +4,10 @@
 #import <Foundation/Foundation.h>
 
 @interface DBMapRecord : NSObject
+- (nonnull instancetype)init NS_UNAVAILABLE;
++ (nonnull instancetype)new NS_UNAVAILABLE;
 - (nonnull instancetype)initWithMap:(nonnull NSDictionary<NSString *, NSNumber *> *)map
-                               imap:(nonnull NSDictionary<NSNumber *, NSNumber *> *)imap;
+                               imap:(nonnull NSDictionary<NSNumber *, NSNumber *> *)imap NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)mapRecordWithMap:(nonnull NSDictionary<NSString *, NSNumber *> *)map
                                     imap:(nonnull NSDictionary<NSNumber *, NSNumber *> *)imap;
 

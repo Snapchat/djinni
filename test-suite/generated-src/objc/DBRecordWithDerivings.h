@@ -4,6 +4,8 @@
 #import <Foundation/Foundation.h>
 
 @interface DBRecordWithDerivings : NSObject
+- (nonnull instancetype)init NS_UNAVAILABLE;
++ (nonnull instancetype)new NS_UNAVAILABLE;
 - (nonnull instancetype)initWithEight:(int8_t)eight
                               sixteen:(int16_t)sixteen
                             thirtytwo:(int32_t)thirtytwo
@@ -11,7 +13,7 @@
                            fthirtytwo:(float)fthirtytwo
                            fsixtyfour:(double)fsixtyfour
                                     d:(nonnull NSDate *)d
-                                    s:(nonnull NSString *)s;
+                                    s:(nonnull NSString *)s NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)recordWithDerivingsWithEight:(int8_t)eight
                                              sixteen:(int16_t)sixteen
                                            thirtytwo:(int32_t)thirtytwo

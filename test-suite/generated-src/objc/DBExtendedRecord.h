@@ -6,7 +6,9 @@
 
 /** Extended record */
 @interface DBExtendedRecord : NSObject
-- (nonnull instancetype)initWithFoo:(BOOL)foo;
+- (nonnull instancetype)init NS_UNAVAILABLE;
++ (nonnull instancetype)new NS_UNAVAILABLE;
+- (nonnull instancetype)initWithFoo:(BOOL)foo NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)extendedRecordWithFoo:(BOOL)foo;
 
 + (DBExtendedRecord * __nonnull)extendedRecordConst;

@@ -6,7 +6,7 @@
 
 /** Record containing enum constant */
 @interface DBConstantWithEnum : NSObject
-- (nonnull instancetype)init;
+- (nonnull instancetype)init NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)constantWithEnum;
 
 + (DBConstantEnum)constEnum;

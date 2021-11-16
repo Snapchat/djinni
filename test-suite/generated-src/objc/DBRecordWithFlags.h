@@ -5,7 +5,9 @@
 #import <Foundation/Foundation.h>
 
 @interface DBRecordWithFlags : NSObject
-- (nonnull instancetype)initWithAccess:(DBAccessFlags)access;
+- (nonnull instancetype)init NS_UNAVAILABLE;
++ (nonnull instancetype)new NS_UNAVAILABLE;
+- (nonnull instancetype)initWithAccess:(DBAccessFlags)access NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)recordWithFlagsWithAccess:(DBAccessFlags)access;
 
 @property (nonatomic, readonly) DBAccessFlags access;
