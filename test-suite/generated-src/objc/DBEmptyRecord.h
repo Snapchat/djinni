@@ -9,7 +9,7 @@
  *   Indented third line of multi-line documentation.)
  */
 @interface DBEmptyRecord : NSObject
-- (nonnull instancetype)init;
+- (nonnull instancetype)init NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)emptyRecord;
 
 @end

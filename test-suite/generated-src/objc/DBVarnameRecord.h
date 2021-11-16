@@ -9,7 +9,9 @@
  * badly when it is.  However this test case ensures we at least don't crash.
  */
 @interface DBVarnameRecord : NSObject
-- (nonnull instancetype)initWithField:(int8_t)Field;
+- (nonnull instancetype)init NS_UNAVAILABLE;
++ (nonnull instancetype)new NS_UNAVAILABLE;
+- (nonnull instancetype)initWithField:(int8_t)Field NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)VarnameRecordWithField:(int8_t)Field;
 
 @property (nonatomic, readonly) int8_t Field;

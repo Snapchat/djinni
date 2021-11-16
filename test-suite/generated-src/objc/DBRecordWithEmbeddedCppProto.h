@@ -5,7 +5,9 @@
 #import <Foundation/Foundation.h>
 
 @interface DBRecordWithEmbeddedCppProto : NSObject
-- (nonnull instancetype)initWithState:(const djinni::test2::PersistingState & )state;
+- (nonnull instancetype)init NS_UNAVAILABLE;
++ (nonnull instancetype)new NS_UNAVAILABLE;
+- (nonnull instancetype)initWithState:(const djinni::test2::PersistingState & )state NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)RecordWithEmbeddedCppProtoWithState:(const djinni::test2::PersistingState & )state;
 
 @property (nonatomic, readonly) djinni::test2::PersistingState state;

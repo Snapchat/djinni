@@ -5,11 +5,13 @@
 #import <Foundation/Foundation.h>
 
 @interface DBEnumUsageRecord : NSObject
+- (nonnull instancetype)init NS_UNAVAILABLE;
++ (nonnull instancetype)new NS_UNAVAILABLE;
 - (nonnull instancetype)initWithE:(DBColor)e
                                 o:(nullable NSNumber *)o
                                 l:(nonnull NSArray<NSNumber *> *)l
                                 s:(nonnull NSSet<NSNumber *> *)s
-                                m:(nonnull NSDictionary<NSNumber *, NSNumber *> *)m;
+                                m:(nonnull NSDictionary<NSNumber *, NSNumber *> *)m NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)enumUsageRecordWithE:(DBColor)e
                                            o:(nullable NSNumber *)o
                                            l:(nonnull NSArray<NSNumber *> *)l

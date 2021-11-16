@@ -4,8 +4,10 @@
 #import <Foundation/Foundation.h>
 
 @interface DBSetRecord : NSObject
+- (nonnull instancetype)init NS_UNAVAILABLE;
++ (nonnull instancetype)new NS_UNAVAILABLE;
 - (nonnull instancetype)initWithSet:(nonnull NSSet<NSString *> *)set
-                               iset:(nonnull NSSet<NSNumber *> *)iset;
+                               iset:(nonnull NSSet<NSNumber *> *)iset NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)setRecordWithSet:(nonnull NSSet<NSString *> *)set
                                     iset:(nonnull NSSet<NSNumber *> *)iset;
 

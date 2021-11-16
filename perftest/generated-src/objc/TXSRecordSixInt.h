@@ -4,12 +4,14 @@
 #import <Foundation/Foundation.h>
 
 @interface TXSRecordSixInt : NSObject
+- (nonnull instancetype)init NS_UNAVAILABLE;
++ (nonnull instancetype)new NS_UNAVAILABLE;
 - (nonnull instancetype)initWithI1:(int64_t)i1
                                 i2:(int64_t)i2
                                 i3:(int64_t)i3
                                 i4:(int64_t)i4
                                 i5:(int64_t)i5
-                                i6:(int64_t)i6;
+                                i6:(int64_t)i6 NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)RecordSixIntWithI1:(int64_t)i1
                                         i2:(int64_t)i2
                                         i3:(int64_t)i3
