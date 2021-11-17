@@ -19,7 +19,12 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
+#ifdef __EMSCRIPTEN_PTHREADS__
+#include <emscripten/threading.h>
+#endif
+
 #include "../expected.hpp"
+#include "../cpp/Future.hpp"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -414,6 +419,92 @@ struct Array<F64> : PrimitiveArray<F64> {
     static em::val getArrayClass() {
         static em::val arrayClass = em::val::global("Float64Array");
         return arrayClass;
+    }
+};
+
+class CppResolveHandlerBase {
+public:
+    virtual ~CppResolveHandlerBase() = default;
+    virtual void init(em::val resolveFunc) = 0;
+
+    static void initInstance(int handlerPtr, em::val resolveFunc) {
+        auto* handler = reinterpret_cast<CppResolveHandlerBase*>(handlerPtr);
+        handler->init(resolveFunc);
+    }
+    
+    static void resolveNativePromise(int func, int context, em::val res) {
+        typedef void (*ResolveNativePromiseFunc)(int context, em::val res);
+        auto resolveNativePromiseFunc = reinterpret_cast<ResolveNativePromiseFunc>(func);
+        resolveNativePromiseFunc(context, res);
+    }
+};
+
+template <class RESULT>
+class FutureAdaptor
+{
+    using CppResType = typename RESULT::CppType;
+
+public:
+    using CppType = Future<CppResType>;
+    using JsType = em::val;
+
+    using Boxed = FutureAdaptor;
+
+    using NativePromiseType = Promise<CppResType>;
+
+    static void resolveNativePromise(int context, em::val res) {
+        auto* pNativePromise = reinterpret_cast<NativePromiseType*>(context);
+        pNativePromise->setValue(RESULT::Boxed::toCpp(res));
+        delete pNativePromise;
+    }
+    
+    static CppType toCpp(JsType o)
+    {
+        auto p = new NativePromiseType();
+        auto makeNativePromiseResolver = em::val::module_property("makeNativePromiseResolver");
+        o.call<void>("then", makeNativePromiseResolver(reinterpret_cast<int>(&resolveNativePromise), reinterpret_cast<int>(p)));
+        auto f = p->getFuture();
+        return f;
+    }
+
+    class CppResolveHandler: public CppResolveHandlerBase {
+    public:
+        void init(em::val resolveFunc) {
+            _resolveFunc = resolveFunc;
+        }
+        void resolve(CppResType result) {
+            _result = std::move(result);
+#ifdef __EMSCRIPTEN_PTHREADS__
+            emscripten_async_run_in_main_runtime_thread(EM_FUNC_SIG_VI, &trampoline, this);
+#else
+            trampoline(this);
+#endif
+        }
+    private:
+        em::val _resolveFunc = em::val::undefined();
+        CppResType _result;
+
+        void doResolve() {
+            _resolveFunc(RESULT::Boxed::fromCpp(_result));
+        }
+        static void trampoline (void *context) {
+            CppResolveHandler* pthis = reinterpret_cast<CppResolveHandler*>(context);
+            pthis->doResolve();
+            delete pthis;
+        };
+    };
+    
+    static JsType fromCpp(const CppType& c)
+    {
+        static auto jsPromiseHolderClass = em::val::module_property("DjinniJsPromiseHolder");
+        auto* cppResolveHandler = new CppResolveHandler();
+        // Promise constructor calls cppResolveHandler.init(), and stores the JS
+        // resolve handler routine in cppResolveHandler.
+        em::val jsPromise = jsPromiseHolderClass.new_(reinterpret_cast<int>(cppResolveHandler));
+        c.then([cppResolveHandler] (CppResType res) {
+            cppResolveHandler->resolve(res);
+        });
+        return jsPromise["promise"];
     }
 };
 

@@ -120,6 +120,12 @@ em::val NativeTestHelpers::assorted_primitives_id(const em::val& w_i) {
 em::val NativeTestHelpers::id_binary(const em::val& w_b) {
     return ::djinni::Binary::fromCpp(::testsuite::TestHelpers::id_binary(::djinni::Binary::toCpp(w_b)));
 }
+em::val NativeTestHelpers::get_async_result() {
+    return ::djinni::FutureAdaptor<::djinni::I32>::fromCpp(::testsuite::TestHelpers::get_async_result());
+}
+em::val NativeTestHelpers::future_roundtrip(const em::val& w_i) {
+    return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(::testsuite::TestHelpers::future_roundtrip(::djinni::FutureAdaptor<::djinni::I32>::toCpp(w_i)));
+}
 
 EMSCRIPTEN_BINDINGS(test_helpers) {
     em::class_<::testsuite::TestHelpers>("TestHelpers")
@@ -150,6 +156,8 @@ EMSCRIPTEN_BINDINGS(test_helpers) {
         .class_function("returnNone", NativeTestHelpers::return_none)
         .class_function("assortedPrimitivesId", NativeTestHelpers::assorted_primitives_id)
         .class_function("idBinary", NativeTestHelpers::id_binary)
+        .class_function("getAsyncResult", NativeTestHelpers::get_async_result)
+        .class_function("futureRoundtrip", NativeTestHelpers::future_roundtrip)
         ;
 }
 

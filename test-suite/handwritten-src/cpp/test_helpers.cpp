@@ -9,8 +9,12 @@
 #include "primitive_list.hpp"
 #include "set_record.hpp"
 #include <exception>
+
+#if defined(__EMSCRIPTEN__)
+#include <emscripten.h>
+#else
 #include <thread>
-#include <future>
+#endif
 
 namespace testsuite {
 
@@ -164,30 +168,27 @@ std::vector<uint8_t> TestHelpers::id_binary(const std::vector<uint8_t> & v) {
 }
 
 djinni::Future<int32_t> TestHelpers::get_async_result() {
-    auto p = djinni::Promise<int32_t>();
-    auto f = p.getFuture();
+    auto* p = new djinni::Promise<int32_t>();
+    auto f = p->getFuture();
 
-    std::thread t([p = std::move(p)] () mutable {
+#if defined(__EMSCRIPTEN__)
+    emscripten_async_call([] (void* context) {
+        auto* p = reinterpret_cast<djinni::Promise<int32_t>*>(context);
+        p->setValue(42);
+        delete p;
+    }, p, 10);
+#else
+    std::thread t([p] () mutable {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        p.setValue(42);
+        p->setValue(42);
+        delete p;
     });
     t.detach();
-
+#endif
     return f;
 }
 
-int32_t TestHelpers::check_async_interface(const std::shared_ptr<testsuite::AsyncInterface>& i) {
-    auto f = i->get_async_result();
-    std::promise<int32_t> p;
-    f.then([] (auto res) {
-        return std::to_string(res);
-    }).then([&p] (std::string s) {
-        p.set_value(std::stoi(s));
-    });
-    return p.get_future().get();
-}
-
-djinni::Future<std::string> TestHelpers::pass_future(djinni::Future<int32_t> f) {
+djinni::Future<std::string> TestHelpers::future_roundtrip(djinni::Future<int32_t> f) {
     return f.then([] (int32_t i) {
         return std::to_string(i);
     });

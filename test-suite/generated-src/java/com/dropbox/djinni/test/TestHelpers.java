@@ -87,10 +87,7 @@ public abstract class TestHelpers {
     @Nonnull
     public static native Future<Integer> getAsyncResult();
 
-    @Nonnull
-    public static native int checkAsyncInterface(AsyncInterface i);
-
-    public static native Future<String> passFuture(Future<Integer> f);
+    public static native Future<String> futureRoundtrip(Future<Integer> f);
 
     public static final class CppProxy extends TestHelpers
     {

@@ -128,6 +128,21 @@ EM_JS(void, djinni_init_wasm, (), {
         }
         Module.DjinniCppProxy = DjinniCppProxy;
 
+        class DjinniJsPromiseHolder {
+            constructor(cppHandlerPtr) {
+                this.promise = new Promise((resolveFunc, rejectFunc) => {
+                        Module.initCppResolveHandler(cppHandlerPtr, resolveFunc);
+                    });
+            }
+        }
+        Module.DjinniJsPromiseHolder = DjinniJsPromiseHolder;
+
+        Module.makeNativePromiseResolver = function(func, pNativePromise) {
+            return function(res) {
+                Module.resolveNativePromise(func, pNativePromise, res);
+            };
+        };
+
         Module.writeNativeMemory = function(src, nativePtr) {
             var srcByteView = new Uint8Array(src.buffer, src.byteOffset, src.byteLength);
             Module.HEAPU8.set(srcByteView, nativePtr);
@@ -154,6 +169,8 @@ EMSCRIPTEN_BINDINGS(djinni_wasm) {
     djinni_init_wasm();    
     em::function("allocateWasmBuffer", &allocateWasmBuffer);
     em::function("getExceptionMessage", &getExceptionMessage);
+    em::function("initCppResolveHandler", &CppResolveHandlerBase::initInstance);
+    em::function("resolveNativePromise", &CppResolveHandlerBase::resolveNativePromise);
 }
 
 }

@@ -11,7 +11,6 @@
 #include "NativePrimitiveList.hpp"
 #include "NativeSetRecord.hpp"
 #include "NativeUserToken.hpp"
-#include "NativeAsyncInterface.hpp"
 
 namespace djinni_generated {
 
@@ -229,18 +228,10 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestHelpers_getAsyncResu
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT jint JNICALL Java_com_dropbox_djinni_test_TestHelpers_checkAsyncInterface(JNIEnv* jniEnv, jobject /*this*/, jobject i)
+CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestHelpers_futureRoundtrip(JNIEnv* jniEnv, jobject /*this*/, jobject f)
 {
     try {
-        auto r = ::testsuite::TestHelpers::check_async_interface(NativeAsyncInterface::toCpp(jniEnv, i));
-        return ::djinni::release(::djinni::I32::fromCpp(jniEnv, r));
-    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
-}
-
-CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestHelpers_passFuture(JNIEnv* jniEnv, jobject /*this*/, jobject f)
-{
-    try {
-        auto r = ::testsuite::TestHelpers::pass_future(::djinni::FutureAdaptor<::djinni::I32>::toCpp(jniEnv, f));
+        auto r = ::testsuite::TestHelpers::future_roundtrip(::djinni::FutureAdaptor<::djinni::I32>::toCpp(jniEnv, f));
         return ::djinni::release(::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }

@@ -24,15 +24,15 @@ function units(n, u) {
     return n + ' ' + u;
 }
 
-function runTests(module, tests) {
+async function runTests(module, tests) {
     failed = [];
     var total = 0;
     var t2 = performance.now();
-    tests.forEach(function(cls) {
+    for (const cls of tests) {
         var t = new cls(module);
         var count = 0;
         var t1 = performance.now();
-        Reflect.ownKeys(Reflect.getPrototypeOf(t)).forEach(function(m) {
+        for (const m of Reflect.ownKeys(Reflect.getPrototypeOf(t))) {
             if (m.startsWith('test')) {
                 currentTest = cls.name + '.' + m;
                 println('[ RUN      ] ' + currentTest)
@@ -40,7 +40,10 @@ function runTests(module, tests) {
                 var t0 = performance.now();
                 try {
                     if (t['setUp'] !== undefined) {t.setUp();}
-                    t[m]();
+                    var r = t[m]();
+                    if (typeof r === 'object' && typeof r.then === 'function') {
+                        await r;
+                    }
                     if (t['tearDown'] !== undefined) {t.tearDown();}
                 } catch (err) {
                     console.log(err);
@@ -50,10 +53,10 @@ function runTests(module, tests) {
                 println(status + cls.name + '.' + m + ' (' + (performance.now() - t0) + ' ms)')
                 count++;
             }
-        });
+        }
         total += count;
         println('[----------] ' + units(count, 'test') + ' from ' + cls.name + '(' + (performance.now() - t1) + ' ms total)')
-    });
+    }
     println('[==========] ' + units(total, 'test') + ' from ' + units(tests.length, 'test suite') + ' ran. (' + (performance.now() - t2) + ' ms total)')
     println('[  PASSED  ] ' + units(total - failed.length, 'test') + '.')
     if (failed.length > 0) {

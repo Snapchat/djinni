@@ -91,9 +91,7 @@ public:
 
     static djinni::Future<int32_t> get_async_result();
 
-    static int32_t check_async_interface(const std::shared_ptr<AsyncInterface>& i);
-
-    static djinni::Future<std::string> pass_future(djinni::Future<int32_t> f);
+    static djinni::Future<std::string> future_roundtrip(djinni::Future<int32_t> f);
 };
 
 }  // namespace testsuite

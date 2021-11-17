@@ -10,20 +10,6 @@ public class AsyncTest extends TestCase {
         Integer res;
     }
 
-    static class JavaAsyncInterfaceImpl extends AsyncInterface {
-        public Future<Integer> getAsyncResult() {
-            final Promise<Integer> p = new Promise<Integer>();
-            Future<Integer> f = p.getFuture();
-            Thread thread = new Thread("New Thread") {
-                    public void run(){
-                        p.setValue(42);
-                    }
-                };
-            thread.start();
-            return f;
-        }
-    }
-    
     public void testConsumeNativeFuture() {
         Future<Integer> f = TestHelpers.getAsyncResult();
         final ResultHolder r = new ResultHolder();
@@ -47,19 +33,14 @@ public class AsyncTest extends TestCase {
         }
         assertEquals(Integer.valueOf(42), r.res);
     }
-    
-    public void testConsumePlatformFuture() {
-        int r = TestHelpers.checkAsyncInterface(new JavaAsyncInterfaceImpl());
-        assertEquals(r, 42);
-    }
 
-    public void testPassingFuture() {
+    public void testFutureRoundtrip() {
         final Promise<String> p = new Promise<String>();
         Future<String> f = p.getFuture();
         Future<Integer> f2 = f.then((s) -> {
                 return Integer.parseInt(s);
             });
-        Future<String> f3 = TestHelpers.passFuture(f2);
+        Future<String> f3 = TestHelpers.futureRoundtrip(f2);
         p.setValue("36");
         assertEquals(f3.get(), "36");
     }
