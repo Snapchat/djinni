@@ -458,13 +458,13 @@ public:
         return f;
     }
 
-    static ObjcType fromCpp(const CppType& c)
+    static ObjcType fromCpp(CppType c)
     {
         DJPromise<typename RESULT::Boxed::ObjcType>* promise = [[DJPromise alloc] init];
         DJFuture<typename RESULT::Boxed::ObjcType>* future = [promise getFuture];
 
-        c.then([promise] (CppResType res) {
-                [promise setValue:RESULT::Boxed::fromCpp(res)];
+        c.then([promise] (Future<CppResType> res) {
+                [promise setValue:RESULT::Boxed::fromCpp(res.get())];
             });
         
         return future;

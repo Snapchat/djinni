@@ -224,7 +224,7 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestHelpers_getAsyncResu
 {
     try {
         auto r = ::testsuite::TestHelpers::get_async_result();
-        return ::djinni::release(::djinni::FutureAdaptor<::djinni::I32>::fromCpp(jniEnv, r));
+        return ::djinni::release(::djinni::FutureAdaptor<::djinni::I32>::fromCpp(jniEnv, std::move(r)));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
@@ -232,7 +232,7 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestHelpers_futureRoundt
 {
     try {
         auto r = ::testsuite::TestHelpers::future_roundtrip(::djinni::FutureAdaptor<::djinni::I32>::toCpp(jniEnv, f));
-        return ::djinni::release(::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, r));
+        return ::djinni::release(::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, std::move(r)));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 

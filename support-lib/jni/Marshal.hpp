@@ -880,7 +880,7 @@ namespace djinni
             return f;
         }
 
-        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c)
+        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, CppType c)
         {
             const auto& promiseJniInfo = JniClass<PromiseJniInfo>::get();
 
@@ -888,10 +888,10 @@ namespace djinni
             promise->set(jniEnv, jniEnv->NewObject(promiseJniInfo.clazz.get(), promiseJniInfo.constructor));
             auto future = LocalRef<jobject>(jniEnv, jniEnv->CallObjectMethod(promise->get(), promiseJniInfo.method_get_future));
             jniExceptionCheck(jniEnv);
-            
-            c.then([promise, &promiseJniInfo] (CppResType res) {
+                        
+            c.then([promise, &promiseJniInfo] (Future<CppResType> res) {
                 JNIEnv* jniEnv = jniGetThreadEnv();
-                jniEnv->CallVoidMethod(promise->get(), promiseJniInfo.method_set_value, RESULT::Boxed::fromCpp(jniEnv, res).get());
+                jniEnv->CallVoidMethod(promise->get(), promiseJniInfo.method_set_value, RESULT::Boxed::fromCpp(jniEnv, res.get()).get());
                 jniExceptionCheck(jniEnv);
             });
             

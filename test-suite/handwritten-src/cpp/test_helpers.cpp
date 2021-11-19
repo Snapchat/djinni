@@ -189,8 +189,8 @@ djinni::Future<int32_t> TestHelpers::get_async_result() {
 }
 
 djinni::Future<std::string> TestHelpers::future_roundtrip(djinni::Future<int32_t> f) {
-    return f.then([] (int32_t i) {
-        return std::to_string(i);
+    return f.then([] (djinni::Future<int32_t> f) {
+        return std::to_string(f.get());
     });
 }
 

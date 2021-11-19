@@ -27,18 +27,21 @@ namespace djinni {
 template <typename T>
 struct ValueHolder {
     using type = T;
+    std::optional<T> value;
+    T getValueUnsafe() const {return *value;}
 };
 template <>
 struct ValueHolder<void> {
     using type = bool;
+    std::optional<bool> value;
+    void getValueUnsafe() const {}
 };
 
 template<typename T>
-struct SharedState {
-    std::optional<typename ValueHolder<T>::type> value;
+struct SharedState: ValueHolder<T> {
     std::condition_variable cv;
     std::mutex mutex;
-    std::function<void(typename ValueHolder<T>::type)> handler;
+    std::function<void(std::shared_ptr<SharedState>)> handler;
 };
 
 template<typename T>
@@ -48,33 +51,51 @@ template <typename T>
 class Future;
 
 template <typename T>
-class Promise {
+class PromiseBase {
 public:
     Future<T> getFuture();
 
+protected:
     void setValue(typename ValueHolder<T>::type val) {
+        decltype(_sharedState->handler) handler;
         {
             std::unique_lock lk(_sharedState->mutex);
             _sharedState->value = val;
-            if (_sharedState->handler) {
-                // handler already assigned
-                // TODO call handler without lock
-                _sharedState->handler(val);
-            }
+            handler = std::move(_sharedState->handler);
         }
-        _sharedState->cv.notify_all();
+        if (handler) {
+            // handler already assigned
+            handler(_sharedState);
+        } else {
+            _sharedState->cv.notify_all();
+        }
     }
 private:
     SharedStatePtr<T> _sharedState = std::make_shared<SharedState<T>>();
 };
 
+template <typename T>
+class Promise: public PromiseBase<T> {
+public:
+    using PromiseBase<T>::setValue;
+};
+
+template <>
+class Promise<void>: public PromiseBase<void> {
+public:
+    void setValue() {
+        PromiseBase<void>::setValue(true);
+    }
+};
+
 template<typename T>
 class Future {
     template<typename U>
-    friend class Promise;
+    friend class PromiseBase;
     
     Future(SharedStatePtr<T> sharedState) : _sharedState(sharedState) {}
 public:
+    Future(Future&& other) = default;
 
     bool isValid() const {
         return _sharedState != nullptr;
@@ -85,57 +106,61 @@ public:
         return _sharedState->value.has_value();
     }
     
-    T get() const {
+    void wait() const {
         std::unique_lock lk(_sharedState->mutex);
         _sharedState->cv.wait(lk, [state = _sharedState] { return state->value.has_value(); });
-        return *(_sharedState->value);
+    }
+
+    auto get() const {
+        std::unique_lock lk(_sharedState->mutex);
+        _sharedState->cv.wait(lk, [state = _sharedState] { return state->value.has_value(); });
+        return _sharedState->getValueUnsafe();
     }
 
     template<typename FUNC>
-    auto then(FUNC handler) const {
-        // TODO can only call once
-        std::unique_lock lk(_sharedState->mutex);
+    auto then(FUNC handler) {
+        using HandlerReturnType = std::invoke_result_t<FUNC, Future<T>>;
 
-        using HandlerReturnType = std::invoke_result_t<FUNC, T>;
+        std::unique_lock lk(_sharedState->mutex);
+        auto sharedState = std::move(_sharedState);
 
         if constexpr(std::is_void_v<HandlerReturnType>) {
             Promise<void> nextPromise;
             auto nextFuture = nextPromise.getFuture();
-            auto continuation = [handler, p = std::move(nextPromise)] (T x) mutable {
-                handler(x);
-                p.setValue(true);
+            auto continuation = [this, handler, nextPromise] (SharedStatePtr<T> x) mutable {
+                handler(Future<T>(x));
+                nextPromise.setValue();
             };
-            if (_sharedState->value.has_value()) {
+            if (sharedState->value.has_value()) {
                 // result already available
-                continuation(*(_sharedState->value));
+                continuation(sharedState);
             } else {
                 // result not yet available
-                _sharedState->handler = continuation;
+                sharedState->handler = std::move(continuation);
             }
             return nextFuture;
         } else {
             Promise<HandlerReturnType> nextPromise;
             auto nextFuture = nextPromise.getFuture();
-            auto continuation = [handler, p = std::move(nextPromise)] (T x) mutable {
-                p.setValue(handler(x));
+            auto continuation = [this, handler, nextPromise] (SharedStatePtr<T> x) mutable {
+                nextPromise.setValue(handler(Future<T>(x)));
             };
-            if (_sharedState->value.has_value()) {
+            if (sharedState->value.has_value()) {
                 // result already available
-                continuation(*(_sharedState->value));
+                continuation(sharedState);
             } else {
                 // result not yet available
-                _sharedState->handler = continuation;
+                sharedState->handler = std::move(continuation);
             }
             return nextFuture;
         }
     }
 private:
-    mutable SharedStatePtr<T> _sharedState;
+    SharedStatePtr<T> _sharedState;
 };
 
 template <typename T>
-Future<T> Promise<T>::getFuture() {
-    // TODO can only call once
+Future<T> PromiseBase<T>::getFuture() {
     return Future<T>(_sharedState);
 }
 

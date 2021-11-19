@@ -210,12 +210,12 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
 
 + (DJFuture<NSNumber*>* _Nonnull) getAsyncResult {
     auto r = ::testsuite::TestHelpers::get_async_result();
-    return ::djinni::FutureAdaptor<::djinni::I32>::fromCpp(r);
+    return ::djinni::FutureAdaptor<::djinni::I32>::fromCpp(std::move(r));
 }
 
 + (DJFuture<NSString*>* _Nonnull) futureRoundtrip:(nonnull DJFuture<NSNumber*>*)f {
     auto r = ::testsuite::TestHelpers::future_roundtrip(djinni::FutureAdaptor<::djinni::I32>::toCpp(f));
-    return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(r);
+    return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(r));
 }
 
 namespace djinni_generated {
