@@ -18,13 +18,13 @@
 
 #import <Foundation/Foundation.h>
 
-typedef _Nullable id (^FutureHandler)(_Nonnull id);
+@class DJFuture;
 
 @interface DJFuture<__covariant Value> : NSObject
 -(nonnull instancetype) init NS_UNAVAILABLE;
 -(BOOL) isReady;
 -(nullable Value) get;
--(nonnull DJFuture<id>*)then:(_Nullable id(^_Nonnull)(_Nonnull Value))handler;
+-(nonnull DJFuture<id>*)then:(_Nullable id(^_Nonnull)(DJFuture<Value>* _Nonnull))handler;
 @end
 
 // ------------------------------------------

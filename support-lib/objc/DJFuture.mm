@@ -16,10 +16,14 @@
 
 #import "DJFuture.h"
 
+@class DJSharedSate<Value>;
+
+typedef _Nullable id (^Continuation)(DJSharedSate* _Nonnull);
+
 @interface DJSharedSate<Value> : NSObject
     @property (nonatomic, strong) Value value;
     @property (nonatomic, strong) NSCondition* cond;
-    @property (nonatomic, strong) FutureHandler handler;
+    @property (nonatomic, strong) Continuation handler;
 @end
 
 @implementation DJSharedSate
@@ -63,12 +67,12 @@
     return ret;
 }
 
--(DJFuture<id>*)then:(FutureHandler)handler {
+-(DJFuture<id>*)then:(_Nullable id(^_Nonnull)(DJFuture<id>* _Nonnull))handler {
     DJPromise<id>* nextPromise = [[DJPromise alloc] init];
     DJFuture<id>* nextFuture = [nextPromise getFuture];
-    FutureHandler continuation;
-    continuation = ^id _Nonnull(id _Nonnull value) {
-        [nextPromise setValue:handler(value)];
+    Continuation continuation;
+    continuation = ^id _Nonnull(DJSharedSate* _Nonnull st) {
+        [nextPromise setValue:handler([[DJFuture alloc] initWithSharedState:st])];
         return {};
     };
     
@@ -96,19 +100,20 @@
     return self;
 }
 
--(DJFuture*) getFuture {
+-(DJFuture<id>*) getFuture {
     return [[DJFuture alloc] initWithSharedState: _sharedState];
 }
 
 -(void) setValue:(id) val {
+    Continuation continuation = nil;
     [_sharedState.cond lock];
     _sharedState.value = val;
-    if (_sharedState.handler) {
-        // TODO call out of lock
-        _sharedState.handler(val);
-    }
+    continuation = _sharedState.handler;
     [_sharedState.cond broadcast];
     [_sharedState.cond unlock];
+    if (continuation) {
+        continuation(_sharedState);
+    }
 }
 
 @end

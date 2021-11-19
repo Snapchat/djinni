@@ -454,7 +454,7 @@ public:
 
         __block auto p = std::make_unique<NativePromiseType>();
         auto f = p->getFuture();
-        [o then: ^id(id res) {p->setValue(RESULT::Boxed::toCpp(res)); return nil;}];
+        [o then: ^id(DJFuture* res) {p->setValue(RESULT::Boxed::toCpp([res get])); return nil;}];
         return f;
     }
 
