@@ -30,10 +30,9 @@ public class Promise<T> {
 
     public void setValue(T val) {
         synchronized(sharedState) {
+            sharedState.value = val;
             if (sharedState.handler != null) {
-                sharedState.handler.handleResult(val);
-            } else {
-                sharedState.value = val;
+                sharedState.handler.handleResult(sharedState);
             }
             sharedState.notifyAll();
         }

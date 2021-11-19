@@ -18,12 +18,20 @@ package com.snapchat.djinni;
 
 public class Future<T> {
 
+    public interface FutureHandler<U> {
+        public void handleResult(Future<U> res);
+    }
+
+    public interface FutureHandlerWithReturn<U, R> {
+        public R handleResult(Future<U> res);
+    }
+    
     private SharedState<T> sharedState;
 
     Future(SharedState<T> state) {
         sharedState = state;
     }
-        
+
     public boolean isReady() {
         synchronized(sharedState) {
             return sharedState.value != null;
@@ -47,14 +55,14 @@ public class Future<T> {
         final Promise<Void> nextPromise = new Promise<Void>();
         final Future<Void> nextFuture = nextPromise.getFuture();
 
-        final FutureHandler<T> continuation = (T res) -> {
-            handler.handleResult(res);
+        final SharedState.Continuation<T> continuation = (SharedState<T> res) -> {
+            handler.handleResult(new Future<T>(res));
             nextPromise.setValue(null);
         };
 
         synchronized(sharedState) {
             if (sharedState.value != null) {
-                continuation.handleResult(sharedState.value);
+                continuation.handleResult(sharedState);
             } else {
                 sharedState.handler = continuation;
             }
@@ -67,13 +75,13 @@ public class Future<T> {
         final Promise<R> nextPromise = new Promise<R>();
         final Future<R> nextFuture = nextPromise.getFuture();
 
-        final FutureHandler<T> continuation = (T res) -> {
-            nextPromise.setValue(handler.handleResult(res));
+        final SharedState.Continuation<T> continuation = (SharedState<T> res) -> {
+            nextPromise.setValue(handler.handleResult(new Future<T>(res)));
         };
         
         synchronized(sharedState) {
             if (sharedState.value != null) {
-                continuation.handleResult(sharedState.value);
+                continuation.handleResult(sharedState);
             } else {
                 sharedState.handler = continuation;
             }

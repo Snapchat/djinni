@@ -825,7 +825,7 @@ namespace djinni
 
     struct FutureJniInfo {
         const GlobalRef<jclass> clazz { jniFindClass("com/snapchat/djinni/Future") };
-        const jmethodID method_then { jniGetMethodID(clazz.get(), "then", "(Lcom/snapchat/djinni/FutureHandler;)Lcom/snapchat/djinni/Future;") };
+        const jmethodID method_then { jniGetMethodID(clazz.get(), "then", "(Lcom/snapchat/djinni/Future$FutureHandler;)Lcom/snapchat/djinni/Future;") };
     };
 
     struct NativeFutureHandlerJniInfo {
@@ -833,7 +833,7 @@ namespace djinni
         const jmethodID constructor { jniGetMethodID(clazz.get(), "<init>", "(JJ)V") };
     };
 
-    using NativeFutureHandlerFunc = void (*)(JNIEnv* jniEnv, jlong nativePromise, jobject jres);
+    using NativeFutureHandlerFunc = void (*)(JNIEnv* jniEnv, jlong nativePromise, jobject jres, jthrowable jex);
 
     template <class RESULT>
     class FutureAdaptor
@@ -861,7 +861,7 @@ namespace djinni
             auto p = std::make_unique<NativePromiseType>();
             auto f = p->getFuture();
 
-            NativeFutureHandlerFunc FutureHandler = [] (JNIEnv* jniEnv, jlong nativePromise, jobject jres) {
+            NativeFutureHandlerFunc FutureHandler = [] (JNIEnv* jniEnv, jlong nativePromise, jobject jres, jthrowable jex) {
                 std::unique_ptr<NativePromiseType> promise {
                     reinterpret_cast<NativePromiseType*>(nativePromise)
                 };

@@ -20,6 +20,11 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 class SharedState<T> {
+
+    interface Continuation<U> {
+        void handleResult(SharedState<U> res);
+    }
+    
     public T value;
-    public FutureHandler<T> handler;
+    public Continuation<T> handler;
 }
