@@ -494,15 +494,15 @@ public:
         };
     };
     
-    static JsType fromCpp(const CppType& c)
+    static JsType fromCpp(CppType c)
     {
         static auto jsPromiseHolderClass = em::val::module_property("DjinniJsPromiseHolder");
         auto* cppResolveHandler = new CppResolveHandler();
         // Promise constructor calls cppResolveHandler.init(), and stores the JS
         // resolve handler routine in cppResolveHandler.
         em::val jsPromise = jsPromiseHolderClass.new_(reinterpret_cast<int>(cppResolveHandler));
-        c.then([cppResolveHandler] (CppResType res) {
-            cppResolveHandler->resolve(res);
+        c.then([cppResolveHandler] (Future<CppResType> res) {
+            cppResolveHandler->resolve(res.get());
         });
         return jsPromise["promise"];
     }
