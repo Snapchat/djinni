@@ -19,11 +19,11 @@ package com.snapchat.djinni;
 public class Future<T> {
 
     public interface FutureHandler<U> {
-        public void handleResult(Future<U> res);
+        public void handleResult(Future<U> res) throws Throwable;
     }
 
     public interface FutureHandlerWithReturn<U, R> {
-        public R handleResult(Future<U> res);
+        public R handleResult(Future<U> res) throws Throwable;
     }
     
     private SharedState<T> sharedState;
@@ -34,17 +34,21 @@ public class Future<T> {
 
     public boolean isReady() {
         synchronized(sharedState) {
-            return sharedState.value != null;
+            return sharedState.isReady();
         }
     }
 
-    public T get() {
+    public T get() throws Throwable {
         synchronized(sharedState) {
             try {
-                while(sharedState.value == null) {
+                while(!sharedState.isReady()) {
                     sharedState.wait();
                 }
-                return sharedState.value;
+                if (sharedState.exception == null) {
+                    return sharedState.value;
+                } else {
+                    throw sharedState.exception;
+                }
             } catch (InterruptedException e) {
                 return null;
             }
@@ -56,15 +60,21 @@ public class Future<T> {
         final Future<Void> nextFuture = nextPromise.getFuture();
 
         final SharedState.Continuation<T> continuation = (SharedState<T> res) -> {
-            handler.handleResult(new Future<T>(res));
-            nextPromise.setValue(null);
+            try {
+                handler.handleResult(new Future<T>(res));
+                nextPromise.setValue(null);
+            } catch (Throwable e) {
+                nextPromise.setException(e);
+            }
         };
 
         synchronized(sharedState) {
-            if (sharedState.value != null) {
-                continuation.handleResult(sharedState);
+            SharedState<T> st = sharedState;
+            sharedState = null;
+            if (st.isReady()) {
+                continuation.handleResult(st);
             } else {
-                sharedState.handler = continuation;
+                st.handler = continuation;
             }
         }
 
@@ -76,14 +86,20 @@ public class Future<T> {
         final Future<R> nextFuture = nextPromise.getFuture();
 
         final SharedState.Continuation<T> continuation = (SharedState<T> res) -> {
-            nextPromise.setValue(handler.handleResult(new Future<T>(res)));
+            try {
+                nextPromise.setValue(handler.handleResult(new Future<T>(res)));
+            } catch (Throwable e) {
+                nextPromise.setException(e);
+            }
         };
-        
+
         synchronized(sharedState) {
-            if (sharedState.value != null) {
-                continuation.handleResult(sharedState);
+            SharedState<T> st = sharedState;
+            sharedState = null;
+            if (st.isReady()) {
+                continuation.handleResult(st);
             } else {
-                sharedState.handler = continuation;
+                st.handler = continuation;
             }
         }
         return nextFuture;

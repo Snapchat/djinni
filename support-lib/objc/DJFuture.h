@@ -33,4 +33,5 @@
 -(nonnull instancetype) init;
 -(nonnull DJFuture<Value>*) getFuture;
 -(void) setValue:(nullable Value) val;
+-(void) setException:(nonnull NSException*) exception;
 @end

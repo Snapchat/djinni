@@ -28,10 +28,10 @@ public class NativeFutureHandler implements Future.FutureHandler {
     @Override
     public void handleResult(Future future) {
         Object res = null;
-        Exception ex = null;
+        Throwable ex = null;
         try {
             res = future.get();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             ex = e;
         }
         nativeHandleResult(mNativeFunc, mNativePromise, res, ex);

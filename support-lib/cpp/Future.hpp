@@ -41,7 +41,12 @@ template<typename T>
 struct SharedState: ValueHolder<T> {
     std::condition_variable cv;
     std::mutex mutex;
+    std::exception_ptr exception;
     std::function<void(std::shared_ptr<SharedState>)> handler;
+
+    bool isReady() const {
+        return this->value.has_value() || exception != nullptr;
+    }
 };
 
 template<typename T>
@@ -57,27 +62,42 @@ public:
 
 protected:
     void setValue(typename ValueHolder<T>::type val) {
-        decltype(_sharedState->handler) handler;
+        SharedStatePtr<T> sharedState;
         {
             std::unique_lock lk(_sharedState->mutex);
             _sharedState->value = val;
-            handler = std::move(_sharedState->handler);
+            sharedState = std::move(_sharedState);
         }
-        if (handler) {
-            // handler already assigned
-            handler(_sharedState);
-        } else {
-            _sharedState->cv.notify_all();
+        callResultHandler(sharedState);
+    }
+
+    void setException(std::exception_ptr ex) {
+        SharedStatePtr<T> sharedState;
+        {
+            std::unique_lock lk(_sharedState->mutex);
+            _sharedState->exception = ex;
+            sharedState = std::move(_sharedState);
         }
+        callResultHandler(sharedState);
     }
 private:
     SharedStatePtr<T> _sharedState = std::make_shared<SharedState<T>>();
+
+    void callResultHandler(SharedStatePtr<T> sharedState) {
+        if (sharedState->handler) {
+            // handler already assigned
+            sharedState->handler(sharedState);
+        } else {
+            sharedState->cv.notify_all();
+        }
+    }
 };
 
 template <typename T>
 class Promise: public PromiseBase<T> {
 public:
     using PromiseBase<T>::setValue;
+    using PromiseBase<T>::setException;
 };
 
 template <>
@@ -86,6 +106,7 @@ public:
     void setValue() {
         PromiseBase<void>::setValue(true);
     }
+    using PromiseBase<void>::setException;
 };
 
 template<typename T>
@@ -103,18 +124,22 @@ public:
     
     bool isReady() const {
         std::unique_lock lk(_sharedState->mutex);
-        return _sharedState->value.has_value();
+        return _sharedState->isReady();
     }
     
     void wait() const {
         std::unique_lock lk(_sharedState->mutex);
-        _sharedState->cv.wait(lk, [state = _sharedState] { return state->value.has_value(); });
+        _sharedState->cv.wait(lk, [state = _sharedState] {return state->isReady();});
     }
 
     auto get() const {
         std::unique_lock lk(_sharedState->mutex);
-        _sharedState->cv.wait(lk, [state = _sharedState] { return state->value.has_value(); });
-        return _sharedState->getValueUnsafe();
+        _sharedState->cv.wait(lk, [state = _sharedState] {return state->isReady();});
+        if (!_sharedState->exception) {
+            return _sharedState->getValueUnsafe();
+        } else {
+            std::rethrow_exception(_sharedState->exception);
+        }
     }
 
     template<typename FUNC>
@@ -128,10 +153,14 @@ public:
             Promise<void> nextPromise;
             auto nextFuture = nextPromise.getFuture();
             auto continuation = [this, handler, nextPromise] (SharedStatePtr<T> x) mutable {
-                handler(Future<T>(x));
-                nextPromise.setValue();
+                try {
+                    handler(Future<T>(x));
+                    nextPromise.setValue();
+                } catch (std::exception& e) {
+                    nextPromise.setException(std::current_exception());
+                }
             };
-            if (sharedState->value.has_value()) {
+            if (sharedState->isReady()) {
                 // result already available
                 continuation(sharedState);
             } else {
@@ -143,9 +172,13 @@ public:
             Promise<HandlerReturnType> nextPromise;
             auto nextFuture = nextPromise.getFuture();
             auto continuation = [this, handler, nextPromise] (SharedStatePtr<T> x) mutable {
-                nextPromise.setValue(handler(Future<T>(x)));
+                try { 
+                    nextPromise.setValue(handler(Future<T>(x)));
+                } catch (std::exception& e) {
+                    nextPromise.setException(std::current_exception());
+                }
             };
-            if (sharedState->value.has_value()) {
+            if (sharedState->isReady()) {
                 // result already available
                 continuation(sharedState);
             } else {

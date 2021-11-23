@@ -37,4 +37,14 @@ public class Promise<T> {
             sharedState.notifyAll();
         }
     }
+
+    public void setException(Throwable ex) {
+        synchronized(sharedState) {
+            sharedState.exception = ex;
+            if (sharedState.handler != null) {
+                sharedState.handler.handleResult(sharedState);
+            }
+            sharedState.notifyAll();
+        }
+    }
 }

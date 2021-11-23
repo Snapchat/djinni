@@ -22,18 +22,25 @@ typedef _Nullable id (^Continuation)(DJSharedSate* _Nonnull);
 
 @interface DJSharedSate<Value> : NSObject
     @property (nonatomic, strong) Value value;
+    @property (nonatomic, strong) NSException* exception;
     @property (nonatomic, strong) NSCondition* cond;
     @property (nonatomic, strong) Continuation handler;
+
+    @property (readonly) BOOL isReady;
 @end
 
 @implementation DJSharedSate
 -(instancetype)init {
     if (self = [super init]) {
         self->_value = nil;
+        self->_exception = nil;
         self->_cond = [[NSCondition alloc] init];
         self->_handler = nil;
     }
     return self;
+}
+-(BOOL) isReady {
+    return _value != nil || _exception != nil;
 }
 @end
 
@@ -52,18 +59,23 @@ typedef _Nullable id (^Continuation)(DJSharedSate* _Nonnull);
 
 -(BOOL) isReady {
     [_sharedState.cond lock];
-    BOOL ready = (_sharedState.value != nil);
+    BOOL ready = (_sharedState.isReady);
     [_sharedState.cond unlock];
     return ready;
 }
 
 -(id) get {
     id ret = nil;
+    id ex = nil;
     [_sharedState.cond lock];
-    while (_sharedState.value == nil)
+    while (!_sharedState.isReady)
         [_sharedState.cond wait];
     ret = _sharedState.value;
+    ex = _sharedState.exception;
     [_sharedState.cond unlock];
+    if (ex != nil) {
+        @throw ex;
+    }
     return ret;
 }
 
@@ -71,18 +83,23 @@ typedef _Nullable id (^Continuation)(DJSharedSate* _Nonnull);
     DJPromise<id>* nextPromise = [[DJPromise alloc] init];
     DJFuture<id>* nextFuture = [nextPromise getFuture];
     Continuation continuation;
-    continuation = ^id _Nonnull(DJSharedSate* _Nonnull st) {
-        [nextPromise setValue:handler([[DJFuture alloc] initWithSharedState:st])];
-        return {};
+    continuation = ^id (DJSharedSate* _Nonnull st) {
+        @try {
+            [nextPromise setValue:handler([[DJFuture alloc] initWithSharedState:st])];
+        } @catch ( NSException* e ) {
+            [nextPromise setException:e];
+        }
+        return nil;
     };
-    
     [_sharedState.cond lock];
-    if (_sharedState.value != nil) {
-        continuation(_sharedState.value);
+    DJSharedSate<id>* sharedState = _sharedState;
+    _sharedState = nil;
+    if (sharedState.isReady) {
+        continuation(sharedState.value);
     } else {
-        _sharedState.handler = continuation;
+        sharedState.handler = continuation;
     }
-    [_sharedState.cond unlock];
+    [sharedState.cond unlock];
     return nextFuture;
 }
 
@@ -105,14 +122,26 @@ typedef _Nullable id (^Continuation)(DJSharedSate* _Nonnull);
 }
 
 -(void) setValue:(id) val {
-    Continuation continuation = nil;
+    DJSharedSate* sharedState = nil;
     [_sharedState.cond lock];
-    _sharedState.value = val;
-    continuation = _sharedState.handler;
-    [_sharedState.cond broadcast];
-    [_sharedState.cond unlock];
-    if (continuation) {
-        continuation(_sharedState);
+    sharedState = _sharedState;
+    sharedState.value = val;
+    [sharedState.cond broadcast];
+    [sharedState.cond unlock];
+    if (sharedState.handler) {
+        sharedState.handler(sharedState);
+    }
+}
+
+-(void) setException:(NSException*) exception {
+    DJSharedSate* sharedState = nil;
+    [_sharedState.cond lock];
+    sharedState = _sharedState;
+    sharedState.exception = exception;
+    [sharedState.cond broadcast];
+    [sharedState.cond unlock];
+    if (sharedState.handler) {
+        sharedState.handler(sharedState);
     }
 }
 

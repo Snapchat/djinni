@@ -454,7 +454,18 @@ public:
 
         __block auto p = std::make_unique<NativePromiseType>();
         auto f = p->getFuture();
-        [o then: ^id(DJFuture* res) {p->setValue(RESULT::Boxed::toCpp([res get])); return nil;}];
+        [o then: ^id(DJFuture* res) {
+                @try {
+                    p->setValue(RESULT::Boxed::toCpp([res get]));
+                } @catch (NSException* e) {
+                    try {
+                        throw std::runtime_error(String::toCpp(e.reason));
+                    } catch (std::exception&) {
+                        p->setException(std::current_exception());
+                    }
+                }
+                return nil;
+            }];
         return f;
     }
 
@@ -464,7 +475,11 @@ public:
         DJFuture<typename RESULT::Boxed::ObjcType>* future = [promise getFuture];
 
         c.then([promise] (Future<CppResType> res) {
-                [promise setValue:RESULT::Boxed::fromCpp(res.get())];
+                try {
+                    [promise setValue:RESULT::Boxed::fromCpp(res.get())];
+                } catch (std::exception& e) {
+                    [promise setException: [NSException exceptionWithName:@"" reason:String::fromCpp(e.what()) userInfo:nil]];
+                }
             });
         
         return future;
