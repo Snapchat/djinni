@@ -174,13 +174,23 @@ djinni::Future<int32_t> TestHelpers::get_async_result() {
 #if defined(__EMSCRIPTEN__)
     emscripten_async_call([] (void* context) {
         auto* p = reinterpret_cast<djinni::Promise<int32_t>*>(context);
-        p->setValue(42);
+        // p->setValue(42);
+        try {
+            throw std::runtime_error("123");
+        } catch (std::exception& e) {
+            p->setException(std::current_exception());
+        }
         delete p;
-    }, p, 10);
+    }, p, 10/*ms*/);
 #else
     std::thread t([p] () mutable {
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        p->setValue(42);
+        // p->setValue(42);
+        try {
+            throw std::runtime_error("123");
+        } catch (std::exception& e) {
+            p->setException(std::current_exception());
+        }
         delete p;
     });
     t.detach();
