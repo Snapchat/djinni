@@ -425,17 +425,17 @@ struct Array<F64> : PrimitiveArray<F64> {
 class CppResolveHandlerBase {
 public:
     virtual ~CppResolveHandlerBase() = default;
-    virtual void init(em::val resolveFunc) = 0;
+    virtual void init(em::val resolveFunc, em::val rejectFunc) = 0;
 
-    static void initInstance(int handlerPtr, em::val resolveFunc) {
+    static void initInstance(int handlerPtr, em::val resolveFunc, em::val rejectFunc) {
         auto* handler = reinterpret_cast<CppResolveHandlerBase*>(handlerPtr);
-        handler->init(resolveFunc);
+        handler->init(resolveFunc, rejectFunc);
     }
     
-    static void resolveNativePromise(int func, int context, em::val res) {
-        typedef void (*ResolveNativePromiseFunc)(int context, em::val res);
+    static void resolveNativePromise(int func, int context, em::val res, em::val err) {
+        typedef void (*ResolveNativePromiseFunc)(int context, em::val res, em::val err);
         auto resolveNativePromiseFunc = reinterpret_cast<ResolveNativePromiseFunc>(func);
-        resolveNativePromiseFunc(context, res);
+        resolveNativePromiseFunc(context, res, err);
     }
 };
 
@@ -452,28 +452,39 @@ public:
 
     using NativePromiseType = Promise<CppResType>;
 
-    static void resolveNativePromise(int context, em::val res) {
+    static void resolveNativePromise(int context, em::val res, em::val err) {
         auto* pNativePromise = reinterpret_cast<NativePromiseType*>(context);
-        pNativePromise->setValue(RESULT::Boxed::toCpp(res));
+        if (err.isNull() || err.isUndefined()) {
+            pNativePromise->setValue(RESULT::Boxed::toCpp(res));
+        } else {
+            try {
+                throw std::runtime_error(err["message"].as<std::string>());
+            } catch (std::exception&) {
+                pNativePromise->setException(std::current_exception());
+            }
+        }
         delete pNativePromise;
     }
     
     static CppType toCpp(JsType o)
     {
         auto p = new NativePromiseType();
-        auto makeNativePromiseResolver = em::val::module_property("makeNativePromiseResolver");
-        o.call<void>("then", makeNativePromiseResolver(reinterpret_cast<int>(&resolveNativePromise), reinterpret_cast<int>(p)));
         auto f = p->getFuture();
+        auto makeNativePromiseResolver = em::val::module_property("makeNativePromiseResolver");
+        auto makeNativePromiseRejecter = em::val::module_property("makeNativePromiseRejecter");
+        auto next = o.call<em::val>("then", makeNativePromiseResolver(reinterpret_cast<int>(&resolveNativePromise), reinterpret_cast<int>(p)));
+        next.call<void>("catch", makeNativePromiseRejecter(reinterpret_cast<int>(&resolveNativePromise), reinterpret_cast<int>(p)));
         return f;
     }
 
     class CppResolveHandler: public CppResolveHandlerBase {
     public:
-        void init(em::val resolveFunc) {
+        void init(em::val resolveFunc, em::val rejectFunc) override {
             _resolveFunc = resolveFunc;
+            _rejectFunc = rejectFunc;
         }
-        void resolve(CppResType result) {
-            _result = std::move(result);
+        void resolve(Future<CppResType> future) {
+            _future = std::move(future);
 #ifdef __EMSCRIPTEN_PTHREADS__
             emscripten_async_run_in_main_runtime_thread(EM_FUNC_SIG_VI, &trampoline, this);
 #else
@@ -482,10 +493,18 @@ public:
         }
     private:
         em::val _resolveFunc = em::val::undefined();
-        CppResType _result;
+        em::val _rejectFunc = em::val::undefined();
+        std::optional<Future<CppResType>> _future;
 
+        // runs in main thread
         void doResolve() {
-            _resolveFunc(RESULT::Boxed::fromCpp(_result));
+            try {
+                _resolveFunc(RESULT::Boxed::fromCpp(_future->get()));
+            } catch (std::exception& e) {
+                auto errorClass = em::val::global("Error");
+                auto error = errorClass.new_(std::string(e.what()));
+                _rejectFunc(error);
+            }
         }
         static void trampoline (void *context) {
             CppResolveHandler* pthis = reinterpret_cast<CppResolveHandler*>(context);
@@ -502,7 +521,7 @@ public:
         // resolve handler routine in cppResolveHandler.
         em::val jsPromise = jsPromiseHolderClass.new_(reinterpret_cast<int>(cppResolveHandler));
         c.then([cppResolveHandler] (Future<CppResType> res) {
-            cppResolveHandler->resolve(res.get());
+            cppResolveHandler->resolve(std::move(res));
         });
         return jsPromise["promise"];
     }

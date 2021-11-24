@@ -131,7 +131,7 @@ EM_JS(void, djinni_init_wasm, (), {
         class DjinniJsPromiseHolder {
             constructor(cppHandlerPtr) {
                 this.promise = new Promise((resolveFunc, rejectFunc) => {
-                        Module.initCppResolveHandler(cppHandlerPtr, resolveFunc);
+                        Module.initCppResolveHandler(cppHandlerPtr, resolveFunc, rejectFunc);
                     });
             }
         }
@@ -139,7 +139,12 @@ EM_JS(void, djinni_init_wasm, (), {
 
         Module.makeNativePromiseResolver = function(func, pNativePromise) {
             return function(res) {
-                Module.resolveNativePromise(func, pNativePromise, res);
+                Module.resolveNativePromise(func, pNativePromise, res, null);
+            };
+        };
+        Module.makeNativePromiseRejecter = function(func, pNativePromise) {
+            return function(err) {
+                Module.resolveNativePromise(func, pNativePromise, null, err);
             };
         };
 

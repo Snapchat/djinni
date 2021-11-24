@@ -116,7 +116,8 @@ class Future {
     
     Future(SharedStatePtr<T> sharedState) : _sharedState(sharedState) {}
 public:
-    Future(Future&& other) = default;
+    Future(Future&& other) noexcept = default;
+    Future& operator= (Future&& other) noexcept = default;
 
     bool isValid() const {
         return _sharedState != nullptr;
