@@ -128,14 +128,14 @@ EM_JS(void, djinni_init_wasm, (), {
         }
         Module.DjinniCppProxy = DjinniCppProxy;
 
-        class DjinniJsPromiseHolder {
+        class DjinniJsPromiseBuilder {
             constructor(cppHandlerPtr) {
                 this.promise = new Promise((resolveFunc, rejectFunc) => {
                         Module.initCppResolveHandler(cppHandlerPtr, resolveFunc, rejectFunc);
                     });
             }
         }
-        Module.DjinniJsPromiseHolder = DjinniJsPromiseHolder;
+        Module.DjinniJsPromiseBuilder = DjinniJsPromiseBuilder;
 
         Module.makeNativePromiseResolver = function(func, pNativePromise) {
             return function(res) {

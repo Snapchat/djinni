@@ -515,15 +515,15 @@ public:
     
     static JsType fromCpp(CppType c)
     {
-        static auto jsPromiseHolderClass = em::val::module_property("DjinniJsPromiseHolder");
+        static auto jsPromiseBuilderClass = em::val::module_property("DjinniJsPromiseBuilder");
         auto* cppResolveHandler = new CppResolveHandler();
         // Promise constructor calls cppResolveHandler.init(), and stores the JS
         // resolve handler routine in cppResolveHandler.
-        em::val jsPromise = jsPromiseHolderClass.new_(reinterpret_cast<int>(cppResolveHandler));
+        em::val jsPromiseBuilder = jsPromiseBuilderClass.new_(reinterpret_cast<int>(cppResolveHandler));
         c.then([cppResolveHandler] (Future<CppResType> res) {
             cppResolveHandler->resolve(std::move(res));
         });
-        return jsPromise["promise"];
+        return jsPromiseBuilder["promise"];
     }
 };
 
