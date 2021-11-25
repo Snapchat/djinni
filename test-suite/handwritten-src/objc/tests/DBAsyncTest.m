@@ -29,7 +29,7 @@
     NSString* s = nil;
     @try {
         NSNumber* i = [f3 get];
-        XCTAssertEqualObjects([i integerValue], 42);
+        XCTAssertEqual([i integerValue], 42);
     } @catch (NSException* e) {
         s = e.reason;
     }
