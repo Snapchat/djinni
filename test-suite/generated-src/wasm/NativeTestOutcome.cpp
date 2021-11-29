@@ -8,14 +8,6 @@ namespace djinni_generated {
 
 em::val NativeTestOutcome::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "getSuccessOutcome",
-        "getErrorOutcome",
-        "putSuccessOutcome",
-        "putErrorOutcome",
-        "getNestedSuccessOutcome",
-        "getNestedErrorOutcome",
-        "putNestedSuccessOutcome",
-        "putNestedErrorOutcome",
     });
     return methods;
 }

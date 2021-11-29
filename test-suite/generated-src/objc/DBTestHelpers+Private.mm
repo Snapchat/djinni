@@ -14,6 +14,7 @@
 #import "DJICppWrapperCache+Private.h"
 #import "DJIError.h"
 #import "DJIMarshal+Private.h"
+#import "Future_objc.hpp"
 #include <exception>
 #include <stdexcept>
 #include <utility>
@@ -208,14 +209,18 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (DJFuture<NSNumber*>* _Nonnull) getAsyncResult {
-    auto r = ::testsuite::TestHelpers::get_async_result();
-    return ::djinni::FutureAdaptor<::djinni::I32>::fromCpp(std::move(r));
++ (nonnull DJFuture<NSNumber *> *)getAsyncResult {
+    try {
+        auto objcpp_result_ = ::testsuite::TestHelpers::get_async_result();
+        return ::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (DJFuture<NSString*>* _Nonnull) futureRoundtrip:(nonnull DJFuture<NSNumber*>*)f {
-    auto r = ::testsuite::TestHelpers::future_roundtrip(djinni::FutureAdaptor<::djinni::I32>::toCpp(f));
-    return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(r));
++ (nonnull DJFuture<NSString *> *)futureRoundtrip:(nonnull DJFuture<NSNumber *> *)f {
+    try {
+        auto objcpp_result_ = ::testsuite::TestHelpers::future_roundtrip(::snapchat::djinni::FutureAdaptor<::djinni::I32>::toCpp(f));
+        return ::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
 namespace djinni_generated {

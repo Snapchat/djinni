@@ -9,7 +9,6 @@ namespace djinni_generated {
 
 em::val NativeListenerCaller::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "init",
         "callFirst",
         "callSecond",
     });

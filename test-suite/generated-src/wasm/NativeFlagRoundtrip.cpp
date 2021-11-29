@@ -9,10 +9,6 @@ namespace djinni_generated {
 
 em::val NativeFlagRoundtrip::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "roundtripAccess",
-        "roundtripEmpty",
-        "roundtripAccessBoxed",
-        "roundtripEmptyBoxed",
     });
     return methods;
 }

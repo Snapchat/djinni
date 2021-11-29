@@ -9,19 +9,6 @@ namespace djinni_generated {
 
 em::val NativeProtoTests::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "protoToStrings",
-        "stringsToProto",
-        "embeddedProtoToString",
-        "stringToEmbeddedProto",
-        "cppProtoToString",
-        "stringToCppProto",
-        "embeddedCppProtoToString",
-        "stringToEmbeddedCppProto",
-        "protoListToStrings",
-        "stringsToProtoList",
-        "optionalProtoToString",
-        "stringToOptionalProto",
-        "stringToProtoOutcome",
     });
     return methods;
 }

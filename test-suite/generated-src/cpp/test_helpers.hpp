@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include "Future.hpp"
-#include "async_interface.hpp"
 #include "../../handwritten-src/cpp/optional.hpp"
+#include "Future.hpp"
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -89,9 +88,9 @@ public:
 
     static std::vector<uint8_t> id_binary(const std::vector<uint8_t> & b);
 
-    static djinni::Future<int32_t> get_async_result();
+    static ::djinni::Future<int32_t> get_async_result();
 
-    static djinni::Future<std::string> future_roundtrip(djinni::Future<int32_t> f);
+    static ::djinni::Future<std::string> future_roundtrip(::djinni::Future<int32_t> f);
 };
 
 }  // namespace testsuite

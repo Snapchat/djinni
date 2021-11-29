@@ -10,7 +10,6 @@ em::val NativeReverseClientInterface::cppProxyMethods() {
         "returnStr",
         "methTakingInterface",
         "methTakingOptionalInterface",
-        "create",
     });
     return methods;
 }

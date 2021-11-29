@@ -17,8 +17,6 @@
 #include <unordered_map>
 #include <vector>
 #include "../expected.hpp"
-#import "DJFuture.h"
-#import "Future.hpp"
 
 static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for this file");
 
@@ -434,55 +432,6 @@ public:
     static const ObjcType& fromCpp(const CppType& c)
     {
         return c;
-    }
-};
-
-template <class RESULT>
-class FutureAdaptor
-{
-    using CppResType = typename RESULT::CppType;
-
-public:
-    using CppType = Future<CppResType>;
-    using ObjcType = DJFuture*;
-
-    using Boxed = FutureAdaptor;
-
-    static CppType toCpp(ObjcType o)
-    {
-        using NativePromiseType = Promise<CppResType>;
-
-        __block auto p = std::make_unique<NativePromiseType>();
-        auto f = p->getFuture();
-        [o then: ^id(DJFuture* res) {
-                @try {
-                    p->setValue(RESULT::Boxed::toCpp([res get]));
-                } @catch (NSException* e) {
-                    try {
-                        throw std::runtime_error(String::toCpp(e.reason));
-                    } catch (std::exception&) {
-                        p->setException(std::current_exception());
-                    }
-                }
-                return nil;
-            }];
-        return f;
-    }
-
-    static ObjcType fromCpp(CppType c)
-    {
-        DJPromise<typename RESULT::Boxed::ObjcType>* promise = [[DJPromise alloc] init];
-        DJFuture<typename RESULT::Boxed::ObjcType>* future = [promise getFuture];
-
-        c.then([promise] (Future<CppResType> res) {
-                try {
-                    [promise setValue:RESULT::Boxed::fromCpp(res.get())];
-                } catch (std::exception& e) {
-                    [promise setException: [NSException exceptionWithName:@"" reason:String::fromCpp(e.what()) userInfo:nil]];
-                }
-            });
-        
-        return future;
     }
 };
 

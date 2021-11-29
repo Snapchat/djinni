@@ -8,26 +8,6 @@ namespace djinni_generated {
 
 em::val NativeTestDuration::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "hoursString",
-        "minutesString",
-        "secondsString",
-        "millisString",
-        "microsString",
-        "nanosString",
-        "hours",
-        "minutes",
-        "seconds",
-        "millis",
-        "micros",
-        "nanos",
-        "hoursf",
-        "minutesf",
-        "secondsf",
-        "millisf",
-        "microsf",
-        "nanosf",
-        "box",
-        "unbox",
     });
     return methods;
 }

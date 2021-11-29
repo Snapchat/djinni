@@ -435,6 +435,8 @@ export interface TestHelpers_statics {
     /** Ensures that we generate integer translation code */
     assortedPrimitivesId(i: AssortedPrimitives): AssortedPrimitives;
     idBinary(b: Uint8Array): Uint8Array;
+    getAsyncResult(): Future;
+    futureRoundtrip(f: Future): Future;
 }
 
 /**

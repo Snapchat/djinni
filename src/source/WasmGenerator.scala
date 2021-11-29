@@ -323,7 +323,9 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.w(s"em::val $helper::cppProxyMethods()").braced {
           w.w("static const em::val methods = em::val::array(std::vector<std::string>").bracedEnd(");") {
             for (m <- i.methods) {
-              w.wl(s""""${idJs.method(m.ident)}",""")
+              if (!m.static) {
+                w.wl(s""""${idJs.method(m.ident)}",""")
+              }
             }
           }
           w.wl("return methods;")

@@ -78,8 +78,8 @@
 
 + (nonnull NSData *)idBinary:(nonnull NSData *)b;
 
-+ (DJFuture<NSNumber*>* _Nonnull) getAsyncResult;
++ (nonnull DJFuture<NSNumber *> *)getAsyncResult;
 
-+ (DJFuture<NSString*>* _Nonnull) futureRoundtrip:(nonnull DJFuture<NSNumber*>*)f;
++ (nonnull DJFuture<NSString *> *)futureRoundtrip:(nonnull DJFuture<NSNumber *> *)f;
 
 @end

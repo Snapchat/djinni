@@ -7,7 +7,6 @@ namespace djinni_generated {
 
 em::val NativeReturnTwo::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "getInstance",
         "returnTwo",
     });
     return methods;

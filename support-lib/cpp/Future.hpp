@@ -116,6 +116,7 @@ class Future {
     
     Future(SharedStatePtr<T> sharedState) : _sharedState(sharedState) {}
 public:
+    Future(const Future& other) = default;
     Future(Future&& other) noexcept = default;
     Future& operator= (Future&& other) noexcept = default;
 

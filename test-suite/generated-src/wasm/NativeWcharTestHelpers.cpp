@@ -8,10 +8,6 @@ namespace djinni_generated {
 
 em::val NativeWcharTestHelpers::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "getRecord",
-        "getString",
-        "checkString",
-        "checkRecord",
     });
     return methods;
 }

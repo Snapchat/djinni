@@ -17,7 +17,6 @@ em::val NativeDataRefTest::cppProxyMethods() {
         "dataFromStr",
         "sendDataView",
         "recvDataView",
-        "create",
     });
     return methods;
 }

@@ -1,0 +1,37 @@
+name: future
+typedef: 'record'
+params: [T]
+prefix: ''
+cpp:
+  typename: '::djinni::Future'
+  header: '"Future.hpp"'
+  byValue: true
+  moveOnly: true
+objc:
+  typename: 'DJFuture'
+  header: '"DJFuture.h"'
+  boxed: 'DJFuture'
+  pointer: true
+  generic: true
+  hash: '%s.hash'
+objcpp:
+  translator: '::snapchat::djinni::FutureAdaptor'
+  header: '"Future_objc.hpp"'
+java:
+  typename: 'com.snapchat.djinni.Future'
+  boxed: 'com.snapchat.djinni.Future'
+  reference: true
+  generic: true
+  hash: '%s.hashCode()'
+jni:
+  translator: '::snapchat::djinni::FutureAdaptor'
+  header: '"Future_jni.hpp"'
+  typename: jobject
+  typeSignature: 'Lcom/snapchat/djinni/Future;'
+wasm:
+  typename: 'em::val'
+  translator: '::snapchat::djinni::FutureAdaptor'
+  header: '"Future_wasm.hpp"'
+ts:
+  typename: 'Future'
+  module: ''

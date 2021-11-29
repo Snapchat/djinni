@@ -8,10 +8,6 @@ namespace djinni_generated {
 
 em::val NativeTestArray::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "testStringArray",
-        "testIntArray",
-        "testRecordArray",
-        "testArrayOfArray",
     });
     return methods;
 }

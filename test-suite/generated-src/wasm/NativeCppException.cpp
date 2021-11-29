@@ -8,7 +8,6 @@ namespace djinni_generated {
 em::val NativeCppException::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
         "throwAnException",
-        "get",
     });
     return methods;
 }
