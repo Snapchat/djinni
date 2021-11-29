@@ -167,13 +167,13 @@ std::vector<uint8_t> TestHelpers::id_binary(const std::vector<uint8_t> & v) {
     return v;
 }
 
-djinni::Future<int32_t> TestHelpers::get_async_result() {
-    auto* p = new djinni::Promise<int32_t>();
+snapchat::djinni::Future<int32_t> TestHelpers::get_async_result() {
+    auto* p = new snapchat::djinni::Promise<int32_t>();
     auto f = p->getFuture();
 
 #if defined(__EMSCRIPTEN__)
     emscripten_async_call([] (void* context) {
-        auto* p = reinterpret_cast<djinni::Promise<int32_t>*>(context);
+        auto* p = reinterpret_cast<snapchat::djinni::Promise<int32_t>*>(context);
         // p->setValue(42);
         try {
             throw std::runtime_error("123");
@@ -198,8 +198,8 @@ djinni::Future<int32_t> TestHelpers::get_async_result() {
     return f;
 }
 
-djinni::Future<std::string> TestHelpers::future_roundtrip(djinni::Future<int32_t> f) {
-    return f.then([] (djinni::Future<int32_t> f) {
+snapchat::djinni::Future<std::string> TestHelpers::future_roundtrip(snapchat::djinni::Future<int32_t> f) {
+    return f.then([] (snapchat::djinni::Future<int32_t> f) {
         return std::to_string(f.get());
     });
 }

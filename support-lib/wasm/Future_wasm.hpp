@@ -28,12 +28,12 @@ class FutureAdaptor
     using CppResType = typename RESULT::CppType;
 
 public:
-    using CppType = ::djinni::Future<CppResType>;
+    using CppType = Future<CppResType>;
     using JsType = em::val;
 
     using Boxed = FutureAdaptor;
 
-    using NativePromiseType = ::djinni::Promise<CppResType>;
+    using NativePromiseType = Promise<CppResType>;
 
     static void resolveNativePromise(int context, em::val res, em::val err) {
         auto* pNativePromise = reinterpret_cast<NativePromiseType*>(context);
@@ -66,7 +66,7 @@ public:
             _resolveFunc = resolveFunc;
             _rejectFunc = rejectFunc;
         }
-        void resolve(::djinni::Future<CppResType> future) {
+        void resolve(Future<CppResType> future) {
             _future = std::move(future);
 #ifdef __EMSCRIPTEN_PTHREADS__
             emscripten_async_run_in_main_runtime_thread(EM_FUNC_SIG_VI, &trampoline, this);
@@ -77,7 +77,7 @@ public:
     private:
         em::val _resolveFunc = em::val::undefined();
         em::val _rejectFunc = em::val::undefined();
-        std::optional<::djinni::Future<CppResType>> _future;
+        std::optional<Future<CppResType>> _future;
 
         // runs in main thread
         void doResolve() {
@@ -103,7 +103,7 @@ public:
         // Promise constructor calls cppResolveHandler.init(), and stores the JS
         // resolve handler routine in cppResolveHandler.
         em::val jsPromiseBuilder = jsPromiseBuilderClass.new_(reinterpret_cast<int>(cppResolveHandler));
-        c.then([cppResolveHandler] (::djinni::Future<CppResType> res) {
+        c.then([cppResolveHandler] (Future<CppResType> res) {
             cppResolveHandler->resolve(std::move(res));
         });
         return jsPromiseBuilder["promise"];

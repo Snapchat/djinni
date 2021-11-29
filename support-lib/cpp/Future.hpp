@@ -22,7 +22,7 @@
 #include <condition_variable>
 #include <mutex>
 
-namespace djinni {
+namespace snapchat::djinni {
 
 template <typename T>
 struct ValueHolder {
@@ -199,4 +199,4 @@ Future<T> PromiseBase<T>::getFuture() {
     return Future<T>(_sharedState);
 }
 
-} // namespace djinni
+} // namespace snapchat::djinni

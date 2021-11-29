@@ -66,14 +66,14 @@ class FutureAdaptor
         auto get() const { return promise.get(); }
     };
 public:
-    using CppType = ::djinni::Future<CppResType>;
+    using CppType = Future<CppResType>;
     using JniType = jobject;
 
     using Boxed = FutureAdaptor;
 
     static CppType toCpp(JNIEnv* jniEnv, JniType j)
     {
-        using NativePromiseType = ::djinni::Promise<CppResType>;
+        using NativePromiseType = Promise<CppResType>;
             
         auto p = std::make_unique<NativePromiseType>();
         auto f = p->getFuture();
@@ -119,7 +119,7 @@ public:
         auto future = ::djinni::LocalRef<jobject>(jniEnv, jniEnv->CallObjectMethod(promise->get(), promiseJniInfo.method_get_future));
         ::djinni::jniExceptionCheck(jniEnv);
                         
-        c.then([promise, &promiseJniInfo] (::djinni::Future<CppResType> cppFuture) {
+        c.then([promise, &promiseJniInfo] (Future<CppResType> cppFuture) {
             JNIEnv* jniEnv = ::djinni::jniGetThreadEnv();
             try {
                 auto res = cppFuture.get();

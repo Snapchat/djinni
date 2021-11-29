@@ -3,7 +3,7 @@ typedef: 'record'
 params: [T]
 prefix: ''
 cpp:
-  typename: '::djinni::Future'
+  typename: '::snapchat::djinni::Future'
   header: '"Future.hpp"'
   byValue: true
   moveOnly: true

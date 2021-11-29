@@ -30,14 +30,14 @@ class FutureAdaptor
     using CppResType = typename RESULT::CppType;
 
 public:
-    using CppType = ::djinni::Future<CppResType>;
+    using CppType = Future<CppResType>;
     using ObjcType = DJFuture*;
 
     using Boxed = FutureAdaptor;
 
     static CppType toCpp(ObjcType o)
     {
-        using NativePromiseType = ::djinni::Promise<CppResType>;
+        using NativePromiseType = Promise<CppResType>;
 
         __block auto p = std::make_unique<NativePromiseType>();
         auto f = p->getFuture();
@@ -61,7 +61,7 @@ public:
         DJPromise<typename RESULT::Boxed::ObjcType>* promise = [[DJPromise alloc] init];
         DJFuture<typename RESULT::Boxed::ObjcType>* future = [promise getFuture];
 
-        c.then([promise] (::djinni::Future<CppResType> res) {
+        c.then([promise] (Future<CppResType> res) {
                 try {
                     [promise setValue:RESULT::Boxed::fromCpp(res.get())];
                 } catch (std::exception& e) {
