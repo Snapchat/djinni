@@ -71,6 +71,11 @@ protected:
         callResultHandler(sharedState);
     }
 
+    template <typename E>
+    void setException(const E& ex) {
+        setException(std::make_exception_ptr(ex));
+    }
+
     void setException(std::exception_ptr ex) {
         SharedStatePtr<T> sharedState;
         {

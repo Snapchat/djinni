@@ -45,11 +45,7 @@ public:
                 @try {
                     p->setValue(RESULT::Boxed::toCpp([res get]));
                 } @catch (NSException* e) {
-                    try {
-                        throw std::runtime_error(::djinni::String::toCpp(e.reason));
-                    } catch (std::exception&) {
-                        p->setException(std::current_exception());
-                    }
+                    p->setException(std::runtime_error(::djinni::String::toCpp(e.reason)));
                 }
                 return nil;
             }];

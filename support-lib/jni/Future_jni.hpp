@@ -90,11 +90,7 @@ public:
                                                                                              throwableJniInfo.method_get_message,
                                                                                              jex)));
                 std::string msg = ::djinni::jniUTF8FromString(jniEnv, jmsg.get());
-                try {
-                    throw std::runtime_error(msg);
-                } catch (std::exception&) {
-                    promise->setException(std::current_exception());
-                }
+                promise->setException(std::runtime_error(msg));
             }
         };
 

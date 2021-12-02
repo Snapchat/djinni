@@ -40,11 +40,7 @@ public:
         if (err.isNull() || err.isUndefined()) {
             pNativePromise->setValue(RESULT::Boxed::toCpp(res));
         } else {
-            try {
-                throw std::runtime_error(err["message"].as<std::string>());
-            } catch (std::exception&) {
-                pNativePromise->setException(std::current_exception());
-            }
+            pNativePromise->setException(std::runtime_error(err["message"].as<std::string>()));
         }
         delete pNativePromise;
     }
