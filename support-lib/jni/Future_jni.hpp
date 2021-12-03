@@ -83,7 +83,7 @@ public:
                 reinterpret_cast<NativePromiseType*>(nativePromise)
             };
             if (jex == nullptr) {
-                promise->setValue(RESULT::Boxed::toCpp(jniEnv, jres));
+                promise->setValue(RESULT::Boxed::toCpp(jniEnv, static_cast<typename RESULT::Boxed::JniType>(jres)));
             } else {
                 const auto& throwableJniInfo = ::djinni::JniClass<ThrowableJniInfo>::get();
                 ::djinni::LocalRef<jstring> jmsg(jniEnv, static_cast<jstring>(jniEnv->CallObjectMethod(jex,
@@ -114,7 +114,7 @@ public:
         promise->set(jniEnv, jniEnv->NewObject(promiseJniInfo.clazz.get(), promiseJniInfo.constructor));
         auto future = ::djinni::LocalRef<jobject>(jniEnv, jniEnv->CallObjectMethod(promise->get(), promiseJniInfo.method_get_future));
         ::djinni::jniExceptionCheck(jniEnv);
-                        
+
         c.then([promise, &promiseJniInfo] (Future<CppResType> cppFuture) {
             JNIEnv* jniEnv = ::djinni::jniGetThreadEnv();
             try {

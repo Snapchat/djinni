@@ -4,6 +4,7 @@
 #include "NativeTestHelpers.hpp"  // my header
 #include "Future_wasm.hpp"
 #include "NativeAssortedPrimitives.hpp"
+#include "NativeAsyncInterface.hpp"
 #include "NativeClientInterface.hpp"
 #include "NativeColor.hpp"
 #include "NativeMapListRecord.hpp"
@@ -102,6 +103,9 @@ em::val NativeTestHelpers::get_async_result() {
 em::val NativeTestHelpers::future_roundtrip(const em::val& w_f) {
     return ::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(::testsuite::TestHelpers::future_roundtrip(::snapchat::djinni::FutureAdaptor<::djinni::I32>::toCpp(w_f)));
 }
+em::val NativeTestHelpers::check_async_interface(const em::val& w_i) {
+    return ::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(::testsuite::TestHelpers::check_async_interface(::djinni_generated::NativeAsyncInterface::toCpp(w_i)));
+}
 
 EMSCRIPTEN_BINDINGS(test_helpers) {
     em::class_<::testsuite::TestHelpers>("TestHelpers")
@@ -134,6 +138,7 @@ EMSCRIPTEN_BINDINGS(test_helpers) {
         .class_function("idBinary", NativeTestHelpers::id_binary)
         .class_function("getAsyncResult", NativeTestHelpers::get_async_result)
         .class_function("futureRoundtrip", NativeTestHelpers::future_roundtrip)
+        .class_function("checkAsyncInterface", NativeTestHelpers::check_async_interface)
         ;
 }
 

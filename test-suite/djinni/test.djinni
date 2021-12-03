@@ -1,5 +1,9 @@
 @extern "../../support-lib/future.yaml"
 
+async_interface = interface +j +o +w {
+  future_roundtrip(f: future<i32>): future<string>;
+}
+
 # Helper methods used by various different tests.
 # (Second line of multi-line documentation.
 #   Indented third line of multi-line documentation.)
@@ -46,6 +50,8 @@ test_helpers = interface +c {
 
     static get_async_result(): future<i32>;
     static future_roundtrip(f: future<i32>): future<string>;
+
+    static check_async_interface(i: async_interface): future<string>;
 }
 
 # Empty record

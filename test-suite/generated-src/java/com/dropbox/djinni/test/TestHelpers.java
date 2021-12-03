@@ -89,6 +89,9 @@ public abstract class TestHelpers {
     @Nonnull
     public static native com.snapchat.djinni.Future<String> futureRoundtrip(@Nonnull com.snapchat.djinni.Future<Integer> f);
 
+    @Nonnull
+    public static native com.snapchat.djinni.Future<String> checkAsyncInterface(@CheckForNull AsyncInterface i);
+
     public static final class CppProxy extends TestHelpers
     {
         private final long nativeRef;

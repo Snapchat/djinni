@@ -6,6 +6,13 @@ import com.snapchat.djinni.Promise;
 import com.snapchat.djinni.Future;
 
 public class AsyncTest extends TestCase {
+
+    static class AsyncInterfaceImpl extends AsyncInterface {
+        public com.snapchat.djinni.Future<String> futureRoundtrip(com.snapchat.djinni.Future<Integer> f) {
+            return f.then((i) -> {return i.get().toString();});
+        }
+    }
+    
     public void testConsumeNativeFuture() throws Throwable {
         Future<Integer> f = TestHelpers.getAsyncResult();
         Future<Integer> f2 = f.then((i) -> {
@@ -42,5 +49,10 @@ public class AsyncTest extends TestCase {
         //     s = e.getMessage();
         // }
         // assertEquals(s, "123");
+    }
+
+    public void testFutureRoundtripBackwards() throws Throwable {
+        Future<String> s = TestHelpers.checkAsyncInterface(new AsyncInterfaceImpl());
+        assertEquals(s.get(), "36");
     }
 }

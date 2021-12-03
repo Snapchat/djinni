@@ -2,6 +2,16 @@
 #import <XCTest/XCTest.h>
 #import <DJFuture.h>
 #import "DBTestHelpers.h"
+#import "DBAsyncInterface.h"
+
+@interface AsyncInterfaceImpl : NSObject <DBAsyncInterface>
+@end
+
+@implementation AsyncInterfaceImpl
+- (DJFuture<NSString *> *)futureRoundtrip:(DJFuture<NSNumber *> *)f {
+    return [f then:^id(DJFuture<NSNumber*>* i) { return [[i get] stringValue]; }];
+}
+@end
 
 @interface DBAsyncTests : XCTestCase
 @end
@@ -55,6 +65,11 @@
         s = e.reason;
     }
     XCTAssertEqualObjects(s, @"123");
+}
+
+- (void) testFutureRoundtripBackwards {
+    DJFuture<NSString*>* s = [DBTestHelpers checkAsyncInterface: [[AsyncInterfaceImpl alloc] init]];
+    XCTAssertEqualObjects([s get], @"36");
 }
 
 @end

@@ -9,6 +9,7 @@
 #import "DBSetRecord.h"
 #import "DJFuture.h"
 #import <Foundation/Foundation.h>
+@protocol DBAsyncInterface;
 @protocol DBClientInterface;
 @protocol DBUserToken;
 
@@ -81,5 +82,7 @@
 + (nonnull DJFuture<NSNumber *> *)getAsyncResult;
 
 + (nonnull DJFuture<NSString *> *)futureRoundtrip:(nonnull DJFuture<NSNumber *> *)f;
+
++ (nonnull DJFuture<NSString *> *)checkAsyncInterface:(nullable id<DBAsyncInterface>)i;
 
 @end

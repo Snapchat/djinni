@@ -5,6 +5,7 @@
 #include "Future_jni.hpp"
 #include "Marshal.hpp"
 #include "NativeAssortedPrimitives.hpp"
+#include "NativeAsyncInterface.hpp"
 #include "NativeClientInterface.hpp"
 #include "NativeColor.hpp"
 #include "NativeMapListRecord.hpp"
@@ -233,6 +234,14 @@ CJNIEXPORT ::snapchat::djinni::FutureAdaptor<::djinni::String>::JniType JNICALL 
 {
     try {
         auto r = ::testsuite::TestHelpers::future_roundtrip(::snapchat::djinni::FutureAdaptor<::djinni::I32>::toCpp(jniEnv, j_f));
+        return ::djinni::release(::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT ::snapchat::djinni::FutureAdaptor<::djinni::String>::JniType JNICALL Java_com_dropbox_djinni_test_TestHelpers_checkAsyncInterface(JNIEnv* jniEnv, jobject /*this*/, jobject j_i)
+{
+    try {
+        auto r = ::testsuite::TestHelpers::check_async_interface(::djinni_generated::NativeAsyncInterface::toCpp(jniEnv, j_i));
         return ::djinni::release(::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }

@@ -1,6 +1,7 @@
 #include "test_helpers.hpp"
 #include "client_returned_record.hpp"
 #include "client_interface.hpp"
+#include "async_interface.hpp"
 #include "user_token.hpp"
 #include "assorted_primitives.hpp"
 #include "color.hpp"
@@ -194,6 +195,17 @@ snapchat::djinni::Future<std::string> TestHelpers::future_roundtrip(snapchat::dj
     return f.then([] (snapchat::djinni::Future<int32_t> f) {
         return std::to_string(f.get());
     });
+}
+
+snapchat::djinni::Future<std::string> TestHelpers::check_async_interface(const std::shared_ptr<AsyncInterface> & i) {
+    snapchat::djinni::Promise<std::string> p;
+    auto f = p.getFuture();
+    auto f2 = f.then([] (snapchat::djinni::Future<std::string> s) {
+        return std::stoi(s.get());
+    });
+    auto f3 = i->future_roundtrip(std::move(f2));
+    p.setValue("36");
+    return f3;
 }
 
 } // namespace testsuite

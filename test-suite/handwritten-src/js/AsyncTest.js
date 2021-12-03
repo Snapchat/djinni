@@ -8,6 +8,13 @@ async function asyncFunc() {
     return 36;
 }
 
+class AsyncInterfaceImpl {
+    async futureRoundtrip(f) {
+        const i = await f;
+        return i.toString();
+    }
+}
+
 class AsyncTest {
     constructor(module) {
         this.module = module;
@@ -33,6 +40,11 @@ class AsyncTest {
         } catch (e) {
             console.log(e);
         }
+    }
+
+    async testFutureRoundtripBackwards() {
+        const s = await this.module.TestHelpers.checkAsyncInterface(new AsyncInterfaceImpl());
+        assertEq(s, "36");
     }
 }
 

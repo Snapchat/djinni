@@ -153,47 +153,33 @@ public:
     auto then(FUNC handler) {
         using HandlerReturnType = std::invoke_result_t<FUNC, Future<T>>;
 
-        std::unique_lock lk(_sharedState->mutex);
-        auto sharedState = std::move(_sharedState);
-
-        if constexpr(std::is_void_v<HandlerReturnType>) {
-            Promise<void> nextPromise;
-            auto nextFuture = nextPromise.getFuture();
-            auto continuation = [this, handler, nextPromise] (SharedStatePtr<T> x) mutable {
-                try {
+        SharedStatePtr<T> sharedState;
+        {
+            std::unique_lock lk(_sharedState->mutex);
+            sharedState = std::move(_sharedState);
+        }
+        Promise<HandlerReturnType> nextPromise;
+        auto nextFuture = nextPromise.getFuture();
+        auto continuation = [this, handler, nextPromise] (SharedStatePtr<T> x) mutable {
+            try {
+                if constexpr(std::is_void_v<HandlerReturnType>) {
                     handler(Future<T>(x));
                     nextPromise.setValue();
-                } catch (std::exception& e) {
-                    nextPromise.setException(std::current_exception());
-                }
-            };
-            if (sharedState->isReady()) {
-                // result already available
-                continuation(sharedState);
-            } else {
-                // result not yet available
-                sharedState->handler = std::move(continuation);
-            }
-            return nextFuture;
-        } else {
-            Promise<HandlerReturnType> nextPromise;
-            auto nextFuture = nextPromise.getFuture();
-            auto continuation = [this, handler, nextPromise] (SharedStatePtr<T> x) mutable {
-                try { 
+                } else {
                     nextPromise.setValue(handler(Future<T>(x)));
-                } catch (std::exception& e) {
-                    nextPromise.setException(std::current_exception());
                 }
-            };
-            if (sharedState->isReady()) {
-                // result already available
-                continuation(sharedState);
-            } else {
-                // result not yet available
-                sharedState->handler = std::move(continuation);
+            } catch (std::exception& e) {
+                nextPromise.setException(std::current_exception());
             }
-            return nextFuture;
+        };
+        if (sharedState->isReady()) {
+            // result already available
+            continuation(sharedState);
+        } else {
+            // result not yet available
+            sharedState->handler = std::move(continuation);
         }
+        return nextFuture;
     }
 private:
     SharedStatePtr<T> _sharedState;
