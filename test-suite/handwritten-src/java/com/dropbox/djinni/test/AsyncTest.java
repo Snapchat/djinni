@@ -16,19 +16,11 @@ public class AsyncTest extends TestCase {
     public void testConsumeNativeFuture() throws Throwable {
         Future<Integer> f = TestHelpers.getAsyncResult();
         Future<Integer> f2 = f.then((i) -> {
-                System.out.println(i.get().getClass().getName());
                 return i.get().toString();
             }).then((s) -> {
-                    System.out.println(s.get().getClass().getName());
                     return Integer.parseInt(s.get());
                 });
-        String s = null;
-        try {
-            assertEquals(Integer.valueOf(42), f2.get());
-        } catch (Throwable e) {
-            s = e.getMessage();
-        }
-        assertEquals(s, "123");
+        assertEquals(Integer.valueOf(42), f2.get());
     }
 
     public void testFutureRoundtrip() throws Throwable {

@@ -36,14 +36,8 @@
     DJFuture<NSNumber*>* f3 = [f2 then:^id(DJFuture<NSString*>* res) {
             return @([[res get] integerValue]);
         }];
-    NSString* s = nil;
-    @try {
-        NSNumber* i = [f3 get];
-        XCTAssertEqual([i integerValue], 42);
-    } @catch (NSException* e) {
-        s = e.reason;
-    }
-    XCTAssertEqualObjects(s, @"123");
+    NSNumber* i = [f3 get];
+    XCTAssertEqual([i integerValue], 42);
 }
 
 - (void) testFutureRoundtrip {

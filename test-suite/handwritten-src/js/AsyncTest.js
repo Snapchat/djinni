@@ -24,15 +24,12 @@ class AsyncTest {
         this.module = module;
     }
     async testConsumeNativeFuture() {
-        try {
-            const r = await this.module.TestHelpers.getAsyncResult();
-            assertEq(r, 42);
-        } catch (e) {
-            console.log(e);
-        }
-        // this.module.TestHelpers.getAsyncResult()
-        //     .then(res => console.log('ok' + res))
-        //     .catch(err => console.log('ko' + err));
+        const r = await this.module.TestHelpers.getAsyncResult();
+        assertEq(r, 42);
+    }
+
+    async testConsumeNativeFutureAltSyntax() {
+        return this.module.TestHelpers.getAsyncResult().then(res => assertEq(res, 42)).catch(e => assertTrue(false));
     }
 
     async testFutureRoundtrip() {
