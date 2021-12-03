@@ -4,8 +4,12 @@ function sleep(ms) {
 
 async function asyncFunc() {
     await sleep(10);
-    throw new Error("321");
     return 36;
+}
+
+async function asyncException() {
+    await sleep(10);
+    throw new Error("123");
 }
 
 class AsyncInterfaceImpl {
@@ -32,14 +36,22 @@ class AsyncTest {
     }
 
     async testFutureRoundtrip() {
-        const f = asyncFunc();
+        const s = await this.module.TestHelpers.futureRoundtrip(asyncFunc());
+        const r = parseInt(s);
+        assertEq(r, 36);
+    }
+
+    async testFutureRoundtripWithException() {
+        var s = null;
         try {
-            const s = await this.module.TestHelpers.futureRoundtrip(f);
+            const s = await this.module.TestHelpers.futureRoundtrip(asyncException());
             const r = parseInt(s);
             assertEq(r, 36);
         } catch (e) {
-            console.log(e);
+            s = e.message;
         }
+        console.log(s);
+        assertEq(s, "123");
     }
 
     async testFutureRoundtripBackwards() {

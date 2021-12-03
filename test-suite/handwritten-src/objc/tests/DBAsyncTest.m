@@ -50,6 +50,17 @@
     DJPromise<NSString*>* p = [[DJPromise alloc] init];
     DJFuture<NSString*>* f = [p getFuture];
     DJFuture<NSNumber*>* f2 = [f then:^id(DJFuture<NSString*>* s) {
+            return @([[s get] integerValue]);
+        }];
+    DJFuture<NSString*>* f3 = [DBTestHelpers futureRoundtrip:f2];
+    [p setValue:@"36"];
+    XCTAssertEqualObjects([f3 get], @"36");
+}
+
+- (void) testFutureRoundtripWithException {
+    DJPromise<NSString*>* p = [[DJPromise alloc] init];
+    DJFuture<NSString*>* f = [p getFuture];
+    DJFuture<NSNumber*>* f2 = [f then:^id(DJFuture<NSString*>* s) {
             if (1) {
                 [NSException raise:@"djinni_error" format:@"123"];
             }
@@ -59,8 +70,7 @@
     [p setValue:@"36"];
     NSString* s = nil;
     @try {
-        NSString* i = [f3 get];
-        XCTAssertEqualObjects(i, @"36");
+        [f3 get];
     } @catch (NSException* e) {
         s = e.reason;
     }
