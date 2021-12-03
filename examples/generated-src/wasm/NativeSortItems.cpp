@@ -11,8 +11,6 @@ namespace djinni_generated {
 em::val NativeSortItems::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
         "sort",
-        "createWithListener",
-        "runSort",
     });
     return methods;
 }

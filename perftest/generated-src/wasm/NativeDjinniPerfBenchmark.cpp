@@ -13,7 +13,6 @@ namespace djinni_generated {
 
 em::val NativeDjinniPerfBenchmark::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "getInstance",
         "cppTests",
         "baseline",
         "argString",
