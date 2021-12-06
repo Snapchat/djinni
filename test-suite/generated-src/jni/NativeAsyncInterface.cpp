@@ -20,7 +20,7 @@ NativeAsyncInterface::JavaProxy::~JavaProxy() = default;
     ::djinni::JniLocalScope jscope(jniEnv, 10);
     const auto& data = ::djinni::JniClass<::djinni_generated::NativeAsyncInterface>::get();
     auto jret = jniEnv->CallObjectMethod(Handle::get().get(), data.method_futureRoundtrip,
-                                         ::djinni::get(::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(jniEnv, c_f)));
+                                         ::djinni::get(::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(jniEnv, std::move(c_f))));
     ::djinni::jniExceptionCheck(jniEnv);
     return ::snapchat::djinni::FutureAdaptor<::djinni::String>::toCpp(jniEnv, jret);
 }

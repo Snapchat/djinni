@@ -13,7 +13,7 @@ em::val NativeObjectNative::cppProxyMethods() {
 }
 
 void NativeObjectNative::baseline(const CppType& self) {
-    return self->baseline();
+    self->baseline();
 }
 
 EMSCRIPTEN_BINDINGS(ObjectNative) {

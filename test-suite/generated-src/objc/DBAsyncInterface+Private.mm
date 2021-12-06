@@ -22,7 +22,7 @@ public:
     ::snapchat::djinni::Future<std::string> future_roundtrip(::snapchat::djinni::Future<int32_t> c_f) override
     {
         @autoreleasepool {
-            auto objcpp_result_ = [djinni_private_get_proxied_objc_object() futureRoundtrip:(::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(c_f))];
+            auto objcpp_result_ = [djinni_private_get_proxied_objc_object() futureRoundtrip:(::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(std::move(c_f)))];
             return ::snapchat::djinni::FutureAdaptor<::djinni::String>::toCpp(objcpp_result_);
         }
     }

@@ -13,16 +13,20 @@ em::val NativeWcharTestHelpers::cppProxyMethods() {
 }
 
 em::val NativeWcharTestHelpers::get_record() {
-    return ::djinni_generated::NativeWcharTestRec::fromCpp(::testsuite::WcharTestHelpers::get_record());
+    auto r = ::testsuite::WcharTestHelpers::get_record();
+    return ::djinni_generated::NativeWcharTestRec::fromCpp(r);
 }
 std::wstring NativeWcharTestHelpers::get_string() {
-    return ::djinni::WString::fromCpp(::testsuite::WcharTestHelpers::get_string());
+    auto r = ::testsuite::WcharTestHelpers::get_string();
+    return ::djinni::WString::fromCpp(r);
 }
 bool NativeWcharTestHelpers::check_string(const std::wstring& w_str) {
-    return ::djinni::Bool::fromCpp(::testsuite::WcharTestHelpers::check_string(::djinni::WString::toCpp(w_str)));
+    auto r = ::testsuite::WcharTestHelpers::check_string(::djinni::WString::toCpp(w_str));
+    return ::djinni::Bool::fromCpp(r);
 }
 bool NativeWcharTestHelpers::check_record(const em::val& w_rec) {
-    return ::djinni::Bool::fromCpp(::testsuite::WcharTestHelpers::check_record(::djinni_generated::NativeWcharTestRec::toCpp(w_rec)));
+    auto r = ::testsuite::WcharTestHelpers::check_record(::djinni_generated::NativeWcharTestRec::toCpp(w_rec));
+    return ::djinni::Bool::fromCpp(r);
 }
 
 EMSCRIPTEN_BINDINGS(wchar_test_helpers) {

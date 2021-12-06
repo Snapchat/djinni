@@ -8,7 +8,7 @@ namespace djinni_generated {
 
 
 ::snapchat::djinni::Future<std::string> NativeAsyncInterface::JsProxy::future_roundtrip(::snapchat::djinni::Future<int32_t> f) {
-    auto ret = callMethod("futureRoundtrip", ::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(f));
+    auto ret = callMethod("futureRoundtrip", ::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(std::move(f)));
     checkError(ret);
     return ::snapchat::djinni::FutureAdaptor<::djinni::String>::toCpp(ret);
 }

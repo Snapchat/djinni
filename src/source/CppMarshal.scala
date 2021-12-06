@@ -261,4 +261,26 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
     val valueType = cppType
     if(byValue(tm)) valueType else refType
   }
+
+  private def moveOnly(tm: MExpr): Boolean = tm.base match {
+    case d: MDef => d.body match {
+      case r: Record => r.fields.exists(t => moveOnly(t.ty.resolved))
+      case _  => false
+    }
+    case e: MExtern => e.defType match {
+      case DRecord => e.cpp.moveOnly
+      case _ => false
+    }
+    case MOptional => moveOnly(tm.args.head)
+    case _ => false
+  }
+
+  def maybeMove(expr: String, tm: MExpr) = {
+    if (moveOnly(tm))
+      s"std::move($expr)"
+    else
+      expr
+  }
+
+  def maybeMove(expr: String, ty: TypeRef):String = maybeMove(expr, ty.resolved)
 }

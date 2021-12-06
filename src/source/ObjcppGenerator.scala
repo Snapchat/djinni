@@ -204,7 +204,7 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
               writeAlignedCall(w, call, m.params, ")", p => objcppMarshal.toCpp(p.ty, idObjc.local(p.ident.name)))
 
               w.wl(";")
-              m.ret.fold()(r => w.wl(s"return ${objcppMarshal.fromCpp(r, "objcpp_result_")};"))
+              m.ret.fold()(r => w.wl(s"return ${objcppMarshal.fromCpp(r, cppMarshal.maybeMove("objcpp_result_", r))};"))
             }
             if (spec.objcppDisableExceptionTranslation) {
               // write body without try/DJINNI_TRANSLATE_EXCEPTIONS
@@ -242,7 +242,7 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
                 w.w("@autoreleasepool").braced {
                   val ret = m.ret.fold("")(_ => "auto objcpp_result_ = ")
                   val call = s"[djinni_private_get_proxied_objc_object() ${idObjc.method(m.ident)}"
-                  writeAlignedObjcCall(w, ret + call, m.params, "]", p => (idObjc.field(p.ident), s"(${objcppMarshal.fromCpp(p.ty, "c_" + idCpp.local(p.ident))})"))
+                  writeAlignedObjcCall(w, ret + call, m.params, "]", p => (idObjc.field(p.ident), s"(${objcppMarshal.fromCpp(p.ty, cppMarshal.maybeMove("c_" + idCpp.local(p.ident), p.ty))})"))
                   w.wl(";")
                   m.ret.fold()(ty => {
                     if (spec.cppNnCheckExpression.nonEmpty && isInterface(ty.resolved)) {
@@ -398,7 +398,7 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
           if(r.fields.isEmpty) w.wl("(void)cpp; // Suppress warnings in relase builds for empty records")
           val first = if(r.fields.isEmpty) "" else IdentStyle.camelUpper("with_" + r.fields.head.ident.name)
           val call = s"return [[$noBaseSelf alloc] init$first"
-          writeAlignedObjcCall(w, call, r.fields, "]", f => (idObjc.field(f.ident), s"(${objcppMarshal.fromCpp(f.ty, "cpp." + idCpp.field(f.ident))})"))
+          writeAlignedObjcCall(w, call, r.fields, "]", f => (idObjc.field(f.ident), s"(${objcppMarshal.fromCpp(f.ty, cppMarshal.maybeMove("cpp." + idCpp.field(f.ident), f.ty))})"))
           w.wl(";")
         }
       })

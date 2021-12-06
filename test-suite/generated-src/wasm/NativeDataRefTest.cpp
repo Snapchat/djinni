@@ -22,31 +22,38 @@ em::val NativeDataRefTest::cppProxyMethods() {
 }
 
 void NativeDataRefTest::sendData(const CppType& self, const em::val& w_data) {
-    return self->sendData(::snapchat::djinni::NativeDataRef::toCpp(w_data));
+    self->sendData(::snapchat::djinni::NativeDataRef::toCpp(w_data));
 }
 em::val NativeDataRefTest::retriveAsBin(const CppType& self) {
-    return ::djinni::Binary::fromCpp(self->retriveAsBin());
+    auto r = self->retriveAsBin();
+    return ::djinni::Binary::fromCpp(r);
 }
 void NativeDataRefTest::sendMutableData(const CppType& self, const em::val& w_data) {
-    return self->sendMutableData(::snapchat::djinni::NativeDataRef::toCpp(w_data));
+    self->sendMutableData(::snapchat::djinni::NativeDataRef::toCpp(w_data));
 }
 em::val NativeDataRefTest::generateData(const CppType& self) {
-    return ::snapchat::djinni::NativeDataRef::fromCpp(self->generateData());
+    auto r = self->generateData();
+    return ::snapchat::djinni::NativeDataRef::fromCpp(r);
 }
 em::val NativeDataRefTest::dataFromVec(const CppType& self) {
-    return ::snapchat::djinni::NativeDataRef::fromCpp(self->dataFromVec());
+    auto r = self->dataFromVec();
+    return ::snapchat::djinni::NativeDataRef::fromCpp(r);
 }
 em::val NativeDataRefTest::dataFromStr(const CppType& self) {
-    return ::snapchat::djinni::NativeDataRef::fromCpp(self->dataFromStr());
+    auto r = self->dataFromStr();
+    return ::snapchat::djinni::NativeDataRef::fromCpp(r);
 }
 em::val NativeDataRefTest::sendDataView(const CppType& self, const em::val& w_data) {
-    return ::djinni::Binary::fromCpp(self->sendDataView(::snapchat::djinni::NativeDataView::toCpp(w_data)));
+    auto r = self->sendDataView(::snapchat::djinni::NativeDataView::toCpp(w_data));
+    return ::djinni::Binary::fromCpp(r);
 }
 em::val NativeDataRefTest::recvDataView(const CppType& self) {
-    return ::snapchat::djinni::NativeDataView::fromCpp(self->recvDataView());
+    auto r = self->recvDataView();
+    return ::snapchat::djinni::NativeDataView::fromCpp(r);
 }
 em::val NativeDataRefTest::create() {
-    return ::djinni_generated::NativeDataRefTest::fromCpp(::testsuite::DataRefTest::create());
+    auto r = ::testsuite::DataRefTest::create();
+    return ::djinni_generated::NativeDataRefTest::fromCpp(r);
 }
 
 EMSCRIPTEN_BINDINGS(DataRefTest) {

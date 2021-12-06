@@ -13,16 +13,20 @@ em::val NativeTestArray::cppProxyMethods() {
 }
 
 em::val NativeTestArray::testStringArray(const em::val& w_a) {
-    return ::djinni::Array<::djinni::String>::fromCpp(::testsuite::TestArray::testStringArray(::djinni::Array<::djinni::String>::toCpp(w_a)));
+    auto r = ::testsuite::TestArray::testStringArray(::djinni::Array<::djinni::String>::toCpp(w_a));
+    return ::djinni::Array<::djinni::String>::fromCpp(r);
 }
 em::val NativeTestArray::testIntArray(const em::val& w_a) {
-    return ::djinni::Array<::djinni::I32>::fromCpp(::testsuite::TestArray::testIntArray(::djinni::Array<::djinni::I32>::toCpp(w_a)));
+    auto r = ::testsuite::TestArray::testIntArray(::djinni::Array<::djinni::I32>::toCpp(w_a));
+    return ::djinni::Array<::djinni::I32>::fromCpp(r);
 }
 em::val NativeTestArray::testRecordArray(const em::val& w_a) {
-    return ::djinni::Array<::djinni_generated::NativeVec2>::fromCpp(::testsuite::TestArray::testRecordArray(::djinni::Array<::djinni_generated::NativeVec2>::toCpp(w_a)));
+    auto r = ::testsuite::TestArray::testRecordArray(::djinni::Array<::djinni_generated::NativeVec2>::toCpp(w_a));
+    return ::djinni::Array<::djinni_generated::NativeVec2>::fromCpp(r);
 }
 em::val NativeTestArray::testArrayOfArray(const em::val& w_a) {
-    return ::djinni::Array<::djinni::Array<::djinni::I32>>::fromCpp(::testsuite::TestArray::testArrayOfArray(::djinni::Array<::djinni::Array<::djinni::I32>>::toCpp(w_a)));
+    auto r = ::testsuite::TestArray::testArrayOfArray(::djinni::Array<::djinni::Array<::djinni::I32>>::toCpp(w_a));
+    return ::djinni::Array<::djinni::Array<::djinni::I32>>::fromCpp(r);
 }
 
 EMSCRIPTEN_BINDINGS(test_array) {

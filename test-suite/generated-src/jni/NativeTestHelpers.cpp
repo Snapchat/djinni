@@ -226,7 +226,7 @@ CJNIEXPORT ::snapchat::djinni::FutureAdaptor<::djinni::I32>::JniType JNICALL Jav
 {
     try {
         auto r = ::testsuite::TestHelpers::get_async_result();
-        return ::djinni::release(::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(jniEnv, r));
+        return ::djinni::release(::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(jniEnv, std::move(r)));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
@@ -234,7 +234,7 @@ CJNIEXPORT ::snapchat::djinni::FutureAdaptor<::djinni::String>::JniType JNICALL 
 {
     try {
         auto r = ::testsuite::TestHelpers::future_roundtrip(::snapchat::djinni::FutureAdaptor<::djinni::I32>::toCpp(jniEnv, j_f));
-        return ::djinni::release(::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, r));
+        return ::djinni::release(::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, std::move(r)));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
@@ -242,7 +242,7 @@ CJNIEXPORT ::snapchat::djinni::FutureAdaptor<::djinni::String>::JniType JNICALL 
 {
     try {
         auto r = ::testsuite::TestHelpers::check_async_interface(::djinni_generated::NativeAsyncInterface::toCpp(jniEnv, j_i));
-        return ::djinni::release(::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, r));
+        return ::djinni::release(::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, std::move(r)));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 

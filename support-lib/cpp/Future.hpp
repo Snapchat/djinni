@@ -23,7 +23,10 @@
 #include <mutex>
 
 namespace snapchat::djinni {
+namespace detail {
 
+// A wrapper object to support both void and non-void result types in
+// Promise/Future
 template <typename T>
 struct ValueHolder {
     using type = T;
@@ -38,11 +41,39 @@ struct ValueHolder<void> {
 };
 
 template<typename T>
+struct SharedState;
+
+// A simple type erased function container. It would be nice if std::function<>
+// supports move only lambdas.
+template <typename T>
+struct ValueHandlerBase {
+    virtual ~ValueHandlerBase() = default;
+    virtual void call(const std::shared_ptr<SharedState<T>>&) = 0;
+};
+template <typename T, typename F>
+class ValueHandler : public ValueHandlerBase<T> {
+public:
+    ValueHandler(F&& f) : _f(std::move(f)) {}
+    ValueHandler(ValueHandler&& other) : _f(std::move(other._f)) {}
+    void call (const std::shared_ptr<SharedState<T>>& s) override {
+        _f(s);
+    }
+    
+private:
+    std::decay_t<F> _f;
+};
+template<typename T, typename FUNC>
+static std::unique_ptr<ValueHandler<T, FUNC>> createValueHandler(FUNC&& f) {
+    return std::make_unique<ValueHandler<T, FUNC>>(std::forward<FUNC>(f));
+}
+
+// The shared state object that links the promise and future objects
+template<typename T>
 struct SharedState: ValueHolder<T> {
     std::condition_variable cv;
     std::mutex mutex;
     std::exception_ptr exception;
-    std::function<void(std::shared_ptr<SharedState>)> handler;
+    std::unique_ptr<ValueHandlerBase<T>> handler;
 
     bool isReady() const {
         return this->value.has_value() || exception != nullptr;
@@ -51,18 +82,23 @@ struct SharedState: ValueHolder<T> {
 
 template<typename T>
 using SharedStatePtr = std::shared_ptr<SharedState<T>>;
+}
 
 template <typename T>
 class Future;
 
+namespace detail {
+// Common promise base class, shared by both `void` and `T` results.
 template <typename T>
 class PromiseBase {
 public:
     Future<T> getFuture();
 
 protected:
+    // setValue can only be called once. After which the shared state is set to
+    // null and further calls to setValue will fail.
     void setValue(typename ValueHolder<T>::type val) {
-        SharedStatePtr<T> sharedState;
+        detail::SharedStatePtr<T> sharedState;
         {
             std::unique_lock lk(_sharedState->mutex);
             _sharedState->value = val;
@@ -70,14 +106,13 @@ protected:
         }
         callResultHandler(sharedState);
     }
-
+    // setException can only be called once
     template <typename E>
     void setException(const E& ex) {
         setException(std::make_exception_ptr(ex));
     }
-
     void setException(std::exception_ptr ex) {
-        SharedStatePtr<T> sharedState;
+        detail::SharedStatePtr<T> sharedState;
         {
             std::unique_lock lk(_sharedState->mutex);
             _sharedState->exception = ex;
@@ -86,59 +121,81 @@ protected:
         callResultHandler(sharedState);
     }
 private:
-    SharedStatePtr<T> _sharedState = std::make_shared<SharedState<T>>();
+    detail::SharedStatePtr<T> _sharedState = std::make_shared<SharedState<T>>();
 
-    void callResultHandler(SharedStatePtr<T> sharedState) {
+    void callResultHandler(detail::SharedStatePtr<T> sharedState) {
         if (sharedState->handler) {
             // handler already assigned
-            sharedState->handler(sharedState);
+            sharedState->handler->call(sharedState);
         } else {
             sharedState->cv.notify_all();
         }
     }
 };
+}
 
+// Promise with non-void result type `T`
 template <typename T>
-class Promise: public PromiseBase<T> {
+class Promise: public detail::PromiseBase<T> {
 public:
-    using PromiseBase<T>::setValue;
-    using PromiseBase<T>::setException;
+    using detail::PromiseBase<T>::setValue;
+    using detail::PromiseBase<T>::setException;
+    // default constructable
+    Promise() = default;
+    // moveable
+    Promise(Promise&&) noexcept = default;
+    Promise& operator= (Promise&&) noexcept = default;
+    // not copyable
+    Promise(const Promise&) = delete;
+    Promise& operator= (const Promise&) noexcept = delete;
 };
 
+// Promise with a void result
 template <>
-class Promise<void>: public PromiseBase<void> {
+class Promise<void>: public detail::PromiseBase<void> {
 public:
     void setValue() {
-        PromiseBase<void>::setValue(true);
+        detail::PromiseBase<void>::setValue(true);
     }
-    using PromiseBase<void>::setException;
+    using detail::PromiseBase<void>::setException;
+    // default constructable
+    Promise() = default;
+    // moveable
+    Promise(Promise&&) noexcept = default;
+    Promise& operator= (Promise&&) noexcept = default;
+    // not copyable
+    Promise(const Promise&) = delete;
+    Promise& operator= (const Promise&) noexcept = delete;
 };
 
 template<typename T>
 class Future {
     template<typename U>
-    friend class PromiseBase;
-    
-    Future(SharedStatePtr<T> sharedState) : _sharedState(sharedState) {}
+    friend class detail::PromiseBase;
+    // not user constructable
+    Future(detail::SharedStatePtr<T> sharedState) : _sharedState(sharedState) {}
 public:
-    Future(const Future& other) = default;
+    // moveable
     Future(Future&& other) noexcept = default;
     Future& operator= (Future&& other) noexcept = default;
-
+    // not copyable
+    Future(const Future& other) = delete;
+    Future& operator= (const Future& other) noexcept = delete;
+    // Future becomes invalid after `then()` is called on it
     bool isValid() const {
         return _sharedState != nullptr;
     }
-    
+    // returns true if the result can be `get()` without blocking
     bool isReady() const {
         std::unique_lock lk(_sharedState->mutex);
         return _sharedState->isReady();
     }
-    
+    // wait until future becomes `isReady()`
     void wait() const {
         std::unique_lock lk(_sharedState->mutex);
         _sharedState->cv.wait(lk, [state = _sharedState] {return state->isReady();});
     }
-
+    // wait until future becomes `isReady()` and return the result
     auto get() const {
         std::unique_lock lk(_sharedState->mutex);
         _sharedState->cv.wait(lk, [state = _sharedState] {return state->isReady();});
@@ -153,23 +210,23 @@ public:
     auto then(FUNC handler) {
         using HandlerReturnType = std::invoke_result_t<FUNC, Future<T>>;
 
-        SharedStatePtr<T> sharedState;
+        detail::SharedStatePtr<T> sharedState;
         {
             std::unique_lock lk(_sharedState->mutex);
             sharedState = std::move(_sharedState);
         }
-        Promise<HandlerReturnType> nextPromise;
-        auto nextFuture = nextPromise.getFuture();
-        auto continuation = [this, handler, nextPromise] (SharedStatePtr<T> x) mutable {
+        auto nextPromise = std::make_unique<Promise<HandlerReturnType>>();
+        auto nextFuture = nextPromise->getFuture();
+        auto continuation = [this, handler = std::move(handler), nextPromise = std::move(nextPromise)] (detail::SharedStatePtr<T> x) mutable {
             try {
                 if constexpr(std::is_void_v<HandlerReturnType>) {
                     handler(Future<T>(x));
-                    nextPromise.setValue();
+                    nextPromise->setValue();
                 } else {
-                    nextPromise.setValue(handler(Future<T>(x)));
+                    nextPromise->setValue(handler(Future<T>(x)));
                 }
             } catch (std::exception& e) {
-                nextPromise.setException(std::current_exception());
+                nextPromise->setException(std::current_exception());
             }
         };
         if (sharedState->isReady()) {
@@ -177,16 +234,16 @@ public:
             continuation(sharedState);
         } else {
             // result not yet available
-            sharedState->handler = std::move(continuation);
+            sharedState->handler = detail::createValueHandler<T>(std::move(continuation));
         }
         return nextFuture;
     }
 private:
-    SharedStatePtr<T> _sharedState;
+    detail::SharedStatePtr<T> _sharedState;
 };
 
 template <typename T>
-Future<T> PromiseBase<T>::getFuture() {
+Future<T> detail::PromiseBase<T>::getFuture() {
     return Future<T>(_sharedState);
 }
 

@@ -213,21 +213,21 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
 + (nonnull DJFuture<NSNumber *> *)getAsyncResult {
     try {
         auto objcpp_result_ = ::testsuite::TestHelpers::get_async_result();
-        return ::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(objcpp_result_);
+        return ::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(std::move(objcpp_result_));
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
 + (nonnull DJFuture<NSString *> *)futureRoundtrip:(nonnull DJFuture<NSNumber *> *)f {
     try {
         auto objcpp_result_ = ::testsuite::TestHelpers::future_roundtrip(::snapchat::djinni::FutureAdaptor<::djinni::I32>::toCpp(f));
-        return ::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(objcpp_result_);
+        return ::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(objcpp_result_));
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
 + (nonnull DJFuture<NSString *> *)checkAsyncInterface:(nullable id<DBAsyncInterface>)i {
     try {
         auto objcpp_result_ = ::testsuite::TestHelpers::check_async_interface(::djinni_generated::AsyncInterface::toCpp(i));
-        return ::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(objcpp_result_);
+        return ::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(objcpp_result_));
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 

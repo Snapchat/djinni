@@ -13,10 +13,12 @@ em::val NativeCppException::cppProxyMethods() {
 }
 
 int32_t NativeCppException::throw_an_exception(const CppType& self) {
-    return ::djinni::I32::fromCpp(self->throw_an_exception());
+    auto r = self->throw_an_exception();
+    return ::djinni::I32::fromCpp(r);
 }
 em::val NativeCppException::get() {
-    return ::djinni_generated::NativeCppException::fromCpp(::testsuite::CppException::get());
+    auto r = ::testsuite::CppException::get();
+    return ::djinni_generated::NativeCppException::fromCpp(r);
 }
 
 EMSCRIPTEN_BINDINGS(cpp_exception) {
