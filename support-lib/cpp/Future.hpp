@@ -123,7 +123,7 @@ protected:
 private:
     detail::SharedStatePtr<T> _sharedState = std::make_shared<SharedState<T>>();
 
-    void callResultHandler(detail::SharedStatePtr<T> sharedState) {
+    static void callResultHandler(detail::SharedStatePtr<T> sharedState) {
         if (sharedState->handler) {
             // handler already assigned
             sharedState->handler->call(sharedState);
