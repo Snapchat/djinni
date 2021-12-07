@@ -322,6 +322,8 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
   //   - `cpp.namespace` key must be present
   // - `java` key must be present
   //   - `java.class` key must be present
+  //   - `jni_class` is optional
+  //   - `jni_header` is optional
   // - `ts` key must be present
   //   - `ts.module` key must be present
   // - `objc` key is optional
@@ -341,7 +343,7 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
   }
   val proto = ProtobufMessage(
     ProtobufMessage.Cpp(c("header"), c("namespace")),
-    ProtobufMessage.Java(j("class")),
+    ProtobufMessage.Java(j("class"), j.get("jni_class"), j.get("jni_header")),
     // ObjC is optional, if it's not present, then ObjC will use C++ protos
     Option(doc.get("objc")) match {
       case Some(properties) => {
