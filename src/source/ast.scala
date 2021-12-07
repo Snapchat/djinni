@@ -93,7 +93,7 @@ case class Field(ident: Ident, ty: TypeRef, doc: Doc)
 case class ProtobufMessage(cpp: ProtobufMessage.Cpp, java: ProtobufMessage.Java, objc: Option[ProtobufMessage.Objc], ts: Option[ProtobufMessage.Ts]) extends TypeDef
 object ProtobufMessage {
   case class Cpp(header: String, ns: String)
-  case class Java(pkg: String)
+  case class Java(pkg: String, jniClass: Option[String], jniHeader: Option[String])
   case class Objc(header: String, prefix: String)
   case class Ts(module: String, ns: String)
 }
