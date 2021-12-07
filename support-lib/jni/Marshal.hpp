@@ -598,11 +598,11 @@ namespace djinni
         const GlobalRef<jclass> clazz { jniFindClass("com/google/protobuf/MessageLite") };
         const jmethodID method_to_byte_array { jniGetMethodID(clazz.get(), "toByteArray", "()[B") };
 
-        jbyteArray serialzeJavaProto(JNIEnv* jniEnv, jobject jproto) const {
+        jbyteArray serializeJavaProto(JNIEnv* jniEnv, jobject jproto) const {
             return static_cast<jbyteArray>(jniEnv->CallObjectMethod(jproto, method_to_byte_array));
         }
 
-        jobject deserialzeJavaProto(JNIEnv* jniEnv, jobject javaBuf, const char* javaClassName) const {
+        jobject deserializeJavaProto(JNIEnv* jniEnv, jobject javaBuf, const char* javaClassName) const {
             auto cls = jniFindClass(javaClassName);
             auto sig = std::string("(Ljava/nio/ByteBuffer;)L") + javaClassName + ";";
             auto mid = jniGetStaticMethodID(cls.get(), "parseFrom", sig.c_str());
@@ -636,7 +636,7 @@ namespace djinni
 
             // Call message.toByteArray() through JNI
             const auto& msgcls = JniClass<JAVA_SERIALIZER>::get();
-            auto bytes = LocalRef<jbyteArray>(jniEnv, msgcls.serialzeJavaProto(jniEnv, j));
+            auto bytes = LocalRef<jbyteArray>(jniEnv, msgcls.serializeJavaProto(jniEnv, j));
             jniExceptionCheck(jniEnv);
 
             // Get the length of byte array
@@ -672,7 +672,7 @@ namespace djinni
             auto javaBuf = LocalRef<jobject>(jniEnv, jniEnv->NewDirectByteBuffer(cppBuf.data(), cppBuf.size()));
             // Then deserialize from ByteBuffer
             const auto& msgcls = JniClass<JAVA_SERIALIZER>::get();
-            auto ret = msgcls.deserialzeJavaProto(jniEnv, javaBuf.get(), JAVA_PROTO::name());
+            auto ret = msgcls.deserializeJavaProto(jniEnv, javaBuf.get(), JAVA_PROTO::name());
             jniExceptionCheck(jniEnv);
             return {jniEnv, ret};
         }
