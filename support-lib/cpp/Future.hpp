@@ -98,13 +98,9 @@ protected:
     // setValue can only be called once. After which the shared state is set to
     // null and further calls to setValue will fail.
     void setValue(typename ValueHolder<T>::type val) {
-        detail::SharedStatePtr<T> sharedState;
-        {
-            std::unique_lock lk(_sharedState->mutex);
-            _sharedState->value = val;
-            sharedState = std::move(_sharedState);
-        }
-        callResultHandler(sharedState);
+        updateAndCallResultHandler([&] (const detail::SharedStatePtr<T>& sharedState) {
+            sharedState->value = val;
+        });
     }
     // setException can only be called once
     template <typename E>
@@ -112,22 +108,29 @@ protected:
         setException(std::make_exception_ptr(ex));
     }
     void setException(std::exception_ptr ex) {
-        detail::SharedStatePtr<T> sharedState;
-        {
-            std::unique_lock lk(_sharedState->mutex);
-            _sharedState->exception = ex;
-            sharedState = std::move(_sharedState);
-        }
-        callResultHandler(sharedState);
+        updateAndCallResultHandler([&] (const detail::SharedStatePtr<T>& sharedState) {
+            sharedState->exception = ex;
+        });
     }
 private:
     detail::SharedStatePtr<T> _sharedState = std::make_shared<SharedState<T>>();
 
-    static void callResultHandler(detail::SharedStatePtr<T> sharedState) {
-        if (sharedState->handler) {
-            // handler already assigned
-            sharedState->handler->call(sharedState);
+    template <typename UpdateFunc>
+    void updateAndCallResultHandler(UpdateFunc&& updater) {
+        detail::SharedStatePtr<T> sharedState;
+        sharedState = std::atomic_exchange(&_sharedState, sharedState);
+        assert(sharedState);    // a second call will trigger assertion
+        std::unique_ptr<ValueHandlerBase<T>> handler;
+        {
+            std::lock_guard lk(sharedState->mutex);
+            updater(sharedState);
+            handler = std::move(sharedState->handler);
+        }
+        if (handler) {
+            // handler already assigned, call it inline
+            handler->call(sharedState);
         } else {
+            // otherwise unblock potential waiters
             sharedState->cv.notify_all();
         }
     }
@@ -183,38 +186,42 @@ public:
     Future& operator= (const Future& other) noexcept = delete;
     // Future becomes invalid after `then()` is called on it
     bool isValid() const {
-        return _sharedState != nullptr;
+        return std::atomic_load(&_sharedState) != nullptr;
     }
     // returns true if the result can be `get()` without blocking
     bool isReady() const {
-        std::unique_lock lk(_sharedState->mutex);
-        return _sharedState->isReady();
+        auto sharedState = std::atomic_load(&_sharedState);
+        assert(sharedState);    // call on invalid future will trigger assertion
+        std::unique_lock lk(sharedState->mutex);
+        return sharedState->isReady();
     }
     // wait until future becomes `isReady()`
     void wait() const {
-        std::unique_lock lk(_sharedState->mutex);
-        _sharedState->cv.wait(lk, [state = _sharedState] {return state->isReady();});
+        auto sharedState = std::atomic_load(&_sharedState);
+        assert(sharedState);    // call on invalid future will trigger assertion
+        std::unique_lock lk(sharedState->mutex);
+        sharedState->cv.wait(lk, [state = sharedState] {return state->isReady();});
     }
     // wait until future becomes `isReady()` and return the result
-    auto get() const {
-        std::unique_lock lk(_sharedState->mutex);
-        _sharedState->cv.wait(lk, [state = _sharedState] {return state->isReady();});
-        if (!_sharedState->exception) {
-            return _sharedState->getValueUnsafe();
+    auto get() {
+        detail::SharedStatePtr<T> sharedState;
+        sharedState = std::atomic_exchange(&_sharedState, sharedState);
+        assert(sharedState);    // call on invalid future will trigger assertion
+        std::unique_lock lk(sharedState->mutex);
+        sharedState->cv.wait(lk, [state = sharedState] {return state->isReady();});
+        if (!sharedState->exception) {
+            return sharedState->getValueUnsafe();
         } else {
-            std::rethrow_exception(_sharedState->exception);
+            std::rethrow_exception(sharedState->exception);
         }
     }
 
     template<typename FUNC>
     auto then(FUNC handler) {
         using HandlerReturnType = std::invoke_result_t<FUNC, Future<T>>;
-
         detail::SharedStatePtr<T> sharedState;
-        {
-            std::unique_lock lk(_sharedState->mutex);
-            sharedState = std::move(_sharedState);
-        }
+        sharedState = std::atomic_exchange(&_sharedState, sharedState);
+        assert(sharedState);    // a second call will trigger assertion
         auto nextPromise = std::make_unique<Promise<HandlerReturnType>>();
         auto nextFuture = nextPromise->getFuture();
         auto continuation = [this, handler = std::move(handler), nextPromise = std::move(nextPromise)] (detail::SharedStatePtr<T> x) mutable {
@@ -229,12 +236,19 @@ public:
                 nextPromise->setException(std::current_exception());
             }
         };
-        if (sharedState->isReady()) {
-            // result already available
-            continuation(sharedState);
-        } else {
-            // result not yet available
-            sharedState->handler = detail::createValueHandler<T>(std::move(continuation));
+        detail::SharedStatePtr<T> sharedStateForReadyFuture;
+        {
+            std::unique_lock lk(sharedState->mutex);
+            if (sharedState->isReady()) {
+                // result already available
+                sharedStateForReadyFuture = std::move(sharedState);
+            } else {
+                // result not yet available
+                sharedState->handler = detail::createValueHandler<T>(std::move(continuation));
+            }
+        }
+        if (sharedStateForReadyFuture) {
+            continuation(sharedStateForReadyFuture);
         }
         return nextFuture;
     }
@@ -244,6 +258,7 @@ private:
 
 template <typename T>
 Future<T> detail::PromiseBase<T>::getFuture() {
+    // TODO atomic load
     return Future<T>(_sharedState);
 }
 
