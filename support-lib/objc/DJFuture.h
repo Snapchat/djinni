@@ -23,6 +23,7 @@
 @interface DJFuture<__covariant Value> : NSObject
 -(nonnull instancetype) init NS_UNAVAILABLE;
 -(BOOL) isReady;
+-(void) wait;
 -(nullable Value) get;
 -(nonnull DJFuture<id>*)then:(_Nullable id(^_Nonnull)(DJFuture<Value>* _Nonnull))handler;
 @end

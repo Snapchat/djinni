@@ -46,6 +46,16 @@ typedef _Nullable id (^Continuation)(DJSharedSate* _Nonnull);
 
 // ------------------------------------------
 
+template <typename T>
+T withLockHeld(id<NSLocking> lock, T(^block)()) {
+    [lock lock];
+    @try {
+        return block();
+    } @finally {
+        [lock unlock];
+    }
+}
+
 @implementation DJFuture {
     DJSharedSate* _sharedState;
 }
@@ -58,25 +68,30 @@ typedef _Nullable id (^Continuation)(DJSharedSate* _Nonnull);
 }
 
 -(BOOL) isReady {
-    [_sharedState.cond lock];
-    BOOL ready = (_sharedState.isReady);
-    [_sharedState.cond unlock];
-    return ready;
+    DJSharedSate* sharedState = nil;
+    @synchronized(self) {sharedState = self->_sharedState;}
+    return withLockHeld(sharedState.cond, ^{return sharedState.isReady;});
+}
+
+-(void) wait {
+    DJSharedSate* sharedState = nil;
+    @synchronized(self) {sharedState = self->_sharedState;}
+    return withLockHeld(sharedState.cond, ^{while (!sharedState.isReady) [sharedState.cond wait];});
 }
 
 -(id) get {
-    id ret = nil;
-    id ex = nil;
-    [_sharedState.cond lock];
-    while (!_sharedState.isReady)
-        [_sharedState.cond wait];
-    ret = _sharedState.value;
-    ex = _sharedState.exception;
-    [_sharedState.cond unlock];
-    if (ex != nil) {
-        @throw ex;
+    DJSharedSate* sharedState = nil;
+    @synchronized(self) {
+        sharedState = self->_sharedState;
+        self->_sharedState = nil;
     }
-    return ret;
+    return withLockHeld(sharedState.cond, ^{
+            while (!sharedState.isReady) [sharedState.cond wait];
+            if (sharedState.exception != nil) {
+                @throw sharedState.exception;
+            }
+            return sharedState.value;
+        });
 }
 
 -(DJFuture<id>*)then:(_Nullable id(^_Nonnull)(DJFuture<id>* _Nonnull))handler {
@@ -91,15 +106,23 @@ typedef _Nullable id (^Continuation)(DJSharedSate* _Nonnull);
         }
         return nil;
     };
-    [_sharedState.cond lock];
-    DJSharedSate<id>* sharedState = _sharedState;
-    _sharedState = nil;
-    if (sharedState.isReady) {
-        continuation(sharedState.value);
-    } else {
-        sharedState.handler = continuation;
+    DJSharedSate* sharedState = nil;
+    @synchronized(self) {
+        sharedState = self->_sharedState;
+        self->_sharedState = nil;
     }
-    [sharedState.cond unlock];
+
+    __block DJSharedSate* sharedStateForReadyFuture = nil;
+    withLockHeld(sharedState.cond, ^{
+            if (sharedState.isReady) {
+                sharedStateForReadyFuture = sharedState;
+            } else {
+                sharedState.handler = continuation;
+            }
+        });
+    if (sharedStateForReadyFuture) {
+        continuation(sharedStateForReadyFuture);
+    }
     return nextFuture;
 }
 
@@ -118,31 +141,36 @@ typedef _Nullable id (^Continuation)(DJSharedSate* _Nonnull);
 }
 
 -(DJFuture<id>*) getFuture {
-    return [[DJFuture alloc] initWithSharedState: _sharedState];
+    @synchronized (self) {
+        return [[DJFuture alloc] initWithSharedState: _sharedState];
+    }
+}
+
+-(void) updateAndCallResultHandler:(void(^)(DJSharedSate*))block {
+    DJSharedSate* sharedState = nil;
+    @synchronized (self) {
+        sharedState = self->_sharedState;
+        self->_sharedState = nil;
+    }
+    __block Continuation handler = nil;    
+    withLockHeld(sharedState.cond, ^{
+            block(sharedState);
+            handler = sharedState.handler;
+            if (!handler) {
+                [sharedState.cond broadcast];
+            }
+        });
+    if (handler) {
+        sharedState.handler(sharedState);
+    }
 }
 
 -(void) setValue:(id) val {
-    DJSharedSate* sharedState = nil;
-    [_sharedState.cond lock];
-    sharedState = _sharedState;
-    sharedState.value = val;
-    [sharedState.cond broadcast];
-    [sharedState.cond unlock];
-    if (sharedState.handler) {
-        sharedState.handler(sharedState);
-    }
+    [self updateAndCallResultHandler: ^(DJSharedSate* sharedState){sharedState.value = val;}];
 }
 
 -(void) setException:(NSException*) exception {
-    DJSharedSate* sharedState = nil;
-    [_sharedState.cond lock];
-    sharedState = _sharedState;
-    sharedState.exception = exception;
-    [sharedState.cond broadcast];
-    [sharedState.cond unlock];
-    if (sharedState.handler) {
-        sharedState.handler(sharedState);
-    }
+    [self updateAndCallResultHandler: ^(DJSharedSate* sharedState){sharedState.exception = exception;}];
 }
 
 @end
