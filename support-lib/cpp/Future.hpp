@@ -53,12 +53,11 @@ struct ValueHandlerBase {
 template <typename T, typename F>
 class ValueHandler : public ValueHandlerBase<T> {
 public:
-    ValueHandler(F&& f) : _f(std::move(f)) {}
+    ValueHandler(F&& f) : _f(std::forward<F>(f)) {}
     ValueHandler(ValueHandler&& other) : _f(std::move(other._f)) {}
     void call (const std::shared_ptr<SharedState<T>>& s) override {
         _f(s);
     }
-    
 private:
     std::decay_t<F> _f;
 };
@@ -97,9 +96,14 @@ public:
 protected:
     // setValue can only be called once. After which the shared state is set to
     // null and further calls to setValue will fail.
-    void setValue(typename ValueHolder<T>::type val) {
+    void setValue(const typename ValueHolder<T>::type& val) {
         updateAndCallResultHandler([&] (const detail::SharedStatePtr<T>& sharedState) {
             sharedState->value = val;
+        });
+    }
+    void setValue(typename ValueHolder<T>::type&& val) {
+        updateAndCallResultHandler([&] (const detail::SharedStatePtr<T>& sharedState) {
+            sharedState->value = std::move(val);
         });
     }
     // setException can only be called once
@@ -169,9 +173,8 @@ public:
     Promise& operator= (const Promise&) noexcept = delete;
 private:
     // hide the bool version
-    void setValue(bool) {
-        detail::PromiseBase<void>::setValue(true);
-    }
+    void setValue(const bool&) {detail::PromiseBase<void>::setValue(true);}
+    void setValue(bool&&) {detail::PromiseBase<void>::setValue(true);}
 };
 
 template<typename T>
@@ -220,14 +223,14 @@ public:
     }
 
     template<typename FUNC>
-    auto then(FUNC handler) {
+    auto then(FUNC&& handler) {
         using HandlerReturnType = std::invoke_result_t<FUNC, Future<T>>;
         detail::SharedStatePtr<T> sharedState;
         sharedState = std::atomic_exchange(&_sharedState, sharedState);
         assert(sharedState);    // a second call will trigger assertion
         auto nextPromise = std::make_unique<Promise<HandlerReturnType>>();
         auto nextFuture = nextPromise->getFuture();
-        auto continuation = [this, handler = std::move(handler), nextPromise = std::move(nextPromise)] (detail::SharedStatePtr<T> x) mutable {
+        auto continuation = [this, handler = std::forward<FUNC>(handler), nextPromise = std::move(nextPromise)] (detail::SharedStatePtr<T> x) mutable {
             try {
                 if constexpr(std::is_void_v<HandlerReturnType>) {
                     handler(Future<T>(x));
@@ -261,8 +264,7 @@ private:
 
 template <typename T>
 Future<T> detail::PromiseBase<T>::getFuture() {
-    // TODO atomic load
-    return Future<T>(_sharedState);
+    return Future<T>(std::atomic_load(&_sharedState));
 }
 
 } // namespace snapchat::djinni
