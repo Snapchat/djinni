@@ -16,35 +16,49 @@
 
 package com.snapchat.djinni;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 public class Promise<T> {
 
-    private SharedState<T> sharedState;
+    private AtomicReference<SharedState<T>> _sharedState;
 
     public Promise() {
-        sharedState = new SharedState<T>();
+        _sharedState = new AtomicReference(new SharedState<T>());
     }
     
     public Future<T> getFuture() {
-        return new Future<T>(sharedState);
+        return new Future<T>(_sharedState.get());
     }
 
     public void setValue(T val) {
+        SharedState<T> sharedState = _sharedState.getAndSet(null);
+        SharedState.Continuation<T> handler = null;
         synchronized(sharedState) {
             sharedState.value = val;
             if (sharedState.handler != null) {
-                sharedState.handler.handleResult(sharedState);
+                handler = sharedState.handler;
+            } else {
+                sharedState.notifyAll();
             }
-            sharedState.notifyAll();
+        }
+        if (handler != null) {
+            handler.handleResult(sharedState);
         }
     }
 
     public void setException(Throwable ex) {
+        SharedState<T> sharedState = _sharedState.getAndSet(null);
+        SharedState.Continuation<T> handler = null;
         synchronized(sharedState) {
             sharedState.exception = ex;
             if (sharedState.handler != null) {
-                sharedState.handler.handleResult(sharedState);
+                handler = sharedState.handler;
+            } else {
+                sharedState.notifyAll();
             }
-            sharedState.notifyAll();
+        }
+        if (handler != null) {
+            handler.handleResult(sharedState);
         }
     }
 }
