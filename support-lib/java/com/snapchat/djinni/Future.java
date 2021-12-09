@@ -19,11 +19,11 @@ package com.snapchat.djinni;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Future<T> {
-
+    // Handler routine for type U that does not return a value
     public interface FutureHandler<U> {
         public void handleResult(Future<U> res) throws Throwable;
     }
-
+    // Handler routine for type U that returns a value of type R
     public interface FutureHandlerWithReturn<U, R> {
         public R handleResult(Future<U> res) throws Throwable;
     }
@@ -33,14 +33,27 @@ public class Future<T> {
     Future(SharedState<T> state) {
         _sharedState = new AtomicReference(state);
     }
-
+    // If the future is ready, then calling its `get()` method will not block.
     public boolean isReady() {
         SharedState<T> sharedState = _sharedState.get();
         synchronized(sharedState) {
             return sharedState.isReady();
         }
     }
-
+    // Wait until future becomes ready
+    public void wait() {
+        SharedState<T> sharedState = _sharedState.get();
+        synchronized(sharedState) {
+            try {
+                while(!sharedState.isReady()) {
+                    sharedState.wait();
+                }
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+    // Block and wait for the result (or exception). This can only be called
+    // once.
     public T get() throws Throwable {
         SharedState<T> sharedState = _sharedState.getAndSet(null);
         synchronized(sharedState) {
@@ -58,7 +71,9 @@ public class Future<T> {
             }
         }
     }
-
+    // Tell the future to Call the specified handler routine when it becomes
+    // ready. Returns a new void future. The current future becomes invalid
+    // after this call.
     public Future<Void> then (FutureHandler<T> handler) {
         final Promise<Void> nextPromise = new Promise<Void>();
         final Future<Void> nextFuture = nextPromise.getFuture();
@@ -84,7 +99,9 @@ public class Future<T> {
         }
         return nextFuture;
     }
-
+    // Tell the future to Call the specified handler routine when it becomes
+    // ready. Returns a new future that wraps the return value of the handler
+    // routine. The current future becomes invalid after this call.
     public <R> Future<R> then (final FutureHandlerWithReturn<T, R> handler) {
         final Promise<R> nextPromise = new Promise<R>();
         final Future<R> nextFuture = nextPromise.getFuture();

@@ -21,6 +21,7 @@
 #include <optional>
 #include <condition_variable>
 #include <mutex>
+#include <cassert>
 
 namespace snapchat::djinni {
 namespace detail {
@@ -94,8 +95,12 @@ public:
     Future<T> getFuture();
 
 protected:
-    // setValue can only be called once. After which the shared state is set to
-    // null and further calls to setValue will fail.
+    // `setValue()` or `setException()` can only be called once. After which the
+    // shared state is set to null and further calls to `setValue()` or
+    // `setException()` will fail.  If at the moment of calling `setValue()` or
+    // `setException()`, the `then()` method is already called on the future
+    // object, then the handler routine specified by `then()` will immediately
+    // be called in the current thread.
     void setValue(const typename ValueHolder<T>::type& val) {
         updateAndCallResultHandler([&] (const detail::SharedStatePtr<T>& sharedState) {
             sharedState->value = val;
@@ -106,7 +111,6 @@ protected:
             sharedState->value = std::move(val);
         });
     }
-    // setException can only be called once
     template <typename E>
     void setException(const E& ex) {
         setException(std::make_exception_ptr(ex));
@@ -208,7 +212,8 @@ public:
         std::unique_lock lk(sharedState->mutex);
         sharedState->cv.wait(lk, [state = sharedState] {return state->isReady();});
     }
-    // wait until future becomes `isReady()` and return the result
+    // wait until future becomes `isReady()` and return the result. This can
+    // only be called once.
     auto get() {
         detail::SharedStatePtr<T> sharedState;
         sharedState = std::atomic_exchange(&_sharedState, sharedState);
@@ -221,7 +226,10 @@ public:
             std::rethrow_exception(sharedState->exception);
         }
     }
-
+    // If at the moment of calling `then()`, the result (or exception) is
+    // already available, then the handler routine will immediately be called in
+    // the current thread. Returns a new future that wraps the return value of
+    // the handler routine. The current future becomes invalid after this call.
     template<typename FUNC>
     auto then(FUNC&& handler) {
         using HandlerReturnType = std::invoke_result_t<FUNC, Future<T>>;

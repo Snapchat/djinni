@@ -25,11 +25,14 @@ public class Promise<T> {
     public Promise() {
         _sharedState = new AtomicReference(new SharedState<T>());
     }
-    
+
+    // Get a future object associated with this promise
     public Future<T> getFuture() {
         return new Future<T>(_sharedState.get());
     }
 
+    // `setValue()` or `setException()` can only be called once on a
+    // promise. After which the internal state becomes invalid.
     public void setValue(T val) {
         SharedState<T> sharedState = _sharedState.getAndSet(null);
         SharedState.Continuation<T> handler = null;
