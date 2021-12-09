@@ -157,9 +157,7 @@ public:
 template <>
 class Promise<void>: public detail::PromiseBase<void> {
 public:
-    void setValue() {
-        detail::PromiseBase<void>::setValue(true);
-    }
+    void setValue() {setValue(true);}
     using detail::PromiseBase<void>::setException;
     // default constructable
     Promise() = default;
@@ -169,6 +167,11 @@ public:
     // not copyable
     Promise(const Promise&) = delete;
     Promise& operator= (const Promise&) noexcept = delete;
+private:
+    // hide the bool version
+    void setValue(bool) {
+        detail::PromiseBase<void>::setValue(true);
+    }
 };
 
 template<typename T>
