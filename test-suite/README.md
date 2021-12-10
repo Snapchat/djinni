@@ -10,7 +10,5 @@ like to be generated. After input files are changed, run `./run_djinni.sh` to re
 
 Testing
 -------
-`bazel test //test-suite:all` builds and then runs all tests.
-
-Or `bazel test //test-suite:djinni-objc-tests` and `bazel test
-//test-suite:djinni-java-tests` to run Objective-C and Java tests separately.
+Use `bazel test //test-suite:djinni-objc-tests //test-suite:djinni-java-tests`
+to build and run Objective-C and Java tests.
