@@ -7,8 +7,10 @@
 
 /** This file tests YAML dumped by Djinni can be parsed back in */
 @interface DBExternRecordWithDerivings : NSObject
+- (nonnull instancetype)init NS_UNAVAILABLE;
++ (nonnull instancetype)new NS_UNAVAILABLE;
 - (nonnull instancetype)initWithMember:(nonnull DBRecordWithDerivings *)member
-                                     e:(DBColor)e;
+                                     e:(DBColor)e NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)externRecordWithDerivingsWithMember:(nonnull DBRecordWithDerivings *)member
                                                           e:(DBColor)e;
 

@@ -209,7 +209,19 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       def writeInitializer(sign: String, prefix: String) {
         val decl = s"$sign (nonnull instancetype)$prefix$firstInitializerArg"
         writeAlignedObjcCall(w, decl, r.fields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
-        w.wl(";")
+
+        if (prefix == "init") {
+          w.wl(" NS_DESIGNATED_INITIALIZER;")
+        } else {
+          w.wl(";")
+        }
+      }
+
+      if (r.fields.nonEmpty) {
+          // NSObject init / new are marked unavailable. Only allow designated initializer
+          // as records may have non-optional / nonnull fields.
+          w.wl("- (nonnull instancetype)init NS_UNAVAILABLE;")
+          w.wl("+ (nonnull instancetype)new NS_UNAVAILABLE;")
       }
 
       writeInitializer("-", "init")

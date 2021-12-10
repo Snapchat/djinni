@@ -4,7 +4,9 @@
 #import <Foundation/Foundation.h>
 
 @interface DBDateRecord : NSObject
-- (nonnull instancetype)initWithCreatedAt:(nonnull NSDate *)createdAt;
+- (nonnull instancetype)init NS_UNAVAILABLE;
++ (nonnull instancetype)new NS_UNAVAILABLE;
+- (nonnull instancetype)initWithCreatedAt:(nonnull NSDate *)createdAt NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)dateRecordWithCreatedAt:(nonnull NSDate *)createdAt;
 
 @property (nonatomic, readonly, nonnull) NSDate * createdAt;

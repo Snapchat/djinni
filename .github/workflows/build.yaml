@@ -28,6 +28,9 @@ jobs:
         - name: Build
           run: bazel build //src:djinni
 
+        - name: Generate examples / check clean output
+          run: ./ci/generate.sh
+
         - name: Test
           run: bazel test //test-suite:djinni-java-tests  //test-suite:djinni-objc-tests
 

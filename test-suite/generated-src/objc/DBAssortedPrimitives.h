@@ -4,6 +4,8 @@
 #import <Foundation/Foundation.h>
 
 @interface DBAssortedPrimitives : NSObject
+- (nonnull instancetype)init NS_UNAVAILABLE;
++ (nonnull instancetype)new NS_UNAVAILABLE;
 - (nonnull instancetype)initWithB:(BOOL)b
                             eight:(int8_t)eight
                           sixteen:(int16_t)sixteen
@@ -17,7 +19,7 @@
                        oThirtytwo:(nullable NSNumber *)oThirtytwo
                        oSixtyfour:(nullable NSNumber *)oSixtyfour
                       oFthirtytwo:(nullable NSNumber *)oFthirtytwo
-                      oFsixtyfour:(nullable NSNumber *)oFsixtyfour;
+                      oFsixtyfour:(nullable NSNumber *)oFsixtyfour NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)assortedPrimitivesWithB:(BOOL)b
                                           eight:(int8_t)eight
                                         sixteen:(int16_t)sixteen

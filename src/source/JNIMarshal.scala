@@ -53,7 +53,13 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
 
   def references(m: Meta, exclude: String = ""): Seq[SymbolReference] = m match {
     case o: MOpaque => List(ImportRef(q(spec.jniBaseLibIncludePrefix + "Marshal.hpp")))
-    case p: MProtobuf => List(ImportRef(q(spec.jniBaseLibIncludePrefix + "Marshal.hpp")))
+    case p: MProtobuf => {
+      val headers = List(ImportRef(q(spec.jniBaseLibIncludePrefix + "Marshal.hpp")))
+      p.body.java.jniHeader match {
+        case Some(serialzerHeader) => ImportRef(serialzerHeader) :: headers
+        case _ => headers
+      }
+    }
     case d: MDef => List(ImportRef(include(d.name)))
     case e: MExtern => List(ImportRef(e.jni.header))
     case _ => List()
@@ -173,7 +179,11 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       case p: MProtobuf =>
         assert(tm.args.size == 0)
         val fqJavaProtoClass = p.body.java.pkg.replaceAllLiterally(".", "/") + "$" + p.name
-        s"""<${withNs(Some(p.body.cpp.ns), p.name)}, ${javaClassNameAsCppType(fqJavaProtoClass)}>"""
+        val serializerClass = p.body.java.jniClass match {
+          case Some(serializer) => s", ${serializer}"
+          case None => ""
+        }
+        s"""<${withNs(Some(p.body.cpp.ns), p.name)}, ${javaClassNameAsCppType(fqJavaProtoClass)}${serializerClass}>"""
       case MArray =>
         assert(tm.args.size == 1)
         s"""<${helperClass(tm.args.head)}, ${javaClassNameAsCppType(javaClassNameForFindClass(tm.args.head))}>"""
