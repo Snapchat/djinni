@@ -19,8 +19,10 @@ either plain Bazel or [Bazelisk](https://github.com/bazelbuild/bazelisk).
 
 ### Building and running the test suite
 
-Use `bazel test //test-suite:djinni-objc-tests //test-suite:djinni-java-tests`
-to build and run Objective-C and Java tests.
+`bazel test //test-suite:all` builds and then runs all tests.
+
+Or `bazel test //test-suite:djinni-objc-tests` and `bazel test
+//test-suite:djinni-java-tests` to run Objective-C and Java tests separately.
 
 ### Building and running the mobile example apps
 
