@@ -287,6 +287,34 @@ Notable differences when comparing to the Java/ObjC support:
   easily add extension methods (by add functions to prototype) without having to
   derive from a base class.
 
+## Experimental async interface support
+
+With the new yaml type `future<>` we can now write Djinni interfaces that
+return results asynchronously more easily.
+
+Instead of writing this:
+
+```
+FooCb = interface {
+  complete(res: i32): void;
+}
+Foo = interface {
+  bar(cb: FooCb): void;
+}
+```
+
+We can now write:
+
+```
+Foo = interface {
+  bar(): future<i32>;
+}
+```
+
+The `future<>` djinni type is mapped to the `Future` types defined in the C++,
+Java and ObjC djinni support library. In Javascript, `future<>` is mapped to the
+builtin `Promise` type (and therefore supports the `await` syntax).
+
 ## FAQ
 
 Q. Do I need to use Bazel to build my project?
