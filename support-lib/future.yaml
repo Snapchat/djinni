@@ -33,5 +33,6 @@ wasm:
   translator: '::snapchat::djinni::FutureAdaptor'
   header: '"Future_wasm.hpp"'
 ts:
-  typename: 'Future'
+  typename: 'Promise'
   module: ''
+  generic: true

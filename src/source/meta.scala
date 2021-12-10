@@ -74,13 +74,14 @@ object MExtern {
     typeSignature: String // The mangled Java type signature (e.g. "Ljava/lang/String;")
   )
   case class Wasm(
-    typename: String, // The JNI type to use (e.g. em::val, int32_t)
+    typename: String, // The Emscripten type to use (e.g. em::val, int32_t)
     translator: String, // C++ typename containing toCpp/fromCpp methods
     header: String // Where to find the translator class
   )
   case class Ts(
-    typename: String,
-    module: String
+    typename: String, // The TypeScript type
+    module: String,   // The module to import for the type
+    generic: Boolean
   )
 }
 case class MProtobuf(name: String, override val numParams: Int, body: ProtobufMessage) extends Meta

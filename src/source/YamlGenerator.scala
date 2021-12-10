@@ -190,7 +190,8 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
 
   private def ts(td: TypeDecl) = Map[String, Any](
     "typename" -> tsMarshal.toTsType(mexpr(td)),
-    "module" -> QuotedString("./" + spec.tsModule)
+    "module" -> QuotedString("./" + spec.tsModule),
+    "generic" -> false
   )
 
   // TODO: there has to be a way to do all this without the MExpr/Meta conversions?
@@ -275,7 +276,8 @@ object YamlGenerator {
       getOptionalField(td, "wasm", "header")),
     MExtern.Ts(
       getOptionalField(td, "ts", "typename"),
-      getOptionalField(td, "ts", "module"))
+      getOptionalField(td, "ts", "module"),
+      getOptionalField(td, "ts", "generic", false))
   )
 
   private def nested(td: ExternTypeDecl, key: String) = {

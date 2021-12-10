@@ -76,7 +76,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
             case m => f(arg) + " | undefined"
           }
         case MArray => tsArrayType(tm.args.head)
-        case e: MExtern => e.ts.typename
+        case e: MExtern => if (e.ts.generic) e.ts.typename + args(tm) else e.ts.typename
         case p: MProtobuf => p.name
         case o =>
           val base = o match {

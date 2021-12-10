@@ -396,7 +396,7 @@ export interface /*record*/ AssortedPrimitives {
 }
 
 export interface AsyncInterface {
-    futureRoundtrip(f: Future): Future;
+    futureRoundtrip(f: Promise<number>): Promise<string>;
 }
 
 /**
@@ -439,9 +439,9 @@ export interface TestHelpers_statics {
     /** Ensures that we generate integer translation code */
     assortedPrimitivesId(i: AssortedPrimitives): AssortedPrimitives;
     idBinary(b: Uint8Array): Uint8Array;
-    getAsyncResult(): Future;
-    futureRoundtrip(f: Future): Future;
-    checkAsyncInterface(i: AsyncInterface): Future;
+    getAsyncResult(): Promise<number>;
+    futureRoundtrip(f: Promise<number>): Promise<string>;
+    checkAsyncInterface(i: AsyncInterface): Promise<string>;
 }
 
 /**

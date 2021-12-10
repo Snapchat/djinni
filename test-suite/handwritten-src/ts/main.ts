@@ -1,6 +1,7 @@
 import {DjinniModule} from "@djinni_support/DjinniModule"
 import {runTests, allTests} from "./testutils"
 import "./ArrayTest"
+import "./AsyncTest"
 import "./ClientInterfaceTest"
 import "./ConstantsTest"
 import "./CppExceptionTest"
