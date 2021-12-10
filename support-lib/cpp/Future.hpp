@@ -23,6 +23,10 @@
 #include <mutex>
 #include <cassert>
 
+#if defined(DJINNI_FUTURE_COROUTINE_SUPPORT)
+#include <experimental/coroutine>
+#endif
+
 namespace snapchat::djinni {
 namespace detail {
 
@@ -238,7 +242,7 @@ public:
         assert(sharedState);    // a second call will trigger assertion
         auto nextPromise = std::make_unique<Promise<HandlerReturnType>>();
         auto nextFuture = nextPromise->getFuture();
-        auto continuation = [this, handler = std::forward<FUNC>(handler), nextPromise = std::move(nextPromise)] (detail::SharedStatePtr<T> x) mutable {
+        auto continuation = [handler = std::forward<FUNC>(handler), nextPromise = std::move(nextPromise)] (detail::SharedStatePtr<T> x) mutable {
             try {
                 if constexpr(std::is_void_v<HandlerReturnType>) {
                     handler(Future<T>(x));
@@ -266,8 +270,33 @@ public:
         }
         return nextFuture;
     }
+
 private:
     detail::SharedStatePtr<T> _sharedState;
+
+#if defined(DJINNI_FUTURE_COROUTINE_SUPPORT)
+public:
+    bool await_ready() {
+        return isReady();
+    }
+    auto await_resume() {
+        auto sharedState = std::atomic_load(&_sharedState);
+        if (sharedState) {
+            return Future<T>(sharedState).get();
+        } else {
+            return Future<T>(_coroState).get();
+        }
+    }
+    bool await_suspend(std::experimental::coroutine_handle<> h) {
+        this->then([h, this] (Future<T> x) mutable {
+            _coroState = x._sharedState;
+            h();
+        });
+        return true;
+    }
+private:
+    detail::SharedStatePtr<T> _coroState;
+#endif
 };
 
 template <typename T>
