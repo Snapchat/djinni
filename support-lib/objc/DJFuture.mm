@@ -73,12 +73,6 @@ T withLockHeld(id<NSLocking> lock, T(^block)()) {
     return withLockHeld(sharedState.cond, ^{return sharedState.isReady;});
 }
 
--(void) wait {
-    DJSharedSate* sharedState = nil;
-    @synchronized(self) {sharedState = self->_sharedState;}
-    return withLockHeld(sharedState.cond, ^{while (!sharedState.isReady) [sharedState.cond wait];});
-}
-
 -(id) get {
     DJSharedSate* sharedState = nil;
     @synchronized(self) {

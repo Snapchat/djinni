@@ -40,18 +40,6 @@ public class Future<T> {
             return sharedState.isReady();
         }
     }
-    // Wait until future becomes ready
-    public void wait() {
-        SharedState<T> sharedState = _sharedState.get();
-        synchronized(sharedState) {
-            try {
-                while(!sharedState.isReady()) {
-                    sharedState.wait();
-                }
-            } catch (InterruptedException e) {
-            }
-        }
-    }
     // Block and wait for the result (or exception). This can only be called
     // once.
     public T get() throws Throwable {

@@ -24,8 +24,6 @@
 -(nonnull instancetype) init NS_UNAVAILABLE;
 // If the future is ready, then calling its `get` method will not block.
 -(BOOL) isReady;
-// Wait until future becomes ready
--(void) wait;
 // Block and wait for the result (or exception). This can only be called once.
 -(nullable Value) get;
 // Tell the future to Call the specified handler routine when it becomes
