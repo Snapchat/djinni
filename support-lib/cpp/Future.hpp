@@ -23,8 +23,18 @@
 #include <mutex>
 #include <cassert>
 
-#if defined(DJINNI_FUTURE_COROUTINE_SUPPORT)
-#include <experimental/coroutine>
+#if __has_include(<coroutine>)
+    #include <coroutine>
+    namespace snapchat::djinni::detail {
+        template <typename Promise = void> using CoroutineHandle = std::coroutine_handle<Promise>;
+    }
+    #define DJINNI_FUTURE_COROUTINE_SUPPORT 1
+#elif __has_include(<experimental/coroutine>)
+    #include <experimental/coroutine>
+    namespace snapchat::djinni::detail {
+        template <typename Promise = void> using CoroutineHandle = std::experimental::coroutine_handle<Promise>;
+    }
+    #define DJINNI_FUTURE_COROUTINE_SUPPORT 1
 #endif
 
 namespace snapchat::djinni {
@@ -287,7 +297,7 @@ public:
             return Future<T>(_coroState).get();
         }
     }
-    bool await_suspend(std::experimental::coroutine_handle<> h) {
+    bool await_suspend(detail::CoroutineHandle<> h) {
         this->then([h, this] (Future<T> x) mutable {
             _coroState = x._sharedState;
             h();
