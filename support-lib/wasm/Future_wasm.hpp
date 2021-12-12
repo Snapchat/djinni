@@ -19,8 +19,7 @@
 #include "djinni_wasm.hpp"
 #include "../cpp/Future.hpp"
 
-namespace snapchat {
-namespace djinni {
+namespace snapchat::djinni {
 
 template <class RESULT>
 class FutureAdaptor
@@ -79,7 +78,7 @@ public:
         void doResolve() {
             try {
                 _resolveFunc(RESULT::Boxed::fromCpp(_future->get()));
-            } catch (std::exception& e) {
+            } catch (const std::exception& e) {
                 auto errorClass = em::val::global("Error");
                 auto error = errorClass.new_(std::string(e.what()));
                 _rejectFunc(error);
@@ -106,4 +105,4 @@ public:
     }
 };
 
-}} // namespace snapchat::djinni
+} // namespace snapchat::djinni

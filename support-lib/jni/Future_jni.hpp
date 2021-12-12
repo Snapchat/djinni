@@ -20,8 +20,8 @@
 #include "Marshal.hpp"
 #include "../cpp/Future.hpp"
 
-namespace snapchat {
-namespace djinni {
+namespace snapchat::djinni {
+
 struct PromiseJniInfo {
     const ::djinni::GlobalRef<jclass> clazz { ::djinni::jniFindClass("com/snapchat/djinni/Promise") };
     const jmethodID constructor { ::djinni::jniGetMethodID(clazz.get(), "<init>", "()V") };
@@ -120,7 +120,7 @@ public:
             try {
                 auto res = cppFuture.get();
                 jniEnv->CallVoidMethod(promise->get(), promiseJniInfo.method_set_value, RESULT::Boxed::fromCpp(jniEnv, res).get());
-            } catch (std::exception& e) {
+            } catch (const std::exception& e) {
                 // create a java exception object
                 const auto& exceptionJniInfo = ::djinni::JniClass<RuntimeExceptionJniInfo>::get();
                 ::djinni::LocalRef<jobject> jex(jniEnv, jniEnv->NewObject(exceptionJniInfo.clazz.get(), exceptionJniInfo.constructor, ::djinni::String::fromCpp(jniEnv, e.what()).get()));
@@ -133,4 +133,4 @@ public:
         return future;
     }
 };
-}} // namespace snapchat::djinni
+} // namespace snapchat::djinni

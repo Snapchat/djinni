@@ -67,7 +67,7 @@ private:
     std::decay_t<F> _f;
 };
 template<typename T, typename FUNC>
-static std::unique_ptr<ValueHandler<T, FUNC>> createValueHandler(FUNC&& f) {
+static auto createValueHandler(FUNC&& f) {
     return std::make_unique<ValueHandler<T, FUNC>>(std::forward<FUNC>(f));
 }
 
@@ -162,7 +162,7 @@ public:
     Promise& operator= (Promise&&) noexcept = default;
     // not copyable
     Promise(const Promise&) = delete;
-    Promise& operator= (const Promise&) noexcept = delete;
+    Promise& operator= (const Promise&) = delete;
 };
 
 // Promise with a void result
@@ -178,7 +178,7 @@ public:
     Promise& operator= (Promise&&) noexcept = default;
     // not copyable
     Promise(const Promise&) = delete;
-    Promise& operator= (const Promise&) noexcept = delete;
+    Promise& operator= (const Promise&) = delete;
 private:
     // hide the bool version
     void setValue(const bool&) {detail::PromiseBase<void>::setValue(true);}
@@ -197,7 +197,7 @@ public:
     Future& operator= (Future&& other) noexcept = default;
     // not copyable
     Future(const Future& other) = delete;
-    Future& operator= (const Future& other) noexcept = delete;
+    Future& operator= (const Future& other) = delete;
     // Future becomes invalid after `then()` is called on it
     bool isValid() const {
         return std::atomic_load(&_sharedState) != nullptr;
@@ -250,7 +250,7 @@ public:
                 } else {
                     nextPromise->setValue(handler(Future<T>(x)));
                 }
-            } catch (std::exception& e) {
+            } catch (const std::exception& e) {
                 nextPromise->setException(std::current_exception());
             }
         };

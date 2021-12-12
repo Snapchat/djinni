@@ -20,9 +20,7 @@
 #import "DJFuture.h"
 #import "Future.hpp"
 
-namespace snapchat {
-namespace djinni {
-
+namespace snapchat::djinni {
 
 template <class RESULT>
 class FutureAdaptor
@@ -60,7 +58,7 @@ public:
         c.then([promise] (Future<CppResType> res) {
                 try {
                     [promise setValue:RESULT::Boxed::fromCpp(res.get())];
-                } catch (std::exception& e) {
+                } catch (const std::exception& e) {
                     [promise setException: [NSException exceptionWithName:@"" reason: ::djinni::String::fromCpp(e.what()) userInfo:nil]];
                 }
             });
@@ -69,4 +67,4 @@ public:
     }
 };
 
-}} // namespace snapchat::djinni
+} // namespace snapchat::djinni
