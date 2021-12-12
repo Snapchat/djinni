@@ -23,18 +23,18 @@
 #include <mutex>
 #include <cassert>
 
+#if defined(DJINNI_FUTURE_COROUTINE_SUPPORT)
 #if __has_include(<coroutine>)
     #include <coroutine>
     namespace snapchat::djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::coroutine_handle<Promise>;
     }
-    #define DJINNI_FUTURE_COROUTINE_SUPPORT 1
 #elif __has_include(<experimental/coroutine>)
     #include <experimental/coroutine>
     namespace snapchat::djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::experimental::coroutine_handle<Promise>;
     }
-    #define DJINNI_FUTURE_COROUTINE_SUPPORT 1
+#endif
 #endif
 
 namespace snapchat::djinni {
