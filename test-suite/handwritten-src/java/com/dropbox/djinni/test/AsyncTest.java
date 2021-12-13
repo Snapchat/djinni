@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import com.snapchat.djinni.Promise;
 import com.snapchat.djinni.Future;
 import java.util.concurrent.ExecutionException;
-import rx.Single;
+import io.reactivex.Single;
 
 public class AsyncTest extends TestCase {
 
@@ -70,12 +70,12 @@ public class AsyncTest extends TestCase {
                         o.onError(e);
                     }
                 }));
-        assertEquals(Integer.valueOf(42), s.toBlocking().value());
+        assertEquals(Integer.valueOf(42), s.blockingGet());
     }
     
     public void testRxFromFuture() throws Throwable {
         Future<Integer> f = TestHelpers.getAsyncResult();
-        Single<Integer> s = Single.from(f);
-        assertEquals(Integer.valueOf(42), s.toBlocking().value());
+        Single<Integer> s = Single.fromFuture(f);
+        assertEquals(Integer.valueOf(42), s.blockingGet());
     }
 }

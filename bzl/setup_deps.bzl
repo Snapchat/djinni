@@ -17,7 +17,7 @@ def djinni_setup_deps():
             "org.scala-lang.modules:scala-parser-combinators_2.11:1.0.1",
             "org.yaml:snakeyaml:1.15",
             "com.github.scopt:scopt_2.11:3.2.0",
-            "io.reactivex:rxjava:1.3.8"
+            "io.reactivex.rxjava2:rxjava:2.2.21"
         ],
         repositories = ["https://maven.google.com", "https://repo1.maven.org/maven2"],
     )
