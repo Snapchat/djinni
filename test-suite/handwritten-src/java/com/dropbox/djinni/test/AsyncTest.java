@@ -4,6 +4,8 @@ import junit.framework.TestCase;
 import static org.junit.Assert.*;
 import com.snapchat.djinni.Promise;
 import com.snapchat.djinni.Future;
+import java.util.concurrent.ExecutionException;
+import rx.Single;
 
 public class AsyncTest extends TestCase {
 
@@ -48,7 +50,7 @@ public class AsyncTest extends TestCase {
         String s = null;
         try {
             f3.get();
-        } catch (Exception e) {
+        } catch (ExecutionException e) {
             s = e.getMessage();
         }
         assertEquals(s, "123");
@@ -57,5 +59,23 @@ public class AsyncTest extends TestCase {
     public void testFutureRoundtripBackwards() throws Throwable {
         Future<String> s = TestHelpers.checkAsyncInterface(new AsyncInterfaceImpl());
         assertEquals(s.get(), "36");
+    }
+
+    public void testRx() throws Throwable {
+        Future<Integer> f = TestHelpers.getAsyncResult();
+        Single<Integer> s = Single.create(o -> f.then((i) -> {
+                    try {
+                        o.onSuccess(i.get());
+                    } catch (Throwable e) {
+                        o.onError(e);
+                    }
+                }));
+        assertEquals(Integer.valueOf(42), s.toBlocking().value());
+    }
+    
+    public void testRxFromFuture() throws Throwable {
+        Future<Integer> f = TestHelpers.getAsyncResult();
+        Single<Integer> s = Single.from(f);
+        assertEquals(Integer.valueOf(42), s.toBlocking().value());
     }
 }

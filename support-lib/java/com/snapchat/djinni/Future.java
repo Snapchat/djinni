@@ -17,8 +17,45 @@
 package com.snapchat.djinni;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
-public class Future<T> {
+public class Future<T> implements java.util.concurrent.Future<T> {
+    // Does not support cancel on this object
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        return false;
+    }
+    // Block and wait for the result (or exception). This can only be called
+    // once.
+    public T get(long timeout, java.util.concurrent.TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        SharedState<T> sharedState = _sharedState.getAndSet(null);
+        synchronized(sharedState) {
+            while(!sharedState.isReady()) {
+                sharedState.wait(unit.toMillis(timeout));
+            }
+            if (sharedState.exception == null) {
+                return sharedState.value;
+            } else {
+                throw new ExecutionException(sharedState.exception.getMessage(), sharedState.exception);
+            }
+        }
+    }
+    public T get() throws InterruptedException, ExecutionException {
+        try {
+            return get(0, java.util.concurrent.TimeUnit.MILLISECONDS);
+        } catch (TimeoutException e) {
+            return null; // won't happen since we wait indefinitely (0)
+        }
+    }
+
+    public boolean isCancelled() {
+        return false;
+    }
+
+    public boolean isDone() {
+        return isReady();
+    }
+    
     // Handler routine for type U that does not return a value
     public interface FutureHandler<U> {
         public void handleResult(Future<U> res) throws Throwable;
@@ -38,25 +75,6 @@ public class Future<T> {
         SharedState<T> sharedState = _sharedState.get();
         synchronized(sharedState) {
             return sharedState.isReady();
-        }
-    }
-    // Block and wait for the result (or exception). This can only be called
-    // once.
-    public T get() throws Throwable {
-        SharedState<T> sharedState = _sharedState.getAndSet(null);
-        synchronized(sharedState) {
-            try {
-                while(!sharedState.isReady()) {
-                    sharedState.wait();
-                }
-                if (sharedState.exception == null) {
-                    return sharedState.value;
-                } else {
-                    throw sharedState.exception;
-                }
-            } catch (InterruptedException e) {
-                return null;
-            }
         }
     }
     // Tell the future to Call the specified handler routine when it becomes
