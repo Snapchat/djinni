@@ -38,6 +38,10 @@
 #endif
 
 namespace snapchat::djinni {
+
+template <typename T>
+class Future;
+
 namespace detail {
 
 // A wrapper object to support both void and non-void result types in
@@ -96,12 +100,7 @@ struct SharedState: ValueHolder<T> {
 
 template<typename T>
 using SharedStatePtr = std::shared_ptr<SharedState<T>>;
-}
 
-template <typename T>
-class Future;
-
-namespace detail {
 // Common promise base class, shared by both `void` and `T` results.
 template <typename T>
 class PromiseBase {
@@ -157,7 +156,7 @@ private:
         }
     }
 };
-}
+} // namespace detail
 
 // Promise with non-void result type `T`
 template <typename T>

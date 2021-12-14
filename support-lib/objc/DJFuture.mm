@@ -21,25 +21,21 @@
 typedef _Nullable id (^Continuation)(DJSharedSate* _Nonnull);
 
 @interface DJSharedSate<Value> : NSObject
-    @property (nonatomic, strong) Value value;
-    @property (nonatomic, strong) NSException* exception;
-    @property (nonatomic, strong) NSCondition* cond;
-    @property (nonatomic, strong) Continuation handler;
-
-    @property (readonly) BOOL isReady;
+@property (nonatomic) Value value;
+@property (nonatomic) NSException *exception;
+@property (nonatomic) NSCondition *cond;
+@property (nonatomic) Continuation handler;
+@property (readonly) BOOL isReady;
 @end
 
 @implementation DJSharedSate
--(instancetype)init {
+- (instancetype)init {
     if (self = [super init]) {
-        self->_value = nil;
-        self->_exception = nil;
-        self->_cond = [[NSCondition alloc] init];
-        self->_handler = nil;
+        _cond = [[NSCondition alloc] init];
     }
     return self;
 }
--(BOOL) isReady {
+- (BOOL)isReady {
     return _value != nil || _exception != nil;
 }
 @end
@@ -57,24 +53,24 @@ T withLockHeld(id<NSLocking> lock, T(^block)()) {
 }
 
 @implementation DJFuture {
-    DJSharedSate* _sharedState;
+    DJSharedSate *_sharedState;
 }
 
--(instancetype)initWithSharedState:(DJSharedSate*) sharedState {
+- (instancetype)initWithSharedState:(DJSharedSate *)sharedState {
     if (self = [super init]) {
         self->_sharedState = sharedState;
     }
     return self;
 }
 
--(BOOL) isReady {
-    DJSharedSate* sharedState = nil;
+- (BOOL)isReady {
+    DJSharedSate *sharedState = nil;
     @synchronized(self) {sharedState = self->_sharedState;}
     return withLockHeld(sharedState.cond, ^{return sharedState.isReady;});
 }
 
--(id) get {
-    DJSharedSate* sharedState = nil;
+- (id)get {
+    DJSharedSate *sharedState = nil;
     @synchronized(self) {
         sharedState = self->_sharedState;
         self->_sharedState = nil;
@@ -88,25 +84,25 @@ T withLockHeld(id<NSLocking> lock, T(^block)()) {
         });
 }
 
--(DJFuture<id>*)then:(_Nullable id(^_Nonnull)(DJFuture<id>* _Nonnull))handler {
-    DJPromise<id>* nextPromise = [[DJPromise alloc] init];
-    DJFuture<id>* nextFuture = [nextPromise getFuture];
+- (DJFuture<id>*)then:(_Nullable id(^_Nonnull)(DJFuture<id> * _Nonnull))handler {
+    DJPromise<id> *nextPromise = [[DJPromise alloc] init];
+    DJFuture<id> *nextFuture = [nextPromise getFuture];
     Continuation continuation;
-    continuation = ^id (DJSharedSate* _Nonnull st) {
+    continuation = ^id (DJSharedSate * _Nonnull st) {
         @try {
             [nextPromise setValue:handler([[DJFuture alloc] initWithSharedState:st])];
-        } @catch ( NSException* e ) {
+        } @catch (NSException *e) {
             [nextPromise setException:e];
         }
         return nil;
     };
-    DJSharedSate* sharedState = nil;
+    DJSharedSate *sharedState = nil;
     @synchronized(self) {
         sharedState = self->_sharedState;
         self->_sharedState = nil;
     }
 
-    __block DJSharedSate* sharedStateForReadyFuture = nil;
+    __block DJSharedSate *sharedStateForReadyFuture = nil;
     withLockHeld(sharedState.cond, ^{
             if (sharedState.isReady) {
                 sharedStateForReadyFuture = sharedState;
@@ -125,23 +121,23 @@ T withLockHeld(id<NSLocking> lock, T(^block)()) {
 // ------------------------------------------
 
 @implementation DJPromise {
-    DJSharedSate* _sharedState;
+    DJSharedSate *_sharedState;
 }
--(instancetype) init {
+- (instancetype)init {
     if (self = [super init]) {
-        _sharedState =[[DJSharedSate alloc] init];
+        _sharedState = [[DJSharedSate alloc] init];
     }
     return self;
 }
 
--(DJFuture<id>*) getFuture {
+- (DJFuture<id> *)getFuture {
     @synchronized (self) {
         return [[DJFuture alloc] initWithSharedState: _sharedState];
     }
 }
 
--(void) updateAndCallResultHandler:(void(^)(DJSharedSate*))block {
-    DJSharedSate* sharedState = nil;
+- (void)updateAndCallResultHandler:(void(^)(DJSharedSate *))block {
+    DJSharedSate *sharedState = nil;
     @synchronized (self) {
         sharedState = self->_sharedState;
         self->_sharedState = nil;
@@ -159,12 +155,12 @@ T withLockHeld(id<NSLocking> lock, T(^block)()) {
     }
 }
 
--(void) setValue:(id) val {
-    [self updateAndCallResultHandler: ^(DJSharedSate* sharedState){sharedState.value = val;}];
+- (void)setValue:(id)val {
+    [self updateAndCallResultHandler: ^(DJSharedSate *sharedState){sharedState.value = val;}];
 }
 
--(void) setException:(NSException*) exception {
-    [self updateAndCallResultHandler: ^(DJSharedSate* sharedState){sharedState.exception = exception;}];
+- (void)setException:(NSException *)exception {
+    [self updateAndCallResultHandler: ^(DJSharedSate *sharedState){sharedState.exception = exception;}];
 }
 
 @end
