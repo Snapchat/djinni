@@ -26,7 +26,10 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
 
   // For JNI typename() is always fully qualified and describes the mangled Java type to be used in field/method signatures
   override def typename(tm: MExpr): String = javaTypeSignature(tm)
-  def typename(name: String, ty: TypeDef) = s"L${undecoratedTypename(name, ty)};"
+  def typename(name: String, ty: TypeDef) = ty match {
+    case e: Enum if e.flags => "Ljava/util/EnumSet;"
+    case _ => s"L${undecoratedTypename(name, ty)};"
+  }
 
   override def fqTypename(tm: MExpr): String = typename(tm)
   def fqTypename(name: String, ty: TypeDef): String = typename(name, ty)
