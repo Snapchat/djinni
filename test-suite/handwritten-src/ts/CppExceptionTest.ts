@@ -1,4 +1,4 @@
-import {TestCase, allTests, assertEq} from "./testutils"
+import {TestCase, allTests, assertEq, fail, assertTrue} from "./testutils"
 import * as test from "../../generated-src/ts/test";
 import {DjinniModule} from "@djinni_support/DjinniModule"
 
@@ -16,13 +16,27 @@ class CppExceptionTest extends TestCase  {
     }
 
     testCppException() {
-        var thrown = null;
         try {
             this.cppInterface.throwAnException();
+            fail();
         } catch (e) {
-            thrown = this.m.getExceptionMessage(e);
+            var thrown = this.m.getExceptionMessage(e);
+            assertEq(thrown, "Exception Thrown2");
         }
-        assertEq(thrown, "Exception Thrown");
+    }
+
+    testJsException() {
+        try {
+            this.cppInterface.throwAnExceptionFromJs({
+                doThrow: function() {
+                    throw new Error("js_exception_thrown");
+                }
+            });
+            fail();
+        } catch (e) {
+            assertTrue(e instanceof Error)
+            assertEq(e.message, "js_exception_thrown");
+        }
     }
 }
 

@@ -120,7 +120,7 @@ public:
     using CppType = std::vector<uint8_t>;
     using JsType = em::val;
     using Boxed = Binary;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 
@@ -132,7 +132,7 @@ public:
     using CppType = std::chrono::system_clock::time_point;
     using JsType = em::val;
     using Boxed = Date;
-    
+
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
 };
@@ -145,7 +145,7 @@ struct Optional
     using CppType = decltype(opt_type<T>(nullptr));
     using JsType = em::val;
     using Boxed = Optional;
-    
+
     static CppType toCpp(const JsType& j) {
         if (j.isUndefined() || j.isNull()) {
             return CppType{};
@@ -162,7 +162,7 @@ struct Optional
     }
 };
 
-template <typename T> 
+template <typename T>
 class List {
     using ECppType = typename T::CppType;
     using EJsType = typename T::Boxed::JsType;
@@ -260,7 +260,7 @@ struct Outcome
     using CppType = expected<typename Result::CppType, typename Error::CppType>;
     using JsType = em::val;
     using Boxed = Outcome;
-    
+
     static CppType toCpp(const JsType& j) {
         em::val res = j["result"];
         if (!res.isUndefined()) {
@@ -330,7 +330,7 @@ public:
         }
         return ret;
     }
-        
+
     static JsType fromCpp(const CppType& c)
     {
         std::vector<uint8_t> cbuf(c.ByteSizeLong());
@@ -430,7 +430,7 @@ public:
         auto* handler = reinterpret_cast<CppResolveHandlerBase*>(handlerPtr);
         handler->init(resolveFunc, rejectFunc);
     }
-    
+
     static void resolveNativePromise(int func, int context, em::val res, em::val err) {
         typedef void (*ResolveNativePromiseFunc)(int context, em::val res, em::val err);
         auto resolveNativePromiseFunc = reinterpret_cast<ResolveNativePromiseFunc>(func);
@@ -439,11 +439,6 @@ public:
 };
 
 using JsProxyId = uint64_t;
-
-class JsException : public std::runtime_error {
-public:
-    JsException(const std::string& what): std::runtime_error(what) {}
-};
 
 class JsProxyBase {
 public:

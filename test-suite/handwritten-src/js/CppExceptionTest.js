@@ -8,15 +8,26 @@ class CppExceptionTest {
     }
 
     testCppException() {
-        var thrown = null;
         try {
             this.cppInterface.throwAnException();
+            fail();
         } catch (e) {
-            thrown = e;
+            assertNe(thrown, null);
         }
-        // In JS all we get is a number (probably a pointer)
-        // Don't know how to get to the actual exception object.
-        assertNe(thrown, null);
+    }
+
+    testCppExceptionFromJs() {
+        try {
+            this.cppInterface.throwAnExceptionFromJs({
+                doThrow: function() {
+                    throw new Error("js_exception_thrown");
+                }
+            });
+            fail();
+        } catch (e) {
+            assertTrue(e instanceof Error);
+            assertEq(e.message, "js_exception_thrown");
+        }
     }
 }
 

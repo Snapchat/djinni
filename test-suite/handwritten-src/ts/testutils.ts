@@ -133,5 +133,8 @@ export function assertArrayEq(a, b) {
 export function assertUndefined(a) {
     assertTrue (a === undefined);
 }
+export function fail() {
+    assertTrue(false)
+}
 
 export var allTests: Array<typeof TestCase> = [];

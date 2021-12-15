@@ -3,6 +3,7 @@
 
 #import "DBCppException+Private.h"
 #import "DBCppException.h"
+#import "DBJsExceptionThrower+Private.h"
 #import "DJICppWrapperCache+Private.h"
 #import "DJIError.h"
 #import "DJIMarshal+Private.h"
@@ -33,6 +34,13 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
 - (int32_t)throwAnException {
     try {
         auto objcpp_result_ = _cppRefHandle.get()->throw_an_exception();
+        return ::djinni::I32::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
+- (int32_t)throwAnExceptionFromJs:(nullable DBJsExceptionThrower *)thrower {
+    try {
+        auto objcpp_result_ = _cppRefHandle.get()->throw_an_exception_from_js(::djinni_generated::JsExceptionThrower::toCpp(thrower));
         return ::djinni::I32::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }

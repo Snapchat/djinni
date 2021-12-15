@@ -3,11 +3,14 @@
 
 #import <Foundation/Foundation.h>
 @class DBCppException;
+@class DBJsExceptionThrower;
 
 
 @interface DBCppException : NSObject
 
 - (int32_t)throwAnException;
+
+- (int32_t)throwAnExceptionFromJs:(nullable DBJsExceptionThrower *)thrower;
 
 + (nullable DBCppException *)get;
 

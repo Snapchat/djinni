@@ -3,6 +3,7 @@
 
 #include "NativeCppException.hpp"  // my header
 #include "Marshal.hpp"
+#include "NativeJsExceptionThrower.hpp"
 
 namespace djinni_generated {
 
@@ -23,6 +24,15 @@ CJNIEXPORT jint JNICALL Java_com_dropbox_djinni_test_CppException_00024CppProxy_
     try {
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::CppException>(nativeRef);
         auto r = ref->throw_an_exception();
+        return ::djinni::release(::djinni::I32::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jint JNICALL Java_com_dropbox_djinni_test_CppException_00024CppProxy_native_1throwAnExceptionFromJs(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jobject j_thrower)
+{
+    try {
+        const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::CppException>(nativeRef);
+        auto r = ref->throw_an_exception_from_js(::djinni_generated::NativeJsExceptionThrower::toCpp(jniEnv, j_thrower));
         return ::djinni::release(::djinni::I32::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }

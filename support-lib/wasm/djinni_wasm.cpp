@@ -58,10 +58,9 @@ const em::val& JsProxyBase::_jsRef() const {
     return _js;
 }
 
-void JsProxyBase::checkError(const em::val& v) {
-    if (v.instanceof(em::val::global("Error"))) {
-        throw JsException(v["message"].as<std::string>());
-    }
+void JsProxyBase::checkError(const em::val&) {
+    // This method is not needed.
+    // TODO: Remove dependency in codegen.
 }
 
 em::val getCppProxyFinalizerRegistry() {
@@ -162,16 +161,15 @@ EM_JS(void, djinni_init_wasm, (), {
         };
 
         Module.callJsProxyMethod = function(obj, method, ...args) {
-            try {
-                return obj[method].apply(obj, args);
-            } catch (e) {
-                return e;
-            }
+            // No try-catch needed here when using emscripten with exceptions enabled (both throw
+            // and catch). Emscripten will generate JS wrappers for every native function that can throw,
+            // and these JS wrappers will do their own try-catch.
+            return obj[method].apply(obj, args);
         };
 });
 
 EMSCRIPTEN_BINDINGS(djinni_wasm) {
-    djinni_init_wasm();    
+    djinni_init_wasm();
     em::function("allocateWasmBuffer", &allocateWasmBuffer);
     em::function("getExceptionMessage", &getExceptionMessage);
     em::function("initCppResolveHandler", &CppResolveHandlerBase::initInstance);

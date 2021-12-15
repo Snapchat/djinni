@@ -125,5 +125,8 @@ function assertArrayEq(a, b) {
 function assertUndefined(a) {
     assertTrue (a === undefined);
 }
+function fail() {
+    assertTrue(false)
+}
 
 var allTests = [];
