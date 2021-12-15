@@ -21,10 +21,8 @@ either plain Bazel or [Bazelisk](https://github.com/bazelbuild/bazelisk).
 
 `./ci/generate.sh` generates the examples sources.
 
-`bazel test //test-suite:all` builds and then runs all tests.
-
-Or `bazel test //test-suite:djinni-objc-tests` and `bazel test
-//test-suite:djinni-java-tests` to run Objective-C and Java tests separately.
+Use `bazel test //test-suite:djinni-objc-tests //test-suite:djinni-java-tests`
+to build and run Objective-C and Java tests.
 
 ### Building and running the mobile example apps
 
@@ -290,6 +288,38 @@ Notable differences when comparing to the Java/ObjC support:
 - Extended records generate the same code as regular records. Because JS can
   easily add extension methods (by add functions to prototype) without having to
   derive from a base class.
+
+## Experimental async interface support
+
+With the new yaml type `future<>` we can now write Djinni interfaces that
+return results asynchronously more easily.
+
+Instead of writing this:
+
+```
+FooCb = interface {
+  complete(res: i32): void;
+}
+Foo = interface {
+  bar(cb: FooCb): void;
+}
+```
+
+We can now write:
+
+```
+Foo = interface {
+  bar(): future<i32>;
+}
+```
+
+The `future<>` djinni type is mapped to the `Future` types defined in the C++,
+Java and ObjC djinni support library. In Javascript, `future<>` is mapped to the
+builtin `Promise` type (and therefore supports the `await` syntax).
+
+The C++ `Future` type has optional support for coroutines. If the preprocessor
+symbol `DJINNI_FUTURE_COROUTINE_SUPPORT` is defined, then you can use `co_await`
+on a future object.
 
 ## FAQ
 

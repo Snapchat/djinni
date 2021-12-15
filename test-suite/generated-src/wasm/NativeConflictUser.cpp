@@ -15,10 +15,12 @@ em::val NativeConflictUser::cppProxyMethods() {
 }
 
 em::val NativeConflictUser::Conflict(const CppType& self) {
-    return ::djinni_generated::NativeConflict::fromCpp(self->Conflict());
+    auto r = self->Conflict();
+    return ::djinni_generated::NativeConflict::fromCpp(r);
 }
 bool NativeConflictUser::conflict_arg(const CppType& self, const em::val& w_cs) {
-    return ::djinni::Bool::fromCpp(self->conflict_arg(::djinni::Set<::djinni_generated::NativeConflict>::toCpp(w_cs)));
+    auto r = self->conflict_arg(::djinni::Set<::djinni_generated::NativeConflict>::toCpp(w_cs));
+    return ::djinni::Bool::fromCpp(r);
 }
 
 EMSCRIPTEN_BINDINGS(conflict_user) {

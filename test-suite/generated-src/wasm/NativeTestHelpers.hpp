@@ -45,6 +45,9 @@ struct NativeTestHelpers : ::djinni::JsInterface<::testsuite::TestHelpers, Nativ
     static em::val return_none();
     static em::val assorted_primitives_id(const em::val& w_i);
     static em::val id_binary(const em::val& w_b);
+    static em::val get_async_result();
+    static em::val future_roundtrip(const em::val& w_f);
+    static em::val check_async_interface(const em::val& w_i);
 
 };
 

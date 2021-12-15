@@ -1,6 +1,7 @@
 #include "test_helpers.hpp"
 #include "client_returned_record.hpp"
 #include "client_interface.hpp"
+#include "async_interface.hpp"
 #include "user_token.hpp"
 #include "assorted_primitives.hpp"
 #include "color.hpp"
@@ -9,6 +10,12 @@
 #include "primitive_list.hpp"
 #include "set_record.hpp"
 #include <exception>
+
+#if defined(__EMSCRIPTEN__)
+#include <emscripten.h>
+#else
+#include <thread>
+#endif
 
 namespace testsuite {
 
@@ -159,6 +166,44 @@ AssortedPrimitives TestHelpers::assorted_primitives_id(const AssortedPrimitives 
 
 std::vector<uint8_t> TestHelpers::id_binary(const std::vector<uint8_t> & v) {
     return v;
+}
+
+snapchat::djinni::Future<int32_t> TestHelpers::get_async_result() {
+    auto* p = new snapchat::djinni::Promise<int32_t>();
+    auto f = p->getFuture();
+
+#if defined(__EMSCRIPTEN__)
+    emscripten_async_call([] (void* context) {
+        auto* p = reinterpret_cast<snapchat::djinni::Promise<int32_t>*>(context);
+        p->setValue(42);
+        delete p;
+    }, p, 10/*ms*/);
+#else
+    std::thread t([p] () mutable {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        p->setValue(42);
+        delete p;
+    });
+    t.detach();
+#endif
+    return f;
+}
+
+snapchat::djinni::Future<std::string> TestHelpers::future_roundtrip(snapchat::djinni::Future<int32_t> f) {
+    return f.then([] (snapchat::djinni::Future<int32_t> f) {
+        return std::to_string(f.get());
+    });
+}
+
+snapchat::djinni::Future<std::string> TestHelpers::check_async_interface(const std::shared_ptr<AsyncInterface> & i) {
+    snapchat::djinni::Promise<std::string> p;
+    auto f = p.getFuture();
+    auto f2 = f.then([] (snapchat::djinni::Future<std::string> s) {
+        return std::stoi(s.get());
+    });
+    auto f3 = i->future_roundtrip(std::move(f2));
+    p.setValue("36");
+    return f3;
 }
 
 } // namespace testsuite

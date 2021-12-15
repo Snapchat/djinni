@@ -15,7 +15,8 @@ em::val NativeInterfaceUsingExtendedRecord::cppProxyMethods() {
 }
 
 em::val NativeInterfaceUsingExtendedRecord::meth(const CppType& self, const em::val& w_er) {
-    return ::djinni_generated::NativeExtendedRecord::fromCpp(self->meth(::djinni_generated::NativeExtendedRecord::toCpp(w_er)));
+    auto r = self->meth(::djinni_generated::NativeExtendedRecord::toCpp(w_er));
+    return ::djinni_generated::NativeExtendedRecord::fromCpp(r);
 }
 
 EMSCRIPTEN_BINDINGS(interface_using_extended_record) {

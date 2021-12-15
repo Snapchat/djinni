@@ -17,10 +17,12 @@ em::val NativeExternInterface1::cppProxyMethods() {
 }
 
 em::val NativeExternInterface1::foo(const CppType& self, const em::val& w_i) {
-    return ::djinni_generated::NativeClientReturnedRecord::fromCpp(self->foo(::djinni_generated::NativeClientInterface::toCpp(w_i)));
+    auto r = self->foo(::djinni_generated::NativeClientInterface::toCpp(w_i));
+    return ::djinni_generated::NativeClientReturnedRecord::fromCpp(r);
 }
 int32_t NativeExternInterface1::bar(const CppType& self, int32_t w_e) {
-    return ::djinni_generated::NativeColor::fromCpp(self->bar(::djinni_generated::NativeColor::toCpp(w_e)));
+    auto r = self->bar(::djinni_generated::NativeColor::toCpp(w_e));
+    return ::djinni_generated::NativeColor::fromCpp(r);
 }
 
 EMSCRIPTEN_BINDINGS(extern_interface_1) {

@@ -11,21 +11,21 @@ namespace djinni_generated {
 em::val NativeSortItems::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
         "sort",
-        "createWithListener",
-        "runSort",
     });
     return methods;
 }
 
 void NativeSortItems::sort(const CppType& self, int32_t w_order,const em::val& w_items) {
-    return self->sort(::djinni_generated::NativeSortOrder::toCpp(w_order),
-                      ::djinni_generated::NativeItemList::toCpp(w_items));
+    self->sort(::djinni_generated::NativeSortOrder::toCpp(w_order),
+         ::djinni_generated::NativeItemList::toCpp(w_items));
 }
 em::val NativeSortItems::create_with_listener(const em::val& w_listener) {
-    return ::djinni_generated::NativeSortItems::fromCpp(::textsort::SortItems::create_with_listener(::djinni_generated::NativeTextboxListener::toCpp(w_listener)));
+    auto r = ::textsort::SortItems::create_with_listener(::djinni_generated::NativeTextboxListener::toCpp(w_listener));
+    return ::djinni_generated::NativeSortItems::fromCpp(r);
 }
 em::val NativeSortItems::run_sort(const em::val& w_items) {
-    return ::djinni_generated::NativeItemList::fromCpp(::textsort::SortItems::run_sort(::djinni_generated::NativeItemList::toCpp(w_items)));
+    auto r = ::textsort::SortItems::run_sort(::djinni_generated::NativeItemList::toCpp(w_items));
+    return ::djinni_generated::NativeItemList::fromCpp(r);
 }
 
 EMSCRIPTEN_BINDINGS(sort_items) {

@@ -42,13 +42,15 @@ object MExtern {
   case class Cpp(
     typename: String,
     header: String,
-    byValue: Boolean // Whether to pass struct by value in C++ (e.g. std::chrono::duration). Only used for "record" types.
+    byValue: Boolean, // Whether to pass struct by value in C++ (e.g. std::chrono::duration). Only used for "record" types.
+    moveOnly: Boolean
   )
   case class Objc(
     typename: String,
     header: String,
     boxed: String, // Fully qualified Objective-C typename, must be an object. Only used for "record" types.
     pointer: Boolean, // True to construct pointer types and make it eligible for "nonnull" qualifier. Only used for "record" types.
+    generic: Boolean, // Set to false to exclude type arguments from the ObjC class. This is should be true by default. Useful if template arguments are only used in C++.
     hash: String, // A well-formed expression to get the hash value. Must be a format string with a single "%s" placeholder. Only used for "record" types with "eq" deriving when needed.
     protocol: Boolean
   )
@@ -72,13 +74,14 @@ object MExtern {
     typeSignature: String // The mangled Java type signature (e.g. "Ljava/lang/String;")
   )
   case class Wasm(
-    typename: String, // The JNI type to use (e.g. em::val, int32_t)
+    typename: String, // The Emscripten type to use (e.g. em::val, int32_t)
     translator: String, // C++ typename containing toCpp/fromCpp methods
     header: String // Where to find the translator class
   )
   case class Ts(
-    typename: String,
-    module: String
+    typename: String, // The TypeScript type
+    module: String,   // The module to import for the type
+    generic: Boolean
   )
 }
 case class MProtobuf(name: String, override val numParams: Int, body: ProtobufMessage) extends Meta

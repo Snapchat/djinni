@@ -47,6 +47,7 @@ djinni-output-temp/cpp/constants_interface.hpp
 djinni-output-temp/cpp/constants_interface.cpp
 djinni-output-temp/cpp/assorted_primitives.hpp
 djinni-output-temp/cpp/assorted_primitives.cpp
+djinni-output-temp/cpp/async_interface.hpp
 djinni-output-temp/cpp/test_helpers.hpp
 djinni-output-temp/cpp/empty_record.hpp
 djinni-output-temp/cpp/Conflict.hpp
@@ -106,6 +107,7 @@ djinni-output-temp/java/ConstantRecord.java
 djinni-output-temp/java/Constants.java
 djinni-output-temp/java/ConstantsInterface.java
 djinni-output-temp/java/AssortedPrimitives.java
+djinni-output-temp/java/AsyncInterface.java
 djinni-output-temp/java/TestHelpers.java
 djinni-output-temp/java/EmptyRecord.java
 djinni-output-temp/java/Conflict.java
@@ -197,6 +199,8 @@ djinni-output-temp/jni/NativeConstantsInterface.hpp
 djinni-output-temp/jni/NativeConstantsInterface.cpp
 djinni-output-temp/jni/NativeAssortedPrimitives.hpp
 djinni-output-temp/jni/NativeAssortedPrimitives.cpp
+djinni-output-temp/jni/NativeAsyncInterface.hpp
+djinni-output-temp/jni/NativeAsyncInterface.cpp
 djinni-output-temp/jni/NativeTestHelpers.hpp
 djinni-output-temp/jni/NativeTestHelpers.cpp
 djinni-output-temp/jni/NativeEmptyRecord.hpp
@@ -292,6 +296,7 @@ djinni-output-temp/objc/DBConstantsInterface.h
 djinni-output-temp/objc/DBConstantsInterface.mm
 djinni-output-temp/objc/DBAssortedPrimitives.h
 djinni-output-temp/objc/DBAssortedPrimitives.mm
+djinni-output-temp/objc/DBAsyncInterface.h
 djinni-output-temp/objc/DBTestHelpers.h
 djinni-output-temp/objc/DBEmptyRecord.h
 djinni-output-temp/objc/DBEmptyRecord.mm
@@ -393,6 +398,8 @@ djinni-output-temp/objc/DBConstantsInterface+Private.h
 djinni-output-temp/objc/DBConstantsInterface+Private.mm
 djinni-output-temp/objc/DBAssortedPrimitives+Private.h
 djinni-output-temp/objc/DBAssortedPrimitives+Private.mm
+djinni-output-temp/objc/DBAsyncInterface+Private.h
+djinni-output-temp/objc/DBAsyncInterface+Private.mm
 djinni-output-temp/objc/DBTestHelpers+Private.h
 djinni-output-temp/objc/DBTestHelpers+Private.mm
 djinni-output-temp/objc/DBEmptyRecord+Private.h
@@ -506,6 +513,8 @@ djinni-output-temp/wasm/NativeConstantsInterface.hpp
 djinni-output-temp/wasm/NativeConstantsInterface.cpp
 djinni-output-temp/wasm/NativeAssortedPrimitives.hpp
 djinni-output-temp/wasm/NativeAssortedPrimitives.cpp
+djinni-output-temp/wasm/NativeAsyncInterface.hpp
+djinni-output-temp/wasm/NativeAsyncInterface.cpp
 djinni-output-temp/wasm/NativeTestHelpers.hpp
 djinni-output-temp/wasm/NativeTestHelpers.cpp
 djinni-output-temp/wasm/NativeEmptyRecord.hpp

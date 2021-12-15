@@ -13,7 +13,8 @@ em::val NativeUserToken::cppProxyMethods() {
 }
 
 std::string NativeUserToken::whoami(const CppType& self) {
-    return ::djinni::String::fromCpp(self->whoami());
+    auto r = self->whoami();
+    return ::djinni::String::fromCpp(r);
 }
 
 std::string NativeUserToken::JsProxy::whoami() {

@@ -8,41 +8,41 @@ namespace djinni_generated {
 
 em::val NativeTestOutcome::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "getSuccessOutcome",
-        "getErrorOutcome",
-        "putSuccessOutcome",
-        "putErrorOutcome",
-        "getNestedSuccessOutcome",
-        "getNestedErrorOutcome",
-        "putNestedSuccessOutcome",
-        "putNestedErrorOutcome",
     });
     return methods;
 }
 
 em::val NativeTestOutcome::getSuccessOutcome() {
-    return ::djinni::Outcome<::djinni::String, ::djinni::I32>::fromCpp(::testsuite::TestOutcome::getSuccessOutcome());
+    auto r = ::testsuite::TestOutcome::getSuccessOutcome();
+    return ::djinni::Outcome<::djinni::String, ::djinni::I32>::fromCpp(r);
 }
 em::val NativeTestOutcome::getErrorOutcome() {
-    return ::djinni::Outcome<::djinni::String, ::djinni::I32>::fromCpp(::testsuite::TestOutcome::getErrorOutcome());
+    auto r = ::testsuite::TestOutcome::getErrorOutcome();
+    return ::djinni::Outcome<::djinni::String, ::djinni::I32>::fromCpp(r);
 }
 std::string NativeTestOutcome::putSuccessOutcome(const em::val& w_x) {
-    return ::djinni::String::fromCpp(::testsuite::TestOutcome::putSuccessOutcome(::djinni::Outcome<::djinni::String, ::djinni::I32>::toCpp(w_x)));
+    auto r = ::testsuite::TestOutcome::putSuccessOutcome(::djinni::Outcome<::djinni::String, ::djinni::I32>::toCpp(w_x));
+    return ::djinni::String::fromCpp(r);
 }
 int32_t NativeTestOutcome::putErrorOutcome(const em::val& w_x) {
-    return ::djinni::I32::fromCpp(::testsuite::TestOutcome::putErrorOutcome(::djinni::Outcome<::djinni::String, ::djinni::I32>::toCpp(w_x)));
+    auto r = ::testsuite::TestOutcome::putErrorOutcome(::djinni::Outcome<::djinni::String, ::djinni::I32>::toCpp(w_x));
+    return ::djinni::I32::fromCpp(r);
 }
 em::val NativeTestOutcome::getNestedSuccessOutcome() {
-    return ::djinni_generated::NativeNestedOutcome::fromCpp(::testsuite::TestOutcome::getNestedSuccessOutcome());
+    auto r = ::testsuite::TestOutcome::getNestedSuccessOutcome();
+    return ::djinni_generated::NativeNestedOutcome::fromCpp(r);
 }
 em::val NativeTestOutcome::getNestedErrorOutcome() {
-    return ::djinni_generated::NativeNestedOutcome::fromCpp(::testsuite::TestOutcome::getNestedErrorOutcome());
+    auto r = ::testsuite::TestOutcome::getNestedErrorOutcome();
+    return ::djinni_generated::NativeNestedOutcome::fromCpp(r);
 }
 int32_t NativeTestOutcome::putNestedSuccessOutcome(const em::val& w_x) {
-    return ::djinni::I32::fromCpp(::testsuite::TestOutcome::putNestedSuccessOutcome(::djinni_generated::NativeNestedOutcome::toCpp(w_x)));
+    auto r = ::testsuite::TestOutcome::putNestedSuccessOutcome(::djinni_generated::NativeNestedOutcome::toCpp(w_x));
+    return ::djinni::I32::fromCpp(r);
 }
 std::string NativeTestOutcome::putNestedErrorOutcome(const em::val& w_x) {
-    return ::djinni::String::fromCpp(::testsuite::TestOutcome::putNestedErrorOutcome(::djinni_generated::NativeNestedOutcome::toCpp(w_x)));
+    auto r = ::testsuite::TestOutcome::putNestedErrorOutcome(::djinni_generated::NativeNestedOutcome::toCpp(w_x));
+    return ::djinni::String::fromCpp(r);
 }
 
 EMSCRIPTEN_BINDINGS(test_outcome) {

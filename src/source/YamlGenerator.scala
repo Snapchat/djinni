@@ -148,6 +148,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
       "header" -> QuotedString(objcMarshal.include(td.ident)),
       "boxed" -> QuotedString(objcMarshal.boxedTypename(td)),
       "pointer" -> objcMarshal.isPointer(td),
+      "generic" -> false,
       "hash" -> QuotedString("%s.hash"))
     td.body match {
       case Interface(_,_,_) =>
@@ -168,7 +169,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     "typename" -> QuotedString(javaMarshal.fqTypename(td.ident, td.body)),
     "boxed" -> QuotedString(javaMarshal.fqTypename(td.ident, td.body)),
     "reference" -> javaMarshal.isReference(td),
-    "generic" -> true,
+    "generic" -> false,
     "hash" -> QuotedString("%s.hashCode()"),
     "writeToParcel" -> QuotedString("%s.writeToParcel(out, flags)"),
     "readFromParcel" -> QuotedString("new %s(in)")
@@ -189,7 +190,8 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
 
   private def ts(td: TypeDecl) = Map[String, Any](
     "typename" -> tsMarshal.toTsType(mexpr(td)),
-    "module" -> QuotedString("./" + spec.tsModule)
+    "module" -> QuotedString("./" + spec.tsModule),
+    "generic" -> false
   )
 
   // TODO: there has to be a way to do all this without the MExpr/Meta conversions?
@@ -242,14 +244,16 @@ object YamlGenerator {
     MExtern.Cpp(
       nested(td, "cpp")("typename").toString,
       nested(td, "cpp")("header").toString,
-      nested(td, "cpp")("byValue").asInstanceOf[Boolean]),
+      nested(td, "cpp")("byValue").asInstanceOf[Boolean],
+      getOptionalField(td, "cpp", "moveOnly", false)),
     MExtern.Objc(
       nested(td, "objc")("typename").toString,
       nested(td, "objc")("header").toString,
       nested(td, "objc")("boxed").toString,
       nested(td, "objc")("pointer").asInstanceOf[Boolean],
+      getOptionalField(td, "objc", "generic", false),
       nested(td, "objc")("hash").toString,
-      if (nested(td, "objc") contains "protocol") nested(td, "objc")("protocol").asInstanceOf[Boolean] else false),
+      getOptionalField(td, "objc", "protocol", false)),
     MExtern.Objcpp(
       nested(td, "objcpp")("translator").toString,
       nested(td, "objcpp")("header").toString),
@@ -259,8 +263,8 @@ object YamlGenerator {
       nested(td, "java")("reference").asInstanceOf[Boolean],
       nested(td, "java")("generic").asInstanceOf[Boolean],
       nested(td, "java")("hash").toString,
-      if (nested(td, "java") contains "writeToParcel") nested(td, "java")("writeToParcel").toString else "%s.writeToParcel(out, flags)",
-      if (nested(td, "java") contains "readFromParcel") nested(td, "java")("readFromParcel").toString else "new %s(in)"),
+      getOptionalField(td, "java", "writeToParcel", "%s.writeToParcel(out, flags)"),
+      getOptionalField(td, "java", "readFromParcel", "new %s(in)")),
     MExtern.Jni(
       nested(td, "jni")("translator").toString,
       nested(td, "jni")("header").toString,
@@ -272,11 +276,18 @@ object YamlGenerator {
       getOptionalField(td, "wasm", "header")),
     MExtern.Ts(
       getOptionalField(td, "ts", "typename"),
-      getOptionalField(td, "ts", "module"))
+      getOptionalField(td, "ts", "module"),
+      getOptionalField(td, "ts", "generic", false))
   )
 
   private def nested(td: ExternTypeDecl, key: String) = {
     td.properties.get(key).collect { case m: JMap[_, _] => m.collect { case (k: String, v: Any) => (k, v) } } getOrElse(Map[String, Any]())
+  }
+
+  private def getOptionalField[T](td: ExternTypeDecl, key: String, subKey: String, defVal: T) = {
+    if (nested(td, key) contains subKey)
+      nested(td, key)(subKey).asInstanceOf[T]
+    else defVal
   }
 
   private def getOptionalField(td: ExternTypeDecl, key: String, subKey: String) = {

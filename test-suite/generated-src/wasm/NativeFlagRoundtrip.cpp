@@ -9,25 +9,25 @@ namespace djinni_generated {
 
 em::val NativeFlagRoundtrip::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "roundtripAccess",
-        "roundtripEmpty",
-        "roundtripAccessBoxed",
-        "roundtripEmptyBoxed",
     });
     return methods;
 }
 
 int32_t NativeFlagRoundtrip::roundtrip_access(int32_t w_flag) {
-    return ::djinni_generated::NativeAccessFlags::fromCpp(::testsuite::FlagRoundtrip::roundtrip_access(::djinni_generated::NativeAccessFlags::toCpp(w_flag)));
+    auto r = ::testsuite::FlagRoundtrip::roundtrip_access(::djinni_generated::NativeAccessFlags::toCpp(w_flag));
+    return ::djinni_generated::NativeAccessFlags::fromCpp(r);
 }
 int32_t NativeFlagRoundtrip::roundtrip_empty(int32_t w_flag) {
-    return ::djinni_generated::NativeEmptyFlags::fromCpp(::testsuite::FlagRoundtrip::roundtrip_empty(::djinni_generated::NativeEmptyFlags::toCpp(w_flag)));
+    auto r = ::testsuite::FlagRoundtrip::roundtrip_empty(::djinni_generated::NativeEmptyFlags::toCpp(w_flag));
+    return ::djinni_generated::NativeEmptyFlags::fromCpp(r);
 }
 em::val NativeFlagRoundtrip::roundtrip_access_boxed(const em::val& w_flag) {
-    return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeAccessFlags>::fromCpp(::testsuite::FlagRoundtrip::roundtrip_access_boxed(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeAccessFlags>::toCpp(w_flag)));
+    auto r = ::testsuite::FlagRoundtrip::roundtrip_access_boxed(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeAccessFlags>::toCpp(w_flag));
+    return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeAccessFlags>::fromCpp(r);
 }
 em::val NativeFlagRoundtrip::roundtrip_empty_boxed(const em::val& w_flag) {
-    return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeEmptyFlags>::fromCpp(::testsuite::FlagRoundtrip::roundtrip_empty_boxed(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeEmptyFlags>::toCpp(w_flag)));
+    auto r = ::testsuite::FlagRoundtrip::roundtrip_empty_boxed(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeEmptyFlags>::toCpp(w_flag));
+    return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeEmptyFlags>::fromCpp(r);
 }
 
 EMSCRIPTEN_BINDINGS(flag_roundtrip) {

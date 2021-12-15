@@ -10,22 +10,25 @@ em::val NativeReverseClientInterface::cppProxyMethods() {
         "returnStr",
         "methTakingInterface",
         "methTakingOptionalInterface",
-        "create",
     });
     return methods;
 }
 
 std::string NativeReverseClientInterface::return_str(const CppType& self) {
-    return ::djinni::String::fromCpp(self->return_str());
+    auto r = self->return_str();
+    return ::djinni::String::fromCpp(r);
 }
 std::string NativeReverseClientInterface::meth_taking_interface(const CppType& self, const em::val& w_i) {
-    return ::djinni::String::fromCpp(self->meth_taking_interface(::djinni_generated::NativeReverseClientInterface::toCpp(w_i)));
+    auto r = self->meth_taking_interface(::djinni_generated::NativeReverseClientInterface::toCpp(w_i));
+    return ::djinni::String::fromCpp(r);
 }
 std::string NativeReverseClientInterface::meth_taking_optional_interface(const CppType& self, const em::val& w_i) {
-    return ::djinni::String::fromCpp(self->meth_taking_optional_interface(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeReverseClientInterface>::toCpp(w_i)));
+    auto r = self->meth_taking_optional_interface(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeReverseClientInterface>::toCpp(w_i));
+    return ::djinni::String::fromCpp(r);
 }
 em::val NativeReverseClientInterface::create() {
-    return ::djinni_generated::NativeReverseClientInterface::fromCpp(::testsuite::ReverseClientInterface::create());
+    auto r = ::testsuite::ReverseClientInterface::create();
+    return ::djinni_generated::NativeReverseClientInterface::fromCpp(r);
 }
 
 EMSCRIPTEN_BINDINGS(reverse_client_interface) {

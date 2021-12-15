@@ -14,7 +14,7 @@ em::val NativeConstantsInterface::cppProxyMethods() {
 }
 
 void NativeConstantsInterface::dummy(const CppType& self) {
-    return self->dummy();
+    self->dummy();
 }
 
 EMSCRIPTEN_BINDINGS(constants_interface) {

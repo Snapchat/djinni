@@ -395,6 +395,10 @@ export interface /*record*/ AssortedPrimitives {
     oFsixtyfour?: number;
 }
 
+export interface AsyncInterface {
+    futureRoundtrip(f: Promise<number>): Promise<string>;
+}
+
 /**
  * Helper methods used by various different tests.
  * (Second line of multi-line documentation.
@@ -435,6 +439,9 @@ export interface TestHelpers_statics {
     /** Ensures that we generate integer translation code */
     assortedPrimitivesId(i: AssortedPrimitives): AssortedPrimitives;
     idBinary(b: Uint8Array): Uint8Array;
+    getAsyncResult(): Promise<number>;
+    futureRoundtrip(f: Promise<number>): Promise<string>;
+    checkAsyncInterface(i: AsyncInterface): Promise<string>;
 }
 
 /**

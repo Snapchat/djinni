@@ -15,10 +15,12 @@ em::val NativeVarnameInterface::cppProxyMethods() {
 }
 
 em::val NativeVarnameInterface::_rmethod_(const CppType& self, const em::val& w__r_arg_) {
-    return ::djinni_generated::NativeVarnameRecord::fromCpp(self->_rmethod_(::djinni_generated::NativeVarnameRecord::toCpp(w__r_arg_)));
+    auto r = self->_rmethod_(::djinni_generated::NativeVarnameRecord::toCpp(w__r_arg_));
+    return ::djinni_generated::NativeVarnameRecord::fromCpp(r);
 }
 em::val NativeVarnameInterface::_imethod_(const CppType& self, const em::val& w__i_arg_) {
-    return ::djinni_generated::NativeVarnameInterface::fromCpp(self->_imethod_(::djinni_generated::NativeVarnameInterface::toCpp(w__i_arg_)));
+    auto r = self->_imethod_(::djinni_generated::NativeVarnameInterface::toCpp(w__i_arg_));
+    return ::djinni_generated::NativeVarnameInterface::fromCpp(r);
 }
 
 EMSCRIPTEN_BINDINGS(_varname_interface_) {

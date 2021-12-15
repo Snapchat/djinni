@@ -154,7 +154,8 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
           w.wl(",")
           writeAlignedCall(w, " " * call.length(), r.fields, ")}", f => {
             val name = idCpp.field(f.ident)
-            val param = jniMarshal.fromCpp(f.ty, s"c.$name")
+            val param = jniMarshal.fromCpp(f.ty,
+              cppMarshal.maybeMove(s"c.$name", f.ty))
             s"::djinni::get($param)"
           })
         }
@@ -307,7 +308,8 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
             if(m.params.nonEmpty){
               w.wl(",")
               writeAlignedCall(w, " " * call.length(), m.params, ")", p => {
-                val param = jniMarshal.fromCpp(p.ty, "c_" + idCpp.local(p.ident))
+                val param = jniMarshal.fromCpp(p.ty,
+                  cppMarshal.maybeMove("c_" + idCpp.local(p.ident), p.ty))
                 s"::djinni::get($param)"
               })
             }
@@ -397,7 +399,7 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
             val call = if (m.static) s"$cppSelf::$methodName(" else s"ref->$methodName("
             writeAlignedCall(w, ret + call, m.params, ")", p => jniMarshal.toCpp(p.ty, "j_" + idJava.local(p.ident)))
             w.wl(";")
-            m.ret.fold()(r => w.wl(s"return ::djinni::release(${jniMarshal.fromCpp(r, "r")});"))
+            m.ret.fold()(r => w.wl(s"return ::djinni::release(${jniMarshal.fromCpp(r, cppMarshal.maybeMove("r", r))});"))
           })
         }
 

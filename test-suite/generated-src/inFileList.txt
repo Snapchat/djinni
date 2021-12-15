@@ -10,6 +10,7 @@ djinni/client_interface.djinni
 djinni/enum.djinni
 djinni/user_token.djinni
 djinni/test.djinni
+../support-lib/future.yaml
 djinni/primtypes.djinni
 djinni/constants.djinni
 djinni/multiple_inheritance.djinni

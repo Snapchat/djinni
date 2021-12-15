@@ -32,15 +32,15 @@ export class TestCase {
     tearDown() {}
 }
 
-export function runTests(module: DjinniModule, tests: Array<typeof TestCase>) {
+export async function runTests(module: DjinniModule, tests: Array<typeof TestCase>) {
     failed = [];
     var totalTests = 0;
     let runStart = performance.now();
-    tests.forEach(testClass => {
+    for (const testClass of tests) {
         let testCase = new testClass(module);
         var count = 0;
         let testCaseStart = performance.now();
-        Reflect.ownKeys(Reflect.getPrototypeOf(testCase)).forEach(method => {
+        for (const method of Reflect.ownKeys(Reflect.getPrototypeOf(testCase))) {
             let methodName = method.toString();
             if (methodName.startsWith('test')) {
                 currentTest = testClass.name + '.' + methodName;
@@ -49,7 +49,10 @@ export function runTests(module: DjinniModule, tests: Array<typeof TestCase>) {
                 let testStart = performance.now();
                 try {
                     testCase.setUp();
-                    testCase[methodName]();
+                    var r = testCase[methodName]();
+                    if (typeof r === 'object' && typeof r.then === 'function') {
+                        await r;
+                    }
                     testCase.tearDown();
                 }catch (err) {
                     console.log('C++ exception: ' + module.getExceptionMessage(err));
@@ -59,10 +62,10 @@ export function runTests(module: DjinniModule, tests: Array<typeof TestCase>) {
                 println(status + currentTest + ' (' + (performance.now() - testStart) + ' ms)')
                 count++;
             }
-        });
+        }
         totalTests += count;
         println('[----------] ' + units(count, 'test') + ' from ' + testClass.name + '(' + (performance.now() - testCaseStart) + ' ms total)')
-    });
+    }
     println('[==========] ' + units(totalTests, 'test') + ' from ' + units(tests.length, 'test suite') + ' ran. (' + (performance.now() - runStart) + ' ms total)')
     println('[  PASSED  ] ' + units(totalTests - failed.length, 'test') + '.')
     if (failed.length > 0) {

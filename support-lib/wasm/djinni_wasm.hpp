@@ -19,6 +19,10 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
+#ifdef __EMSCRIPTEN_PTHREADS__
+#include <emscripten/threading.h>
+#endif
+
 #include "../expected.hpp"
 
 #include <unordered_map>
@@ -414,6 +418,23 @@ struct Array<F64> : PrimitiveArray<F64> {
     static em::val getArrayClass() {
         static em::val arrayClass = em::val::global("Float64Array");
         return arrayClass;
+    }
+};
+
+class CppResolveHandlerBase {
+public:
+    virtual ~CppResolveHandlerBase() = default;
+    virtual void init(em::val resolveFunc, em::val rejectFunc) = 0;
+
+    static void initInstance(int handlerPtr, em::val resolveFunc, em::val rejectFunc) {
+        auto* handler = reinterpret_cast<CppResolveHandlerBase*>(handlerPtr);
+        handler->init(resolveFunc, rejectFunc);
+    }
+    
+    static void resolveNativePromise(int func, int context, em::val res, em::val err) {
+        typedef void (*ResolveNativePromiseFunc)(int context, em::val res, em::val err);
+        auto resolveNativePromiseFunc = reinterpret_cast<ResolveNativePromiseFunc>(func);
+        resolveNativePromiseFunc(context, res, err);
     }
 };
 

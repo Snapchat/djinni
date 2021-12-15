@@ -54,6 +54,7 @@ objc_library(
     name = "djinni-tests-objcxx",
     copts = [
         "-ObjC++",
+        "-std=c++17",
     ],
     srcs = glob([
         "generated-src/objc/**/*.mm",
@@ -128,6 +129,7 @@ java_test(
         "//support-lib:djinni-support-java",
         "@maven_djinni//:com_google_code_findbugs_jsr305",
         "@maven_djinni//:junit_junit",
+        "@maven_djinni//:io_reactivex_rxjava2_rxjava",
         "@com_google_protobuf//java/core:core",
     ],
     jvm_flags = ["-Ddjinni.native_libs_dirs=./test-suite/libdjinni-tests-jni.so"],

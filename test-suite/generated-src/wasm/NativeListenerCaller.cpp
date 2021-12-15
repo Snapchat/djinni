@@ -9,7 +9,6 @@ namespace djinni_generated {
 
 em::val NativeListenerCaller::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "init",
         "callFirst",
         "callSecond",
     });
@@ -17,14 +16,15 @@ em::val NativeListenerCaller::cppProxyMethods() {
 }
 
 em::val NativeListenerCaller::init(const em::val& w_first_l,const em::val& w_second_l) {
-    return ::djinni_generated::NativeListenerCaller::fromCpp(::testsuite::ListenerCaller::init(::djinni_generated::NativeFirstListener::toCpp(w_first_l),
-                                                                                               ::djinni_generated::NativeSecondListener::toCpp(w_second_l)));
+    auto r = ::testsuite::ListenerCaller::init(::djinni_generated::NativeFirstListener::toCpp(w_first_l),
+         ::djinni_generated::NativeSecondListener::toCpp(w_second_l));
+    return ::djinni_generated::NativeListenerCaller::fromCpp(r);
 }
 void NativeListenerCaller::callFirst(const CppType& self) {
-    return self->callFirst();
+    self->callFirst();
 }
 void NativeListenerCaller::callSecond(const CppType& self) {
-    return self->callSecond();
+    self->callSecond();
 }
 
 EMSCRIPTEN_BINDINGS(listener_caller) {

@@ -7,17 +7,18 @@ namespace djinni_generated {
 
 em::val NativeReturnTwo::cppProxyMethods() {
     static const em::val methods = em::val::array(std::vector<std::string> {
-        "getInstance",
         "returnTwo",
     });
     return methods;
 }
 
 em::val NativeReturnTwo::get_instance() {
-    return ::djinni_generated::NativeReturnTwo::fromCpp(::testsuite::ReturnTwo::get_instance());
+    auto r = ::testsuite::ReturnTwo::get_instance();
+    return ::djinni_generated::NativeReturnTwo::fromCpp(r);
 }
 int8_t NativeReturnTwo::return_two(const CppType& self) {
-    return ::djinni::I8::fromCpp(self->return_two());
+    auto r = self->return_two();
+    return ::djinni::I8::fromCpp(r);
 }
 
 EMSCRIPTEN_BINDINGS(return_two) {

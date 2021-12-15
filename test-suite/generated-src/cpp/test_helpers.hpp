@@ -4,6 +4,7 @@
 #pragma once
 
 #include "../../handwritten-src/cpp/optional.hpp"
+#include "Future.hpp"
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -12,6 +13,7 @@
 
 namespace testsuite {
 
+class AsyncInterface;
 class ClientInterface;
 class UserToken;
 enum class color;
@@ -86,6 +88,12 @@ public:
     static AssortedPrimitives assorted_primitives_id(const AssortedPrimitives & i);
 
     static std::vector<uint8_t> id_binary(const std::vector<uint8_t> & b);
+
+    static ::snapchat::djinni::Future<int32_t> get_async_result();
+
+    static ::snapchat::djinni::Future<std::string> future_roundtrip(::snapchat::djinni::Future<int32_t> f);
+
+    static ::snapchat::djinni::Future<std::string> check_async_interface(const std::shared_ptr<AsyncInterface> & i);
 };
 
 }  // namespace testsuite
