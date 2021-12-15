@@ -21,7 +21,7 @@ class CppExceptionTest extends TestCase  {
             fail();
         } catch (e) {
             var thrown = this.m.getExceptionMessage(e);
-            assertEq(thrown, "Exception Thrown2");
+            assertEq(thrown, "Exception Thrown");
         }
     }
 
