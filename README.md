@@ -317,6 +317,10 @@ The `future<>` djinni type is mapped to the `Future` types defined in the C++,
 Java and ObjC djinni support library. In Javascript, `future<>` is mapped to the
 builtin `Promise` type (and therefore supports the `await` syntax).
 
+The C++ `Future` type has optional support for coroutines. If the preprocessor
+symbol `DJINNI_FUTURE_COROUTINE_SUPPORT` is defined, then you can use `co_await`
+on a future object.
+
 ## FAQ
 
 Q. Do I need to use Bazel to build my project?
