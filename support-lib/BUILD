@@ -38,7 +38,7 @@ cc_library(
 
 objc_library(
     name = "djinni-support-objc",
-    srcs = glob(["objc/*.mm", "cpp/*.cpp"]),
+    srcs = glob(["objc/*.mm", "objc/*.cpp", "cpp/*.cpp"]),
     hdrs = glob(["objc/*.h", "objc/*.hpp"]),
     copts = [
         "-ObjC++",
