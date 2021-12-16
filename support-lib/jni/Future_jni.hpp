@@ -18,7 +18,7 @@
 
 #include "djinni_support.hpp"
 #include "Marshal.hpp"
-#include "../cpp/Future.hpp"
+#include "Future.hpp"
 
 namespace snapchat::djinni {
 
