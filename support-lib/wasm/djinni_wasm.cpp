@@ -60,7 +60,20 @@ const em::val& JsProxyBase::_jsRef() const {
 
 void JsProxyBase::checkError(const em::val& v) {
     if (v.instanceof(em::val::global("Error"))) {
-        throw JsException(v["message"].as<std::string>());
+         // The stack property is non-standard, but well supported in browsers
+         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/Stack#browser_compatibility
+         // It also seems to include the name and message properties, so no need to access them separately
+         //
+         // >>> function doThrow() { throw new Error("foo")}
+         // >>> try { doThrow() } catch (e) { console.log(e.stack) }
+         // Error: foo
+         //     at doThrow (<anonymous>:1:25)
+         //     at <anonymous>:1:7
+         // >>> try { doThrow() } catch (e) { console.log(e.name) }
+         // Error
+         // >>> try { brad() } catch (e) {console.log(e.message)}
+         // foo
+        throw JsException(v["stack"].as<std::string>());
     }
 }
 
