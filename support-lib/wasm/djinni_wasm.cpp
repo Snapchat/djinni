@@ -71,7 +71,7 @@ void JsProxyBase::checkError(const em::val& v) {
          //     at <anonymous>:1:7
          // >>> try { doThrow() } catch (e) { console.log(e.name) }
          // Error
-         // >>> try { brad() } catch (e) {console.log(e.message)}
+         // >>> try { doThrow() } catch (e) { console.log(e.message) }
          // foo
         throw JsException(v["stack"].as<std::string>());
     }
