@@ -24,7 +24,7 @@ jobs:
             ${{ runner.os }}-${{ env.cache-name }}-master
 
       - name: Build
-        run: bazel build //src:djinni
+        run: bazel build //src:djinni_deploy.jar
 
       - name: Generator
         run: bazel build //generator
