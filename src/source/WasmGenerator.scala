@@ -129,8 +129,12 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
 
   def references(m: Meta, exclude: String = ""): Seq[SymbolReference] = m match {
     case d: MDef => List(ImportRef(include(d.name)))
-    case e: MExtern => List(ImportRef(e.wasm.header))
+    case e: MExtern => List(ImportRef(resolveExtWasmHdr(e.wasm.header)))
     case _ => List()
+  }
+
+  def resolveExtWasmHdr(path: String) = {
+    path.replaceAll("\\$", spec.wasmBaseLibIncludePrefix);
   }
 
   class WasmRefs(name: String, cppPrefixOverride: Option[String]=None) {

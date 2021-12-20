@@ -289,6 +289,10 @@ Notable differences when comparing to the Java/ObjC support:
   easily add extension methods (by add functions to prototype) without having to
   derive from a base class.
 
+The command to run Wasm/TypeScript unit tests is `bazel run
+//test-suite:server-ts`. You will need the `tsc` compiler and the `browserify`
+tool to run these tests.
+
 ## Experimental async interface support
 
 With the new yaml type `future<>` we can now write Djinni interfaces that

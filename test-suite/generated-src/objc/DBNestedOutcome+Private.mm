@@ -3,6 +3,7 @@
 
 #import "DBNestedOutcome+Private.h"
 #import "DJIMarshal+Private.h"
+#import "Outcome_objc.hpp"
 #include <cassert>
 
 namespace djinni_generated {

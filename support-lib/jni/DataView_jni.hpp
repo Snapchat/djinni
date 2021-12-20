@@ -17,9 +17,8 @@
 #pragma once
 
 #include "djinni_support.hpp"
-#include "DataView.hpp"
+#include "../cpp/DataView.hpp"
 
-namespace snapchat {
 namespace djinni {
 
 struct NativeDataView {
@@ -40,4 +39,4 @@ struct NativeDataView {
     using Boxed = NativeDataView;
 };
 
-}} // namespace snapchat::djinni
+} // namespace djinni

@@ -1,5 +1,6 @@
 @protobuf "proto.yaml"
 @protobuf "proto2.yaml"
+@extern "../../../../support-lib/outcome.yaml"
 
 RecordWithEmbeddedProto = record {
     person: Person;

@@ -14,13 +14,12 @@
   * limitations under the License.
   */
 
-#include "DataRef.hpp"
+#include "../cpp/DataRef.hpp"
 
 #if DATAREF_OBJC
 
 #include <cassert>
 
-namespace snapchat {
 namespace djinni {
 
 class DataRefObjc : public DataRef::Impl {
@@ -146,6 +145,6 @@ DataRef::DataRef(CFDataRef platformObj) {
     _impl = std::make_shared<DataRefObjc>(platformObj);
 }
 
-}} // namespace snapchat::djinni
+} // namespace djinni
 
 #endif

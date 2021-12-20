@@ -119,11 +119,15 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
       // Do not forward declare extern types, they might be in arbitrary namespaces.
       // This isn't a problem as extern types cannot cause dependency cycles with types being generated here
       case DInterface => List(ImportRef("<memory>"), ImportRef(e.cpp.header))
-      case _ => List(ImportRef(e.cpp.header))
+      case _ => List(ImportRef(resolveExtCppHdr(e.cpp.header)))
     }
     case p: MProtobuf =>
       List(ImportRef(p.body.cpp.header))
     case p: MParam => List()
+  }
+
+  def resolveExtCppHdr(path: String) = {
+    path.replaceAll("\\$", spec.cppBaseLibIncludePrefix);
   }
 
   def cppReferences(m: Meta, exclude: String, forwardDeclareOnly: Boolean): Seq[SymbolReference] = {

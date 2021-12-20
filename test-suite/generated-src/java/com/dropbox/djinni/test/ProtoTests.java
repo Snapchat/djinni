@@ -4,7 +4,6 @@
 package com.dropbox.djinni.test;
 
 import com.snapchat.djinni.NativeObjectManager;
-import com.snapchat.djinni.Outcome;
 import djinni.test.Test.AddressBook;
 import djinni.test.Test.Person;
 import djinni.test2.Test2.PersistingState;
@@ -51,7 +50,7 @@ public abstract class ProtoTests {
     public static native Person stringToOptionalProto(@Nonnull String x);
 
     @Nonnull
-    public static native Outcome<Person, Integer> stringToProtoOutcome(@Nonnull String x);
+    public static native com.snapchat.djinni.Outcome<Person, Integer> stringToProtoOutcome(@Nonnull String x);
 
     public static final class CppProxy extends ProtoTests
     {

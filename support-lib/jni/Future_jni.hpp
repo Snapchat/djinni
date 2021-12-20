@@ -18,36 +18,36 @@
 
 #include "djinni_support.hpp"
 #include "Marshal.hpp"
-#include "Future.hpp"
+#include "../cpp/Future.hpp"
 
-namespace snapchat::djinni {
+namespace djinni {
 
 struct PromiseJniInfo {
-    const ::djinni::GlobalRef<jclass> clazz { ::djinni::jniFindClass("com/snapchat/djinni/Promise") };
-    const jmethodID constructor { ::djinni::jniGetMethodID(clazz.get(), "<init>", "()V") };
-    const jmethodID method_get_future { ::djinni::jniGetMethodID(clazz.get(), "getFuture", "()Lcom/snapchat/djinni/Future;") };
-    const jmethodID method_set_value { ::djinni::jniGetMethodID(clazz.get(), "setValue", "(Ljava/lang/Object;)V") };
-    const jmethodID method_set_exception { ::djinni::jniGetMethodID(clazz.get(), "setException", "(Ljava/lang/Throwable;)V") };
+    const GlobalRef<jclass> clazz { jniFindClass("com/snapchat/djinni/Promise") };
+    const jmethodID constructor { jniGetMethodID(clazz.get(), "<init>", "()V") };
+    const jmethodID method_get_future { jniGetMethodID(clazz.get(), "getFuture", "()Lcom/snapchat/djinni/Future;") };
+    const jmethodID method_set_value { jniGetMethodID(clazz.get(), "setValue", "(Ljava/lang/Object;)V") };
+    const jmethodID method_set_exception { jniGetMethodID(clazz.get(), "setException", "(Ljava/lang/Throwable;)V") };
 };
 
 struct FutureJniInfo {
-    const ::djinni::GlobalRef<jclass> clazz { ::djinni::jniFindClass("com/snapchat/djinni/Future") };
-    const jmethodID method_then { ::djinni::jniGetMethodID(clazz.get(), "then", "(Lcom/snapchat/djinni/Future$FutureHandler;)Lcom/snapchat/djinni/Future;") };
+    const GlobalRef<jclass> clazz { jniFindClass("com/snapchat/djinni/Future") };
+    const jmethodID method_then { jniGetMethodID(clazz.get(), "then", "(Lcom/snapchat/djinni/Future$FutureHandler;)Lcom/snapchat/djinni/Future;") };
 };
 
 struct NativeFutureHandlerJniInfo {
-    const ::djinni::GlobalRef<jclass> clazz { ::djinni::jniFindClass("com/snapchat/djinni/NativeFutureHandler") };
-    const jmethodID constructor { ::djinni::jniGetMethodID(clazz.get(), "<init>", "(JJ)V") };
+    const GlobalRef<jclass> clazz { jniFindClass("com/snapchat/djinni/NativeFutureHandler") };
+    const jmethodID constructor { jniGetMethodID(clazz.get(), "<init>", "(JJ)V") };
 };
 
 struct RuntimeExceptionJniInfo {
-    const ::djinni::GlobalRef<jclass> clazz { ::djinni::jniFindClass("java/lang/RuntimeException") };
-    const jmethodID constructor { ::djinni::jniGetMethodID(clazz.get(), "<init>", "(Ljava/lang/String;)V") };
+    const GlobalRef<jclass> clazz { jniFindClass("java/lang/RuntimeException") };
+    const jmethodID constructor { jniGetMethodID(clazz.get(), "<init>", "(Ljava/lang/String;)V") };
 };
 
 struct ThrowableJniInfo {
-    const ::djinni::GlobalRef<jclass> clazz { ::djinni::jniFindClass("java/lang/Throwable") };
-    const jmethodID method_get_message { ::djinni::jniGetMethodID(clazz.get(), "getMessage", "()Ljava/lang/String;") };
+    const GlobalRef<jclass> clazz { jniFindClass("java/lang/Throwable") };
+    const jmethodID method_get_message { jniGetMethodID(clazz.get(), "getMessage", "()Ljava/lang/String;") };
 };
 
 using NativeFutureHandlerFunc = void (*)(JNIEnv* jniEnv, jlong nativePromise, jobject jres, jthrowable jex);
@@ -58,10 +58,10 @@ class FutureAdaptor
     using CppResType = typename RESULT::CppType;
 
     struct PromiseHolder {
-        ::djinni::GlobalRef<jobject> promise;
+        GlobalRef<jobject> promise;
 
         void set(JNIEnv * env, jobject localRef) {
-            promise = ::djinni::GlobalRef<jobject>(env, localRef);
+            promise = GlobalRef<jobject>(env, localRef);
         }
         auto get() const { return promise.get(); }
     };
@@ -85,52 +85,52 @@ public:
             if (jex == nullptr) {
                 promise->setValue(RESULT::Boxed::toCpp(jniEnv, static_cast<typename RESULT::Boxed::JniType>(jres)));
             } else {
-                const auto& throwableJniInfo = ::djinni::JniClass<ThrowableJniInfo>::get();
-                ::djinni::LocalRef<jstring> jmsg(jniEnv, static_cast<jstring>(jniEnv->CallObjectMethod(jex,
+                const auto& throwableJniInfo = JniClass<ThrowableJniInfo>::get();
+                LocalRef<jstring> jmsg(jniEnv, static_cast<jstring>(jniEnv->CallObjectMethod(jex,
                                                                                              throwableJniInfo.method_get_message,
                                                                                              jex)));
-                std::string msg = ::djinni::jniUTF8FromString(jniEnv, jmsg.get());
+                std::string msg = jniUTF8FromString(jniEnv, jmsg.get());
                 promise->setException(std::runtime_error(msg));
             }
         };
 
-        const auto& nativeFutureHandlerJniInfo = ::djinni::JniClass<NativeFutureHandlerJniInfo>::get();
-        auto handler = ::djinni::LocalRef<jobject>(jniEnv, jniEnv->NewObject(nativeFutureHandlerJniInfo.clazz.get(),
+        const auto& nativeFutureHandlerJniInfo = JniClass<NativeFutureHandlerJniInfo>::get();
+        auto handler = LocalRef<jobject>(jniEnv, jniEnv->NewObject(nativeFutureHandlerJniInfo.clazz.get(),
                                                                    nativeFutureHandlerJniInfo.constructor,
                                                                    reinterpret_cast<jlong>(FutureHandler),
                                                                    reinterpret_cast<jlong>(p.release())));
-        ::djinni::jniExceptionCheck(jniEnv);
-        const auto& futureJniInfo = ::djinni::JniClass<FutureJniInfo>::get();
+        jniExceptionCheck(jniEnv);
+        const auto& futureJniInfo = JniClass<FutureJniInfo>::get();
         jniEnv->CallObjectMethod(j, futureJniInfo.method_then, handler.get());
-        ::djinni::jniExceptionCheck(jniEnv);
+        jniExceptionCheck(jniEnv);
         return f;
     }
 
-    static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, CppType c)
+    static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, CppType c)
     {
-        const auto& promiseJniInfo = ::djinni::JniClass<PromiseJniInfo>::get();
+        const auto& promiseJniInfo = JniClass<PromiseJniInfo>::get();
 
         auto promise = std::make_shared<PromiseHolder>();
         promise->set(jniEnv, jniEnv->NewObject(promiseJniInfo.clazz.get(), promiseJniInfo.constructor));
-        auto future = ::djinni::LocalRef<jobject>(jniEnv, jniEnv->CallObjectMethod(promise->get(), promiseJniInfo.method_get_future));
-        ::djinni::jniExceptionCheck(jniEnv);
+        auto future = LocalRef<jobject>(jniEnv, jniEnv->CallObjectMethod(promise->get(), promiseJniInfo.method_get_future));
+        jniExceptionCheck(jniEnv);
 
         c.then([promise, &promiseJniInfo] (Future<CppResType> cppFuture) {
-            JNIEnv* jniEnv = ::djinni::jniGetThreadEnv();
+            JNIEnv* jniEnv = jniGetThreadEnv();
             try {
                 auto res = cppFuture.get();
                 jniEnv->CallVoidMethod(promise->get(), promiseJniInfo.method_set_value, RESULT::Boxed::fromCpp(jniEnv, res).get());
             } catch (const std::exception& e) {
                 // create a java exception object
-                const auto& exceptionJniInfo = ::djinni::JniClass<RuntimeExceptionJniInfo>::get();
-                ::djinni::LocalRef<jobject> jex(jniEnv, jniEnv->NewObject(exceptionJniInfo.clazz.get(), exceptionJniInfo.constructor, ::djinni::String::fromCpp(jniEnv, e.what()).get()));
+                const auto& exceptionJniInfo = JniClass<RuntimeExceptionJniInfo>::get();
+                LocalRef<jobject> jex(jniEnv, jniEnv->NewObject(exceptionJniInfo.clazz.get(), exceptionJniInfo.constructor, String::fromCpp(jniEnv, e.what()).get()));
                 // call setException()
                 jniEnv->CallVoidMethod(promise->get(), promiseJniInfo.method_set_exception, jex.get());
             }
-            ::djinni::jniExceptionCheck(jniEnv);
+            jniExceptionCheck(jniEnv);
         });
             
         return future;
     }
 };
-} // namespace snapchat::djinni
+} // namespace djinni

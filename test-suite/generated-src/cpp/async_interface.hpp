@@ -13,7 +13,7 @@ class AsyncInterface {
 public:
     virtual ~AsyncInterface() = default;
 
-    virtual ::snapchat::djinni::Future<std::string> future_roundtrip(::snapchat::djinni::Future<int32_t> f) = 0;
+    virtual ::djinni::Future<std::string> future_roundtrip(::djinni::Future<int32_t> f) = 0;
 };
 
 }  // namespace testsuite

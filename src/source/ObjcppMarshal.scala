@@ -63,8 +63,12 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
         val objcName = d.name + (if (r.ext.objc) "_base" else "")
         List(ImportRef(q(spec.objcppIncludePrefix + privateHeaderName(objcName))))
     }
-    case e: MExtern => List(ImportRef(e.objcpp.header))
+    case e: MExtern => List(ImportRef(resolveExtObjcppHdr(e.objcpp.header)))
     case p: MParam => List()
+  }
+
+  def resolveExtObjcppHdr(path: String) = {
+    path.replaceAll("\\$", spec.objcBaseLibIncludePrefix);
   }
 
   def include(m: Meta) = m match {

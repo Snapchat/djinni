@@ -23,7 +23,7 @@
 #include <emscripten/threading.h>
 #endif
 
-#include "../expected.hpp"
+// #include "../cpp/expected.hpp"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -250,39 +250,39 @@ public:
     }
 };
 
-// js success type:
-// { result: ...}
-// js error type:
-// { error: ...}
-template <class Result, class Error>
-struct Outcome
-{
-    using CppType = expected<typename Result::CppType, typename Error::CppType>;
-    using JsType = em::val;
-    using Boxed = Outcome;
+// // js success type:
+// // { result: ...}
+// // js error type:
+// // { error: ...}
+// template <class Result, class Error>
+// struct Outcome
+// {
+//     using CppType = expected<typename Result::CppType, typename Error::CppType>;
+//     using JsType = em::val;
+//     using Boxed = Outcome;
     
-    static CppType toCpp(const JsType& j) {
-        em::val res = j["result"];
-        if (!res.isUndefined()) {
-            return Result::Boxed::toCpp(res);
-        } else {
-            em::val err = j["error"];
-            assert(!err.isUndefined());
-            return make_unexpected(Error::Boxed::toCpp(err));
-        }
-    }
-    static JsType fromCpp(const CppType& c) {
-        if (c.has_value()) {
-            em::val res = em::val::object();
-            res.set("result", Result::Boxed::fromCpp(c.value()));
-            return res;
-        } else {
-            em::val err = em::val::object();
-            err.set("error", Error::Boxed::fromCpp(c.error()));
-            return err;
-        }
-    }
-};
+//     static CppType toCpp(const JsType& j) {
+//         em::val res = j["result"];
+//         if (!res.isUndefined()) {
+//             return Result::Boxed::toCpp(res);
+//         } else {
+//             em::val err = j["error"];
+//             assert(!err.isUndefined());
+//             return make_unexpected(Error::Boxed::toCpp(err));
+//         }
+//     }
+//     static JsType fromCpp(const CppType& c) {
+//         if (c.has_value()) {
+//             em::val res = em::val::object();
+//             res.set("result", Result::Boxed::fromCpp(c.value()));
+//             return res;
+//         } else {
+//             em::val err = em::val::object();
+//             err.set("error", Error::Boxed::fromCpp(c.error()));
+//             return err;
+//         }
+//     }
+// };
 
 template<char... chars>
 class JsClassName {

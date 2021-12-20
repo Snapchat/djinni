@@ -7,6 +7,7 @@
 #import "DJICppWrapperCache+Private.h"
 #import "DJIError.h"
 #import "DJIMarshal+Private.h"
+#import "Outcome_objc.hpp"
 #include <exception>
 #include <stdexcept>
 #include <utility>

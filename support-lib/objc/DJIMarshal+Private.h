@@ -8,7 +8,7 @@
 
 #pragma once
 #import <Foundation/Foundation.h>
-#import "DJOutcome.h"
+// #import "DJOutcome.h"
 #include <chrono>
 #include <cstdint>
 #include <string>
@@ -16,7 +16,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <vector>
-#include "../expected.hpp"
+// #include "../cpp/expected.hpp"
 
 static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for this file");
 
@@ -352,37 +352,37 @@ public:
     }
 };
 
-template<typename RESULT, typename ERROR>
-class Outcome {
-    using ResultCppType = typename RESULT::CppType;
-    using ErrorCppType = typename ERROR::CppType;
-    using ResultObjcType = typename RESULT::Boxed::ObjcType;
-    using ErrorObjcType = typename ERROR::Boxed::ObjcType;
-public:
-    using CppType = expected<ResultCppType, ErrorCppType>;
-    using ObjcType = DJOutcome*;
+// template<typename RESULT, typename ERROR>
+// class Outcome {
+//     using ResultCppType = typename RESULT::CppType;
+//     using ErrorCppType = typename ERROR::CppType;
+//     using ResultObjcType = typename RESULT::Boxed::ObjcType;
+//     using ErrorObjcType = typename ERROR::Boxed::ObjcType;
+// public:
+//     using CppType = expected<ResultCppType, ErrorCppType>;
+//     using ObjcType = DJOutcome*;
 
-    using Boxed = Outcome;
+//     using Boxed = Outcome;
 
-    static CppType toCpp(ObjcType o) {
-        assert(o);
-        ResultObjcType r = [o result];
-        if (r) {
-            return RESULT::Boxed::toCpp(r);
-        } else {
-            ErrorObjcType e = [o error];
-            return make_unexpected(ERROR::Boxed::toCpp(e));
-        }
-    }
+//     static CppType toCpp(ObjcType o) {
+//         assert(o);
+//         ResultObjcType r = [o result];
+//         if (r) {
+//             return RESULT::Boxed::toCpp(r);
+//         } else {
+//             ErrorObjcType e = [o error];
+//             return make_unexpected(ERROR::Boxed::toCpp(e));
+//         }
+//     }
 
-    static ObjcType fromCpp(const CppType& c) {
-        if (c.has_value()) {
-            return [DJOutcome fromResult: RESULT::Boxed::fromCpp(c.value())];
-        } else {
-            return [DJOutcome fromError: ERROR::Boxed::fromCpp(c.error())];
-        }
-    }
-};
+//     static ObjcType fromCpp(const CppType& c) {
+//         if (c.has_value()) {
+//             return [DJOutcome fromResult: RESULT::Boxed::fromCpp(c.value())];
+//         } else {
+//             return [DJOutcome fromError: ERROR::Boxed::fromCpp(c.error())];
+//         }
+//     }
+// };
 
 template <typename CPP_PROTO, typename OBJC_PROTO>
 class Protobuf {

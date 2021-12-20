@@ -168,13 +168,13 @@ std::vector<uint8_t> TestHelpers::id_binary(const std::vector<uint8_t> & v) {
     return v;
 }
 
-snapchat::djinni::Future<int32_t> TestHelpers::get_async_result() {
-    auto* p = new snapchat::djinni::Promise<int32_t>();
+djinni::Future<int32_t> TestHelpers::get_async_result() {
+    auto* p = new djinni::Promise<int32_t>();
     auto f = p->getFuture();
 
 #if defined(__EMSCRIPTEN__)
     emscripten_async_call([] (void* context) {
-        auto* p = reinterpret_cast<snapchat::djinni::Promise<int32_t>*>(context);
+        auto* p = reinterpret_cast<djinni::Promise<int32_t>*>(context);
         p->setValue(42);
         delete p;
     }, p, 10/*ms*/);
@@ -189,16 +189,16 @@ snapchat::djinni::Future<int32_t> TestHelpers::get_async_result() {
     return f;
 }
 
-snapchat::djinni::Future<std::string> TestHelpers::future_roundtrip(snapchat::djinni::Future<int32_t> f) {
-    return f.then([] (snapchat::djinni::Future<int32_t> f) {
+djinni::Future<std::string> TestHelpers::future_roundtrip(djinni::Future<int32_t> f) {
+    return f.then([] (djinni::Future<int32_t> f) {
         return std::to_string(f.get());
     });
 }
 
-snapchat::djinni::Future<std::string> TestHelpers::check_async_interface(const std::shared_ptr<AsyncInterface> & i) {
-    snapchat::djinni::Promise<std::string> p;
+djinni::Future<std::string> TestHelpers::check_async_interface(const std::shared_ptr<AsyncInterface> & i) {
+    djinni::Promise<std::string> p;
     auto f = p.getFuture();
-    auto f2 = f.then([] (snapchat::djinni::Future<std::string> s) {
+    auto f2 = f.then([] (djinni::Future<std::string> s) {
         return std::stoi(s.get());
     });
     auto f3 = i->future_roundtrip(std::move(f2));

@@ -21,7 +21,7 @@ struct NativeAsyncInterface : ::djinni::JsInterface<::testsuite::AsyncInterface,
 
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::AsyncInterface, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
-        ::snapchat::djinni::Future<std::string> future_roundtrip(::snapchat::djinni::Future<int32_t> f) override;
+        ::djinni::Future<std::string> future_roundtrip(::djinni::Future<int32_t> f) override;
     };
 };
 

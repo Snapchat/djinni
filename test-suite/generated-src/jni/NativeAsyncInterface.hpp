@@ -33,7 +33,7 @@ private:
         JavaProxy(JniType j);
         ~JavaProxy();
 
-        ::snapchat::djinni::Future<std::string> future_roundtrip(::snapchat::djinni::Future<int32_t> f) override;
+        ::djinni::Future<std::string> future_roundtrip(::djinni::Future<int32_t> f) override;
 
     private:
         friend ::djinni::JniInterface<::testsuite::AsyncInterface, ::djinni_generated::NativeAsyncInterface>;

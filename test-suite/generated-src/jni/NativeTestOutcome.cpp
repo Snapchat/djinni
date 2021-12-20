@@ -4,6 +4,7 @@
 #include "NativeTestOutcome.hpp"  // my header
 #include "Marshal.hpp"
 #include "NativeNestedOutcome.hpp"
+#include "Outcome_jni.hpp"
 
 namespace djinni_generated {
 
@@ -19,7 +20,7 @@ CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_TestOutcome_00024CppProxy_n
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
 
-CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestOutcome_getSuccessOutcome(JNIEnv* jniEnv, jobject /*this*/)
+CJNIEXPORT ::djinni::Outcome<::djinni::String, ::djinni::I32>::JniType JNICALL Java_com_dropbox_djinni_test_TestOutcome_getSuccessOutcome(JNIEnv* jniEnv, jobject /*this*/)
 {
     try {
         auto r = ::testsuite::TestOutcome::getSuccessOutcome();
@@ -27,7 +28,7 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestOutcome_getSuccessOu
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestOutcome_getErrorOutcome(JNIEnv* jniEnv, jobject /*this*/)
+CJNIEXPORT ::djinni::Outcome<::djinni::String, ::djinni::I32>::JniType JNICALL Java_com_dropbox_djinni_test_TestOutcome_getErrorOutcome(JNIEnv* jniEnv, jobject /*this*/)
 {
     try {
         auto r = ::testsuite::TestOutcome::getErrorOutcome();
@@ -35,7 +36,7 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestOutcome_getErrorOutc
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT jstring JNICALL Java_com_dropbox_djinni_test_TestOutcome_putSuccessOutcome(JNIEnv* jniEnv, jobject /*this*/, jobject j_x)
+CJNIEXPORT jstring JNICALL Java_com_dropbox_djinni_test_TestOutcome_putSuccessOutcome(JNIEnv* jniEnv, jobject /*this*/, ::djinni::Outcome<::djinni::String, ::djinni::I32>::JniType j_x)
 {
     try {
         auto r = ::testsuite::TestOutcome::putSuccessOutcome(::djinni::Outcome<::djinni::String, ::djinni::I32>::toCpp(jniEnv, j_x));
@@ -43,7 +44,7 @@ CJNIEXPORT jstring JNICALL Java_com_dropbox_djinni_test_TestOutcome_putSuccessOu
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT jint JNICALL Java_com_dropbox_djinni_test_TestOutcome_putErrorOutcome(JNIEnv* jniEnv, jobject /*this*/, jobject j_x)
+CJNIEXPORT jint JNICALL Java_com_dropbox_djinni_test_TestOutcome_putErrorOutcome(JNIEnv* jniEnv, jobject /*this*/, ::djinni::Outcome<::djinni::String, ::djinni::I32>::JniType j_x)
 {
     try {
         auto r = ::testsuite::TestOutcome::putErrorOutcome(::djinni::Outcome<::djinni::String, ::djinni::I32>::toCpp(jniEnv, j_x));

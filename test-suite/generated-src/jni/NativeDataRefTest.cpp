@@ -20,11 +20,11 @@ CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_n
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
 
-CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1sendData(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, ::snapchat::djinni::NativeDataRef::JniType j_data)
+CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1sendData(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, ::djinni::NativeDataRef::JniType j_data)
 {
     try {
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::DataRefTest>(nativeRef);
-        ref->sendData(::snapchat::djinni::NativeDataRef::toCpp(jniEnv, j_data));
+        ref->sendData(::djinni::NativeDataRef::toCpp(jniEnv, j_data));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
 
@@ -37,56 +37,56 @@ CJNIEXPORT jbyteArray JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppP
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1sendMutableData(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, ::snapchat::djinni::NativeDataRef::JniType j_data)
+CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1sendMutableData(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, ::djinni::NativeDataRef::JniType j_data)
 {
     try {
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::DataRefTest>(nativeRef);
-        ref->sendMutableData(::snapchat::djinni::NativeDataRef::toCpp(jniEnv, j_data));
+        ref->sendMutableData(::djinni::NativeDataRef::toCpp(jniEnv, j_data));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
 
-CJNIEXPORT ::snapchat::djinni::NativeDataRef::JniType JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1generateData(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
+CJNIEXPORT ::djinni::NativeDataRef::JniType JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1generateData(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::DataRefTest>(nativeRef);
         auto r = ref->generateData();
-        return ::djinni::release(::snapchat::djinni::NativeDataRef::fromCpp(jniEnv, r));
+        return ::djinni::release(::djinni::NativeDataRef::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT ::snapchat::djinni::NativeDataRef::JniType JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1dataFromVec(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
+CJNIEXPORT ::djinni::NativeDataRef::JniType JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1dataFromVec(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::DataRefTest>(nativeRef);
         auto r = ref->dataFromVec();
-        return ::djinni::release(::snapchat::djinni::NativeDataRef::fromCpp(jniEnv, r));
+        return ::djinni::release(::djinni::NativeDataRef::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT ::snapchat::djinni::NativeDataRef::JniType JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1dataFromStr(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
+CJNIEXPORT ::djinni::NativeDataRef::JniType JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1dataFromStr(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::DataRefTest>(nativeRef);
         auto r = ref->dataFromStr();
-        return ::djinni::release(::snapchat::djinni::NativeDataRef::fromCpp(jniEnv, r));
+        return ::djinni::release(::djinni::NativeDataRef::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT jbyteArray JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1sendDataView(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, ::snapchat::djinni::NativeDataView::JniType j_data)
+CJNIEXPORT jbyteArray JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1sendDataView(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, ::djinni::NativeDataView::JniType j_data)
 {
     try {
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::DataRefTest>(nativeRef);
-        auto r = ref->sendDataView(::snapchat::djinni::NativeDataView::toCpp(jniEnv, j_data));
+        auto r = ref->sendDataView(::djinni::NativeDataView::toCpp(jniEnv, j_data));
         return ::djinni::release(::djinni::Binary::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT ::snapchat::djinni::NativeDataView::JniType JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1recvDataView(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
+CJNIEXPORT ::djinni::NativeDataView::JniType JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1recvDataView(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef)
 {
     try {
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::DataRefTest>(nativeRef);
         auto r = ref->recvDataView();
-        return ::djinni::release(::snapchat::djinni::NativeDataView::fromCpp(jniEnv, r));
+        return ::djinni::release(::djinni::NativeDataView::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 

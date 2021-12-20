@@ -117,15 +117,15 @@ em::val NativeTestHelpers::id_binary(const em::val& w_b) {
 }
 em::val NativeTestHelpers::get_async_result() {
     auto r = ::testsuite::TestHelpers::get_async_result();
-    return ::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(std::move(r));
+    return ::djinni::FutureAdaptor<::djinni::I32>::fromCpp(std::move(r));
 }
 em::val NativeTestHelpers::future_roundtrip(const em::val& w_f) {
-    auto r = ::testsuite::TestHelpers::future_roundtrip(::snapchat::djinni::FutureAdaptor<::djinni::I32>::toCpp(w_f));
-    return ::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(r));
+    auto r = ::testsuite::TestHelpers::future_roundtrip(::djinni::FutureAdaptor<::djinni::I32>::toCpp(w_f));
+    return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(r));
 }
 em::val NativeTestHelpers::check_async_interface(const em::val& w_i) {
     auto r = ::testsuite::TestHelpers::check_async_interface(::djinni_generated::NativeAsyncInterface::toCpp(w_i));
-    return ::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(r));
+    return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(r));
 }
 
 EMSCRIPTEN_BINDINGS(test_helpers) {

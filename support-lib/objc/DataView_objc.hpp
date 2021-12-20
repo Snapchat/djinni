@@ -17,9 +17,8 @@
 #pragma once
 
 #include "DJIMarshal+Private.h"
-#include "DataView.hpp"
+#include "../cpp/DataView.hpp"
 
-namespace snapchat {
 namespace djinni {
 
 struct NativeDataView {
@@ -38,4 +37,4 @@ struct NativeDataView {
     using Boxed = NativeDataView;
 };
 
-}} // namespace snapchat::djinni
+} // namespace djinni

@@ -59,10 +59,10 @@ void NativeDjinniPerfBenchmark::argBinary(const CppType& self, const em::val& w_
     self->argBinary(::djinni::Binary::toCpp(w_b));
 }
 void NativeDjinniPerfBenchmark::argDataRef(const CppType& self, const em::val& w_r) {
-    self->argDataRef(::snapchat::djinni::NativeDataRef::toCpp(w_r));
+    self->argDataRef(::djinni::NativeDataRef::toCpp(w_r));
 }
 void NativeDjinniPerfBenchmark::argDataView(const CppType& self, const em::val& w_d) {
-    self->argDataView(::snapchat::djinni::NativeDataView::toCpp(w_d));
+    self->argDataView(::djinni::NativeDataView::toCpp(w_d));
 }
 void NativeDjinniPerfBenchmark::argEnumSixValue(const CppType& self, int32_t w_e) {
     self->argEnumSixValue(::djinni_generated::NativeEnumSixValue::toCpp(w_e));

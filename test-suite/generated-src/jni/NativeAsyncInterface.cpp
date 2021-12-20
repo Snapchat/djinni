@@ -15,14 +15,14 @@ NativeAsyncInterface::JavaProxy::JavaProxy(JniType j) : Handle(::djinni::jniGetT
 
 NativeAsyncInterface::JavaProxy::~JavaProxy() = default;
 
-::snapchat::djinni::Future<std::string> NativeAsyncInterface::JavaProxy::future_roundtrip(::snapchat::djinni::Future<int32_t> c_f) {
+::djinni::Future<std::string> NativeAsyncInterface::JavaProxy::future_roundtrip(::djinni::Future<int32_t> c_f) {
     auto jniEnv = ::djinni::jniGetThreadEnv();
     ::djinni::JniLocalScope jscope(jniEnv, 10);
     const auto& data = ::djinni::JniClass<::djinni_generated::NativeAsyncInterface>::get();
     auto jret = jniEnv->CallObjectMethod(Handle::get().get(), data.method_futureRoundtrip,
-                                         ::djinni::get(::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(jniEnv, std::move(c_f))));
+                                         ::djinni::get(::djinni::FutureAdaptor<::djinni::I32>::fromCpp(jniEnv, std::move(c_f))));
     ::djinni::jniExceptionCheck(jniEnv);
-    return ::snapchat::djinni::FutureAdaptor<::djinni::String>::toCpp(jniEnv, jret);
+    return ::djinni::FutureAdaptor<::djinni::String>::toCpp(jniEnv, jret);
 }
 
 }  // namespace djinni_generated

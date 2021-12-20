@@ -20,7 +20,6 @@
 #include <functional>
 #include <memory>
 
-namespace snapchat {
 namespace djinni {
 
 class DataView {
@@ -44,4 +43,4 @@ private:
     const size_t _len;
 };
 
-}} // namespace snapchat::djinni
+} // namespace djinni

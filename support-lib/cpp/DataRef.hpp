@@ -44,7 +44,6 @@
   using PlatformObject = const void*;
 #endif
 
-namespace snapchat {
 namespace djinni {
 
 class DataRef {
@@ -109,4 +108,4 @@ private:
     std::shared_ptr<Impl> _impl;
 };
 
-}} // namespace snapchat::djinni
+} // namespace djinni

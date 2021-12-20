@@ -48,6 +48,7 @@ package object generatorTools {
                    cppNamespace: String,
                    cppIdentStyle: CppIdentStyle,
                    cppFileIdentStyle: IdentConverter,
+                   cppBaseLibIncludePrefix: String,
                    cppOptionalTemplate: String,
                    cppOptionalHeader: String,
                    cppExpectedHeader: String,

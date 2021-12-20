@@ -17,9 +17,8 @@
 #pragma once
 
 #include "djinni_wasm.hpp"
-#include "DataView.hpp"
+#include "../cpp/DataView.hpp"
 
-namespace snapchat {
 namespace djinni {
 
 struct NativeDataView {
@@ -29,7 +28,7 @@ struct NativeDataView {
     static CppType toCpp(const JsType& o) {
         auto buffer = o["buffer"];
         // check that we are looking at the wasm module's memory space
-        assert(buffer == ::djinni::getWasmMemoryBuffer());
+        assert(buffer == getWasmMemoryBuffer());
         return {reinterpret_cast<uint8_t*>(o["byteOffset"].as<unsigned>()),
             static_cast<size_t>(o["length"].as<unsigned>())};
     }
@@ -39,7 +38,7 @@ struct NativeDataView {
 
         unsigned addr = reinterpret_cast<unsigned>(c.buf());
         unsigned size = static_cast<unsigned>(c.len());
-        em::val uint8ArrayObj = uint8ArrayClass.new_(::djinni::getWasmMemoryBuffer(), addr, size);
+        em::val uint8ArrayObj = uint8ArrayClass.new_(getWasmMemoryBuffer(), addr, size);
 
         return uint8ArrayObj;
     }
@@ -47,4 +46,4 @@ struct NativeDataView {
     using Boxed = NativeDataView;
 };
 
-}} // namespace snapchat::djinni
+} // namespace djinni

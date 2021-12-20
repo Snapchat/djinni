@@ -3,6 +3,7 @@
 
 #include "NativeNestedOutcome.hpp"  // my header
 #include "Marshal.hpp"
+#include "Outcome_jni.hpp"
 
 namespace djinni_generated {
 

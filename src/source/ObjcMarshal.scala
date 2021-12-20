@@ -105,12 +105,16 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
         val prefix = if (r.ext.objc) spec.objcExtendedRecordIncludePrefix else spec.objcIncludePrefix
         List(ImportRef(q(prefix + headerName(d.name))))
     }
-    case e: MExtern => List(ImportRef(e.objc.header))
+    case e: MExtern => List(ImportRef(resolveExtObjcHdr(e.objc.header)))
     case p: MProtobuf => p.body.objc match {
       case Some(o) => List(ImportRef(o.header))
       case None => List(ImportRef(p.body.cpp.header))
     }
     case p: MParam => List()
+  }
+
+  def resolveExtObjcHdr(path: String) = {
+    path.replaceAll("\\$", spec.objcBaseLibIncludePrefix);
   }
 
   def implHeaderName(ident: String) = idObjc.ty(ident) + "+Impl." + spec.objcHeaderExt

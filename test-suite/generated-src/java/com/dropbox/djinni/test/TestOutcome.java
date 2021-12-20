@@ -4,22 +4,21 @@
 package com.dropbox.djinni.test;
 
 import com.snapchat.djinni.NativeObjectManager;
-import com.snapchat.djinni.Outcome;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 public abstract class TestOutcome {
     @Nonnull
-    public static native Outcome<String, Integer> getSuccessOutcome();
+    public static native com.snapchat.djinni.Outcome<String, Integer> getSuccessOutcome();
 
     @Nonnull
-    public static native Outcome<String, Integer> getErrorOutcome();
+    public static native com.snapchat.djinni.Outcome<String, Integer> getErrorOutcome();
 
     @Nonnull
-    public static native String putSuccessOutcome(@Nonnull Outcome<String, Integer> x);
+    public static native String putSuccessOutcome(@Nonnull com.snapchat.djinni.Outcome<String, Integer> x);
 
-    public static native int putErrorOutcome(@Nonnull Outcome<String, Integer> x);
+    public static native int putErrorOutcome(@Nonnull com.snapchat.djinni.Outcome<String, Integer> x);
 
     @Nonnull
     public static native NestedOutcome getNestedSuccessOutcome();

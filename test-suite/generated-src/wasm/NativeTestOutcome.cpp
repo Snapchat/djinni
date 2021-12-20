@@ -3,6 +3,7 @@
 
 #include "NativeTestOutcome.hpp"  // my header
 #include "NativeNestedOutcome.hpp"
+#include "Outcome_wasm.hpp"
 
 namespace djinni_generated {
 

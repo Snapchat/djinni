@@ -65,19 +65,19 @@ CJNIEXPORT void JNICALL Java_com_snapchat_djinni_benchmark_DjinniPerfBenchmark_0
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
 
-CJNIEXPORT void JNICALL Java_com_snapchat_djinni_benchmark_DjinniPerfBenchmark_00024CppProxy_native_1argDataRef(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, ::snapchat::djinni::NativeDataRef::JniType j_r)
+CJNIEXPORT void JNICALL Java_com_snapchat_djinni_benchmark_DjinniPerfBenchmark_00024CppProxy_native_1argDataRef(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, ::djinni::NativeDataRef::JniType j_r)
 {
     try {
         const auto& ref = ::djinni::objectFromHandleAddress<::snapchat::djinni::benchmark::DjinniPerfBenchmark>(nativeRef);
-        ref->argDataRef(::snapchat::djinni::NativeDataRef::toCpp(jniEnv, j_r));
+        ref->argDataRef(::djinni::NativeDataRef::toCpp(jniEnv, j_r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
 
-CJNIEXPORT void JNICALL Java_com_snapchat_djinni_benchmark_DjinniPerfBenchmark_00024CppProxy_native_1argDataView(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, ::snapchat::djinni::NativeDataView::JniType j_d)
+CJNIEXPORT void JNICALL Java_com_snapchat_djinni_benchmark_DjinniPerfBenchmark_00024CppProxy_native_1argDataView(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, ::djinni::NativeDataView::JniType j_d)
 {
     try {
         const auto& ref = ::djinni::objectFromHandleAddress<::snapchat::djinni::benchmark::DjinniPerfBenchmark>(nativeRef);
-        ref->argDataView(::snapchat::djinni::NativeDataView::toCpp(jniEnv, j_d));
+        ref->argDataView(::djinni::NativeDataView::toCpp(jniEnv, j_d));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
 

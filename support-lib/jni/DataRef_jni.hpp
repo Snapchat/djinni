@@ -17,9 +17,8 @@
 #pragma once
 
 #include "djinni_support.hpp"
-#include "DataRef.hpp"
+#include "../cpp/DataRef.hpp"
 
-namespace snapchat {
 namespace djinni {
 struct NativeDataRef {
     using CppType = DataRef;
@@ -36,4 +35,4 @@ struct NativeDataRef {
 
     using Boxed = NativeDataRef;
 };
-}} // namespace snapchat::djinni
+} // namespace djinni

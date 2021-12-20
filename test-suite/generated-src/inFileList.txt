@@ -30,6 +30,7 @@ djinni/vendor/third-party/date.yaml
 djinni/vendor/third-party/duration.djinni
 djinni/vendor/third-party/duration.yaml
 djinni/vendor/third-party/outcome.djinni
+../support-lib/outcome.yaml
 djinni/vendor/third-party/proto.djinni
 djinni/vendor/third-party/proto.yaml
 djinni/vendor/third-party/proto2.yaml

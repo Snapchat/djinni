@@ -64,8 +64,12 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       }
     }
     case d: MDef => List(ImportRef(include(d.name)))
-    case e: MExtern => List(ImportRef(e.jni.header))
+    case e: MExtern => List(ImportRef(resolveExtJniHdr(e.jni.header)))
     case _ => List()
+  }
+
+  def resolveExtJniHdr(path: String) = {
+    path.replaceAll("\\$", spec.jniBaseLibIncludePrefix);
   }
 
   def include(ident: String) = q(spec.jniIncludePrefix + spec.jniFileIdentStyle(ident) + "." + spec.cppHeaderExt)
