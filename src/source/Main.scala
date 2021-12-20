@@ -35,7 +35,6 @@ object Main {
     var cppBaseLibIncludePrefix: String = ""
     var cppOptionalTemplate: String = "std::optional"
     var cppOptionalHeader: String = "<optional>"
-    var cppExpectedHeader: String = "<expected.hpp>"
     var cppEnumHashWorkaround : Boolean = true
     var cppNnHeader: Option[String] = None
     var cppNnType: Option[String] = None
@@ -156,8 +155,6 @@ object Main {
         .text("The template to use for optional values (default: \"std::optional\")")
       opt[String]("cpp-optional-header").valueName("<header>").foreach(x => cppOptionalHeader = x)
         .text("The header to use for optional values (default: \"<optional>\")")
-      opt[String]("cpp-expected-header").valueName("<header>").foreach(x => cppExpectedHeader = x)
-        .text("The header to use for expected(outcome) values (default: \"<expected.hpp>\")")
       opt[Boolean]("cpp-enum-hash-workaround").valueName("<true/false>").foreach(x => cppEnumHashWorkaround = x)
         .text("Work around LWG-2148 by generating std::hash specializations for C++ enums (default: true)")
       opt[String]("cpp-nn-header").valueName("<header>").foreach(x => cppNnHeader = Some(x))
@@ -372,7 +369,6 @@ object Main {
       cppBaseLibIncludePrefix,
       cppOptionalTemplate,
       cppOptionalHeader,
-      cppExpectedHeader,
       cppEnumHashWorkaround,
       cppNnHeader,
       cppNnType,

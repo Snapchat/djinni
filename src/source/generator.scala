@@ -51,7 +51,6 @@ package object generatorTools {
                    cppBaseLibIncludePrefix: String,
                    cppOptionalTemplate: String,
                    cppOptionalHeader: String,
-                   cppExpectedHeader: String,
                    cppEnumHashWorkaround: Boolean,
                    cppNnHeader: Option[String],
                    cppNnType: Option[String],

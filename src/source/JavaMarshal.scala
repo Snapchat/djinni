@@ -52,7 +52,6 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
         case MSet => List(ImportRef("java.util.HashSet"))
         case MMap => List(ImportRef("java.util.HashMap"))
         case MDate => List(ImportRef("java.util.Date"))
-        case MOutcome => List(ImportRef("com.snapchat.djinni.Outcome"))
         case _ => List()
       }
     case p: MProtobuf => List(ImportRef(withPackage(Some(p.body.java.pkg), p.name)))
@@ -129,7 +128,6 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
             case MList => "ArrayList"
             case MSet => "HashSet"
             case MMap => "HashMap"
-            case MOutcome => "Outcome"
             case MArray => throw new AssertionError("array should have been special cased")
             case d: MDef => withPackage(packageName, idJava.ty(d.name))
             case e: MExtern => throw new AssertionError("unreachable")

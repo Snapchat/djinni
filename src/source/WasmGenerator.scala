@@ -57,7 +57,6 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       case MList => "List"
       case MSet => "Set"
       case MMap => "Map"
-      case MOutcome => "Outcome"
       case MProtobuf(_,_,_) => "Protobuf"
       case MArray => "Array"
       case d: MDef => throw new AssertionError("unreachable")
@@ -75,7 +74,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       case MList | MSet =>
         assert(tm.args.size == 1)
         f
-      case MMap | MOutcome =>
+      case MMap =>
         assert(tm.args.size == 2)
         f
       case MProtobuf(name, _, ProtobufMessage(cpp,_,_,Some(ts))) =>
