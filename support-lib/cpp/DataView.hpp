@@ -24,7 +24,6 @@ namespace djinni {
 
 class DataView {
 public:
-    DataView(uint8_t* p, size_t len) : _buf(p), _len(len) {}
     DataView(const uint8_t* p, size_t len) : _buf(const_cast<uint8_t*>(p)), _len(len) {}
 
     DataView(DataView&&) = default;
