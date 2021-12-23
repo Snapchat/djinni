@@ -1,39 +1,38 @@
 name: Build and Test
 
 on:
-    push:
-      branches:
-        - master
-    pull_request: {}
+  push:
+    branches:
+      - master
+  pull_request: {}
 
 jobs:
-    build:
-        name: Build and Test
-        runs-on: macos-latest
-        steps:
+  build:
+    name: Build and Test
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-        - name: Checkout repository
-          uses: actions/checkout@v2
+      - name: Cache bazel build results
+        uses: actions/cache@v2
+        env:
+          cache-name: bazel-cache
+        with:
+          path: ~/.cache/bazel
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.ref }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.cache-name }}-master
 
-        - name: Cache bazel build results
-          uses: actions/cache@v2
-          env:
-            cache-name: bazel-cache
-          with:
-            path: ~/.cache/bazel
-            key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.ref }}
-            restore-keys: |
-              ${{ runner.os }}-${{ env.cache-name }}-master
+      - name: Build
+        run: bazel build //src:djinni
 
-        - name: Build
-          run: bazel build //src:djinni
+      - name: Generate examples / check clean output
+        run: ./ci/generate.sh
 
-        - name: Generate examples / check clean output
-          run: ./ci/generate.sh
+      - name: Test
+        run: bazel test //test-suite:djinni-java-tests  //test-suite:djinni-objc-tests
 
-        - name: Test
-          run: bazel test //test-suite:djinni-java-tests  //test-suite:djinni-objc-tests
-
-        - name: External Test
-          working-directory: external-test
-          run: bazel run @djinni//src:djinni -- --help
+      - name: External Test
+        working-directory: external-test
+        run: bazel run @djinni//src:djinni -- --help
