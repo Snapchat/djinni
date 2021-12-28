@@ -88,7 +88,6 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
             case MList => "Array"
             case MSet => "Set"
             case MMap => "Map"
-            case MOutcome => "Outcome"
             case MArray => throw new AssertionError("array should have been special cased")
             case d: MDef => idJs.ty(d.name)
             case e: MExtern => throw new AssertionError("unreachable")
@@ -105,7 +104,6 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
   def references(m: Meta): Seq[TsSymbolRef] = m match {
     case e: MExtern => List(TsSymbolRef(idJs.ty(e.name), e.ts.module))
     case MProtobuf(name, _, ProtobufMessage(_,_,_,Some(ts))) => List(TsSymbolRef(name, ts.module))
-    case MOutcome => List(TsSymbolRef("Outcome", "@djinni_support/Outcome"))
     case _ => List()
   }
   class TsRefs() {

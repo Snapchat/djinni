@@ -8,6 +8,7 @@
 #import "DJICppWrapperCache+Private.h"
 #import "DJIError.h"
 #import "DJIMarshal+Private.h"
+#import "Outcome_objc.hpp"
 #import "proto/objc/test.pbobjc.h"
 #include <exception>
 #include <stdexcept>

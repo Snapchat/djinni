@@ -148,7 +148,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
       "header" -> QuotedString(objcMarshal.include(td.ident)),
       "boxed" -> QuotedString(objcMarshal.boxedTypename(td)),
       "pointer" -> objcMarshal.isPointer(td),
-      "generic" -> false,
+      // "generic" -> false,
       "hash" -> QuotedString("%s.hash"))
     td.body match {
       case Interface(_,_,_) =>
@@ -169,7 +169,8 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     "typename" -> QuotedString(javaMarshal.fqTypename(td.ident, td.body)),
     "boxed" -> QuotedString(javaMarshal.fqTypename(td.ident, td.body)),
     "reference" -> javaMarshal.isReference(td),
-    "generic" -> false,
+    // "generic" -> false,
+    "generic" -> true,
     "hash" -> QuotedString("%s.hashCode()"),
     "writeToParcel" -> QuotedString("%s.writeToParcel(out, flags)"),
     "readFromParcel" -> QuotedString("new %s(in)")
@@ -190,8 +191,8 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
 
   private def ts(td: TypeDecl) = Map[String, Any](
     "typename" -> tsMarshal.toTsType(mexpr(td)),
-    "module" -> QuotedString("./" + spec.tsModule),
-    "generic" -> false
+    "module" -> QuotedString("./" + spec.tsModule)
+    //, "generic" -> false
   )
 
   // TODO: there has to be a way to do all this without the MExpr/Meta conversions?

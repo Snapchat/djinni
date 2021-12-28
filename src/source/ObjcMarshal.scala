@@ -85,8 +85,6 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
   override def fromCpp(tm: MExpr, expr: String): String = throw new AssertionError("direct cpp to objc conversion not possible")
 
   def references(m: Meta, exclude: String = ""): Seq[SymbolReference] = m match {
-    case MOutcome =>
-      List(ImportRef(q(spec.objcBaseLibIncludePrefix + "DJOutcome.h")))
     case o: MOpaque =>
       List(ImportRef("<Foundation/Foundation.h>"))
     case d: MDef => d.defType match {
@@ -105,12 +103,16 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
         val prefix = if (r.ext.objc) spec.objcExtendedRecordIncludePrefix else spec.objcIncludePrefix
         List(ImportRef(q(prefix + headerName(d.name))))
     }
-    case e: MExtern => List(ImportRef(e.objc.header))
+    case e: MExtern => List(ImportRef(resolveExtObjcHdr(e.objc.header)))
     case p: MProtobuf => p.body.objc match {
       case Some(o) => List(ImportRef(o.header))
       case None => List(ImportRef(p.body.cpp.header))
     }
     case p: MParam => List()
+  }
+
+  def resolveExtObjcHdr(path: String) = {
+    path.replaceAll("\\$", spec.objcBaseLibIncludePrefix);
   }
 
   def implHeaderName(ident: String) = idObjc.ty(ident) + "+Impl." + spec.objcHeaderExt
@@ -157,7 +159,6 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
             case MList | MArray => ("NSArray" + args(tm), true)
             case MSet => ("NSSet" + args(tm), true)
             case MMap => ("NSDictionary" + args(tm), true)
-            case MOutcome => ("DJOutcome" + args(tm), true)
             case d: MDef => d.defType match {
               case DEnum => if (needRef) ("NSNumber", true) else (idObjc.ty(d.name), false)
               case DRecord => (idObjc.ty(d.name), true)

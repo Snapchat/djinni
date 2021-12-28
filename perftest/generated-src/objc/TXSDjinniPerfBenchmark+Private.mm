@@ -70,13 +70,13 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
 
 - (void)argDataRef:(nonnull NSData *)r {
     try {
-        _cppRefHandle.get()->argDataRef(::snapchat::djinni::NativeDataRef::toCpp(r));
+        _cppRefHandle.get()->argDataRef(::djinni::NativeDataRef::toCpp(r));
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
 - (void)argDataView:(nonnull NSData *)d {
     try {
-        _cppRefHandle.get()->argDataView(::snapchat::djinni::NativeDataView::toCpp(d));
+        _cppRefHandle.get()->argDataView(::djinni::NativeDataView::toCpp(d));
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 

@@ -189,7 +189,6 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       case MList | MArray => true
       case MSet => true
       case MMap => true
-      case MOutcome => true
       case MBinary => true
       case _ => false
     }
@@ -312,7 +311,6 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
                 case MList | MArray => w.w(s"[self.${idObjc.field(f.ident)} isEqualToArray:typedOther.${idObjc.field(f.ident)}]")
                 case MSet => w.w(s"[self.${idObjc.field(f.ident)} isEqualToSet:typedOther.${idObjc.field(f.ident)}]")
                 case MMap => w.w(s"[self.${idObjc.field(f.ident)} isEqualToDictionary:typedOther.${idObjc.field(f.ident)}]")
-                case MOutcome => w.w(s"[self.${idObjc.field(f.ident)} isEqualToOutcome:typedOther.${idObjc.field(f.ident)}]")
                 case MOptional =>
                   f.ty.resolved.args.head.base match {
                     case df: MDef if df.defType == DEnum =>

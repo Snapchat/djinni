@@ -3,8 +3,8 @@ typedef: 'record'
 params: []
 prefix: ""
 cpp:
-  typename: '::snapchat::djinni::DataView'
-  header: '"DataView.hpp"'
+  typename: '::djinni::DataView'
+  header: '"$DataView.hpp"'
   byValue: false
 objc:
   typename: 'NSData'
@@ -13,8 +13,8 @@ objc:
   boxed: 'NSData'
   header: '<Foundation/Foundation.h>'
 objcpp:
-  translator: '::snapchat::djinni::NativeDataView'
-  header: '"DataView_objc.hpp"'
+  translator: '::djinni::NativeDataView'
+  header: '"$DataView_objc.hpp"'
 java:
   reference: true
   typename: 'java.nio.ByteBuffer'
@@ -22,14 +22,14 @@ java:
   hash: '%s.hashCode()'
   boxed: 'java.nio.ByteBuffer'
 jni:
-  translator: '::snapchat::djinni::NativeDataView'
-  header: '"DataView_jni.hpp"'
+  translator: '::djinni::NativeDataView'
+  header: '"$DataView_jni.hpp"'
   typename: jobject
   typeSignature: 'Ljava/nio/ByteBuffer;'
 wasm:
   typename: 'em::val'
-  translator: '::snapchat::djinni::NativeDataView'
-  header: '"DataView_wasm.hpp"'
+  translator: '::djinni::NativeDataView'
+  header: '"$DataView_wasm.hpp"'
 ts:
   typename: 'Uint8Array'
   module: ''

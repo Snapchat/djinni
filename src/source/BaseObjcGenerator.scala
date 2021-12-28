@@ -39,7 +39,7 @@ abstract class BaseObjcGenerator(spec: Spec) extends Generator(spec) {
   def writeObjcConstVariableDecl(w: IndentWriter, c: Const, s: String): Unit = {
     val nullability = marshal.nullability(c.ty.resolved).fold("")(" __" + _)
     val td = marshal.fqFieldType(c.ty) + nullability
-    // MBinary | MList | MSet | MMap | MOutcome | MArray are not allowed for constants.
+    // MBinary | MList | MSet | MMap | MArray are not allowed for constants.
     w.w(s"${td} const $s${idObjc.const(c.ident)}")
   }
 

@@ -9,7 +9,7 @@
 - (nonnull instancetype)initWithO:(nonnull DJOutcome<NSNumber *, NSString *> *)o
 {
     if (self = [super init]) {
-        _o = [o copy];
+        _o = o;
     }
     return self;
 }
@@ -25,13 +25,13 @@
         return NO;
     }
     DBNestedOutcome *typedOther = (DBNestedOutcome *)other;
-    return [self.o isEqualToOutcome:typedOther.o];
+    return [self.o isEqual:typedOther.o];
 }
 
 - (NSUInteger)hash
 {
     return NSStringFromClass([self class]).hash ^
-            self.o.hash;
+            (self.o.hash);
 }
 
 #ifndef DJINNI_DISABLE_DESCRIPTION_METHODS

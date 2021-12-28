@@ -15,21 +15,21 @@ class DataRefTest {
 public:
     virtual ~DataRefTest() = default;
 
-    virtual void sendData(const ::snapchat::djinni::DataRef & data) = 0;
+    virtual void sendData(const ::djinni::DataRef & data) = 0;
 
     virtual std::vector<uint8_t> retriveAsBin() = 0;
 
-    virtual void sendMutableData(const ::snapchat::djinni::DataRef & data) = 0;
+    virtual void sendMutableData(const ::djinni::DataRef & data) = 0;
 
-    virtual ::snapchat::djinni::DataRef generateData() = 0;
+    virtual ::djinni::DataRef generateData() = 0;
 
-    virtual ::snapchat::djinni::DataRef dataFromVec() = 0;
+    virtual ::djinni::DataRef dataFromVec() = 0;
 
-    virtual ::snapchat::djinni::DataRef dataFromStr() = 0;
+    virtual ::djinni::DataRef dataFromStr() = 0;
 
-    virtual std::vector<uint8_t> sendDataView(const ::snapchat::djinni::DataView & data) = 0;
+    virtual std::vector<uint8_t> sendDataView(const ::djinni::DataView & data) = 0;
 
-    virtual ::snapchat::djinni::DataView recvDataView() = 0;
+    virtual ::djinni::DataView recvDataView() = 0;
 
     static std::shared_ptr<DataRefTest> create();
 };

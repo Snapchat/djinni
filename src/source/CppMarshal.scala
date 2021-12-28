@@ -79,7 +79,6 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
     case MList | MArray => List(ImportRef("<vector>"))
     case MSet => List(ImportRef("<unordered_set>"))
     case MMap => List(ImportRef("<unordered_map>"))
-    case MOutcome => List(ImportRef(spec.cppExpectedHeader))
     case d: MDef => d.body match {
       case r: Record =>
         if (d.name != exclude) {
@@ -119,11 +118,15 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
       // Do not forward declare extern types, they might be in arbitrary namespaces.
       // This isn't a problem as extern types cannot cause dependency cycles with types being generated here
       case DInterface => List(ImportRef("<memory>"), ImportRef(e.cpp.header))
-      case _ => List(ImportRef(e.cpp.header))
+      case _ => List(ImportRef(resolveExtCppHdr(e.cpp.header)))
     }
     case p: MProtobuf =>
       List(ImportRef(p.body.cpp.header))
     case p: MParam => List()
+  }
+
+  def resolveExtCppHdr(path: String) = {
+    path.replaceAll("\\$", spec.cppBaseLibIncludePrefix);
   }
 
   def cppReferences(m: Meta, exclude: String, forwardDeclareOnly: Boolean): Seq[SymbolReference] = {
@@ -181,7 +184,6 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
       case MList | MArray => "std::vector"
       case MSet => "std::unordered_set"
       case MMap => "std::unordered_map"
-      case MOutcome => "djinni::expected"
       case d: MDef =>
         d.defType match {
           case DEnum => withNamespace(idCpp.enumType(d.name))

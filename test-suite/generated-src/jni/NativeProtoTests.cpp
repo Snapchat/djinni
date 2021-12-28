@@ -5,6 +5,7 @@
 #include "Marshal.hpp"
 #include "NativeRecordWithEmbeddedCppProto.hpp"
 #include "NativeRecordWithEmbeddedProto.hpp"
+#include "Outcome_jni.hpp"
 
 namespace djinni_generated {
 
@@ -116,7 +117,7 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_ProtoTests_stringToOptio
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_ProtoTests_stringToProtoOutcome(JNIEnv* jniEnv, jobject /*this*/, jstring j_x)
+CJNIEXPORT ::djinni::Outcome<::djinni::Protobuf<::djinni::test::Person, ::djinni::JavaClassName<'d','j','i','n','n','i','/','t','e','s','t','/','T','e','s','t','$','P','e','r','s','o','n'>>, ::djinni::I32>::JniType JNICALL Java_com_dropbox_djinni_test_ProtoTests_stringToProtoOutcome(JNIEnv* jniEnv, jobject /*this*/, jstring j_x)
 {
     try {
         auto r = ::testsuite::ProtoTests::stringToProtoOutcome(::djinni::String::toCpp(jniEnv, j_x));

@@ -63,8 +63,12 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
         val objcName = d.name + (if (r.ext.objc) "_base" else "")
         List(ImportRef(q(spec.objcppIncludePrefix + privateHeaderName(objcName))))
     }
-    case e: MExtern => List(ImportRef(e.objcpp.header))
+    case e: MExtern => List(ImportRef(resolveExtObjcppHdr(e.objcpp.header)))
     case p: MParam => List()
+  }
+
+  def resolveExtObjcppHdr(path: String) = {
+    path.replaceAll("\\$", spec.objcBaseLibIncludePrefix);
   }
 
   def include(m: Meta) = m match {
@@ -111,7 +115,6 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
       case MList => "List"
       case MSet => "Set"
       case MMap => "Map"
-      case MOutcome => "Outcome"
       case MArray => "Array"
       case d: MDef => throw new AssertionError("unreachable")
       case e: MExtern => throw new AssertionError("unreachable")
@@ -129,9 +132,6 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
         s"<${spec.cppOptionalTemplate}, $argHelperClass>"
       case MList | MSet | MArray =>
         assert(tm.args.size == 1)
-        f
-      case MMap | MOutcome =>
-        assert(tm.args.size == 2)
         f
       case _ => f
     }

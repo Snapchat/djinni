@@ -1,0 +1,38 @@
+name: outcome
+typedef: 'record deriving(eq, nscopying)'
+params: [T, E]
+prefix: ''
+cpp:
+  typename: 'djinni::expected'
+  header: '"$expected.hpp"'
+  byValue: false
+  moveOnly: false
+objc:
+  typename: 'DJOutcome'
+  header: '"$DJOutcome.h"'
+  boxed: 'DJOutcome'
+  pointer: true
+  generic: true
+  hash: '%s.hash'
+objcpp:
+  translator: '::djinni::Outcome'
+  header: '"$Outcome_objc.hpp"'
+java:
+  typename: 'com.snapchat.djinni.Outcome'
+  boxed: 'com.snapchat.djinni.Outcome'
+  reference: true
+  generic: true
+  hash: '%s.hashCode()'
+jni:
+  translator: '::djinni::Outcome'
+  header: '"$Outcome_jni.hpp"'
+  typename: jobject
+  typeSignature: 'Lcom/snapchat/djinni/Outcome;'
+wasm:
+  typename: 'em::val'
+  translator: '::djinni::Outcome'
+  header: '"$Outcome_wasm.hpp"'
+ts:
+  typename: 'Outcome'
+  module: '@djinni_support/Outcome'
+  generic: true

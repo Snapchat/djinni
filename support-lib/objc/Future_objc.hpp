@@ -18,9 +18,9 @@
 
 #include "DJIMarshal+Private.h"
 #import "DJFuture.h"
-#import "Future.hpp"
+#import "../cpp/Future.hpp"
 
-namespace snapchat::djinni {
+namespace djinni {
 
 template <class RESULT>
 class FutureAdaptor
@@ -43,7 +43,7 @@ public:
                 @try {
                     p->setValue(RESULT::Boxed::toCpp([res get]));
                 } @catch (NSException* e) {
-                    p->setException(std::runtime_error(::djinni::String::toCpp(e.reason)));
+                    p->setException(std::runtime_error(String::toCpp(e.reason)));
                 }
                 return nil;
             }];
@@ -59,7 +59,7 @@ public:
                 try {
                     [promise setValue:RESULT::Boxed::fromCpp(res.get())];
                 } catch (const std::exception& e) {
-                    [promise setException: [NSException exceptionWithName:@"" reason: ::djinni::String::fromCpp(e.what()) userInfo:nil]];
+                    [promise setException: [NSException exceptionWithName:@"" reason: String::fromCpp(e.what()) userInfo:nil]];
                 }
             });
         
@@ -67,4 +67,4 @@ public:
     }
 };
 
-} // namespace snapchat::djinni
+} // namespace djinni

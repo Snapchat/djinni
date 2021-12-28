@@ -26,18 +26,18 @@
 #if defined(DJINNI_FUTURE_COROUTINE_SUPPORT)
 #if __has_include(<coroutine>)
     #include <coroutine>
-    namespace snapchat::djinni::detail {
+    namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::coroutine_handle<Promise>;
     }
 #elif __has_include(<experimental/coroutine>)
     #include <experimental/coroutine>
-    namespace snapchat::djinni::detail {
+    namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::experimental::coroutine_handle<Promise>;
     }
 #endif
 #endif
 
-namespace snapchat::djinni {
+namespace djinni {
 
 template <typename T>
 class Future;
@@ -313,4 +313,4 @@ Future<T> detail::PromiseBase<T>::getFuture() {
     return Future<T>(std::atomic_load(&_sharedState));
 }
 
-} // namespace snapchat::djinni
+} // namespace djinni

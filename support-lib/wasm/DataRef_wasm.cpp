@@ -14,14 +14,13 @@
   * limitations under the License.
   */
 
-#include "DataRef.hpp"
+#include "../cpp/DataRef.hpp"
 
 #if DATAREF_WASM
 
 #include "djinni_wasm.hpp"
 #include <cassert>
 
-namespace snapchat {
 namespace djinni {
 
 class DataRefWasm : public DataRef::Impl {
@@ -33,7 +32,7 @@ public:
     // create new data object and initialize with data. although this still
     // copies data, it does the allocation and initialization in one step.
     explicit DataRefWasm(const void* data, size_t len) {
-        auto* dbuf = new ::djinni::GenericBuffer<std::vector<uint8_t>>(
+        auto* dbuf = new GenericBuffer<std::vector<uint8_t>>(
             reinterpret_cast<const uint8_t*>(data), len);
         // The js object will destroy the c++ object when its GCed
         _data = dbuf->createJsObject();
@@ -41,7 +40,7 @@ public:
     // take over a std::vector's buffer without copying it
     explicit DataRefWasm(std::vector<uint8_t>&& vec) {
         if (!vec.empty()) {
-            auto* dbuf = new ::djinni::GenericBuffer<std::vector<uint8_t>>(std::move(vec));
+            auto* dbuf = new GenericBuffer<std::vector<uint8_t>>(std::move(vec));
             _data = dbuf->createJsObject();
         } else {
             allocate(0);
@@ -50,7 +49,7 @@ public:
     // take over a std::string's buffer without copying it
     explicit DataRefWasm(std::string&& str) {
         if (!str.empty()) {
-            auto* dbuf = new ::djinni::GenericBuffer<std::string>(std::move(str));
+            auto* dbuf = new GenericBuffer<std::string>(std::move(str));
             _data = dbuf->createJsObject();
         } else {
             allocate(0);
@@ -58,7 +57,7 @@ public:
     }
     explicit DataRefWasm(PlatformObject data) {
         auto buffer = data["buffer"];
-        assert(buffer == ::djinni::getWasmMemoryBuffer());
+        assert(buffer == getWasmMemoryBuffer());
         _data = data;
     }
     DataRefWasm(const DataRefWasm&) = delete;
@@ -81,7 +80,7 @@ private:
     emscripten::val _data = emscripten::val::undefined();
 
     void allocate(size_t len) {
-        auto* dbuf = new ::djinni::GenericBuffer<std::vector<uint8_t>>(len);
+        auto* dbuf = new GenericBuffer<std::vector<uint8_t>>(len);
         _data = dbuf->createJsObject();
     }
 };
@@ -105,6 +104,6 @@ DataRef::DataRef(PlatformObject platformObj) {
     _impl = std::make_shared<DataRefWasm>(platformObj);
 }
 
-}} // namespace snapchat::djinni
+} // namespace djinni
 
 #endif

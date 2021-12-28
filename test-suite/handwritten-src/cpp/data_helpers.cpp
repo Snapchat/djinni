@@ -2,7 +2,7 @@
 
 namespace testsuite {
 
-using namespace snapchat::djinni;
+using namespace djinni;
 
 class DataRefTestCpp : public ::testsuite::DataRefTest {
     DataRef _data;

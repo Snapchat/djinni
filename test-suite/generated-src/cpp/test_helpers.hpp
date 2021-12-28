@@ -89,11 +89,11 @@ public:
 
     static std::vector<uint8_t> id_binary(const std::vector<uint8_t> & b);
 
-    static ::snapchat::djinni::Future<int32_t> get_async_result();
+    static ::djinni::Future<int32_t> get_async_result();
 
-    static ::snapchat::djinni::Future<std::string> future_roundtrip(::snapchat::djinni::Future<int32_t> f);
+    static ::djinni::Future<std::string> future_roundtrip(::djinni::Future<int32_t> f);
 
-    static ::snapchat::djinni::Future<std::string> check_async_interface(const std::shared_ptr<AsyncInterface> & i);
+    static ::djinni::Future<std::string> check_async_interface(const std::shared_ptr<AsyncInterface> & i);
 };
 
 }  // namespace testsuite

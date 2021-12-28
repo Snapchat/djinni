@@ -19,7 +19,7 @@
 #include "djinni_wasm.hpp"
 #include "../cpp/Future.hpp"
 
-namespace snapchat::djinni {
+namespace djinni {
 
 template <class RESULT>
 class FutureAdaptor
@@ -55,7 +55,7 @@ public:
         return f;
     }
 
-    class CppResolveHandler: public ::djinni::CppResolveHandlerBase {
+    class CppResolveHandler: public CppResolveHandlerBase {
     public:
         void init(em::val resolveFunc, em::val rejectFunc) override {
             _resolveFunc = resolveFunc;
@@ -105,4 +105,4 @@ public:
     }
 };
 
-} // namespace snapchat::djinni
+} // namespace djinni

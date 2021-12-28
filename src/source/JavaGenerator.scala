@@ -314,7 +314,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
                 skipFirst { w.wl(" &&") }
                 f.ty.resolved.base match {
                   case MBinary | MArray => w.w(s"java.util.Arrays.equals(${idJava.field(f.ident)}, other.${idJava.field(f.ident)})")
-                  case MList | MSet | MMap | MString | MDate | MOutcome => w.w(s"this.${idJava.field(f.ident)}.equals(other.${idJava.field(f.ident)})")
+                  case MList | MSet | MMap | MString | MDate => w.w(s"this.${idJava.field(f.ident)}.equals(other.${idJava.field(f.ident)})")
                   case MOptional =>
                     w.w(s"((this.${idJava.field(f.ident)} == null && other.${idJava.field(f.ident)} == null) || ")
                     w.w(s"(this.${idJava.field(f.ident)} != null && this.${idJava.field(f.ident)}.equals(other.${idJava.field(f.ident)})))")
@@ -353,7 +353,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
             for (f <- r.fields) {
               val fieldHashCode = f.ty.resolved.base match {
                 case MBinary | MArray => s"java.util.Arrays.hashCode(${idJava.field(f.ident)})"
-                case MList | MSet | MMap | MString | MDate | MOutcome => s"${idJava.field(f.ident)}.hashCode()"
+                case MList | MSet | MMap | MString | MDate => s"${idJava.field(f.ident)}.hashCode()"
                 // Need to repeat this case for MDef
                 case df: MDef => s"${idJava.field(f.ident)}.hashCode()"
                 case MOptional => s"(${idJava.field(f.ident)} == null ? 0 : ${idJava.field(f.ident)}.hashCode())"

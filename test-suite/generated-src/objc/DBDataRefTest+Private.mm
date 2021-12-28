@@ -34,7 +34,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
 
 - (void)sendData:(nonnull NSData *)data {
     try {
-        _cppRefHandle.get()->sendData(::snapchat::djinni::NativeDataRef::toCpp(data));
+        _cppRefHandle.get()->sendData(::djinni::NativeDataRef::toCpp(data));
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
@@ -47,34 +47,34 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
 
 - (void)sendMutableData:(nonnull NSData *)data {
     try {
-        _cppRefHandle.get()->sendMutableData(::snapchat::djinni::NativeDataRef::toCpp(data));
+        _cppRefHandle.get()->sendMutableData(::djinni::NativeDataRef::toCpp(data));
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
 - (nonnull NSData *)generateData {
     try {
         auto objcpp_result_ = _cppRefHandle.get()->generateData();
-        return ::snapchat::djinni::NativeDataRef::fromCpp(objcpp_result_);
+        return ::djinni::NativeDataRef::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
 - (nonnull NSData *)dataFromVec {
     try {
         auto objcpp_result_ = _cppRefHandle.get()->dataFromVec();
-        return ::snapchat::djinni::NativeDataRef::fromCpp(objcpp_result_);
+        return ::djinni::NativeDataRef::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
 - (nonnull NSData *)dataFromStr {
     try {
         auto objcpp_result_ = _cppRefHandle.get()->dataFromStr();
-        return ::snapchat::djinni::NativeDataRef::fromCpp(objcpp_result_);
+        return ::djinni::NativeDataRef::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
 - (nonnull NSData *)sendDataView:(nonnull NSData *)data {
     try {
-        auto objcpp_result_ = _cppRefHandle.get()->sendDataView(::snapchat::djinni::NativeDataView::toCpp(data));
+        auto objcpp_result_ = _cppRefHandle.get()->sendDataView(::djinni::NativeDataView::toCpp(data));
         return ::djinni::Binary::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
@@ -82,7 +82,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
 - (nonnull NSData *)recvDataView {
     try {
         auto objcpp_result_ = _cppRefHandle.get()->recvDataView();
-        return ::snapchat::djinni::NativeDataView::fromCpp(objcpp_result_);
+        return ::djinni::NativeDataView::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 

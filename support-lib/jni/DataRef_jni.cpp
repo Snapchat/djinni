@@ -14,7 +14,7 @@
   * limitations under the License.
   */
 
-#include "DataRef.hpp"
+#include "../cpp/DataRef.hpp"
 
 #if DATAREF_JNI
 
@@ -23,19 +23,18 @@
 #include <cassert>
 #include <variant>
 
-namespace snapchat {
 namespace djinni {
 
 class DataRefJNI : public DataRef::Impl {
     struct ByteBufferClassInfo {
-        ::djinni::GlobalRef<jclass> classObject;
+        GlobalRef<jclass> classObject;
         jmethodID allocateDirect;
 
         ByteBufferClassInfo() {
-            classObject = ::djinni::jniFindClass("java/nio/ByteBuffer");
+            classObject = jniFindClass("java/nio/ByteBuffer");
             assert(classObject != nullptr);
             allocateDirect =
-                ::djinni::jniGetStaticMethodID(classObject.get(), "allocateDirect", "(I)Ljava/nio/ByteBuffer;");
+                jniGetStaticMethodID(classObject.get(), "allocateDirect", "(I)Ljava/nio/ByteBuffer;");
             assert(allocateDirect != nullptr);
         }
     };
@@ -43,29 +42,29 @@ class DataRefJNI : public DataRef::Impl {
         jmethodID isReadOnly;
 
         BufferClassInfo() {
-            auto jcls = ::djinni::jniFindClass("java/nio/Buffer");
+            auto jcls = jniFindClass("java/nio/Buffer");
             assert(jcls != nullptr);
-            isReadOnly = ::djinni::jniGetMethodID(jcls.get(), "isReadOnly", "()Z");
+            isReadOnly = jniGetMethodID(jcls.get(), "isReadOnly", "()Z");
             assert(isReadOnly != nullptr);
         }
     };
     struct NativeObjectManagerClassInfo {
-        ::djinni::GlobalRef<jclass> classObject;
+        GlobalRef<jclass> classObject;
         jmethodID registerMethodId;
 
         NativeObjectManagerClassInfo() {
-            classObject = ::djinni::jniFindClass("com/snapchat/djinni/NativeObjectManager");
+            classObject = jniFindClass("com/snapchat/djinni/NativeObjectManager");
             assert(classObject != nullptr);
-            registerMethodId = ::djinni::jniGetStaticMethodID(
+            registerMethodId = jniGetStaticMethodID(
                 classObject.get(), "register", "(Ljava/lang/Object;Ljava/lang/Class;J)V");
             assert(registerMethodId != nullptr);
         }
     };
     struct DataRefHelperClassInfo {
-        ::djinni::GlobalRef<jclass> classObject;
+        GlobalRef<jclass> classObject;
 
         DataRefHelperClassInfo() {
-            classObject = ::djinni::jniFindClass("com/snapchat/djinni/DataRefHelper");
+            classObject = jniFindClass("com/snapchat/djinni/DataRefHelper");
             assert(classObject != nullptr);
         }
     };
@@ -79,11 +78,11 @@ public:
     }
     // wrap a ByteBuffer object from java
     explicit DataRefJNI(jobject data) {
-        auto* env = ::djinni::jniGetThreadEnv();
+        auto* env = jniGetThreadEnv();
         _data = {env, data};
         // call ByteBuffer.isReadOnly() to determine mutability
-        _readonly = env->CallBooleanMethod(_data.get(), ::djinni::JniClass<BufferClassInfo>::get().isReadOnly) != 0;
-        ::djinni::jniExceptionCheck(env);
+        _readonly = env->CallBooleanMethod(_data.get(), JniClass<BufferClassInfo>::get().isReadOnly) != 0;
+        jniExceptionCheck(env);
         auto len = env->GetDirectBufferCapacity(_data.get());
         assert(len != -1); // GetDirectBufferCapacity() returns -1 when the ByteBuffer is not direct
         _len = static_cast<size_t>(len);
@@ -125,18 +124,18 @@ public:
     }
 
 private:
-    ::djinni::GlobalRef<jobject> _data;
+    GlobalRef<jobject> _data;
     bool _readonly;
     size_t _len;
     uint8_t* _buf;
 
     void allocate(size_t len) {
-        auto* env = ::djinni::jniGetThreadEnv();
+        auto* env = jniGetThreadEnv();
         // call Java's ByteBuffer.allocateDirect() to create a direct buffer owned by the jobject
-        const auto& classInfo = ::djinni::JniClass<ByteBufferClassInfo>::get();
-        ::djinni::LocalRef<jobject> localData{
+        const auto& classInfo = JniClass<ByteBufferClassInfo>::get();
+        LocalRef<jobject> localData{
             env, env->CallStaticObjectMethod(classInfo.classObject.get(), classInfo.allocateDirect, len)};
-        ::djinni::jniExceptionCheck(env);
+        jniExceptionCheck(env);
         // convert the local ref to a global ref so we can keep it
         _data = {env, localData.get()};
         _readonly = false;
@@ -147,7 +146,7 @@ private:
 
     template<typename T>
     void takeOver(T&& obj) {
-        auto* env = ::djinni::jniGetThreadEnv();
+        auto* env = jniGetThreadEnv();
 
         // move input object to a new heap object
         auto p = std::make_unique<DataObj>(std::forward<T>(obj));
@@ -158,8 +157,8 @@ private:
         auto& r = std::get<std::decay_t<T>>(*p);
 
         // create direct buffer based on the input object
-        ::djinni::LocalRef<jobject> localData{env, env->NewDirectByteBuffer(r.data(), r.size())};
-        ::djinni::jniExceptionCheck(env);
+        LocalRef<jobject> localData{env, env->NewDirectByteBuffer(r.data(), r.size())};
+        jniExceptionCheck(env);
         _data = {env, localData.get()};
         _readonly = false;
         _len = r.size();
@@ -167,13 +166,13 @@ private:
 
         // register direct buffer with DataRefHelper.
         // p will be deleted by DataRefHelper.destroy()
-        const auto& nativeObjectManagerClass = ::djinni::JniClass<NativeObjectManagerClassInfo>::get();
+        const auto& nativeObjectManagerClass = JniClass<NativeObjectManagerClassInfo>::get();
         env->CallStaticVoidMethod(nativeObjectManagerClass.classObject.get(),
                                   nativeObjectManagerClass.registerMethodId,
                                   localData.get(),
-                                  ::djinni::JniClass<DataRefHelperClassInfo>::get().classObject.get(),
+                                  JniClass<DataRefHelperClassInfo>::get().classObject.get(),
                                   reinterpret_cast<jlong>(p.get()));
-        ::djinni::jniExceptionCheck(env);
+        jniExceptionCheck(env);
         // NOLINTNEXTLINE(bugprone-unused-return-value)
         p.release(); // registration is successful, object is now managed by nativeObjectManager
     }
@@ -214,8 +213,8 @@ static const JNINativeMethod kNativeMethods[] = {{
 
 // NOLINTNEXTLINE
 static auto sRegisterMethods =
-    ::djinni::JNIMethodLoadAutoRegister("com/snapchat/djinni/DataRefHelper", kNativeMethods);
+    JNIMethodLoadAutoRegister("com/snapchat/djinni/DataRefHelper", kNativeMethods);
 
-}} // namespace snapchat::djinni
+} // namespace djinni
 
 #endif

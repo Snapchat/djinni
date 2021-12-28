@@ -64,8 +64,12 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       }
     }
     case d: MDef => List(ImportRef(include(d.name)))
-    case e: MExtern => List(ImportRef(e.jni.header))
+    case e: MExtern => List(ImportRef(resolveExtJniHdr(e.jni.header)))
     case _ => List()
+  }
+
+  def resolveExtJniHdr(path: String) = {
+    path.replaceAll("\\$", spec.jniBaseLibIncludePrefix);
   }
 
   def include(ident: String) = q(spec.jniIncludePrefix + spec.jniFileIdentStyle(ident) + "." + spec.cppHeaderExt)
@@ -101,7 +105,6 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       case MList => "Ljava/util/ArrayList;"
       case MSet => "Ljava/util/HashSet;"
       case MMap => "Ljava/util/HashMap;"
-      case MOutcome => "Lcom/snapchat/djinni/Outcome;"
       case MArray => s"[${javaTypeSignature(tm.args.head)}"
     }
     case e: MExtern => e.jni.typeSignature
@@ -156,7 +159,6 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       case MList => "List"
       case MSet => "Set"
       case MMap => "Map"
-      case MOutcome => "Outcome"
       case MProtobuf(_,_,_) => "Protobuf"
       case MArray => "Array"
       case d: MDef => throw new AssertionError("unreachable")
@@ -176,7 +178,7 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       case MList | MSet =>
         assert(tm.args.size == 1)
         f
-      case MMap | MOutcome =>
+      case MMap =>
         assert(tm.args.size == 2)
         f
       case p: MProtobuf =>

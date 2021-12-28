@@ -3,22 +3,21 @@
 
 package com.dropbox.djinni.test;
 
-import com.snapchat.djinni.Outcome;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 public class NestedOutcome {
 
 
-    /*package*/ final Outcome<Integer, String> mO;
+    /*package*/ final com.snapchat.djinni.Outcome<Integer, String> mO;
 
     public NestedOutcome(
-            @Nonnull Outcome<Integer, String> o) {
+            @Nonnull com.snapchat.djinni.Outcome<Integer, String> o) {
         this.mO = o;
     }
 
     @Nonnull
-    public Outcome<Integer, String> getO() {
+    public com.snapchat.djinni.Outcome<Integer, String> getO() {
         return mO;
     }
 
@@ -35,7 +34,7 @@ public class NestedOutcome {
     public int hashCode() {
         // Pick an arbitrary non-zero starting value
         int hashCode = 17;
-        hashCode = hashCode * 31 + mO.hashCode();
+        hashCode = hashCode * 31 + (mO.hashCode());
         return hashCode;
     }
 

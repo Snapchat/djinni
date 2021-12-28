@@ -16,7 +16,6 @@
 
 #include "Future_jni.hpp"
 
-namespace snapchat {
 namespace djinni {
 
 // NOLINTNEXTLINE
@@ -33,6 +32,6 @@ static const JNINativeMethod kNativeMethods[] = {{
 
 // NOLINTNEXTLINE
 static auto sRegisterMethods =
-    ::djinni::JNIMethodLoadAutoRegister("com/snapchat/djinni/NativeFutureHandler", kNativeMethods);
+    JNIMethodLoadAutoRegister("com/snapchat/djinni/NativeFutureHandler", kNativeMethods);
 
-}} // namespace snapchat::djinni
+} // namespace djinni

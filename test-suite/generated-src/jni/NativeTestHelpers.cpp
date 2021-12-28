@@ -222,27 +222,27 @@ CJNIEXPORT jbyteArray JNICALL Java_com_dropbox_djinni_test_TestHelpers_idBinary(
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT ::snapchat::djinni::FutureAdaptor<::djinni::I32>::JniType JNICALL Java_com_dropbox_djinni_test_TestHelpers_getAsyncResult(JNIEnv* jniEnv, jobject /*this*/)
+CJNIEXPORT ::djinni::FutureAdaptor<::djinni::I32>::JniType JNICALL Java_com_dropbox_djinni_test_TestHelpers_getAsyncResult(JNIEnv* jniEnv, jobject /*this*/)
 {
     try {
         auto r = ::testsuite::TestHelpers::get_async_result();
-        return ::djinni::release(::snapchat::djinni::FutureAdaptor<::djinni::I32>::fromCpp(jniEnv, std::move(r)));
+        return ::djinni::release(::djinni::FutureAdaptor<::djinni::I32>::fromCpp(jniEnv, std::move(r)));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT ::snapchat::djinni::FutureAdaptor<::djinni::String>::JniType JNICALL Java_com_dropbox_djinni_test_TestHelpers_futureRoundtrip(JNIEnv* jniEnv, jobject /*this*/, ::snapchat::djinni::FutureAdaptor<::djinni::I32>::JniType j_f)
+CJNIEXPORT ::djinni::FutureAdaptor<::djinni::String>::JniType JNICALL Java_com_dropbox_djinni_test_TestHelpers_futureRoundtrip(JNIEnv* jniEnv, jobject /*this*/, ::djinni::FutureAdaptor<::djinni::I32>::JniType j_f)
 {
     try {
-        auto r = ::testsuite::TestHelpers::future_roundtrip(::snapchat::djinni::FutureAdaptor<::djinni::I32>::toCpp(jniEnv, j_f));
-        return ::djinni::release(::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, std::move(r)));
+        auto r = ::testsuite::TestHelpers::future_roundtrip(::djinni::FutureAdaptor<::djinni::I32>::toCpp(jniEnv, j_f));
+        return ::djinni::release(::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, std::move(r)));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT ::snapchat::djinni::FutureAdaptor<::djinni::String>::JniType JNICALL Java_com_dropbox_djinni_test_TestHelpers_checkAsyncInterface(JNIEnv* jniEnv, jobject /*this*/, jobject j_i)
+CJNIEXPORT ::djinni::FutureAdaptor<::djinni::String>::JniType JNICALL Java_com_dropbox_djinni_test_TestHelpers_checkAsyncInterface(JNIEnv* jniEnv, jobject /*this*/, jobject j_i)
 {
     try {
         auto r = ::testsuite::TestHelpers::check_async_interface(::djinni_generated::NativeAsyncInterface::toCpp(jniEnv, j_i));
-        return ::djinni::release(::snapchat::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, std::move(r)));
+        return ::djinni::release(::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, std::move(r)));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 

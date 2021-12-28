@@ -4,6 +4,7 @@
 #include "NativeProtoTests.hpp"  // my header
 #include "NativeRecordWithEmbeddedCppProto.hpp"
 #include "NativeRecordWithEmbeddedProto.hpp"
+#include "Outcome_wasm.hpp"
 
 namespace djinni_generated {
 

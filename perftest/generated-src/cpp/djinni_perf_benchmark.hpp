@@ -32,9 +32,9 @@ public:
 
     virtual void argBinary(const std::vector<uint8_t> & b) = 0;
 
-    virtual void argDataRef(const ::snapchat::djinni::DataRef & r) = 0;
+    virtual void argDataRef(const ::djinni::DataRef & r) = 0;
 
-    virtual void argDataView(const ::snapchat::djinni::DataView & d) = 0;
+    virtual void argDataView(const ::djinni::DataView & d) = 0;
 
     virtual void argEnumSixValue(EnumSixValue e) = 0;
 

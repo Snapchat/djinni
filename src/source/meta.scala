@@ -101,7 +101,6 @@ case object MOptional extends MOpaque { val numParams = 1; val idlName = "option
 case object MList extends MOpaque { val numParams = 1; val idlName = "list" }
 case object MSet extends MOpaque { val numParams = 1; val idlName = "set" }
 case object MMap extends MOpaque { val numParams = 2; val idlName = "map" }
-case object MOutcome extends MOpaque { val numParams = 2; val idlName = "outcome"}
 case object MArray extends MOpaque { val numParams = 1; val idlName = "array"}
 
 val defaults: Map[String,MOpaque] = immutable.HashMap(
@@ -119,7 +118,6 @@ val defaults: Map[String,MOpaque] = immutable.HashMap(
   ("list", MList),
   ("set", MSet),
   ("map", MMap),
-  ("outcome", MOutcome),
   ("array", MArray))
 
 def isInterface(ty: MExpr): Boolean = {

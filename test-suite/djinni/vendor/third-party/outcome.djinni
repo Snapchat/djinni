@@ -1,3 +1,5 @@
+@extern "../../../../support-lib/outcome.yaml"
+
 nested_outcome = record {
   o: outcome<i32, string>;
 } deriving(eq)

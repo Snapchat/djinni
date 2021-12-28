@@ -20,7 +20,6 @@
 
 #include <cassert>
 
-namespace snapchat {
 namespace djinni {
 
 class DataRefCpp : public DataRef::Impl {
@@ -62,6 +61,6 @@ DataRef::DataRef(std::vector<uint8_t>&& vec) {
 
 DataRef::DataRef(std::string&& str) : DataRef(str.data(), str.size()) {}
 
-}} // namespace snapchat::djinni
+} // namespace djinni
 
 #endif
