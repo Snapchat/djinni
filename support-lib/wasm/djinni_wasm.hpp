@@ -426,9 +426,14 @@ private:
     JsProxyId _id;
 };
 
+struct CppProxyCacheEntry {
+    em::val ref;
+    int count;
+};
+
 extern JsProxyId nextId;
 extern std::unordered_map<JsProxyId, std::weak_ptr<JsProxyBase>> jsProxyCache;
-extern std::unordered_map<void*, em::val> cppProxyCache;
+extern std::unordered_map<void*, CppProxyCacheEntry> cppProxyCache;
 extern std::mutex jsProxyCacheMutex;
 extern std::mutex cppProxyCacheMutex;
 
@@ -436,8 +441,11 @@ template<typename I, typename Self>
 struct JsInterface {
     static void nativeDestroy(const std::shared_ptr<I>& cpp) {
         std::lock_guard lk(cppProxyCacheMutex);
-        assert(cppProxyCache.find(cpp.get()) != cppProxyCache.end());
-        cppProxyCache.erase(cpp.get());
+        auto i = cppProxyCache.find(cpp.get());
+        assert(i != cppProxyCache.end());
+        if (--(i->second.count) == 0) {
+            cppProxyCache.erase(cpp.get());
+        }
     }
     // enable this only when the derived class has `cppProxyMethods` defined
     // (interface +c)
@@ -454,9 +462,11 @@ struct JsInterface {
             // look up in cpp proxy cache
             std::lock_guard lk(cppProxyCacheMutex);
             auto i = cppProxyCache.find(c.get());
+            int jsRefCount = 1;
             if (i != cppProxyCache.end()) {
                 // found existing cpp proxy
-                auto strongRef = i->second.template call<em::val>("deref");
+                jsRefCount += i->second.count;
+                auto strongRef = i->second.ref.template call<em::val>("deref");
                 if (!strongRef.isUndefined()) {
                     // and it's not expired
                     return strongRef;
@@ -468,7 +478,11 @@ struct JsInterface {
             em::val nativeRef(c);
             em::val cppProxy = getCppProxyClass().new_(nativeRef, Self::cppProxyMethods());
             em::val weakRef = weakRefClass.new_(cppProxy);
-            cppProxyCache.emplace(c.get(), weakRef);
+            if (i == cppProxyCache.end()) {
+                cppProxyCache.emplace(c.get(), CppProxyCacheEntry{weakRef, jsRefCount});
+            } else {
+                i->second = CppProxyCacheEntry{weakRef, jsRefCount};
+            }
             getCppProxyFinalizerRegistry().call<void>("register", cppProxy, nativeRef);
             return cppProxy;
         }
