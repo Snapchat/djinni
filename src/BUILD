@@ -10,8 +10,8 @@ scala_binary(
         "@maven_djinni//:org_scala_lang_modules_scala_parser_combinators_2_11",
         "@maven_djinni//:org_yaml_snakeyaml",
     ],
-    # deploy_manifest_lines = [
-    #     "Implementation-Version: " + IMPLEMENTATION_VERSION,
-    # ],
+    deploy_manifest_lines = [
+        "Implementation-Version: " + IMPLEMENTATION_VERSION,
+    ],
     visibility = ["//visibility:public"],
 )
