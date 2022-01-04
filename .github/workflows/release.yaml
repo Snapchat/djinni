@@ -30,7 +30,7 @@ jobs:
         run: bazel build //generator:generator
 
       - name: Test generator
-        run: bazel run //generator:generator
+        run: bazel run //generator:generator -- --help
 
       - name: Creating bat
         run: cp bazel-bin/generator/djinni bazel-bin/generator/djinni.bat
