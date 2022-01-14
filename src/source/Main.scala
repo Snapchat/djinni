@@ -90,6 +90,7 @@ object Main {
     var wasmIncludePrefix: String = ""
     var wasmIncludeCppPrefix: String = ""
     var wasmBaseLibIncludePrefix: String = ""
+    var wasmOmitConstants: Boolean = false
     var jsIdentStyle = IdentStyle.jsDefault
     var tsOutFolder: Option[File] = None
     var tsModule: String = "module"
@@ -231,6 +232,8 @@ object Main {
         .text("The prefix for #includes of the main header files from WASM C++ files.")
       opt[String]("wasm-base-lib-include-prefix").valueName("...").foreach(x => wasmBaseLibIncludePrefix = x)
         .text("The WASM base library's include path, relative to the WASM C++ classes.")
+      opt[Boolean]("wasm-omit-constants").valueName("<true/false>").foreach(x => wasmOmitConstants = x)
+        .text("Omit the generation of consts and enums in wasm, making them only accessible through TypeScript.")
       opt[File]("ts-out").valueName("<out-folder>").foreach(x => tsOutFolder = Some(x))
         .text("The output for the TypeScript interface files (Generator disabled if unspecified).")
       opt[String]("ts-module").valueName("<name>").foreach(tsModule = _)
@@ -410,6 +413,7 @@ object Main {
       wasmIncludePrefix,
       wasmIncludeCppPrefix,
       wasmBaseLibIncludePrefix,
+      wasmOmitConstants,
       jsIdentStyle,
       tsOutFolder,
       tsModule,

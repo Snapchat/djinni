@@ -230,30 +230,34 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     val helper = helperClass(ident)
     writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.w(s"struct $helper: ::djinni::WasmEnum<$cls>").bracedSemi{
-        w.wl("static void staticInitialize();");
+        if (!spec.wasmOmitConstants) {
+          w.wl("static void staticInitialize();");
+        }
       }
     }), (w => {}))
-    writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, spec.wasmIncludePrefix)(ident.name, origin, refs.cpp, (w => {
-      w.w(s"namespace").braced {
-        w.wl(s"EM_JS(void, djinni_init_${nsprefix}_${ident.name}, (), {").nested {
-          w.w(s"Module.${idJs.ty(ident)} = ").braced {
-            writeEnumOptionNone(w, e, idJs.enum, ":")
-            writeEnumOptions(w, e, idJs.enum, ":")
-            writeEnumOptionAll(w, e, idJs.enum, ":")
+    if (!spec.wasmOmitConstants) {
+      writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, spec.wasmIncludePrefix)(ident.name, origin, refs.cpp, (w => {
+        w.w(s"namespace").braced {
+          w.wl(s"EM_JS(void, djinni_init_${nsprefix}_${ident.name}, (), {").nested {
+            w.w(s"Module.${idJs.ty(ident)} = ").braced {
+              writeEnumOptionNone(w, e, idJs.enum, ":")
+              writeEnumOptions(w, e, idJs.enum, ":")
+              writeEnumOptionAll(w, e, idJs.enum, ":")
+            }
           }
+          w.wl("})")
         }
-        w.wl("})")
-      }
-      w.wl
-      w.w(s"void $helper::staticInitialize()").braced {
-        w.wl("static std::once_flag initOnce;")
-        w.wl(s"std::call_once(initOnce, djinni_init_${nsprefix}_${ident.name});")
-      }
-      w.wl
-      w.w(s"EMSCRIPTEN_BINDINGS(${nsprefix}_${ident.name})").braced {
-        w.wl(s"$helper::staticInitialize();")
-      }
-    }))
+        w.wl
+        w.w(s"void $helper::staticInitialize()").braced {
+          w.wl("static std::once_flag initOnce;")
+          w.wl(s"std::call_once(initOnce, djinni_init_${nsprefix}_${ident.name});")
+        }
+        w.wl
+        w.w(s"EMSCRIPTEN_BINDINGS(${nsprefix}_${ident.name})").braced {
+          w.wl(s"$helper::staticInitialize();")
+        }
+      }))
+    }
   }
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface) {
@@ -314,7 +318,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
           }
         }
         // init consts
-        if (!i.consts.isEmpty) {
+        if (!spec.wasmOmitConstants && !i.consts.isEmpty) {
           w.wl("static void staticInitialize();");
         }
       }
@@ -396,7 +400,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         }
       }
       // constants
-      if (!i.consts.isEmpty) {
+      if (!spec.wasmOmitConstants && !i.consts.isEmpty) {
         generateWasmConstants(w, ident, i.consts);
       }
     }))
@@ -421,7 +425,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl("static CppType toCpp(const JsType& j);")
         w.wl("static JsType fromCpp(const CppType& c);")
         // init consts
-        if (!r.consts.isEmpty) {
+        if (!spec.wasmOmitConstants && !r.consts.isEmpty) {
           w.wl("static void staticInitialize();");
         }
       }
@@ -442,7 +446,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl("return js;")
       }
       // constants
-      if (!r.consts.isEmpty) {
+      if (!spec.wasmOmitConstants && !r.consts.isEmpty) {
         generateWasmConstants(w, ident, r.consts);
       }
     }))
