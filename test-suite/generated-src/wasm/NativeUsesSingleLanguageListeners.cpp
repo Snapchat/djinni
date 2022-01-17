@@ -54,15 +54,28 @@ std::shared_ptr<::testsuite::JavaOnlyListener> NativeUsesSingleLanguageListeners
     return ::djinni_generated::NativeJavaOnlyListener::toCpp(ret);
 }
 
-EMSCRIPTEN_BINDINGS(uses_single_language_listeners) {
-    em::class_<::testsuite::UsesSingleLanguageListeners>("UsesSingleLanguageListeners")
-        .smart_ptr<std::shared_ptr<::testsuite::UsesSingleLanguageListeners>>("UsesSingleLanguageListeners")
+namespace {
+    EM_JS(void, djinni_init_testsuite_uses_single_language_listeners, (), {
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.UsesSingleLanguageListeners = Module.testsuite_UsesSingleLanguageListeners
+    })
+}
+void NativeUsesSingleLanguageListeners::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init_testsuite_uses_single_language_listeners);
+}
+EMSCRIPTEN_BINDINGS(testsuite_uses_single_language_listeners) {
+    em::class_<::testsuite::UsesSingleLanguageListeners>("testsuite_UsesSingleLanguageListeners")
+        .smart_ptr<std::shared_ptr<::testsuite::UsesSingleLanguageListeners>>("testsuite_UsesSingleLanguageListeners")
         .function("nativeDestroy", &NativeUsesSingleLanguageListeners::nativeDestroy)
         .function("callForObjC", NativeUsesSingleLanguageListeners::callForObjC)
         .function("returnForObjC", NativeUsesSingleLanguageListeners::returnForObjC)
         .function("callForJava", NativeUsesSingleLanguageListeners::callForJava)
         .function("returnForJava", NativeUsesSingleLanguageListeners::returnForJava)
         ;
+    NativeUsesSingleLanguageListeners::staticInitialize();
 }
 
 }  // namespace djinni_generated

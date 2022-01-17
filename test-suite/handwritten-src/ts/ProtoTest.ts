@@ -6,9 +6,9 @@ import { Writer } from "protobufjs/minimal";
 
 export class ProtoTest extends TestCase {
     m: test.Test_statics;
-    constructor(module: test.Test_statics & DjinniModule) {
+    constructor(module: test.Test_module_statics & DjinniModule) {
         super(module);
-        this.m = module;
+        this.m = module.testsuite;
         // register protobuf types with wasm module
         module.registerProtobufLib("prototest", prototest);
         // optional: override buffer allocator, make it avialble to wasm without

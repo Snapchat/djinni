@@ -4,32 +4,32 @@ class MapRecordTest {
     }
 
     testCppMapToJavaMap() {
-        this.checkJsMap(this.m.TestHelpers.getMap());
+        this.checkJsMap(this.m.testsuite.TestHelpers.getMap());
     }
 
     testEmptyCppMapToJsMap() {
-        assertEq(0, this.m.TestHelpers.getEmptyMap().size);
+        assertEq(0, this.m.testsuite.TestHelpers.getEmptyMap().size);
     }
 
     testCppMapListToJsMapList() {
-        var jsMapListRecord = this.m.TestHelpers.getMapListRecord();
+        var jsMapListRecord = this.m.testsuite.TestHelpers.getMapListRecord();
         var jsMapList = jsMapListRecord.mapList;
         assertEq(1, jsMapList.length);
         this.checkJsMap(jsMapList[0]);
     }
 
     testJsMapToCppMap() {
-        assertTrue(this.m.TestHelpers.checkMap(this.getJsMap()));
+        assertTrue(this.m.testsuite.TestHelpers.checkMap(this.getJsMap()));
     }
 
     testEmptyJsMapToCppMap() {
-        assertTrue(this.m.TestHelpers.checkEmptyMap(new Map()));
+        assertTrue(this.m.testsuite.TestHelpers.checkEmptyMap(new Map()));
     }
 
     testJsMapListToCppMapList() {
         var jsMapList = [];
         jsMapList.push(this.getJsMap());
-        assertTrue(this.m.TestHelpers.checkMapListRecord({mapList: jsMapList}));
+        assertTrue(this.m.testsuite.TestHelpers.checkMapListRecord({mapList: jsMapList}));
     }
 
     getJsMap() {

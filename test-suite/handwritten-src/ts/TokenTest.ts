@@ -10,9 +10,9 @@ class JsToken {
 export class TokenTest extends TestCase {
     m: test.Test_statics;
 
-    constructor(module) {
+    constructor(module: test.Test_module_statics) {
         super(module);
-        this.m = <test.Test_statics>module;
+        this.m = module.testsuite;
     }
     
     testTokens() {

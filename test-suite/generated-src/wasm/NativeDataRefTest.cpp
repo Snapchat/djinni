@@ -56,9 +56,21 @@ em::val NativeDataRefTest::create() {
     return ::djinni_generated::NativeDataRefTest::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(DataRefTest) {
-    em::class_<::testsuite::DataRefTest>("DataRefTest")
-        .smart_ptr<std::shared_ptr<::testsuite::DataRefTest>>("DataRefTest")
+namespace {
+    EM_JS(void, djinni_init_testsuite_DataRefTest, (), {
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.DataRefTest = Module.testsuite_DataRefTest
+    })
+}
+void NativeDataRefTest::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init_testsuite_DataRefTest);
+}
+EMSCRIPTEN_BINDINGS(testsuite_DataRefTest) {
+    em::class_<::testsuite::DataRefTest>("testsuite_DataRefTest")
+        .smart_ptr<std::shared_ptr<::testsuite::DataRefTest>>("testsuite_DataRefTest")
         .function("nativeDestroy", &NativeDataRefTest::nativeDestroy)
         .function("sendData", NativeDataRefTest::sendData)
         .function("retriveAsBin", NativeDataRefTest::retriveAsBin)
@@ -70,6 +82,7 @@ EMSCRIPTEN_BINDINGS(DataRefTest) {
         .function("recvDataView", NativeDataRefTest::recvDataView)
         .class_function("create", NativeDataRefTest::create)
         ;
+    NativeDataRefTest::staticInitialize();
 }
 
 }  // namespace djinni_generated

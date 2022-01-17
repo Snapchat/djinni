@@ -23,6 +23,8 @@ import djinni.meta._
 import djinni.writer.IndentWriter
 
 import scala.collection.mutable
+import java.util.regex.Pattern
+import java.util.regex.Matcher
 
 class WasmGenerator(spec: Spec) extends Generator(spec) {
 
@@ -160,7 +162,6 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
   }
 
   private def generateWasmConstants(w: IndentWriter, ident: Ident, consts: Seq[Const]) {
-    val nsprefix = spec.cppNamespace.replaceAll("::", "_")
     val helper = helperClass(ident)
     var dependentTypes = mutable.TreeSet[String]()
     def writeJsConst(w: IndentWriter, ty: TypeRef, v: Any): Unit = v match {
@@ -170,11 +171,11 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       case b: Boolean => w.w(if (b) "true" else "false")
       case s: String => w.w(s)
       case e: EnumValue => {
-        w.w(s"Module.${idJs.ty(ty.expr.ident)}.${idJs.enum(e)}")
+        w.w(s"Module.${withWasmNamespace(idJs.ty(ty.expr.ident))}.${idJs.enum(e)}")
         dependentTypes.add(helperClass(ty.expr.ident))
       }
       case v: ConstRef => {
-        w.w(s"Module.${idJs.ty(ident)}.${idJs.const(v)}")
+        w.w(s"Module.${withWasmNamespace(idJs.ty(ident))}.${idJs.const(v)}")
       }
       case z: Map[_, _] => { // Value is record
         val recordMdef = ty.resolved.base.asInstanceOf[MDef]
@@ -194,36 +195,40 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     }
     w.wl
     w.w(s"namespace").braced {
-      w.wl(s"EM_JS(void, djinni_init_${nsprefix}_${ident.name}_consts, (), {").nested {
-        w.w(s"if (!('${idJs.ty(ident)}' in Module))").braced {
-          w.wl(s"Module.${idJs.ty(ident)} = {};")
+      w.wl(s"EM_JS(void, djinni_init_${withCppNamespace(ident.name)}_consts, (), {").nested {
+        val fullyQualifiedName = withWasmNamespace(idJs.ty(ident))
+        w.w(s"if (!('${fullyQualifiedName}' in Module))").braced {
+          w.wl(s"Module.${fullyQualifiedName} = {};")
         }
         for (c <- consts) {
-          w.w(s"Module.${idJs.ty(ident)}.${idJs.const(c.ident)} = ")
+          w.w(s"Module.${fullyQualifiedName}.${idJs.const(c.ident)} = ")
           writeJsConst(w, c.ty, c.value)
           w.wl(";")
+        }
+        if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
+          writeNamespaceAlias(w, idJs.ty(ident))
         }
       }
       w.wl("})")
     }
-    w.w(s"void $helper::staticInitialize()").braced {
+    w.w(s"void $helper::staticInitializeConstants()").braced {
       w.wl("static std::once_flag initOnce;")
-      w.wl(s"std::call_once(initOnce, djinni_init_${nsprefix}_${ident.name}_consts);")
+      w.wl(s"std::call_once(initOnce, djinni_init_${withCppNamespace(ident.name)}_consts);")
     }
     w.wl
-    w.w(s"EMSCRIPTEN_BINDINGS(${nsprefix}_${ident.name}_consts)").braced {
+    val fullyQualifiedName = withWasmNamespace(idJs.ty(ident.name))
+    w.w(s"EMSCRIPTEN_BINDINGS(${withCppNamespace(ident.name)}_consts)").braced {
       for (d <- dependentTypes) {
         if (d != helper)
-          w.wl(s"$d::staticInitialize();");
+          w.wl(s"$d::staticInitializeConstants();");
       }
-      w.wl(s"$helper::staticInitialize();");
+      w.wl(s"$helper::staticInitializeConstants();");
     }
   }
 
   //------------------------------------------------------------------------------
 
   override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
-    val nsprefix = spec.cppNamespace.replaceAll("::", "_")
     val refs = new WasmRefs(ident.name)
     refs.cpp.add("#include <mutex>")
     val cls = cppMarshal.fqTypename(ident, e)
@@ -231,30 +236,34 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.w(s"struct $helper: ::djinni::WasmEnum<$cls>").bracedSemi{
         if (!spec.wasmOmitConstants) {
-          w.wl("static void staticInitialize();");
+          w.wl("static void staticInitializeConstants();");
         }
       }
     }), (w => {}))
     if (!spec.wasmOmitConstants) {
       writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, spec.wasmIncludePrefix)(ident.name, origin, refs.cpp, (w => {
         w.w(s"namespace").braced {
-          w.wl(s"EM_JS(void, djinni_init_${nsprefix}_${ident.name}, (), {").nested {
-            w.w(s"Module.${idJs.ty(ident)} = ").braced {
+          w.wl(s"EM_JS(void, djinni_init_${withCppNamespace(ident.name)}, (), {").nested {
+            w.w(s"Module.${withWasmNamespace(idJs.ty(ident))} = ").braced {
               writeEnumOptionNone(w, e, idJs.enum, ":")
               writeEnumOptions(w, e, idJs.enum, ":")
               writeEnumOptionAll(w, e, idJs.enum, ":")
+            }
+            w.wl(";")
+            if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
+              writeNamespaceAlias(w, idJs.ty(ident))
             }
           }
           w.wl("})")
         }
         w.wl
-        w.w(s"void $helper::staticInitialize()").braced {
+        w.w(s"void $helper::staticInitializeConstants()").braced {
           w.wl("static std::once_flag initOnce;")
-          w.wl(s"std::call_once(initOnce, djinni_init_${nsprefix}_${ident.name});")
+          w.wl(s"std::call_once(initOnce, djinni_init_${withCppNamespace(ident.name)});")
         }
         w.wl
-        w.w(s"EMSCRIPTEN_BINDINGS(${nsprefix}_${ident.name})").braced {
-          w.wl(s"$helper::staticInitialize();")
+        w.w(s"EMSCRIPTEN_BINDINGS(${withCppNamespace(ident.name)})").braced {
+          w.wl(s"$helper::staticInitializeConstants();")
         }
       }))
     }
@@ -319,6 +328,9 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         }
         // init consts
         if (!spec.wasmOmitConstants && !i.consts.isEmpty) {
+          w.wl("static void staticInitializeConstants();");
+        }
+        if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
           w.wl("static void staticInitialize();");
         }
       }
@@ -385,10 +397,27 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
           }
         }
       }
+
+      val fullyQualifiedName = withCppNamespace(ident.name)
+      val fullyQualifiedJsName = withWasmNamespace(idJs.ty(ident.name))
+
+      if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
+        w.w(s"namespace").braced {
+          w.wl(s"EM_JS(void, djinni_init_${fullyQualifiedName}, (), {").nested {
+            writeNamespaceAlias(w, idJs.ty(ident.name))
+          }
+          w.wl("})")
+        }
+        w.w(s"void $helper::staticInitialize()").braced {
+          w.wl("static std::once_flag initOnce;")
+          w.wl(s"std::call_once(initOnce, djinni_init_${fullyQualifiedName});")
+        }
+      }
+
       // embind
-      w.w(s"EMSCRIPTEN_BINDINGS(${ident.name})").braced {
-        w.wl(s"""em::class_<$cls>("${idJs.ty(ident.name)}")""").nested {
-          w.wl(s""".smart_ptr<std::shared_ptr<$cls>>("${idJs.ty(ident.name)}")""")
+      w.w(s"EMSCRIPTEN_BINDINGS(${fullyQualifiedName})").braced {
+        w.wl(s"""em::class_<$cls>("${fullyQualifiedJsName}")""").nested {
+          w.wl(s""".smart_ptr<std::shared_ptr<$cls>>("${fullyQualifiedJsName}")""")
           w.wl(s""".function("${idJs.method("native_destroy")}", &$helper::nativeDestroy)""")
           if (i.ext.cpp) {
             for (m <- i.methods) {
@@ -398,12 +427,31 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
           }
           w.wl(";")
         }
+        if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
+          w.wl(s"$helper::staticInitialize();")
+        }
       }
       // constants
       if (!spec.wasmOmitConstants && !i.consts.isEmpty) {
         generateWasmConstants(w, ident, i.consts);
       }
     }))
+  }
+
+  def withWasmNamespace(name: String, sep: String = "_") = spec.wasmNamespace match {
+    case Some(p) => p.replaceAll(Pattern.quote("."), Matcher.quoteReplacement(sep)) + sep + name
+    case None => name
+  }
+
+  def withCppNamespace(name: String, sep: String = "_") = {
+    spec.cppNamespace.replaceAll("::", Matcher.quoteReplacement(sep)) + sep + name
+  }
+
+  def writeNamespaceAlias(w: IndentWriter, name: String) = {
+    w.wl(s"'${spec.wasmNamespace.get}'.split('.').reduce(function(path, part) {")
+    w.wl("    if (!(part in path)) { path[part] = {}}; ")
+    w.wl("    return path[part]}, Module);")
+    w.wl(s"Module.${spec.wasmNamespace.get}.${name} = Module.${withWasmNamespace(name)}")
   }
 
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: Record) {
@@ -413,8 +461,6 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
 
     val cls = withNs(Some(spec.cppNamespace), idCpp.ty(ident.name))
     val helper = helperClass(ident)
-
-    // TODO: consts in records
 
     writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.wl(s"struct $helper").bracedSemi {
@@ -426,7 +472,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl("static JsType fromCpp(const CppType& c);")
         // init consts
         if (!spec.wasmOmitConstants && !r.consts.isEmpty) {
-          w.wl("static void staticInitialize();");
+          w.wl("static void staticInitializeConstants();");
         }
       }
     }), (w => {}))

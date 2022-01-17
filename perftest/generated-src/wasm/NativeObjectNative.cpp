@@ -16,7 +16,7 @@ void NativeObjectNative::baseline(const CppType& self) {
     self->baseline();
 }
 
-EMSCRIPTEN_BINDINGS(ObjectNative) {
+EMSCRIPTEN_BINDINGS(snapchat_djinni_benchmark_ObjectNative) {
     em::class_<::snapchat::djinni::benchmark::ObjectNative>("ObjectNative")
         .smart_ptr<std::shared_ptr<::snapchat::djinni::benchmark::ObjectNative>>("ObjectNative")
         .function("nativeDestroy", &NativeObjectNative::nativeDestroy)

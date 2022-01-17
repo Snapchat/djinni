@@ -27,9 +27,9 @@ class ClientInterfaceImpl implements test.ClientInterface {
 class ClientInterfaceTest extends TestCase {
     m: test.Test_statics;
     jsClientInterface: test.ClientInterface;
-    constructor(module) {
+    constructor(module: test.Test_module_statics) {
         super(module);
-        this.m = <test.Test_statics>module;
+        this.m = module.testsuite;
     }
     setUp() {
         this.jsClientInterface = new ClientInterfaceImpl();

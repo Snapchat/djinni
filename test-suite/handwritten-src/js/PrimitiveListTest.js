@@ -8,19 +8,19 @@ class PrimitiveListTest {
     }
     testJavaPrimitiveListToCpp()
     {
-        assertTrue(this.m.TestHelpers.checkPrimitiveList(this.jsPrimitiveList));
+        assertTrue(this.m.testsuite.TestHelpers.checkPrimitiveList(this.jsPrimitiveList));
     }
 
     testCppPrimitiveListToJava()
     {
-        var converted = this.m.TestHelpers.getPrimitiveList();
+        var converted = this.m.testsuite.TestHelpers.getPrimitiveList();
         assertArrayEq(converted.list, this.jsPrimitiveList.list);
     }
 
     testBinary()
     {
         var b = new Uint8Array([1, 2, 3]);
-        assertArrayEq(this.m.TestHelpers.idBinary(b), b);
+        assertArrayEq(this.m.testsuite.TestHelpers.idBinary(b), b);
     }
 }
 allTests.push(PrimitiveListTest);

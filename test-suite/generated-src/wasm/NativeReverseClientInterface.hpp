@@ -25,6 +25,7 @@ struct NativeReverseClientInterface : ::djinni::JsInterface<::testsuite::Reverse
     static std::string meth_taking_optional_interface(const CppType& self, const em::val& w_i);
     static em::val create();
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

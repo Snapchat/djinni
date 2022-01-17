@@ -9,7 +9,7 @@
 namespace djinni_generated {
 
 struct NativeAccessFlags: ::djinni::WasmEnum<::testsuite::access_flags> {
-    static void staticInitialize();
+    static void staticInitializeConstants();
 };
 
 }  // namespace djinni_generated

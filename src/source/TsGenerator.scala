@@ -24,6 +24,8 @@ import djinni.meta._
 import djinni.writer.IndentWriter
 import scala.collection.mutable.ListBuffer
 import scala.collection.mutable.TreeSet
+import java.util.regex.Pattern
+import java.util.regex.Matcher
 
 class TsGenerator(spec: Spec) extends Generator(spec) {
   private def tsRetType(m: Interface.Method): String = {
@@ -210,6 +212,10 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
       }
     }
   }
+  private def withWasmNamespace(name: String, sep: String = "_") = spec.wasmNamespace match {
+    case Some(p) => p.replaceAll(Pattern.quote("."), Matcher.quoteReplacement(sep)) + sep + name
+    case None => name
+  }
   //--------------------------------------------------------------------------
   override def generate(idl: Seq[TypeDecl]) {
     createFile(spec.tsOutFolder.get, spec.tsModule + ".ts", (w: IndentWriter) => {
@@ -254,10 +260,22 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
         case _ =>
       }
       // add static factories
+      if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
+        w.wl
+        w.w(s"export interface ${idJs.ty(spec.tsModule)}_statics").braced {
+          for (i <- interfacesWithStatics.toList) {
+            w.wl(i + ": " + i + "_statics;")
+          }
+        }
+      }
       w.wl
-      w.w(s"export interface ${idJs.ty(spec.tsModule)}_statics").braced {
+      w.w(s"export interface ${idJs.ty(spec.tsModule)}_module_statics").braced {
         for (i <- interfacesWithStatics.toList) {
-          w.wl(i + ": " + i + "_statics;")
+          w.wl(withWasmNamespace(i) + ": " + i + "_statics;")
+        }
+        if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
+          w.wl
+          w.wl(s"${spec.wasmNamespace.get}: ${idJs.ty(spec.tsModule)}_statics")
         }
       }
     })

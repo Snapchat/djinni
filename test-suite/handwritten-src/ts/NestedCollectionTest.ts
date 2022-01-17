@@ -5,9 +5,9 @@ class NestedCollectionTest extends TestCase {
     m: test.Test_statics;
     jsNestedCollection: test.NestedCollection;
 
-    constructor(module: any) {
+    constructor(module: test.Test_module_statics) {
         super(module);
-        this.m = <test.Test_statics>module;
+        this.m = module.testsuite;
     }
     setUp() {
         var jsSet1 = new Set();

@@ -16,16 +16,17 @@ namespace {
             FIFTH : 4,
             SIXTH : 5,
         }
+        ;
     })
 }
 
-void NativeEnumSixValue::staticInitialize() {
+void NativeEnumSixValue::staticInitializeConstants() {
     static std::once_flag initOnce;
     std::call_once(initOnce, djinni_init_snapchat_djinni_benchmark_EnumSixValue);
 }
 
 EMSCRIPTEN_BINDINGS(snapchat_djinni_benchmark_EnumSixValue) {
-    NativeEnumSixValue::staticInitialize();
+    NativeEnumSixValue::staticInitializeConstants();
 }
 
 }  // namespace djinni_generated

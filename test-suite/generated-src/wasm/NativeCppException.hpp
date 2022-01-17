@@ -23,6 +23,7 @@ struct NativeCppException : ::djinni::JsInterface<::testsuite::CppException, Nat
     static int32_t throw_an_exception(const CppType& self);
     static em::val get();
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

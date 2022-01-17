@@ -19,6 +19,7 @@ struct NativeJavaOnlyListener : ::djinni::JsInterface<::testsuite::JavaOnlyListe
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
 
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

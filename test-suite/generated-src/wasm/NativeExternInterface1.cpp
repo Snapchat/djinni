@@ -25,13 +25,26 @@ int32_t NativeExternInterface1::bar(const CppType& self, int32_t w_e) {
     return ::djinni_generated::NativeColor::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(extern_interface_1) {
-    em::class_<::ExternInterface1>("ExternInterface1")
-        .smart_ptr<std::shared_ptr<::ExternInterface1>>("ExternInterface1")
+namespace {
+    EM_JS(void, djinni_init__extern_interface_1, (), {
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.ExternInterface1 = Module.testsuite_ExternInterface1
+    })
+}
+void NativeExternInterface1::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init__extern_interface_1);
+}
+EMSCRIPTEN_BINDINGS(_extern_interface_1) {
+    em::class_<::ExternInterface1>("testsuite_ExternInterface1")
+        .smart_ptr<std::shared_ptr<::ExternInterface1>>("testsuite_ExternInterface1")
         .function("nativeDestroy", &NativeExternInterface1::nativeDestroy)
         .function("foo", NativeExternInterface1::foo)
         .function("bar", NativeExternInterface1::bar)
         ;
+    NativeExternInterface1::staticInitialize();
 }
 
 }  // namespace djinni_generated

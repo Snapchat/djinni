@@ -29,15 +29,28 @@ bool NativeWcharTestHelpers::check_record(const em::val& w_rec) {
     return ::djinni::Bool::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(wchar_test_helpers) {
-    em::class_<::testsuite::WcharTestHelpers>("WcharTestHelpers")
-        .smart_ptr<std::shared_ptr<::testsuite::WcharTestHelpers>>("WcharTestHelpers")
+namespace {
+    EM_JS(void, djinni_init_testsuite_wchar_test_helpers, (), {
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.WcharTestHelpers = Module.testsuite_WcharTestHelpers
+    })
+}
+void NativeWcharTestHelpers::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init_testsuite_wchar_test_helpers);
+}
+EMSCRIPTEN_BINDINGS(testsuite_wchar_test_helpers) {
+    em::class_<::testsuite::WcharTestHelpers>("testsuite_WcharTestHelpers")
+        .smart_ptr<std::shared_ptr<::testsuite::WcharTestHelpers>>("testsuite_WcharTestHelpers")
         .function("nativeDestroy", &NativeWcharTestHelpers::nativeDestroy)
         .class_function("getRecord", NativeWcharTestHelpers::get_record)
         .class_function("getString", NativeWcharTestHelpers::get_string)
         .class_function("checkString", NativeWcharTestHelpers::check_string)
         .class_function("checkRecord", NativeWcharTestHelpers::check_record)
         ;
+    NativeWcharTestHelpers::staticInitialize();
 }
 
 }  // namespace djinni_generated

@@ -26,6 +26,6 @@ export interface TextboxListener {
     update(items: ItemList): void;
 }
 
-export interface Example_statics {
+export interface Example_module_statics {
     SortItems: SortItems_statics;
 }

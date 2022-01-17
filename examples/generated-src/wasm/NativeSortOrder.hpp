@@ -9,7 +9,7 @@
 namespace djinni_generated {
 
 struct NativeSortOrder: ::djinni::WasmEnum<::textsort::sort_order> {
-    static void staticInitialize();
+    static void staticInitializeConstants();
 };
 
 }  // namespace djinni_generated

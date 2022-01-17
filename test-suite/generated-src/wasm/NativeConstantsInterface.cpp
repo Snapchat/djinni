@@ -17,49 +17,66 @@ void NativeConstantsInterface::dummy(const CppType& self) {
     self->dummy();
 }
 
-EMSCRIPTEN_BINDINGS(constants_interface) {
-    em::class_<::testsuite::ConstantsInterface>("ConstantsInterface")
-        .smart_ptr<std::shared_ptr<::testsuite::ConstantsInterface>>("ConstantsInterface")
+namespace {
+    EM_JS(void, djinni_init_testsuite_constants_interface, (), {
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.ConstantsInterface = Module.testsuite_ConstantsInterface
+    })
+}
+void NativeConstantsInterface::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init_testsuite_constants_interface);
+}
+EMSCRIPTEN_BINDINGS(testsuite_constants_interface) {
+    em::class_<::testsuite::ConstantsInterface>("testsuite_ConstantsInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::ConstantsInterface>>("testsuite_ConstantsInterface")
         .function("nativeDestroy", &NativeConstantsInterface::nativeDestroy)
         .function("dummy", NativeConstantsInterface::dummy)
         ;
+    NativeConstantsInterface::staticInitialize();
 }
 
 namespace {
     EM_JS(void, djinni_init_testsuite_constants_interface_consts, (), {
-        if (!('ConstantsInterface' in Module)) {
-            Module.ConstantsInterface = {};
+        if (!('testsuite_ConstantsInterface' in Module)) {
+            Module.testsuite_ConstantsInterface = {};
         }
-        Module.ConstantsInterface.BOOL_CONSTANT = true;
-        Module.ConstantsInterface.I8_CONSTANT = 1;
-        Module.ConstantsInterface.I16_CONSTANT = 2;
-        Module.ConstantsInterface.I32_CONSTANT = 3;
-        Module.ConstantsInterface.I64_CONSTANT = BigInt("4");
-        Module.ConstantsInterface.F32_CONSTANT = 5.0;
-        Module.ConstantsInterface.F64_CONSTANT = 5.0;
-        Module.ConstantsInterface.OPT_BOOL_CONSTANT = true;
-        Module.ConstantsInterface.OPT_I8_CONSTANT = 1;
-        Module.ConstantsInterface.OPT_I16_CONSTANT = 2;
-        Module.ConstantsInterface.OPT_I32_CONSTANT = 3;
-        Module.ConstantsInterface.OPT_I64_CONSTANT = 4;
-        Module.ConstantsInterface.OPT_F32_CONSTANT = 5.0;
-        Module.ConstantsInterface.OPT_F64_CONSTANT = 5.0;
-        Module.ConstantsInterface.STRING_CONSTANT = "string-constant";
-        Module.ConstantsInterface.OPT_STRING_CONSTANT = "string-constant";
-        Module.ConstantsInterface.OBJECT_CONSTANT =  {
-            someInteger: Module.ConstantsInterface.I32_CONSTANT,
-            someString: Module.ConstantsInterface.STRING_CONSTANT
+        Module.testsuite_ConstantsInterface.BOOL_CONSTANT = true;
+        Module.testsuite_ConstantsInterface.I8_CONSTANT = 1;
+        Module.testsuite_ConstantsInterface.I16_CONSTANT = 2;
+        Module.testsuite_ConstantsInterface.I32_CONSTANT = 3;
+        Module.testsuite_ConstantsInterface.I64_CONSTANT = BigInt("4");
+        Module.testsuite_ConstantsInterface.F32_CONSTANT = 5.0;
+        Module.testsuite_ConstantsInterface.F64_CONSTANT = 5.0;
+        Module.testsuite_ConstantsInterface.OPT_BOOL_CONSTANT = true;
+        Module.testsuite_ConstantsInterface.OPT_I8_CONSTANT = 1;
+        Module.testsuite_ConstantsInterface.OPT_I16_CONSTANT = 2;
+        Module.testsuite_ConstantsInterface.OPT_I32_CONSTANT = 3;
+        Module.testsuite_ConstantsInterface.OPT_I64_CONSTANT = 4;
+        Module.testsuite_ConstantsInterface.OPT_F32_CONSTANT = 5.0;
+        Module.testsuite_ConstantsInterface.OPT_F64_CONSTANT = 5.0;
+        Module.testsuite_ConstantsInterface.STRING_CONSTANT = "string-constant";
+        Module.testsuite_ConstantsInterface.OPT_STRING_CONSTANT = "string-constant";
+        Module.testsuite_ConstantsInterface.OBJECT_CONSTANT =  {
+            someInteger: Module.testsuite_ConstantsInterface.I32_CONSTANT,
+            someString: Module.testsuite_ConstantsInterface.STRING_CONSTANT
         }
         ;
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.ConstantsInterface = Module.testsuite_ConstantsInterface
     })
 }
-void NativeConstantsInterface::staticInitialize() {
+void NativeConstantsInterface::staticInitializeConstants() {
     static std::once_flag initOnce;
     std::call_once(initOnce, djinni_init_testsuite_constants_interface_consts);
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_constants_interface_consts) {
-    NativeConstantsInterface::staticInitialize();
+    NativeConstantsInterface::staticInitializeConstants();
 }
 
 }  // namespace djinni_generated

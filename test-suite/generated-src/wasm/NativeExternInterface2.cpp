@@ -14,11 +14,24 @@ namespace djinni_generated {
     return ::djinni_generated::NativeExternRecordWithDerivings::toCpp(ret);
 }
 
-EMSCRIPTEN_BINDINGS(extern_interface_2) {
-    em::class_<::ExternInterface2>("ExternInterface2")
-        .smart_ptr<std::shared_ptr<::ExternInterface2>>("ExternInterface2")
+namespace {
+    EM_JS(void, djinni_init__extern_interface_2, (), {
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.ExternInterface2 = Module.testsuite_ExternInterface2
+    })
+}
+void NativeExternInterface2::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init__extern_interface_2);
+}
+EMSCRIPTEN_BINDINGS(_extern_interface_2) {
+    em::class_<::ExternInterface2>("testsuite_ExternInterface2")
+        .smart_ptr<std::shared_ptr<::ExternInterface2>>("testsuite_ExternInterface2")
         .function("nativeDestroy", &NativeExternInterface2::nativeDestroy)
         ;
+    NativeExternInterface2::staticInitialize();
 }
 
 }  // namespace djinni_generated

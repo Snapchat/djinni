@@ -10,9 +10,9 @@ function hours(x: number) { return x * 1000 * 3600; }
 
 class DurationTest extends TestCase {
     m: test.Test_statics;
-    constructor(module: any) {
+    constructor(module: test.Test_module_statics) {
         super(module);
-        this.m = <test.Test_statics>module;
+        this.m = module.testsuite;
     }
     test() {
         assertEq(this.m.TestDuration.hoursString(hours(1)), "1");

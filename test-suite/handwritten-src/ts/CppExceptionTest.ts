@@ -3,16 +3,16 @@ import * as test from "../../generated-src/ts/test";
 import {DjinniModule} from "@djinni_support/DjinniModule"
 
 class CppExceptionTest extends TestCase  {
-    m: test.Test_statics & DjinniModule;
+    m: test.Test_module_statics & DjinniModule;
     cppInterface: test.CppException;
 
-    constructor(module: test.Test_statics & DjinniModule) {
+    constructor(module: test.Test_module_statics & DjinniModule) {
         super(module);
         this.m = module;
     }
 
     setUp() {
-        this.cppInterface = this.m.CppException.get();
+        this.cppInterface = this.m.testsuite.CppException.get();
     }
 
     testCppException() {

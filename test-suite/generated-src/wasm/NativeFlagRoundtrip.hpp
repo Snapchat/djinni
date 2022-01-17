@@ -25,6 +25,7 @@ struct NativeFlagRoundtrip : ::djinni::JsInterface<::testsuite::FlagRoundtrip, N
     static em::val roundtrip_access_boxed(const em::val& w_flag);
     static em::val roundtrip_empty_boxed(const em::val& w_flag);
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

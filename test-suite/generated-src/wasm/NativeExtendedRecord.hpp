@@ -16,7 +16,7 @@ struct NativeExtendedRecord
 
     static CppType toCpp(const JsType& j);
     static JsType fromCpp(const CppType& c);
-    static void staticInitialize();
+    static void staticInitializeConstants();
 };
 
 }  // namespace djinni_generated

@@ -15,12 +15,12 @@ class NestedCollectionTest {
         this.jsNestedCollection = { setList: jsList };
     }
     testCppNestedRecordToJsNestedCollection() {
-        var converted = this.m.TestHelpers.getNestedCollection();
+        var converted = this.m.testsuite.TestHelpers.getNestedCollection();
         assertEq(this.jsNestedCollection.setList, converted.setList);
     }
 
     testJsNestedRecordToCppNestedCollection() {
-        assertTrue(this.m.TestHelpers.checkNestedCollection(this.jsNestedCollection));
+        assertTrue(this.m.testsuite.TestHelpers.checkNestedCollection(this.jsNestedCollection));
     }
 }
 

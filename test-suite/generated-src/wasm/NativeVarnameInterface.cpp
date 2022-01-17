@@ -23,13 +23,26 @@ em::val NativeVarnameInterface::_imethod_(const CppType& self, const em::val& w_
     return ::djinni_generated::NativeVarnameInterface::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(_varname_interface_) {
-    em::class_<::testsuite::VarnameInterface>("VarnameInterface")
-        .smart_ptr<std::shared_ptr<::testsuite::VarnameInterface>>("VarnameInterface")
+namespace {
+    EM_JS(void, djinni_init_testsuite__varname_interface_, (), {
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.VarnameInterface = Module.testsuite_VarnameInterface
+    })
+}
+void NativeVarnameInterface::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init_testsuite__varname_interface_);
+}
+EMSCRIPTEN_BINDINGS(testsuite__varname_interface_) {
+    em::class_<::testsuite::VarnameInterface>("testsuite_VarnameInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::VarnameInterface>>("testsuite_VarnameInterface")
         .function("nativeDestroy", &NativeVarnameInterface::nativeDestroy)
         .function("Rmethod", NativeVarnameInterface::_rmethod_)
         .function("Imethod", NativeVarnameInterface::_imethod_)
         ;
+    NativeVarnameInterface::staticInitialize();
 }
 
 }  // namespace djinni_generated

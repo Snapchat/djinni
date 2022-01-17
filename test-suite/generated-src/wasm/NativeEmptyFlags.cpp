@@ -8,20 +8,25 @@ namespace djinni_generated {
 
 namespace {
     EM_JS(void, djinni_init_testsuite_empty_flags, (), {
-        Module.EmptyFlags =  {
+        Module.testsuite_EmptyFlags =  {
             NONE : 0,
             ALL : (1 << 0) - 1,
         }
+        ;
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.EmptyFlags = Module.testsuite_EmptyFlags
     })
 }
 
-void NativeEmptyFlags::staticInitialize() {
+void NativeEmptyFlags::staticInitializeConstants() {
     static std::once_flag initOnce;
     std::call_once(initOnce, djinni_init_testsuite_empty_flags);
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_empty_flags) {
-    NativeEmptyFlags::staticInitialize();
+    NativeEmptyFlags::staticInitializeConstants();
 }
 
 }  // namespace djinni_generated

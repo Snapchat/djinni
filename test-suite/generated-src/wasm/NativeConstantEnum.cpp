@@ -8,20 +8,25 @@ namespace djinni_generated {
 
 namespace {
     EM_JS(void, djinni_init_testsuite_constant_enum, (), {
-        Module.ConstantEnum =  {
+        Module.testsuite_ConstantEnum =  {
             SOME_VALUE : 0,
             SOME_OTHER_VALUE : 1,
         }
+        ;
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.ConstantEnum = Module.testsuite_ConstantEnum
     })
 }
 
-void NativeConstantEnum::staticInitialize() {
+void NativeConstantEnum::staticInitializeConstants() {
     static std::once_flag initOnce;
     std::call_once(initOnce, djinni_init_testsuite_constant_enum);
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_constant_enum) {
-    NativeConstantEnum::staticInitialize();
+    NativeConstantEnum::staticInitializeConstants();
 }
 
 }  // namespace djinni_generated

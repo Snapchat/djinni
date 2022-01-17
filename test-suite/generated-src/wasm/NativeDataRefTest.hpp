@@ -30,6 +30,7 @@ struct NativeDataRefTest : ::djinni::JsInterface<::testsuite::DataRefTest, Nativ
     static em::val recvDataView(const CppType& self);
     static em::val create();
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

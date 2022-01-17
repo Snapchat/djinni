@@ -49,6 +49,7 @@ struct NativeTestHelpers : ::djinni::JsInterface<::testsuite::TestHelpers, Nativ
     static em::val future_roundtrip(const em::val& w_f);
     static em::val check_async_interface(const em::val& w_i);
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

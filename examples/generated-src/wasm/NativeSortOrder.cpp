@@ -13,16 +13,17 @@ namespace {
             DESCENDING : 1,
             RANDOM : 2,
         }
+        ;
     })
 }
 
-void NativeSortOrder::staticInitialize() {
+void NativeSortOrder::staticInitializeConstants() {
     static std::once_flag initOnce;
     std::call_once(initOnce, djinni_init_textsort_sort_order);
 }
 
 EMSCRIPTEN_BINDINGS(textsort_sort_order) {
-    NativeSortOrder::staticInitialize();
+    NativeSortOrder::staticInitializeConstants();
 }
 
 }  // namespace djinni_generated

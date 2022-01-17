@@ -591,3 +591,20 @@ export interface Test_statics {
     ReverseClientInterface: ReverseClientInterface_statics;
     CppException: CppException_statics;
 }
+
+export interface Test_module_statics {
+    testsuite_ProtoTests: ProtoTests_statics;
+    testsuite_TestOutcome: TestOutcome_statics;
+    testsuite_TestDuration: TestDuration_statics;
+    testsuite_DataRefTest: DataRefTest_statics;
+    testsuite_FlagRoundtrip: FlagRoundtrip_statics;
+    testsuite_TestArray: TestArray_statics;
+    testsuite_ListenerCaller: ListenerCaller_statics;
+    testsuite_ReturnOne: ReturnOne_statics;
+    testsuite_ReturnTwo: ReturnTwo_statics;
+    testsuite_TestHelpers: TestHelpers_statics;
+    testsuite_ReverseClientInterface: ReverseClientInterface_statics;
+    testsuite_CppException: CppException_statics;
+
+    testsuite: Test_statics
+}

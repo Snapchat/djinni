@@ -11,7 +11,7 @@ void NativeObjectPlatform::JsProxy::onDone() {
     checkError(ret);
 }
 
-EMSCRIPTEN_BINDINGS(ObjectPlatform) {
+EMSCRIPTEN_BINDINGS(snapchat_djinni_benchmark_ObjectPlatform) {
     em::class_<::snapchat::djinni::benchmark::ObjectPlatform>("ObjectPlatform")
         .smart_ptr<std::shared_ptr<::snapchat::djinni::benchmark::ObjectPlatform>>("ObjectPlatform")
         .function("nativeDestroy", &NativeObjectPlatform::nativeDestroy)

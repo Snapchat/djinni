@@ -93,6 +93,8 @@ package object generatorTools {
                    wasmIncludeCppPrefix: String,
                    wasmBaseLibIncludePrefix: String,
                    wasmOmitConstants: Boolean,
+                   wasmNamespace: Option[String],
+                   wasmOmitNsAlias: Boolean,
                    jsIdentStyle: JsIdentStyle,
                    tsOutFolder: Option[File],
                    tsModule: String,

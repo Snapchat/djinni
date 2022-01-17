@@ -23,6 +23,7 @@ struct NativeReturnOne : ::djinni::JsInterface<::testsuite::ReturnOne, NativeRet
     static em::val get_instance();
     static int8_t return_one(const CppType& self);
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

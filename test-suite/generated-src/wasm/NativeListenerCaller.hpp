@@ -24,6 +24,7 @@ struct NativeListenerCaller : ::djinni::JsInterface<::testsuite::ListenerCaller,
     static void callFirst(const CppType& self);
     static void callSecond(const CppType& self);
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

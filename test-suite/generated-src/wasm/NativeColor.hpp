@@ -9,7 +9,7 @@
 namespace djinni_generated {
 
 struct NativeColor: ::djinni::WasmEnum<::testsuite::color> {
-    static void staticInitialize();
+    static void staticInitializeConstants();
 };
 
 }  // namespace djinni_generated

@@ -68,9 +68,21 @@ std::unordered_map<::testsuite::color, ::testsuite::color> NativeEnumUsageInterf
     return ::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::toCpp(ret);
 }
 
-EMSCRIPTEN_BINDINGS(enum_usage_interface) {
-    em::class_<::testsuite::EnumUsageInterface>("EnumUsageInterface")
-        .smart_ptr<std::shared_ptr<::testsuite::EnumUsageInterface>>("EnumUsageInterface")
+namespace {
+    EM_JS(void, djinni_init_testsuite_enum_usage_interface, (), {
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.EnumUsageInterface = Module.testsuite_EnumUsageInterface
+    })
+}
+void NativeEnumUsageInterface::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init_testsuite_enum_usage_interface);
+}
+EMSCRIPTEN_BINDINGS(testsuite_enum_usage_interface) {
+    em::class_<::testsuite::EnumUsageInterface>("testsuite_EnumUsageInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::EnumUsageInterface>>("testsuite_EnumUsageInterface")
         .function("nativeDestroy", &NativeEnumUsageInterface::nativeDestroy)
         .function("e", NativeEnumUsageInterface::e)
         .function("o", NativeEnumUsageInterface::o)
@@ -78,6 +90,7 @@ EMSCRIPTEN_BINDINGS(enum_usage_interface) {
         .function("s", NativeEnumUsageInterface::s)
         .function("m", NativeEnumUsageInterface::m)
         ;
+    NativeEnumUsageInterface::staticInitialize();
 }
 
 }  // namespace djinni_generated

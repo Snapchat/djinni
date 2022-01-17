@@ -11,33 +11,33 @@ class TokenTest {
     
     testTokens() {
         var jt = new JsToken();
-        assertSame(this.m.TestHelpers.tokenId(jt), jt);
+        assertSame(this.m.testsuite.TestHelpers.tokenId(jt), jt);
     }
 
     testNullToken() {
-        assertSame(this.m.TestHelpers.tokenId(null), null);
+        assertSame(this.m.testsuite.TestHelpers.tokenId(null), null);
     }
 
     testCppToken() {
-        var ct = this.m.TestHelpers.createCppToken();
-        assertSame(this.m.TestHelpers.tokenId(ct), ct);
-        this.m.TestHelpers.checkCppToken(ct);
+        var ct = this.m.testsuite.TestHelpers.createCppToken();
+        assertSame(this.m.testsuite.TestHelpers.tokenId(ct), ct);
+        this.m.testsuite.TestHelpers.checkCppToken(ct);
         ct = null;
     }
 
     testTokenType() {
-        this.m.TestHelpers.checkTokenType(new JsToken(), "Javascript");
-        this.m.TestHelpers.checkTokenType(this.m.TestHelpers.createCppToken(), "C++");
+        this.m.testsuite.TestHelpers.checkTokenType(new JsToken(), "Javascript");
+        this.m.testsuite.TestHelpers.checkTokenType(this.m.testsuite.TestHelpers.createCppToken(), "C++");
         var threw = false;
         try {
-            this.m.TestHelpers.checkTokenType(new JsToken(), "foo");
+            this.m.testsuite.TestHelpers.checkTokenType(new JsToken(), "foo");
         } catch (e) {
             threw = true;
         }
         assertTrue(threw);
         threw = false;
         try {
-            this.m.TestHelpers.checkTokenType(this.m.TestHelpers.createCppToken(), "foo");
+            this.m.testsuite.TestHelpers.checkTokenType(this.m.testsuite.TestHelpers.createCppToken(), "foo");
         } catch (e) {
             threw = true;
         }
@@ -47,7 +47,7 @@ class TokenTest {
     testNotCppToken() {
         var threw = false;
         try {
-            this.m.TestHelpers.checkCppToken(new JsToken());
+            this.m.testsuite.TestHelpers.checkCppToken(new JsToken());
         } catch (e) {
             threw = true;
         }

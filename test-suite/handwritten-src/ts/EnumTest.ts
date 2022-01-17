@@ -3,9 +3,9 @@ import * as test from "../../generated-src/ts/test";
 
 class EnumTest extends TestCase {
     m: test.Test_statics;
-    constructor(module: any) {
+    constructor(module: test.Test_module_statics) {
         super(module);
-        this.m = <test.Test_statics>module;
+        this.m = module.testsuite;
     }
 
     enumToString(v: test.Color) {

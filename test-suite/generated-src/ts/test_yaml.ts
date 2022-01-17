@@ -24,3 +24,8 @@ export interface /*record*/ TestOptionalExternInterfaceRecord {
 
 export interface TestYaml_statics {
 }
+
+export interface TestYaml_module_statics {
+
+    testsuite: TestYaml_statics
+}

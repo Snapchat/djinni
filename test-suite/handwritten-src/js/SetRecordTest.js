@@ -3,7 +3,7 @@ class SetRecordTest {
         this.m = module;
     }
     testCppSetToJavaSet() {
-        var jsSetRecord = this.m.TestHelpers.getSetRecord();
+        var jsSetRecord = this.m.testsuite.TestHelpers.getSetRecord();
         var jsSet = jsSetRecord.set;
         assertEq(3, jsSet.size);
         assertTrue(jsSet.has("StringA"));
@@ -18,7 +18,7 @@ class SetRecordTest {
         jsSet.add("StringB");
         jsSet.add("StringC");
         var jsSetRecord = {set: jsSet, iset: iSet};
-        assertTrue(this.m.TestHelpers.checkSetRecord(jsSetRecord));
+        assertTrue(this.m.testsuite.TestHelpers.checkSetRecord(jsSetRecord));
     }
 }
 allTests.push(SetRecordTest);

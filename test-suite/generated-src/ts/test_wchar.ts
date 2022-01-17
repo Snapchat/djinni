@@ -18,3 +18,9 @@ export interface WcharTestHelpers_statics {
 export interface TestWchar_statics {
     WcharTestHelpers: WcharTestHelpers_statics;
 }
+
+export interface TestWchar_module_statics {
+    testsuite_WcharTestHelpers: WcharTestHelpers_statics;
+
+    testsuite: TestWchar_statics
+}

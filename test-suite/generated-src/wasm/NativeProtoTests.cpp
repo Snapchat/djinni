@@ -67,9 +67,21 @@ em::val NativeProtoTests::stringToProtoOutcome(const std::string& w_x) {
     return ::djinni::Outcome<::djinni::Protobuf<::djinni::test::Person, ::djinni::JsClassName<'p','r','o','t','o','t','e','s','t','.','P','e','r','s','o','n'>>, ::djinni::I32>::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(proto_tests) {
-    em::class_<::testsuite::ProtoTests>("ProtoTests")
-        .smart_ptr<std::shared_ptr<::testsuite::ProtoTests>>("ProtoTests")
+namespace {
+    EM_JS(void, djinni_init_testsuite_proto_tests, (), {
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.ProtoTests = Module.testsuite_ProtoTests
+    })
+}
+void NativeProtoTests::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init_testsuite_proto_tests);
+}
+EMSCRIPTEN_BINDINGS(testsuite_proto_tests) {
+    em::class_<::testsuite::ProtoTests>("testsuite_ProtoTests")
+        .smart_ptr<std::shared_ptr<::testsuite::ProtoTests>>("testsuite_ProtoTests")
         .function("nativeDestroy", &NativeProtoTests::nativeDestroy)
         .class_function("protoToStrings", NativeProtoTests::protoToStrings)
         .class_function("stringsToProto", NativeProtoTests::stringsToProto)
@@ -85,6 +97,7 @@ EMSCRIPTEN_BINDINGS(proto_tests) {
         .class_function("stringToOptionalProto", NativeProtoTests::stringToOptionalProto)
         .class_function("stringToProtoOutcome", NativeProtoTests::stringToProtoOutcome)
         ;
+    NativeProtoTests::staticInitialize();
 }
 
 }  // namespace djinni_generated

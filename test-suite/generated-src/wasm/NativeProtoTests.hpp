@@ -34,6 +34,7 @@ struct NativeProtoTests : ::djinni::JsInterface<::testsuite::ProtoTests, NativeP
     static em::val stringToOptionalProto(const std::string& w_x);
     static em::val stringToProtoOutcome(const std::string& w_x);
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

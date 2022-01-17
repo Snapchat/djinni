@@ -23,6 +23,7 @@ struct NativeConflictUser : ::djinni::JsInterface<::testsuite::ConflictUser, Nat
     static em::val Conflict(const CppType& self);
     static bool conflict_arg(const CppType& self, const em::val& w_cs);
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

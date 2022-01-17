@@ -3,9 +3,9 @@ import * as test from "../../generated-src/ts/test_wchar";
 
 class WcharTest extends TestCase {
     m: test.TestWchar_statics;
-    constructor(module: any) {
+    constructor(module: test.TestWchar_module_statics) {
         super(module);
-        this.m = <test.TestWchar_statics>module;
+        this.m = module.testsuite;
     }
 
     static STR1 = "some string with unicode \u{0000}, \u{263A}, \u{D83D}\u{DCA9} symbols";

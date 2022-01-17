@@ -16,20 +16,24 @@ auto NativeConstantWithEnum::fromCpp(const CppType& c) -> JsType {
 
 namespace {
     EM_JS(void, djinni_init_testsuite_constant_with_enum_consts, (), {
-        if (!('ConstantWithEnum' in Module)) {
-            Module.ConstantWithEnum = {};
+        if (!('testsuite_ConstantWithEnum' in Module)) {
+            Module.testsuite_ConstantWithEnum = {};
         }
-        Module.ConstantWithEnum.CONST_ENUM = Module.ConstantEnum.SOME_VALUE;
+        Module.testsuite_ConstantWithEnum.CONST_ENUM = Module.testsuite_ConstantEnum.SOME_VALUE;
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.ConstantWithEnum = Module.testsuite_ConstantWithEnum
     })
 }
-void NativeConstantWithEnum::staticInitialize() {
+void NativeConstantWithEnum::staticInitializeConstants() {
     static std::once_flag initOnce;
     std::call_once(initOnce, djinni_init_testsuite_constant_with_enum_consts);
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_constant_with_enum_consts) {
-    NativeConstantEnum::staticInitialize();
-    NativeConstantWithEnum::staticInitialize();
+    NativeConstantEnum::staticInitializeConstants();
+    NativeConstantWithEnum::staticInitializeConstants();
 }
 
 }  // namespace djinni_generated

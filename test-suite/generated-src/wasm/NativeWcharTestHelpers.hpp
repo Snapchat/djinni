@@ -25,6 +25,7 @@ struct NativeWcharTestHelpers : ::djinni::JsInterface<::testsuite::WcharTestHelp
     static bool check_string(const std::wstring& w_str);
     static bool check_record(const em::val& w_rec);
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

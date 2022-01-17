@@ -46,9 +46,21 @@ std::string NativeTestOutcome::putNestedErrorOutcome(const em::val& w_x) {
     return ::djinni::String::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(test_outcome) {
-    em::class_<::testsuite::TestOutcome>("TestOutcome")
-        .smart_ptr<std::shared_ptr<::testsuite::TestOutcome>>("TestOutcome")
+namespace {
+    EM_JS(void, djinni_init_testsuite_test_outcome, (), {
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.TestOutcome = Module.testsuite_TestOutcome
+    })
+}
+void NativeTestOutcome::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init_testsuite_test_outcome);
+}
+EMSCRIPTEN_BINDINGS(testsuite_test_outcome) {
+    em::class_<::testsuite::TestOutcome>("testsuite_TestOutcome")
+        .smart_ptr<std::shared_ptr<::testsuite::TestOutcome>>("testsuite_TestOutcome")
         .function("nativeDestroy", &NativeTestOutcome::nativeDestroy)
         .class_function("getSuccessOutcome", NativeTestOutcome::getSuccessOutcome)
         .class_function("getErrorOutcome", NativeTestOutcome::getErrorOutcome)
@@ -59,6 +71,7 @@ EMSCRIPTEN_BINDINGS(test_outcome) {
         .class_function("putNestedSuccessOutcome", NativeTestOutcome::putNestedSuccessOutcome)
         .class_function("putNestedErrorOutcome", NativeTestOutcome::putNestedErrorOutcome)
         ;
+    NativeTestOutcome::staticInitialize();
 }
 
 }  // namespace djinni_generated

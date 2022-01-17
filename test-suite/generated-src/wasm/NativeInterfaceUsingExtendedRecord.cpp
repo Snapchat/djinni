@@ -19,35 +19,52 @@ em::val NativeInterfaceUsingExtendedRecord::meth(const CppType& self, const em::
     return ::djinni_generated::NativeExtendedRecord::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(interface_using_extended_record) {
-    em::class_<::testsuite::InterfaceUsingExtendedRecord>("InterfaceUsingExtendedRecord")
-        .smart_ptr<std::shared_ptr<::testsuite::InterfaceUsingExtendedRecord>>("InterfaceUsingExtendedRecord")
+namespace {
+    EM_JS(void, djinni_init_testsuite_interface_using_extended_record, (), {
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.InterfaceUsingExtendedRecord = Module.testsuite_InterfaceUsingExtendedRecord
+    })
+}
+void NativeInterfaceUsingExtendedRecord::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init_testsuite_interface_using_extended_record);
+}
+EMSCRIPTEN_BINDINGS(testsuite_interface_using_extended_record) {
+    em::class_<::testsuite::InterfaceUsingExtendedRecord>("testsuite_InterfaceUsingExtendedRecord")
+        .smart_ptr<std::shared_ptr<::testsuite::InterfaceUsingExtendedRecord>>("testsuite_InterfaceUsingExtendedRecord")
         .function("nativeDestroy", &NativeInterfaceUsingExtendedRecord::nativeDestroy)
         .function("meth", NativeInterfaceUsingExtendedRecord::meth)
         ;
+    NativeInterfaceUsingExtendedRecord::staticInitialize();
 }
 
 namespace {
     EM_JS(void, djinni_init_testsuite_interface_using_extended_record_consts, (), {
-        if (!('InterfaceUsingExtendedRecord' in Module)) {
-            Module.InterfaceUsingExtendedRecord = {};
+        if (!('testsuite_InterfaceUsingExtendedRecord' in Module)) {
+            Module.testsuite_InterfaceUsingExtendedRecord = {};
         }
-        Module.InterfaceUsingExtendedRecord.CR =  {
+        Module.testsuite_InterfaceUsingExtendedRecord.CR =  {
             er:  {
                 foo: false
             }
 
         }
         ;
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.InterfaceUsingExtendedRecord = Module.testsuite_InterfaceUsingExtendedRecord
     })
 }
-void NativeInterfaceUsingExtendedRecord::staticInitialize() {
+void NativeInterfaceUsingExtendedRecord::staticInitializeConstants() {
     static std::once_flag initOnce;
     std::call_once(initOnce, djinni_init_testsuite_interface_using_extended_record_consts);
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_interface_using_extended_record_consts) {
-    NativeInterfaceUsingExtendedRecord::staticInitialize();
+    NativeInterfaceUsingExtendedRecord::staticInitializeConstants();
 }
 
 }  // namespace djinni_generated

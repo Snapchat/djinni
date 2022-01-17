@@ -12,11 +12,24 @@ em::val NativeConflict::cppProxyMethods() {
 }
 
 
-EMSCRIPTEN_BINDINGS(Conflict) {
-    em::class_<::testsuite::Conflict>("Conflict")
-        .smart_ptr<std::shared_ptr<::testsuite::Conflict>>("Conflict")
+namespace {
+    EM_JS(void, djinni_init_testsuite_Conflict, (), {
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.Conflict = Module.testsuite_Conflict
+    })
+}
+void NativeConflict::staticInitialize() {
+    static std::once_flag initOnce;
+    std::call_once(initOnce, djinni_init_testsuite_Conflict);
+}
+EMSCRIPTEN_BINDINGS(testsuite_Conflict) {
+    em::class_<::testsuite::Conflict>("testsuite_Conflict")
+        .smart_ptr<std::shared_ptr<::testsuite::Conflict>>("testsuite_Conflict")
         .function("nativeDestroy", &NativeConflict::nativeDestroy)
         ;
+    NativeConflict::staticInitialize();
 }
 
 }  // namespace djinni_generated

@@ -25,9 +25,9 @@ class AsyncInterfaceImpl implements test.AsyncInterface {
 
 class AsyncTest extends TestCase {
     m: test.Test_statics;
-    constructor(module) {
+    constructor(module: test.Test_module_statics) {
         super(module);
-        this.m = <test.Test_statics>module;
+        this.m = module.testsuite;
     }
     async testConsumeNativeFuture() {
         const r = await this.m.TestHelpers.getAsyncResult();

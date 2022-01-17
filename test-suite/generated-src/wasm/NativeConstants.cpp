@@ -16,40 +16,44 @@ auto NativeConstants::fromCpp(const CppType& c) -> JsType {
 
 namespace {
     EM_JS(void, djinni_init_testsuite_constants_consts, (), {
-        if (!('Constants' in Module)) {
-            Module.Constants = {};
+        if (!('testsuite_Constants' in Module)) {
+            Module.testsuite_Constants = {};
         }
-        Module.Constants.BOOL_CONSTANT = true;
-        Module.Constants.I8_CONSTANT = 1;
-        Module.Constants.I16_CONSTANT = 2;
-        Module.Constants.I32_CONSTANT = 3;
-        Module.Constants.I64_CONSTANT = BigInt("4");
-        Module.Constants.F32_CONSTANT = 5.0;
-        Module.Constants.F64_CONSTANT = 5.0;
-        Module.Constants.OPT_BOOL_CONSTANT = true;
-        Module.Constants.OPT_I8_CONSTANT = 1;
-        Module.Constants.OPT_I16_CONSTANT = 2;
-        Module.Constants.OPT_I32_CONSTANT = 3;
-        Module.Constants.OPT_I64_CONSTANT = 4;
-        Module.Constants.OPT_F32_CONSTANT = 5.0;
-        Module.Constants.OPT_F64_CONSTANT = 5.0;
-        Module.Constants.STRING_CONSTANT = "string-constant";
-        Module.Constants.OPT_STRING_CONSTANT = "string-constant";
-        Module.Constants.OBJECT_CONSTANT =  {
-            someInteger: Module.Constants.I32_CONSTANT,
-            someString: Module.Constants.STRING_CONSTANT
+        Module.testsuite_Constants.BOOL_CONSTANT = true;
+        Module.testsuite_Constants.I8_CONSTANT = 1;
+        Module.testsuite_Constants.I16_CONSTANT = 2;
+        Module.testsuite_Constants.I32_CONSTANT = 3;
+        Module.testsuite_Constants.I64_CONSTANT = BigInt("4");
+        Module.testsuite_Constants.F32_CONSTANT = 5.0;
+        Module.testsuite_Constants.F64_CONSTANT = 5.0;
+        Module.testsuite_Constants.OPT_BOOL_CONSTANT = true;
+        Module.testsuite_Constants.OPT_I8_CONSTANT = 1;
+        Module.testsuite_Constants.OPT_I16_CONSTANT = 2;
+        Module.testsuite_Constants.OPT_I32_CONSTANT = 3;
+        Module.testsuite_Constants.OPT_I64_CONSTANT = 4;
+        Module.testsuite_Constants.OPT_F32_CONSTANT = 5.0;
+        Module.testsuite_Constants.OPT_F64_CONSTANT = 5.0;
+        Module.testsuite_Constants.STRING_CONSTANT = "string-constant";
+        Module.testsuite_Constants.OPT_STRING_CONSTANT = "string-constant";
+        Module.testsuite_Constants.OBJECT_CONSTANT =  {
+            someInteger: Module.testsuite_Constants.I32_CONSTANT,
+            someString: Module.testsuite_Constants.STRING_CONSTANT
         }
         ;
-        Module.Constants.DUMMY = false;
+        Module.testsuite_Constants.DUMMY = false;
+        'testsuite'.split('.').reduce(function(path, part) {
+            if (!(part in path)) { path[part] = {}}; 
+            return path[part]}, Module);
+        Module.testsuite.Constants = Module.testsuite_Constants
     })
 }
-void NativeConstants::staticInitialize() {
+void NativeConstants::staticInitializeConstants() {
     static std::once_flag initOnce;
     std::call_once(initOnce, djinni_init_testsuite_constants_consts);
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_constants_consts) {
-    NativeConstants::staticInitialize();
+    NativeConstants::staticInitializeConstants();
 }
 
 }  // namespace djinni_generated

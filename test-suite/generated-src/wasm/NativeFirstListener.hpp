@@ -19,6 +19,7 @@ struct NativeFirstListener : ::djinni::JsInterface<::testsuite::FirstListener, N
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
 
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

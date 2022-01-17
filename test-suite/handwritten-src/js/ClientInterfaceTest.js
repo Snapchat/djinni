@@ -29,19 +29,19 @@ class ClientInterfaceTest {
         this.jsClientInterface = new ClientInterfaceImpl();
     }
     testClientReturn() {
-        this.module.TestHelpers.checkClientInterfaceAscii(this.jsClientInterface);
+        this.module.testsuite.TestHelpers.checkClientInterfaceAscii(this.jsClientInterface);
     }
 
     testClientReturnUTF8() {
-        this.module.TestHelpers.checkClientInterfaceNonascii(this.jsClientInterface);
+        this.module.testsuite.TestHelpers.checkClientInterfaceNonascii(this.jsClientInterface);
     }
 
     testClientInterfaceArgs() {
-        this.module.TestHelpers.checkClientInterfaceArgs(this.jsClientInterface);
+        this.module.testsuite.TestHelpers.checkClientInterfaceArgs(this.jsClientInterface);
     }
 
     testReverseClientInterfaceArgs() {
-        var i = this.module.ReverseClientInterface.create();
+        var i = this.module.testsuite.ReverseClientInterface.create();
         assertEq(i.methTakingInterface(i), "test");
         assertEq(i.methTakingOptionalInterface(i), "test");
     }

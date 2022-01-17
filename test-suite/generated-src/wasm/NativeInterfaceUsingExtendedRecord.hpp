@@ -22,6 +22,7 @@ struct NativeInterfaceUsingExtendedRecord : ::djinni::JsInterface<::testsuite::I
 
     static em::val meth(const CppType& self, const em::val& w_er);
 
+    static void staticInitializeConstants();
     static void staticInitialize();
 };
 

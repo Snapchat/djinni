@@ -41,6 +41,7 @@ struct NativeTestDuration : ::djinni::JsInterface<::testsuite::TestDuration, Nat
     static em::val box(int64_t w_count);
     static int64_t unbox(const em::val& w_dt);
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

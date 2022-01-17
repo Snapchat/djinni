@@ -23,6 +23,7 @@ struct NativeExternInterface1 : ::djinni::JsInterface<::ExternInterface1, Native
     static em::val foo(const CppType& self, const em::val& w_i);
     static int32_t bar(const CppType& self, int32_t w_e);
 
+    static void staticInitialize();
 };
 
 }  // namespace djinni_generated
