@@ -26,7 +26,7 @@ std::string NativeUserToken::JsProxy::whoami() {
 namespace {
     EM_JS(void, djinni_init_testsuite_user_token, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.UserToken = Module.testsuite_UserToken

@@ -49,7 +49,7 @@ std::string NativeTestOutcome::putNestedErrorOutcome(const em::val& w_x) {
 namespace {
     EM_JS(void, djinni_init_testsuite_test_outcome, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.TestOutcome = Module.testsuite_TestOutcome

@@ -24,7 +24,7 @@ namespace {
         }
         ;
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.Color = Module.testsuite_Color

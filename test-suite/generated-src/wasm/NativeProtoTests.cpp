@@ -70,7 +70,7 @@ em::val NativeProtoTests::stringToProtoOutcome(const std::string& w_x) {
 namespace {
     EM_JS(void, djinni_init_testsuite_proto_tests, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.ProtoTests = Module.testsuite_ProtoTests

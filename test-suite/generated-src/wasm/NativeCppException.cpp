@@ -24,7 +24,7 @@ em::val NativeCppException::get() {
 namespace {
     EM_JS(void, djinni_init_testsuite_cpp_exception, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.CppException = Module.testsuite_CppException

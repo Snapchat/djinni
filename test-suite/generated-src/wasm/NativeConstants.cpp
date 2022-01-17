@@ -42,7 +42,7 @@ namespace {
         ;
         Module.testsuite_Constants.DUMMY = false;
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.Constants = Module.testsuite_Constants

@@ -33,7 +33,7 @@ em::val NativeFlagRoundtrip::roundtrip_empty_boxed(const em::val& w_flag) {
 namespace {
     EM_JS(void, djinni_init_testsuite_flag_roundtrip, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.FlagRoundtrip = Module.testsuite_FlagRoundtrip

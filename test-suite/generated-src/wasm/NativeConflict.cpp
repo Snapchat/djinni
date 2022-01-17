@@ -15,7 +15,7 @@ em::val NativeConflict::cppProxyMethods() {
 namespace {
     EM_JS(void, djinni_init_testsuite_Conflict, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.Conflict = Module.testsuite_Conflict

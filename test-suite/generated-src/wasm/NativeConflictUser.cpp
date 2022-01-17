@@ -26,7 +26,7 @@ bool NativeConflictUser::conflict_arg(const CppType& self, const em::val& w_cs) 
 namespace {
     EM_JS(void, djinni_init_testsuite_conflict_user, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.ConflictUser = Module.testsuite_ConflictUser

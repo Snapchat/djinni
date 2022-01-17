@@ -21,7 +21,7 @@ namespace {
         }
         Module.testsuite_ConstantWithEnum.CONST_ENUM = Module.testsuite_ConstantEnum.SOME_VALUE;
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.ConstantWithEnum = Module.testsuite_ConstantWithEnum

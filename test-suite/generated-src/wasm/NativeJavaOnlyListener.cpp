@@ -9,7 +9,7 @@ namespace djinni_generated {
 namespace {
     EM_JS(void, djinni_init_testsuite_java_only_listener, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.JavaOnlyListener = Module.testsuite_JavaOnlyListener

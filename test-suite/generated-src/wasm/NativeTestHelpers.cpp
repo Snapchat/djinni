@@ -131,7 +131,7 @@ em::val NativeTestHelpers::check_async_interface(const em::val& w_i) {
 namespace {
     EM_JS(void, djinni_init_testsuite_test_helpers, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.TestHelpers = Module.testsuite_TestHelpers

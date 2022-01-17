@@ -44,7 +44,7 @@ std::string NativeClientInterface::JsProxy::meth_taking_optional_interface(const
 namespace {
     EM_JS(void, djinni_init_testsuite_client_interface, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.ClientInterface = Module.testsuite_ClientInterface

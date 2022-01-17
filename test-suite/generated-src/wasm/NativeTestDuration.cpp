@@ -96,7 +96,7 @@ int64_t NativeTestDuration::unbox(const em::val& w_dt) {
 namespace {
     EM_JS(void, djinni_init_testsuite_test_duration, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.TestDuration = Module.testsuite_TestDuration

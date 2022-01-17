@@ -28,7 +28,7 @@ int32_t NativeExternInterface1::bar(const CppType& self, int32_t w_e) {
 namespace {
     EM_JS(void, djinni_init__extern_interface_1, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.ExternInterface1 = Module.testsuite_ExternInterface1

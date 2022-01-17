@@ -32,7 +32,7 @@ bool NativeWcharTestHelpers::check_record(const em::val& w_rec) {
 namespace {
     EM_JS(void, djinni_init_testsuite_wchar_test_helpers, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.WcharTestHelpers = Module.testsuite_WcharTestHelpers

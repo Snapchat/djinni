@@ -449,7 +449,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
 
   def writeNamespaceAlias(w: IndentWriter, name: String) = {
     w.wl(s"'${spec.wasmNamespace.get}'.split('.').reduce(function(path, part) {")
-    w.wl("    if (!(part in path)) { path[part] = {}}; ")
+    w.wl("    if (!path.hasOwnProperty(part)) { path[part] = {}}; ")
     w.wl("    return path[part]")
     w.wl("}, Module);")
     w.wl(s"Module.${spec.wasmNamespace.get}.${name} = Module.${withWasmNamespace(name)}")

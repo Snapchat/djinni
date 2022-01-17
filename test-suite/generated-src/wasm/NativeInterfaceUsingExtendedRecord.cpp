@@ -22,7 +22,7 @@ em::val NativeInterfaceUsingExtendedRecord::meth(const CppType& self, const em::
 namespace {
     EM_JS(void, djinni_init_testsuite_interface_using_extended_record, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.InterfaceUsingExtendedRecord = Module.testsuite_InterfaceUsingExtendedRecord
@@ -54,7 +54,7 @@ namespace {
         }
         ;
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.InterfaceUsingExtendedRecord = Module.testsuite_InterfaceUsingExtendedRecord

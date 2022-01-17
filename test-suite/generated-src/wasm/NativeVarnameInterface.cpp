@@ -26,7 +26,7 @@ em::val NativeVarnameInterface::_imethod_(const CppType& self, const em::val& w_
 namespace {
     EM_JS(void, djinni_init_testsuite__varname_interface_, (), {
         'testsuite'.split('.').reduce(function(path, part) {
-            if (!(part in path)) { path[part] = {}}; 
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
             return path[part]
         }, Module);
         Module.testsuite.VarnameInterface = Module.testsuite_VarnameInterface
