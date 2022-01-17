@@ -130,8 +130,8 @@ std::string NativeDjinniPerfBenchmark::roundTripString(const CppType& self, cons
 }
 
 EMSCRIPTEN_BINDINGS(snapchat_djinni_benchmark_djinni_perf_benchmark) {
-    em::class_<::snapchat::djinni::benchmark::DjinniPerfBenchmark>("DjinniPerfBenchmark")
-        .smart_ptr<std::shared_ptr<::snapchat::djinni::benchmark::DjinniPerfBenchmark>>("DjinniPerfBenchmark")
+    em::class_<::snapchat::djinni::benchmark::DjinniPerfBenchmark>("benchmark_DjinniPerfBenchmark")
+        .smart_ptr<std::shared_ptr<::snapchat::djinni::benchmark::DjinniPerfBenchmark>>("benchmark_DjinniPerfBenchmark")
         .function("nativeDestroy", &NativeDjinniPerfBenchmark::nativeDestroy)
         .class_function("getInstance", NativeDjinniPerfBenchmark::getInstance)
         .function("cppTests", NativeDjinniPerfBenchmark::cppTests)

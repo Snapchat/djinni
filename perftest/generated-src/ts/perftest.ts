@@ -62,5 +62,5 @@ export interface DjinniPerfBenchmark_statics {
 }
 
 export interface Perftest_module_statics {
-    DjinniPerfBenchmark: DjinniPerfBenchmark_statics;
+    benchmark_DjinniPerfBenchmark: DjinniPerfBenchmark_statics;
 }

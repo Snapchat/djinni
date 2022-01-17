@@ -74,6 +74,8 @@ fi
     --objc-swift-bridging-header "Benchmark-Bridging-Header" \
     \
     --wasm-out "$temp_out/wasm" \
+    --wasm-namespace benchmark \
+    --wasm-omit-namespace-alias true \
     --ts-out "$temp_out/ts" \
     --ts-module "perftest" \
     \

@@ -8,7 +8,7 @@ namespace djinni_generated {
 
 namespace {
     EM_JS(void, djinni_init_snapchat_djinni_benchmark_EnumSixValue, (), {
-        Module.EnumSixValue =  {
+        Module.benchmark_EnumSixValue =  {
             FIRST : 0,
             SECOND : 1,
             THIRD : 2,
