@@ -58,7 +58,8 @@ namespace {
     EM_JS(void, djinni_init_testsuite_uses_single_language_listeners, (), {
         'testsuite'.split('.').reduce(function(path, part) {
             if (!(part in path)) { path[part] = {}}; 
-            return path[part]}, Module);
+            return path[part]
+        }, Module);
         Module.testsuite.UsesSingleLanguageListeners = Module.testsuite_UsesSingleLanguageListeners
     })
 }

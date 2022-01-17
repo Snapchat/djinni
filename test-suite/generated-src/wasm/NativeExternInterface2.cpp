@@ -18,7 +18,8 @@ namespace {
     EM_JS(void, djinni_init__extern_interface_2, (), {
         'testsuite'.split('.').reduce(function(path, part) {
             if (!(part in path)) { path[part] = {}}; 
-            return path[part]}, Module);
+            return path[part]
+        }, Module);
         Module.testsuite.ExternInterface2 = Module.testsuite_ExternInterface2
     })
 }

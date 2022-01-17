@@ -34,7 +34,8 @@ namespace {
     EM_JS(void, djinni_init_testsuite_flag_roundtrip, (), {
         'testsuite'.split('.').reduce(function(path, part) {
             if (!(part in path)) { path[part] = {}}; 
-            return path[part]}, Module);
+            return path[part]
+        }, Module);
         Module.testsuite.FlagRoundtrip = Module.testsuite_FlagRoundtrip
     })
 }

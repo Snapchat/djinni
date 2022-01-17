@@ -21,7 +21,8 @@ namespace {
     EM_JS(void, djinni_init_testsuite_constants_interface, (), {
         'testsuite'.split('.').reduce(function(path, part) {
             if (!(part in path)) { path[part] = {}}; 
-            return path[part]}, Module);
+            return path[part]
+        }, Module);
         Module.testsuite.ConstantsInterface = Module.testsuite_ConstantsInterface
     })
 }
@@ -66,7 +67,8 @@ namespace {
         ;
         'testsuite'.split('.').reduce(function(path, part) {
             if (!(part in path)) { path[part] = {}}; 
-            return path[part]}, Module);
+            return path[part]
+        }, Module);
         Module.testsuite.ConstantsInterface = Module.testsuite_ConstantsInterface
     })
 }

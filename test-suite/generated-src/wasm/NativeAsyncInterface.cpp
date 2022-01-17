@@ -17,7 +17,8 @@ namespace {
     EM_JS(void, djinni_init_testsuite_async_interface, (), {
         'testsuite'.split('.').reduce(function(path, part) {
             if (!(part in path)) { path[part] = {}}; 
-            return path[part]}, Module);
+            return path[part]
+        }, Module);
         Module.testsuite.AsyncInterface = Module.testsuite_AsyncInterface
     })
 }

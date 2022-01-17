@@ -43,7 +43,8 @@ namespace {
         Module.testsuite_Constants.DUMMY = false;
         'testsuite'.split('.').reduce(function(path, part) {
             if (!(part in path)) { path[part] = {}}; 
-            return path[part]}, Module);
+            return path[part]
+        }, Module);
         Module.testsuite.Constants = Module.testsuite_Constants
     })
 }

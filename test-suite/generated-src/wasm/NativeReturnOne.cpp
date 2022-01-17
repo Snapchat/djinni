@@ -25,7 +25,8 @@ namespace {
     EM_JS(void, djinni_init_testsuite_return_one, (), {
         'testsuite'.split('.').reduce(function(path, part) {
             if (!(part in path)) { path[part] = {}}; 
-            return path[part]}, Module);
+            return path[part]
+        }, Module);
         Module.testsuite.ReturnOne = Module.testsuite_ReturnOne
     })
 }

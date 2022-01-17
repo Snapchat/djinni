@@ -24,7 +24,8 @@ namespace {
         ;
         'testsuite'.split('.').reduce(function(path, part) {
             if (!(part in path)) { path[part] = {}}; 
-            return path[part]}, Module);
+            return path[part]
+        }, Module);
         Module.testsuite.AccessFlags = Module.testsuite_AccessFlags
     })
 }

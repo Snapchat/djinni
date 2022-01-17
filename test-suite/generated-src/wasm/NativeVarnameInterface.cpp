@@ -27,7 +27,8 @@ namespace {
     EM_JS(void, djinni_init_testsuite__varname_interface_, (), {
         'testsuite'.split('.').reduce(function(path, part) {
             if (!(part in path)) { path[part] = {}}; 
-            return path[part]}, Module);
+            return path[part]
+        }, Module);
         Module.testsuite.VarnameInterface = Module.testsuite_VarnameInterface
     })
 }

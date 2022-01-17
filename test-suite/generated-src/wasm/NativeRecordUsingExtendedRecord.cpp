@@ -29,7 +29,8 @@ namespace {
         ;
         'testsuite'.split('.').reduce(function(path, part) {
             if (!(part in path)) { path[part] = {}}; 
-            return path[part]}, Module);
+            return path[part]
+        }, Module);
         Module.testsuite.RecordUsingExtendedRecord = Module.testsuite_RecordUsingExtendedRecord
     })
 }

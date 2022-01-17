@@ -17,7 +17,8 @@ namespace {
     EM_JS(void, djinni_init_testsuite_constant_interface_with_enum, (), {
         'testsuite'.split('.').reduce(function(path, part) {
             if (!(part in path)) { path[part] = {}}; 
-            return path[part]}, Module);
+            return path[part]
+        }, Module);
         Module.testsuite.ConstantInterfaceWithEnum = Module.testsuite_ConstantInterfaceWithEnum
     })
 }
@@ -41,7 +42,8 @@ namespace {
         Module.testsuite_ConstantInterfaceWithEnum.CONST_ENUM = Module.testsuite_ConstantEnum.SOME_VALUE;
         'testsuite'.split('.').reduce(function(path, part) {
             if (!(part in path)) { path[part] = {}}; 
-            return path[part]}, Module);
+            return path[part]
+        }, Module);
         Module.testsuite.ConstantInterfaceWithEnum = Module.testsuite_ConstantInterfaceWithEnum
     })
 }
