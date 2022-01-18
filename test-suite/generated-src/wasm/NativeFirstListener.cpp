@@ -6,9 +6,9 @@
 namespace djinni_generated {
 
 
-EMSCRIPTEN_BINDINGS(first_listener) {
-    em::class_<::testsuite::FirstListener>("FirstListener")
-        .smart_ptr<std::shared_ptr<::testsuite::FirstListener>>("FirstListener")
+EMSCRIPTEN_BINDINGS(testsuite_first_listener) {
+    ::djinni::DjinniClass_<::testsuite::FirstListener>("testsuite_FirstListener", "testsuite.FirstListener")
+        .smart_ptr<std::shared_ptr<::testsuite::FirstListener>>("testsuite_FirstListener")
         .function("nativeDestroy", &NativeFirstListener::nativeDestroy)
         ;
 }

@@ -31,9 +31,9 @@ em::val NativeReverseClientInterface::create() {
     return ::djinni_generated::NativeReverseClientInterface::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(reverse_client_interface) {
-    em::class_<::testsuite::ReverseClientInterface>("ReverseClientInterface")
-        .smart_ptr<std::shared_ptr<::testsuite::ReverseClientInterface>>("ReverseClientInterface")
+EMSCRIPTEN_BINDINGS(testsuite_reverse_client_interface) {
+    ::djinni::DjinniClass_<::testsuite::ReverseClientInterface>("testsuite_ReverseClientInterface", "testsuite.ReverseClientInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::ReverseClientInterface>>("testsuite_ReverseClientInterface")
         .function("nativeDestroy", &NativeReverseClientInterface::nativeDestroy)
         .function("returnStr", NativeReverseClientInterface::return_str)
         .function("methTakingInterface", NativeReverseClientInterface::meth_taking_interface)

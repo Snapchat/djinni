@@ -7,8 +7,8 @@
 namespace djinni_generated {
 
 namespace {
-    EM_JS(void, djinni_init_snapchat_djinni_benchmark_EnumSixValue, (), {
-        Module.EnumSixValue =  {
+    EM_JS(void, djinni_init_snapchat_djinni_benchmark_EnumSixValue_consts, (), {
+        Module.benchmark_EnumSixValue =  {
             FIRST : 0,
             SECOND : 1,
             THIRD : 2,
@@ -19,13 +19,15 @@ namespace {
     })
 }
 
-void NativeEnumSixValue::staticInitialize() {
+void NativeEnumSixValue::staticInitializeConstants() {
     static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_snapchat_djinni_benchmark_EnumSixValue);
+    std::call_once(initOnce, [] {
+        djinni_init_snapchat_djinni_benchmark_EnumSixValue_consts();
+    });
 }
 
 EMSCRIPTEN_BINDINGS(snapchat_djinni_benchmark_EnumSixValue) {
-    NativeEnumSixValue::staticInitialize();
+    NativeEnumSixValue::staticInitializeConstants();
 }
 
 }  // namespace djinni_generated

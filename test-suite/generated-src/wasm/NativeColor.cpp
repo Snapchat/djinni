@@ -7,8 +7,8 @@
 namespace djinni_generated {
 
 namespace {
-    EM_JS(void, djinni_init_testsuite_color, (), {
-        Module.Color =  {
+    EM_JS(void, djinni_init_testsuite_color_consts, (), {
+        Module.testsuite_Color =  {
             RED : 0,
             ORANGE : 1,
             YELLOW : 2,
@@ -25,13 +25,16 @@ namespace {
     })
 }
 
-void NativeColor::staticInitialize() {
+void NativeColor::staticInitializeConstants() {
     static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_color);
+    std::call_once(initOnce, [] {
+        djinni_init_testsuite_color_consts();
+        ::djinni::djinni_register_name_in_ns("testsuite_Color", "testsuite.Color");
+    });
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_color) {
-    NativeColor::staticInitialize();
+    NativeColor::staticInitializeConstants();
 }
 
 }  // namespace djinni_generated

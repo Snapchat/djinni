@@ -21,9 +21,9 @@ int8_t NativeReturnOne::return_one(const CppType& self) {
     return ::djinni::I8::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(return_one) {
-    em::class_<::testsuite::ReturnOne>("ReturnOne")
-        .smart_ptr<std::shared_ptr<::testsuite::ReturnOne>>("ReturnOne")
+EMSCRIPTEN_BINDINGS(testsuite_return_one) {
+    ::djinni::DjinniClass_<::testsuite::ReturnOne>("testsuite_ReturnOne", "testsuite.ReturnOne")
+        .smart_ptr<std::shared_ptr<::testsuite::ReturnOne>>("testsuite_ReturnOne")
         .function("nativeDestroy", &NativeReturnOne::nativeDestroy)
         .class_function("getInstance", NativeReturnOne::get_instance)
         .function("returnOne", NativeReturnOne::return_one)

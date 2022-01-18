@@ -13,9 +13,9 @@ namespace djinni_generated {
     return ::djinni::FutureAdaptor<::djinni::String>::toCpp(ret);
 }
 
-EMSCRIPTEN_BINDINGS(async_interface) {
-    em::class_<::testsuite::AsyncInterface>("AsyncInterface")
-        .smart_ptr<std::shared_ptr<::testsuite::AsyncInterface>>("AsyncInterface")
+EMSCRIPTEN_BINDINGS(testsuite_async_interface) {
+    ::djinni::DjinniClass_<::testsuite::AsyncInterface>("testsuite_AsyncInterface", "testsuite.AsyncInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::AsyncInterface>>("testsuite_AsyncInterface")
         .function("nativeDestroy", &NativeAsyncInterface::nativeDestroy)
         ;
 }

@@ -67,9 +67,9 @@ em::val NativeProtoTests::stringToProtoOutcome(const std::string& w_x) {
     return ::djinni::Outcome<::djinni::Protobuf<::djinni::test::Person, ::djinni::JsClassName<'p','r','o','t','o','t','e','s','t','.','P','e','r','s','o','n'>>, ::djinni::I32>::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(proto_tests) {
-    em::class_<::testsuite::ProtoTests>("ProtoTests")
-        .smart_ptr<std::shared_ptr<::testsuite::ProtoTests>>("ProtoTests")
+EMSCRIPTEN_BINDINGS(testsuite_proto_tests) {
+    ::djinni::DjinniClass_<::testsuite::ProtoTests>("testsuite_ProtoTests", "testsuite.ProtoTests")
+        .smart_ptr<std::shared_ptr<::testsuite::ProtoTests>>("testsuite_ProtoTests")
         .function("nativeDestroy", &NativeProtoTests::nativeDestroy)
         .class_function("protoToStrings", NativeProtoTests::protoToStrings)
         .class_function("stringsToProto", NativeProtoTests::stringsToProto)

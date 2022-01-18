@@ -22,7 +22,7 @@ struct NativeConstantsInterface : ::djinni::JsInterface<::testsuite::ConstantsIn
 
     static void dummy(const CppType& self);
 
-    static void staticInitialize();
+    static void staticInitializeConstants();
 };
 
 }  // namespace djinni_generated

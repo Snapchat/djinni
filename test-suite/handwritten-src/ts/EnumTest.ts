@@ -3,9 +3,9 @@ import * as test from "../../generated-src/ts/test";
 
 class EnumTest extends TestCase {
     m: test.Test_statics;
-    constructor(module: any) {
+    constructor(module: test.Test_statics) {
         super(module);
-        this.m = <test.Test_statics>module;
+        this.m = module;
     }
 
     enumToString(v: test.Color) {
@@ -31,7 +31,7 @@ class EnumTest extends TestCase {
         map.set(test.Color.BLUE, "blue");
         map.set(test.Color.INDIGO, "indigo");
         map.set(test.Color.VIOLET, "violet");
-        this.m.TestHelpers.checkEnumMap(map);
+        this.m.testsuite.TestHelpers.checkEnumMap(map);
     }
     testAccessFlagRoundtrip() {
         var flags = [
@@ -42,10 +42,10 @@ class EnumTest extends TestCase {
             test.AccessFlags.OWNER_READ | test.AccessFlags.OWNER_WRITE | test.AccessFlags.OWNER_EXECUTE,
         ];
         for (var i = 0; i < flags.length; ++i) {
-            assertEq(flags[i], this.m.FlagRoundtrip.roundtripAccess(flags[i]));
-            assertEq(flags[i], this.m.FlagRoundtrip.roundtripAccessBoxed(flags[i]));
+            assertEq(flags[i], this.m.testsuite.FlagRoundtrip.roundtripAccess(flags[i]));
+            assertEq(flags[i], this.m.testsuite.FlagRoundtrip.roundtripAccessBoxed(flags[i]));
         }
-        assertUndefined(this.m.FlagRoundtrip.roundtripAccessBoxed(null));
+        assertUndefined(this.m.testsuite.FlagRoundtrip.roundtripAccessBoxed(null));
     }
     testEmptyFlagRoundtrip() {
         var flags = [
@@ -53,10 +53,10 @@ class EnumTest extends TestCase {
             test.EmptyFlags.ALL,
         ];
         for (var i = 0; i < flags.length; ++i) {
-            assertEq(flags[i], this.m.FlagRoundtrip.roundtripEmpty(flags[i]));
-            assertEq(flags[i], this.m.FlagRoundtrip.roundtripEmptyBoxed(flags[i]));
+            assertEq(flags[i], this.m.testsuite.FlagRoundtrip.roundtripEmpty(flags[i]));
+            assertEq(flags[i], this.m.testsuite.FlagRoundtrip.roundtripEmptyBoxed(flags[i]));
         }
-        assertUndefined(this.m.FlagRoundtrip.roundtripEmptyBoxed(null));
+        assertUndefined(this.m.testsuite.FlagRoundtrip.roundtripEmptyBoxed(null));
     }
 }
 

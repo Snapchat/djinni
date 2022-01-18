@@ -3,9 +3,9 @@ import * as test from "../../generated-src/ts/test";
 
 class PrimitivesTest extends TestCase {
     m: test.Test_statics;
-    constructor(module: any) {
+    constructor(module: test.Test_statics) {
         super(module);
-        this.m = <test.Test_statics>module;
+        this.m = module;
     }
     testPrimitives() {
         var p = {
@@ -27,7 +27,7 @@ class PrimitivesTest extends TestCase {
         };
         // f32 roundtrip test is not applicable to js because js has no native
         // 32-bit floating point number.
-        assertEq(p, this.m.TestHelpers.assortedPrimitivesId(p));
+        assertEq(p, this.m.testsuite.TestHelpers.assortedPrimitivesId(p));
     }
 }
 allTests.push(PrimitivesTest);

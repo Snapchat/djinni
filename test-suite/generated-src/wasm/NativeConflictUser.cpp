@@ -23,9 +23,9 @@ bool NativeConflictUser::conflict_arg(const CppType& self, const em::val& w_cs) 
     return ::djinni::Bool::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(conflict_user) {
-    em::class_<::testsuite::ConflictUser>("ConflictUser")
-        .smart_ptr<std::shared_ptr<::testsuite::ConflictUser>>("ConflictUser")
+EMSCRIPTEN_BINDINGS(testsuite_conflict_user) {
+    ::djinni::DjinniClass_<::testsuite::ConflictUser>("testsuite_ConflictUser", "testsuite.ConflictUser")
+        .smart_ptr<std::shared_ptr<::testsuite::ConflictUser>>("testsuite_ConflictUser")
         .function("nativeDestroy", &NativeConflictUser::nativeDestroy)
         .function("Conflict", NativeConflictUser::Conflict)
         .function("conflictArg", NativeConflictUser::conflict_arg)

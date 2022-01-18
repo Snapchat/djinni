@@ -68,9 +68,9 @@ std::unordered_map<::testsuite::color, ::testsuite::color> NativeEnumUsageInterf
     return ::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::toCpp(ret);
 }
 
-EMSCRIPTEN_BINDINGS(enum_usage_interface) {
-    em::class_<::testsuite::EnumUsageInterface>("EnumUsageInterface")
-        .smart_ptr<std::shared_ptr<::testsuite::EnumUsageInterface>>("EnumUsageInterface")
+EMSCRIPTEN_BINDINGS(testsuite_enum_usage_interface) {
+    ::djinni::DjinniClass_<::testsuite::EnumUsageInterface>("testsuite_EnumUsageInterface", "testsuite.EnumUsageInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::EnumUsageInterface>>("testsuite_EnumUsageInterface")
         .function("nativeDestroy", &NativeEnumUsageInterface::nativeDestroy)
         .function("e", NativeEnumUsageInterface::e)
         .function("o", NativeEnumUsageInterface::o)

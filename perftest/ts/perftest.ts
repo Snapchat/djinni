@@ -63,7 +63,7 @@ function main (module: perftest.Perftest_statics & DjinniModule) {
 
     var i64Array = {i1: BigInt(1), i2: BigInt(2), i3: BigInt(3), i4: BigInt(4), i5: BigInt(5), i6: BigInt(6)};
 
-    var dpb = module.DjinniPerfBenchmark.getInstance();
+    var dpb = module.benchmark_DjinniPerfBenchmark.getInstance();
     measure('memcpy256b', function(){ dpb.cppTests(); });
     measure("baseline", function() { dpb.baseline(); });
 

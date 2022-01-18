@@ -9,7 +9,7 @@
 namespace djinni_generated {
 
 struct NativeEmptyFlags: ::djinni::WasmEnum<::testsuite::empty_flags> {
-    static void staticInitialize();
+    static void staticInitializeConstants();
 };
 
 }  // namespace djinni_generated

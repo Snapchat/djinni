@@ -46,9 +46,9 @@ std::string NativeTestOutcome::putNestedErrorOutcome(const em::val& w_x) {
     return ::djinni::String::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(test_outcome) {
-    em::class_<::testsuite::TestOutcome>("TestOutcome")
-        .smart_ptr<std::shared_ptr<::testsuite::TestOutcome>>("TestOutcome")
+EMSCRIPTEN_BINDINGS(testsuite_test_outcome) {
+    ::djinni::DjinniClass_<::testsuite::TestOutcome>("testsuite_TestOutcome", "testsuite.TestOutcome")
+        .smart_ptr<std::shared_ptr<::testsuite::TestOutcome>>("testsuite_TestOutcome")
         .function("nativeDestroy", &NativeTestOutcome::nativeDestroy)
         .class_function("getSuccessOutcome", NativeTestOutcome::getSuccessOutcome)
         .class_function("getErrorOutcome", NativeTestOutcome::getErrorOutcome)

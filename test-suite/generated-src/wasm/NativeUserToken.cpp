@@ -23,9 +23,9 @@ std::string NativeUserToken::JsProxy::whoami() {
     return ::djinni::String::toCpp(ret.as<std::string>());
 }
 
-EMSCRIPTEN_BINDINGS(user_token) {
-    em::class_<::testsuite::UserToken>("UserToken")
-        .smart_ptr<std::shared_ptr<::testsuite::UserToken>>("UserToken")
+EMSCRIPTEN_BINDINGS(testsuite_user_token) {
+    ::djinni::DjinniClass_<::testsuite::UserToken>("testsuite_UserToken", "testsuite.UserToken")
+        .smart_ptr<std::shared_ptr<::testsuite::UserToken>>("testsuite_UserToken")
         .function("nativeDestroy", &NativeUserToken::nativeDestroy)
         .function("whoami", NativeUserToken::whoami)
         ;

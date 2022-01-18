@@ -22,7 +22,7 @@ class PrimitivesTest {
         };
         // f32 roundtrip test is not applicable to js because js has no native
         // 32-bit floating point number.
-        assertEq(p, this.m.TestHelpers.assortedPrimitivesId(p));
+        assertEq(p, this.m.testsuite.TestHelpers.assortedPrimitivesId(p));
     }
 }
 allTests.push(PrimitivesTest);

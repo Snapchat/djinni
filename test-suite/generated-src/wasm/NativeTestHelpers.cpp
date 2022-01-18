@@ -128,9 +128,9 @@ em::val NativeTestHelpers::check_async_interface(const em::val& w_i) {
     return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(r));
 }
 
-EMSCRIPTEN_BINDINGS(test_helpers) {
-    em::class_<::testsuite::TestHelpers>("TestHelpers")
-        .smart_ptr<std::shared_ptr<::testsuite::TestHelpers>>("TestHelpers")
+EMSCRIPTEN_BINDINGS(testsuite_test_helpers) {
+    ::djinni::DjinniClass_<::testsuite::TestHelpers>("testsuite_TestHelpers", "testsuite.TestHelpers")
+        .smart_ptr<std::shared_ptr<::testsuite::TestHelpers>>("testsuite_TestHelpers")
         .function("nativeDestroy", &NativeTestHelpers::nativeDestroy)
         .class_function("getSetRecord", NativeTestHelpers::get_set_record)
         .class_function("checkSetRecord", NativeTestHelpers::check_set_record)

@@ -9,7 +9,7 @@
 namespace djinni_generated {
 
 struct NativeConstantEnum: ::djinni::WasmEnum<::testsuite::constant_enum> {
-    static void staticInitialize();
+    static void staticInitializeConstants();
 };
 
 }  // namespace djinni_generated

@@ -27,27 +27,27 @@ class ClientInterfaceImpl implements test.ClientInterface {
 class ClientInterfaceTest extends TestCase {
     m: test.Test_statics;
     jsClientInterface: test.ClientInterface;
-    constructor(module) {
+    constructor(module: test.Test_statics) {
         super(module);
-        this.m = <test.Test_statics>module;
+        this.m = module;
     }
     setUp() {
         this.jsClientInterface = new ClientInterfaceImpl();
     }
     testClientReturn() {
-        this.m.TestHelpers.checkClientInterfaceAscii(this.jsClientInterface);
+        this.m.testsuite.TestHelpers.checkClientInterfaceAscii(this.jsClientInterface);
     }
 
     testClientReturnUTF8() {
-        this.m.TestHelpers.checkClientInterfaceNonascii(this.jsClientInterface);
+        this.m.testsuite.TestHelpers.checkClientInterfaceNonascii(this.jsClientInterface);
     }
 
     testClientInterfaceArgs() {
-        this.m.TestHelpers.checkClientInterfaceArgs(this.jsClientInterface);
+        this.m.testsuite.TestHelpers.checkClientInterfaceArgs(this.jsClientInterface);
     }
 
     testReverseClientInterfaceArgs() {
-        var i = this.m.ReverseClientInterface.create();
+        var i = this.m.testsuite.ReverseClientInterface.create();
         assertEq(i.methTakingInterface(i), "test");
         assertEq(i.methTakingOptionalInterface(i), "test");
     }

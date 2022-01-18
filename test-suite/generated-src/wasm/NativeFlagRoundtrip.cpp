@@ -30,9 +30,9 @@ em::val NativeFlagRoundtrip::roundtrip_empty_boxed(const em::val& w_flag) {
     return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeEmptyFlags>::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(flag_roundtrip) {
-    em::class_<::testsuite::FlagRoundtrip>("FlagRoundtrip")
-        .smart_ptr<std::shared_ptr<::testsuite::FlagRoundtrip>>("FlagRoundtrip")
+EMSCRIPTEN_BINDINGS(testsuite_flag_roundtrip) {
+    ::djinni::DjinniClass_<::testsuite::FlagRoundtrip>("testsuite_FlagRoundtrip", "testsuite.FlagRoundtrip")
+        .smart_ptr<std::shared_ptr<::testsuite::FlagRoundtrip>>("testsuite_FlagRoundtrip")
         .function("nativeDestroy", &NativeFlagRoundtrip::nativeDestroy)
         .class_function("roundtripAccess", NativeFlagRoundtrip::roundtrip_access)
         .class_function("roundtripEmpty", NativeFlagRoundtrip::roundtrip_empty)

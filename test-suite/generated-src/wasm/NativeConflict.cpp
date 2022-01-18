@@ -12,9 +12,9 @@ em::val NativeConflict::cppProxyMethods() {
 }
 
 
-EMSCRIPTEN_BINDINGS(Conflict) {
-    em::class_<::testsuite::Conflict>("Conflict")
-        .smart_ptr<std::shared_ptr<::testsuite::Conflict>>("Conflict")
+EMSCRIPTEN_BINDINGS(testsuite_Conflict) {
+    ::djinni::DjinniClass_<::testsuite::Conflict>("testsuite_Conflict", "testsuite.Conflict")
+        .smart_ptr<std::shared_ptr<::testsuite::Conflict>>("testsuite_Conflict")
         .function("nativeDestroy", &NativeConflict::nativeDestroy)
         ;
 }

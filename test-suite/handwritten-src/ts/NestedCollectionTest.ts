@@ -5,9 +5,9 @@ class NestedCollectionTest extends TestCase {
     m: test.Test_statics;
     jsNestedCollection: test.NestedCollection;
 
-    constructor(module: any) {
+    constructor(module: test.Test_statics) {
         super(module);
-        this.m = <test.Test_statics>module;
+        this.m = module;
     }
     setUp() {
         var jsSet1 = new Set();
@@ -22,12 +22,12 @@ class NestedCollectionTest extends TestCase {
         this.jsNestedCollection = { setList: jsList };
     }
     testCppNestedRecordToJsNestedCollection() {
-        var converted = this.m.TestHelpers.getNestedCollection();
+        var converted = this.m.testsuite.TestHelpers.getNestedCollection();
         assertEq(this.jsNestedCollection.setList, converted.setList);
     }
 
     testJsNestedRecordToCppNestedCollection() {
-        assertTrue(this.m.TestHelpers.checkNestedCollection(this.jsNestedCollection));
+        assertTrue(this.m.testsuite.TestHelpers.checkNestedCollection(this.jsNestedCollection));
     }
 }
 

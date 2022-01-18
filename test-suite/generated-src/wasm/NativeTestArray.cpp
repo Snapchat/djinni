@@ -29,9 +29,9 @@ em::val NativeTestArray::testArrayOfArray(const em::val& w_a) {
     return ::djinni::Array<::djinni::Array<::djinni::I32>>::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(test_array) {
-    em::class_<::testsuite::TestArray>("TestArray")
-        .smart_ptr<std::shared_ptr<::testsuite::TestArray>>("TestArray")
+EMSCRIPTEN_BINDINGS(testsuite_test_array) {
+    ::djinni::DjinniClass_<::testsuite::TestArray>("testsuite_TestArray", "testsuite.TestArray")
+        .smart_ptr<std::shared_ptr<::testsuite::TestArray>>("testsuite_TestArray")
         .function("nativeDestroy", &NativeTestArray::nativeDestroy)
         .class_function("testStringArray", NativeTestArray::testStringArray)
         .class_function("testIntArray", NativeTestArray::testIntArray)

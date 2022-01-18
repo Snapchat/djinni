@@ -15,6 +15,11 @@ export interface WcharTestHelpers_statics {
     checkRecord(rec: WcharTestRec): boolean;
 }
 
-export interface TestWchar_statics {
+export interface ns_testsuite {
     WcharTestHelpers: WcharTestHelpers_statics;
+}
+export interface TestWchar_statics {
+    testsuite_WcharTestHelpers: WcharTestHelpers_statics;
+
+    testsuite: ns_testsuite;
 }

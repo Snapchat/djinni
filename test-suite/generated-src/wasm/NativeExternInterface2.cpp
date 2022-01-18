@@ -14,9 +14,9 @@ namespace djinni_generated {
     return ::djinni_generated::NativeExternRecordWithDerivings::toCpp(ret);
 }
 
-EMSCRIPTEN_BINDINGS(extern_interface_2) {
-    em::class_<::ExternInterface2>("ExternInterface2")
-        .smart_ptr<std::shared_ptr<::ExternInterface2>>("ExternInterface2")
+EMSCRIPTEN_BINDINGS(_extern_interface_2) {
+    ::djinni::DjinniClass_<::ExternInterface2>("testsuite_ExternInterface2", "testsuite.ExternInterface2")
+        .smart_ptr<std::shared_ptr<::ExternInterface2>>("testsuite_ExternInterface2")
         .function("nativeDestroy", &NativeExternInterface2::nativeDestroy)
         ;
 }

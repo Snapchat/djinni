@@ -13,50 +13,50 @@ class EnumTest {
     }
     
     testEnumToString() {
-        assertEq(this.enumToString(this.m.Color.RED, this.m.Color), "RED");
-        assertEq(this.enumToString(this.m.Color.ORANGE, this.m.Color), "ORANGE");
-        assertEq(this.enumToString(this.m.Color.YELLOW, this.m.Color), "YELLOW");
-        assertEq(this.enumToString(this.m.Color.GREEN, this.m.Color), "GREEN");
-        assertEq(this.enumToString(this.m.Color.BLUE, this.m.Color), "BLUE");
-        assertEq(this.enumToString(this.m.Color.INDIGO, this.m.Color), "INDIGO");
-        assertEq(this.enumToString(this.m.Color.VIOLET, this.m.Color), "VIOLET");
+        assertEq(this.enumToString(this.m.testsuite.Color.RED, this.m.testsuite.Color), "RED");
+        assertEq(this.enumToString(this.m.testsuite.Color.ORANGE, this.m.testsuite.Color), "ORANGE");
+        assertEq(this.enumToString(this.m.testsuite.Color.YELLOW, this.m.testsuite.Color), "YELLOW");
+        assertEq(this.enumToString(this.m.testsuite.Color.GREEN, this.m.testsuite.Color), "GREEN");
+        assertEq(this.enumToString(this.m.testsuite.Color.BLUE, this.m.testsuite.Color), "BLUE");
+        assertEq(this.enumToString(this.m.testsuite.Color.INDIGO, this.m.testsuite.Color), "INDIGO");
+        assertEq(this.enumToString(this.m.testsuite.Color.VIOLET, this.m.testsuite.Color), "VIOLET");
     }
     
     testEnumKey() {
         var map = new Map();
-        map.set(this.m.Color.RED, "red");
-        map.set(this.m.Color.ORANGE, "orange");
-        map.set(this.m.Color.YELLOW, "yellow");
-        map.set(this.m.Color.GREEN, "green");
-        map.set(this.m.Color.BLUE, "blue");
-        map.set(this.m.Color.INDIGO, "indigo");
-        map.set(this.m.Color.VIOLET, "violet");
-        this.m.TestHelpers.checkEnumMap(map);
+        map.set(this.m.testsuite.Color.RED, "red");
+        map.set(this.m.testsuite.Color.ORANGE, "orange");
+        map.set(this.m.testsuite.Color.YELLOW, "yellow");
+        map.set(this.m.testsuite.Color.GREEN, "green");
+        map.set(this.m.testsuite.Color.BLUE, "blue");
+        map.set(this.m.testsuite.Color.INDIGO, "indigo");
+        map.set(this.m.testsuite.Color.VIOLET, "violet");
+        this.m.testsuite.TestHelpers.checkEnumMap(map);
     }
     testAccessFlagRoundtrip() {
         var flags = [
-            this.m.AccessFlags.NOBODY,
-            this.m.AccessFlags.EVERYBODY,
-            this.m.AccessFlags.OWNER_READ,
-            this.m.AccessFlags.OWNER_READ | this.m.AccessFlags.OWNER_WRITE,
-            this.m.AccessFlags.OWNER_READ | this.m.AccessFlags.OWNER_WRITE | this.m.AccessFlags.OWNER_EXECUTE,
+            this.m.testsuite.AccessFlags.NOBODY,
+            this.m.testsuite.AccessFlags.EVERYBODY,
+            this.m.testsuite.AccessFlags.OWNER_READ,
+            this.m.testsuite.AccessFlags.OWNER_READ | this.m.testsuite.AccessFlags.OWNER_WRITE,
+            this.m.testsuite.AccessFlags.OWNER_READ | this.m.testsuite.AccessFlags.OWNER_WRITE | this.m.testsuite.AccessFlags.OWNER_EXECUTE,
         ];
         for (var i = 0; i < flags.length; ++i) {
-            assertEq(flags[i], this.m.FlagRoundtrip.roundtripAccess(flags[i]));
-            assertEq(flags[i], this.m.FlagRoundtrip.roundtripAccessBoxed(flags[i]));
+            assertEq(flags[i], this.m.testsuite.FlagRoundtrip.roundtripAccess(flags[i]));
+            assertEq(flags[i], this.m.testsuite.FlagRoundtrip.roundtripAccessBoxed(flags[i]));
         }
-        assertUndefined(this.m.FlagRoundtrip.roundtripAccessBoxed(null));
+        assertUndefined(this.m.testsuite.FlagRoundtrip.roundtripAccessBoxed(null));
     }
     testEmptyFlagRoundtrip() {
         var flags = [
-            this.m.EmptyFlags.NONE,
-            this.m.EmptyFlags.ALL,
+            this.m.testsuite.EmptyFlags.NONE,
+            this.m.testsuite.EmptyFlags.ALL,
         ];
         for (var i = 0; i < flags.length; ++i) {
-            assertEq(flags[i], this.m.FlagRoundtrip.roundtripEmpty(flags[i]));
-            assertEq(flags[i], this.m.FlagRoundtrip.roundtripEmptyBoxed(flags[i]));
+            assertEq(flags[i], this.m.testsuite.FlagRoundtrip.roundtripEmpty(flags[i]));
+            assertEq(flags[i], this.m.testsuite.FlagRoundtrip.roundtripEmptyBoxed(flags[i]));
         }
-        assertUndefined(this.m.FlagRoundtrip.roundtripEmptyBoxed(null));
+        assertUndefined(this.m.testsuite.FlagRoundtrip.roundtripEmptyBoxed(null));
     }
 }
 

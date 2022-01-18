@@ -7,8 +7,8 @@
 namespace djinni_generated {
 
 namespace {
-    EM_JS(void, djinni_init_testsuite_access_flags, (), {
-        Module.AccessFlags =  {
+    EM_JS(void, djinni_init_testsuite_access_flags_consts, (), {
+        Module.testsuite_AccessFlags =  {
             NOBODY : 0,
             OWNER_READ : 1 << 0,
             OWNER_WRITE : 1 << 1,
@@ -24,13 +24,16 @@ namespace {
     })
 }
 
-void NativeAccessFlags::staticInitialize() {
+void NativeAccessFlags::staticInitializeConstants() {
     static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_access_flags);
+    std::call_once(initOnce, [] {
+        djinni_init_testsuite_access_flags_consts();
+        ::djinni::djinni_register_name_in_ns("testsuite_AccessFlags", "testsuite.AccessFlags");
+    });
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_access_flags) {
-    NativeAccessFlags::staticInitialize();
+    NativeAccessFlags::staticInitializeConstants();
 }
 
 }  // namespace djinni_generated

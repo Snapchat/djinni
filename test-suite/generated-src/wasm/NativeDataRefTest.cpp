@@ -56,9 +56,9 @@ em::val NativeDataRefTest::create() {
     return ::djinni_generated::NativeDataRefTest::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(DataRefTest) {
-    em::class_<::testsuite::DataRefTest>("DataRefTest")
-        .smart_ptr<std::shared_ptr<::testsuite::DataRefTest>>("DataRefTest")
+EMSCRIPTEN_BINDINGS(testsuite_DataRefTest) {
+    ::djinni::DjinniClass_<::testsuite::DataRefTest>("testsuite_DataRefTest", "testsuite.DataRefTest")
+        .smart_ptr<std::shared_ptr<::testsuite::DataRefTest>>("testsuite_DataRefTest")
         .function("nativeDestroy", &NativeDataRefTest::nativeDestroy)
         .function("sendData", NativeDataRefTest::sendData)
         .function("retriveAsBin", NativeDataRefTest::retriveAsBin)

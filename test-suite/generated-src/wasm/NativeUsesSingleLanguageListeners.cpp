@@ -54,9 +54,9 @@ std::shared_ptr<::testsuite::JavaOnlyListener> NativeUsesSingleLanguageListeners
     return ::djinni_generated::NativeJavaOnlyListener::toCpp(ret);
 }
 
-EMSCRIPTEN_BINDINGS(uses_single_language_listeners) {
-    em::class_<::testsuite::UsesSingleLanguageListeners>("UsesSingleLanguageListeners")
-        .smart_ptr<std::shared_ptr<::testsuite::UsesSingleLanguageListeners>>("UsesSingleLanguageListeners")
+EMSCRIPTEN_BINDINGS(testsuite_uses_single_language_listeners) {
+    ::djinni::DjinniClass_<::testsuite::UsesSingleLanguageListeners>("testsuite_UsesSingleLanguageListeners", "testsuite.UsesSingleLanguageListeners")
+        .smart_ptr<std::shared_ptr<::testsuite::UsesSingleLanguageListeners>>("testsuite_UsesSingleLanguageListeners")
         .function("nativeDestroy", &NativeUsesSingleLanguageListeners::nativeDestroy)
         .function("callForObjC", NativeUsesSingleLanguageListeners::callForObjC)
         .function("returnForObjC", NativeUsesSingleLanguageListeners::returnForObjC)

@@ -28,7 +28,7 @@ em::val NativeSortItems::run_sort(const em::val& w_items) {
     return ::djinni_generated::NativeItemList::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(sort_items) {
+EMSCRIPTEN_BINDINGS(textsort_sort_items) {
     em::class_<::textsort::SortItems>("SortItems")
         .smart_ptr<std::shared_ptr<::textsort::SortItems>>("SortItems")
         .function("nativeDestroy", &NativeSortItems::nativeDestroy)

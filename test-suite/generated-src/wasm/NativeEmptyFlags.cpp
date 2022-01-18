@@ -7,21 +7,24 @@
 namespace djinni_generated {
 
 namespace {
-    EM_JS(void, djinni_init_testsuite_empty_flags, (), {
-        Module.EmptyFlags =  {
+    EM_JS(void, djinni_init_testsuite_empty_flags_consts, (), {
+        Module.testsuite_EmptyFlags =  {
             NONE : 0,
             ALL : (1 << 0) - 1,
         }
     })
 }
 
-void NativeEmptyFlags::staticInitialize() {
+void NativeEmptyFlags::staticInitializeConstants() {
     static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_empty_flags);
+    std::call_once(initOnce, [] {
+        djinni_init_testsuite_empty_flags_consts();
+        ::djinni::djinni_register_name_in_ns("testsuite_EmptyFlags", "testsuite.EmptyFlags");
+    });
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_empty_flags) {
-    NativeEmptyFlags::staticInitialize();
+    NativeEmptyFlags::staticInitializeConstants();
 }
 
 }  // namespace djinni_generated

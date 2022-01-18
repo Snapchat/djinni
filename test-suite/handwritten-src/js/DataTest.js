@@ -4,7 +4,7 @@ class DataTest {
     }
 
     setUp() {
-        this.test = this.m.DataRefTest.create();
+        this.test = this.m.testsuite.DataRefTest.create();
     }
 
     testSend() {

@@ -13,29 +13,32 @@ em::val NativeConstantInterfaceWithEnum::cppProxyMethods() {
 }
 
 
-EMSCRIPTEN_BINDINGS(constant_interface_with_enum) {
-    em::class_<::testsuite::ConstantInterfaceWithEnum>("ConstantInterfaceWithEnum")
-        .smart_ptr<std::shared_ptr<::testsuite::ConstantInterfaceWithEnum>>("ConstantInterfaceWithEnum")
+EMSCRIPTEN_BINDINGS(testsuite_constant_interface_with_enum) {
+    ::djinni::DjinniClass_<::testsuite::ConstantInterfaceWithEnum>("testsuite_ConstantInterfaceWithEnum", "testsuite.ConstantInterfaceWithEnum")
+        .smart_ptr<std::shared_ptr<::testsuite::ConstantInterfaceWithEnum>>("testsuite_ConstantInterfaceWithEnum")
         .function("nativeDestroy", &NativeConstantInterfaceWithEnum::nativeDestroy)
         ;
 }
 
 namespace {
     EM_JS(void, djinni_init_testsuite_constant_interface_with_enum_consts, (), {
-        if (!('ConstantInterfaceWithEnum' in Module)) {
-            Module.ConstantInterfaceWithEnum = {};
+        if (!('testsuite_ConstantInterfaceWithEnum' in Module)) {
+            Module.testsuite_ConstantInterfaceWithEnum = {};
         }
-        Module.ConstantInterfaceWithEnum.CONST_ENUM = Module.ConstantEnum.SOME_VALUE;
+        Module.testsuite_ConstantInterfaceWithEnum.CONST_ENUM = Module.testsuite_ConstantEnum.SOME_VALUE;
     })
 }
-void NativeConstantInterfaceWithEnum::staticInitialize() {
+void NativeConstantInterfaceWithEnum::staticInitializeConstants() {
     static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_constant_interface_with_enum_consts);
+    std::call_once(initOnce, [] {
+        djinni_init_testsuite_constant_interface_with_enum_consts();
+        ::djinni::djinni_register_name_in_ns("testsuite_ConstantInterfaceWithEnum", "testsuite.ConstantInterfaceWithEnum");
+    });
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_constant_interface_with_enum_consts) {
-    NativeConstantEnum::staticInitialize();
-    NativeConstantInterfaceWithEnum::staticInitialize();
+    NativeConstantEnum::staticInitializeConstants();
+    NativeConstantInterfaceWithEnum::staticInitializeConstants();
 }
 
 }  // namespace djinni_generated

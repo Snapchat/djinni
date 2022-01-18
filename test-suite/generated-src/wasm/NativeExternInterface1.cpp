@@ -25,9 +25,9 @@ int32_t NativeExternInterface1::bar(const CppType& self, int32_t w_e) {
     return ::djinni_generated::NativeColor::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(extern_interface_1) {
-    em::class_<::ExternInterface1>("ExternInterface1")
-        .smart_ptr<std::shared_ptr<::ExternInterface1>>("ExternInterface1")
+EMSCRIPTEN_BINDINGS(_extern_interface_1) {
+    ::djinni::DjinniClass_<::ExternInterface1>("testsuite_ExternInterface1", "testsuite.ExternInterface1")
+        .smart_ptr<std::shared_ptr<::ExternInterface1>>("testsuite_ExternInterface1")
         .function("nativeDestroy", &NativeExternInterface1::nativeDestroy)
         .function("foo", NativeExternInterface1::foo)
         .function("bar", NativeExternInterface1::bar)

@@ -27,9 +27,9 @@ void NativeListenerCaller::callSecond(const CppType& self) {
     self->callSecond();
 }
 
-EMSCRIPTEN_BINDINGS(listener_caller) {
-    em::class_<::testsuite::ListenerCaller>("ListenerCaller")
-        .smart_ptr<std::shared_ptr<::testsuite::ListenerCaller>>("ListenerCaller")
+EMSCRIPTEN_BINDINGS(testsuite_listener_caller) {
+    ::djinni::DjinniClass_<::testsuite::ListenerCaller>("testsuite_ListenerCaller", "testsuite.ListenerCaller")
+        .smart_ptr<std::shared_ptr<::testsuite::ListenerCaller>>("testsuite_ListenerCaller")
         .function("nativeDestroy", &NativeListenerCaller::nativeDestroy)
         .class_function("init", NativeListenerCaller::init)
         .function("callFirst", NativeListenerCaller::callFirst)

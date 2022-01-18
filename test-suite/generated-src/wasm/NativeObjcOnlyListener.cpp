@@ -6,9 +6,9 @@
 namespace djinni_generated {
 
 
-EMSCRIPTEN_BINDINGS(objc_only_listener) {
-    em::class_<::testsuite::ObjcOnlyListener>("ObjcOnlyListener")
-        .smart_ptr<std::shared_ptr<::testsuite::ObjcOnlyListener>>("ObjcOnlyListener")
+EMSCRIPTEN_BINDINGS(testsuite_objc_only_listener) {
+    ::djinni::DjinniClass_<::testsuite::ObjcOnlyListener>("testsuite_ObjcOnlyListener", "testsuite.ObjcOnlyListener")
+        .smart_ptr<std::shared_ptr<::testsuite::ObjcOnlyListener>>("testsuite_ObjcOnlyListener")
         .function("nativeDestroy", &NativeObjcOnlyListener::nativeDestroy)
         ;
 }

@@ -577,4 +577,17 @@ private:
     T _buffer;
 };
 
+extern "C" void djinni_register_name_in_ns(const char* prefixedName, const char* namespacedName);
+
+template<typename ClassType>
+class DjinniClass_ : public em::class_<ClassType> {
+public:
+    DjinniClass_ () = delete;
+
+    EMSCRIPTEN_ALWAYS_INLINE explicit DjinniClass_(const char* prefixedName, const char* namespacedName)
+        : em::class_<ClassType>(prefixedName) {
+        djinni_register_name_in_ns(prefixedName, namespacedName);
+    }
+};
+
 }

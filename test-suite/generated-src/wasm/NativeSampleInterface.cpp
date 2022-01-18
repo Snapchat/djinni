@@ -12,9 +12,9 @@ em::val NativeSampleInterface::cppProxyMethods() {
 }
 
 
-EMSCRIPTEN_BINDINGS(sample_interface) {
-    em::class_<::testsuite::SampleInterface>("SampleInterface")
-        .smart_ptr<std::shared_ptr<::testsuite::SampleInterface>>("SampleInterface")
+EMSCRIPTEN_BINDINGS(testsuite_sample_interface) {
+    ::djinni::DjinniClass_<::testsuite::SampleInterface>("testsuite_SampleInterface", "testsuite.SampleInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::SampleInterface>>("testsuite_SampleInterface")
         .function("nativeDestroy", &NativeSampleInterface::nativeDestroy)
         ;
 }

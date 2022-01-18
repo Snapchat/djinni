@@ -41,9 +41,9 @@ std::string NativeClientInterface::JsProxy::meth_taking_optional_interface(const
     return ::djinni::String::toCpp(ret.as<std::string>());
 }
 
-EMSCRIPTEN_BINDINGS(client_interface) {
-    em::class_<::testsuite::ClientInterface>("ClientInterface")
-        .smart_ptr<std::shared_ptr<::testsuite::ClientInterface>>("ClientInterface")
+EMSCRIPTEN_BINDINGS(testsuite_client_interface) {
+    ::djinni::DjinniClass_<::testsuite::ClientInterface>("testsuite_ClientInterface", "testsuite.ClientInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::ClientInterface>>("testsuite_ClientInterface")
         .function("nativeDestroy", &NativeClientInterface::nativeDestroy)
         ;
 }

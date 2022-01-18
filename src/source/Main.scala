@@ -91,6 +91,8 @@ object Main {
     var wasmIncludeCppPrefix: String = ""
     var wasmBaseLibIncludePrefix: String = ""
     var wasmOmitConstants: Boolean = false
+    var wasmNamespace: Option[String] = None
+    var wasmOmitNsAlias: Boolean = false
     var jsIdentStyle = IdentStyle.jsDefault
     var tsOutFolder: Option[File] = None
     var tsModule: String = "module"
@@ -234,6 +236,10 @@ object Main {
         .text("The WASM base library's include path, relative to the WASM C++ classes.")
       opt[Boolean]("wasm-omit-constants").valueName("<true/false>").foreach(x => wasmOmitConstants = x)
         .text("Omit the generation of consts and enums in wasm, making them only accessible through TypeScript.")
+      opt[String]("wasm-namespace").valueName("...").foreach(x => wasmNamespace = Some(x))
+        .text("The namespace to use for generated Wasm classes.")
+      opt[Boolean]("wasm-omit-namespace-alias").valueName("<true/false>").foreach(x => wasmOmitNsAlias = x)
+        .text("Omit the generation of namespace aliases for classes. Namespaces will be prepended to class names instead.")
       opt[File]("ts-out").valueName("<out-folder>").foreach(x => tsOutFolder = Some(x))
         .text("The output for the TypeScript interface files (Generator disabled if unspecified).")
       opt[String]("ts-module").valueName("<name>").foreach(tsModule = _)
@@ -414,6 +420,8 @@ object Main {
       wasmIncludeCppPrefix,
       wasmBaseLibIncludePrefix,
       wasmOmitConstants,
+      wasmNamespace,
+      wasmOmitNsAlias,
       jsIdentStyle,
       tsOutFolder,
       tsModule,

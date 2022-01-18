@@ -91,6 +91,7 @@ fi
     --objc-type-prefix DB \
     \
     --wasm-out "$temp_out_relative/wasm" \
+    --wasm-namespace "testsuite" \
     --ts-out "$temp_out_relative/ts" \
     --ts-module "test_wchar" \
     \
@@ -125,6 +126,7 @@ fi
     --objc-type-prefix DB \
     \
     --wasm-out "$temp_out_relative/wasm" \
+    --wasm-namespace "testsuite" \
     --ts-out "$temp_out_relative/ts" \
     --ts-module "test" \
     \
@@ -188,6 +190,7 @@ cp "$base_dir/djinni/yaml-test.djinni" "$temp_out/yaml"
     --objc-type-prefix DB \
     \
     --wasm-out "$temp_out_relative/wasm" \
+    --wasm-namespace "testsuite" \
     --ts-out "$temp_out_relative/ts" \
     --ts-module "test_yaml" \
     \

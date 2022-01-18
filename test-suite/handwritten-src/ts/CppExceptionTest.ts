@@ -12,7 +12,7 @@ class CppExceptionTest extends TestCase  {
     }
 
     setUp() {
-        this.cppInterface = this.m.CppException.get();
+        this.cppInterface = this.m.testsuite.CppException.get();
     }
 
     testCppException() {

@@ -21,9 +21,9 @@ em::val NativeCppException::get() {
     return ::djinni_generated::NativeCppException::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(cpp_exception) {
-    em::class_<::testsuite::CppException>("CppException")
-        .smart_ptr<std::shared_ptr<::testsuite::CppException>>("CppException")
+EMSCRIPTEN_BINDINGS(testsuite_cpp_exception) {
+    ::djinni::DjinniClass_<::testsuite::CppException>("testsuite_CppException", "testsuite.CppException")
+        .smart_ptr<std::shared_ptr<::testsuite::CppException>>("testsuite_CppException")
         .function("nativeDestroy", &NativeCppException::nativeDestroy)
         .function("throwAnException", NativeCppException::throw_an_exception)
         .class_function("get", NativeCppException::get)

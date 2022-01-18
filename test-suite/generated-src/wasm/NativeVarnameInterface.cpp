@@ -23,9 +23,9 @@ em::val NativeVarnameInterface::_imethod_(const CppType& self, const em::val& w_
     return ::djinni_generated::NativeVarnameInterface::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(_varname_interface_) {
-    em::class_<::testsuite::VarnameInterface>("VarnameInterface")
-        .smart_ptr<std::shared_ptr<::testsuite::VarnameInterface>>("VarnameInterface")
+EMSCRIPTEN_BINDINGS(testsuite__varname_interface_) {
+    ::djinni::DjinniClass_<::testsuite::VarnameInterface>("testsuite_VarnameInterface", "testsuite.VarnameInterface")
+        .smart_ptr<std::shared_ptr<::testsuite::VarnameInterface>>("testsuite_VarnameInterface")
         .function("nativeDestroy", &NativeVarnameInterface::nativeDestroy)
         .function("Rmethod", NativeVarnameInterface::_rmethod_)
         .function("Imethod", NativeVarnameInterface::_imethod_)

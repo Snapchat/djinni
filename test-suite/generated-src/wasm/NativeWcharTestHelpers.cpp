@@ -29,9 +29,9 @@ bool NativeWcharTestHelpers::check_record(const em::val& w_rec) {
     return ::djinni::Bool::fromCpp(r);
 }
 
-EMSCRIPTEN_BINDINGS(wchar_test_helpers) {
-    em::class_<::testsuite::WcharTestHelpers>("WcharTestHelpers")
-        .smart_ptr<std::shared_ptr<::testsuite::WcharTestHelpers>>("WcharTestHelpers")
+EMSCRIPTEN_BINDINGS(testsuite_wchar_test_helpers) {
+    ::djinni::DjinniClass_<::testsuite::WcharTestHelpers>("testsuite_WcharTestHelpers", "testsuite.WcharTestHelpers")
+        .smart_ptr<std::shared_ptr<::testsuite::WcharTestHelpers>>("testsuite_WcharTestHelpers")
         .function("nativeDestroy", &NativeWcharTestHelpers::nativeDestroy)
         .class_function("getRecord", NativeWcharTestHelpers::get_record)
         .class_function("getString", NativeWcharTestHelpers::get_string)
