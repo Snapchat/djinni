@@ -23,26 +23,12 @@ std::string NativeUserToken::JsProxy::whoami() {
     return ::djinni::String::toCpp(ret.as<std::string>());
 }
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_user_token, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.UserToken = Module.testsuite_UserToken
-    })
-}
-void NativeUserToken::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_user_token);
-}
 EMSCRIPTEN_BINDINGS(testsuite_user_token) {
-    em::class_<::testsuite::UserToken>("testsuite_UserToken")
+    ::djinni::DjinniClass_<::testsuite::UserToken>("testsuite_UserToken", "testsuite.UserToken")
         .smart_ptr<std::shared_ptr<::testsuite::UserToken>>("testsuite_UserToken")
         .function("nativeDestroy", &NativeUserToken::nativeDestroy)
         .function("whoami", NativeUserToken::whoami)
         ;
-    NativeUserToken::staticInitialize();
 }
 
 }  // namespace djinni_generated

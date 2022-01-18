@@ -32,7 +32,6 @@ struct NativeUsesSingleLanguageListeners : ::djinni::JsInterface<::testsuite::Us
         void callForJava(const std::shared_ptr<::testsuite::JavaOnlyListener> & l) override;
         std::shared_ptr<::testsuite::JavaOnlyListener> returnForJava() override;
     };
-    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

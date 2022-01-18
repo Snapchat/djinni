@@ -19,26 +19,12 @@ em::val NativeInterfaceUsingExtendedRecord::meth(const CppType& self, const em::
     return ::djinni_generated::NativeExtendedRecord::fromCpp(r);
 }
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_interface_using_extended_record, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.InterfaceUsingExtendedRecord = Module.testsuite_InterfaceUsingExtendedRecord
-    })
-}
-void NativeInterfaceUsingExtendedRecord::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_interface_using_extended_record);
-}
 EMSCRIPTEN_BINDINGS(testsuite_interface_using_extended_record) {
-    em::class_<::testsuite::InterfaceUsingExtendedRecord>("testsuite_InterfaceUsingExtendedRecord")
+    ::djinni::DjinniClass_<::testsuite::InterfaceUsingExtendedRecord>("testsuite_InterfaceUsingExtendedRecord", "testsuite.InterfaceUsingExtendedRecord")
         .smart_ptr<std::shared_ptr<::testsuite::InterfaceUsingExtendedRecord>>("testsuite_InterfaceUsingExtendedRecord")
         .function("nativeDestroy", &NativeInterfaceUsingExtendedRecord::nativeDestroy)
         .function("meth", NativeInterfaceUsingExtendedRecord::meth)
         ;
-    NativeInterfaceUsingExtendedRecord::staticInitialize();
 }
 
 namespace {

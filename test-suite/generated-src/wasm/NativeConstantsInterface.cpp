@@ -17,26 +17,12 @@ void NativeConstantsInterface::dummy(const CppType& self) {
     self->dummy();
 }
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_constants_interface, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.ConstantsInterface = Module.testsuite_ConstantsInterface
-    })
-}
-void NativeConstantsInterface::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_constants_interface);
-}
 EMSCRIPTEN_BINDINGS(testsuite_constants_interface) {
-    em::class_<::testsuite::ConstantsInterface>("testsuite_ConstantsInterface")
+    ::djinni::DjinniClass_<::testsuite::ConstantsInterface>("testsuite_ConstantsInterface", "testsuite.ConstantsInterface")
         .smart_ptr<std::shared_ptr<::testsuite::ConstantsInterface>>("testsuite_ConstantsInterface")
         .function("nativeDestroy", &NativeConstantsInterface::nativeDestroy)
         .function("dummy", NativeConstantsInterface::dummy)
         ;
-    NativeConstantsInterface::staticInitialize();
 }
 
 namespace {

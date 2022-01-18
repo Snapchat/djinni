@@ -21,7 +21,6 @@ struct NativeSampleInterface : ::djinni::JsInterface<::testsuite::SampleInterfac
     static em::val cppProxyMethods();
 
 
-    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

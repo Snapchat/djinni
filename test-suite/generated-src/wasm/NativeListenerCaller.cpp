@@ -27,28 +27,14 @@ void NativeListenerCaller::callSecond(const CppType& self) {
     self->callSecond();
 }
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_listener_caller, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.ListenerCaller = Module.testsuite_ListenerCaller
-    })
-}
-void NativeListenerCaller::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_listener_caller);
-}
 EMSCRIPTEN_BINDINGS(testsuite_listener_caller) {
-    em::class_<::testsuite::ListenerCaller>("testsuite_ListenerCaller")
+    ::djinni::DjinniClass_<::testsuite::ListenerCaller>("testsuite_ListenerCaller", "testsuite.ListenerCaller")
         .smart_ptr<std::shared_ptr<::testsuite::ListenerCaller>>("testsuite_ListenerCaller")
         .function("nativeDestroy", &NativeListenerCaller::nativeDestroy)
         .class_function("init", NativeListenerCaller::init)
         .function("callFirst", NativeListenerCaller::callFirst)
         .function("callSecond", NativeListenerCaller::callSecond)
         ;
-    NativeListenerCaller::staticInitialize();
 }
 
 }  // namespace djinni_generated

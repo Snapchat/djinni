@@ -23,7 +23,6 @@ struct NativeAsyncInterface : ::djinni::JsInterface<::testsuite::AsyncInterface,
         JsProxy(const em::val& v) : JsProxyBase(v) {}
         ::djinni::Future<std::string> future_roundtrip(::djinni::Future<int32_t> f) override;
     };
-    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

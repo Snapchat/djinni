@@ -23,7 +23,6 @@ struct NativeExternInterface2 : ::djinni::JsInterface<::ExternInterface2, Native
         JsProxy(const em::val& v) : JsProxyBase(v) {}
         ::ExternRecordWithDerivings foo(const std::shared_ptr<::testsuite::TestHelpers> & i) override;
     };
-    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

@@ -13,25 +13,11 @@ namespace djinni_generated {
     return ::djinni::FutureAdaptor<::djinni::String>::toCpp(ret);
 }
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_async_interface, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.AsyncInterface = Module.testsuite_AsyncInterface
-    })
-}
-void NativeAsyncInterface::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_async_interface);
-}
 EMSCRIPTEN_BINDINGS(testsuite_async_interface) {
-    em::class_<::testsuite::AsyncInterface>("testsuite_AsyncInterface")
+    ::djinni::DjinniClass_<::testsuite::AsyncInterface>("testsuite_AsyncInterface", "testsuite.AsyncInterface")
         .smart_ptr<std::shared_ptr<::testsuite::AsyncInterface>>("testsuite_AsyncInterface")
         .function("nativeDestroy", &NativeAsyncInterface::nativeDestroy)
         ;
-    NativeAsyncInterface::staticInitialize();
 }
 
 }  // namespace djinni_generated

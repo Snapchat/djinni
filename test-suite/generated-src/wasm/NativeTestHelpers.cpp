@@ -128,21 +128,8 @@ em::val NativeTestHelpers::check_async_interface(const em::val& w_i) {
     return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(r));
 }
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_test_helpers, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.TestHelpers = Module.testsuite_TestHelpers
-    })
-}
-void NativeTestHelpers::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_test_helpers);
-}
 EMSCRIPTEN_BINDINGS(testsuite_test_helpers) {
-    em::class_<::testsuite::TestHelpers>("testsuite_TestHelpers")
+    ::djinni::DjinniClass_<::testsuite::TestHelpers>("testsuite_TestHelpers", "testsuite.TestHelpers")
         .smart_ptr<std::shared_ptr<::testsuite::TestHelpers>>("testsuite_TestHelpers")
         .function("nativeDestroy", &NativeTestHelpers::nativeDestroy)
         .class_function("getSetRecord", NativeTestHelpers::get_set_record)
@@ -174,7 +161,6 @@ EMSCRIPTEN_BINDINGS(testsuite_test_helpers) {
         .class_function("futureRoundtrip", NativeTestHelpers::future_roundtrip)
         .class_function("checkAsyncInterface", NativeTestHelpers::check_async_interface)
         ;
-    NativeTestHelpers::staticInitialize();
 }
 
 }  // namespace djinni_generated

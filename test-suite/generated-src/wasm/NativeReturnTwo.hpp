@@ -23,7 +23,6 @@ struct NativeReturnTwo : ::djinni::JsInterface<::testsuite::ReturnTwo, NativeRet
     static em::val get_instance();
     static int8_t return_two(const CppType& self);
 
-    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

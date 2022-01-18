@@ -41,25 +41,11 @@ std::string NativeClientInterface::JsProxy::meth_taking_optional_interface(const
     return ::djinni::String::toCpp(ret.as<std::string>());
 }
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_client_interface, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.ClientInterface = Module.testsuite_ClientInterface
-    })
-}
-void NativeClientInterface::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_client_interface);
-}
 EMSCRIPTEN_BINDINGS(testsuite_client_interface) {
-    em::class_<::testsuite::ClientInterface>("testsuite_ClientInterface")
+    ::djinni::DjinniClass_<::testsuite::ClientInterface>("testsuite_ClientInterface", "testsuite.ClientInterface")
         .smart_ptr<std::shared_ptr<::testsuite::ClientInterface>>("testsuite_ClientInterface")
         .function("nativeDestroy", &NativeClientInterface::nativeDestroy)
         ;
-    NativeClientInterface::staticInitialize();
 }
 
 }  // namespace djinni_generated

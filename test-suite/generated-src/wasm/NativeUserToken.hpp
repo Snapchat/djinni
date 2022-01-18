@@ -26,7 +26,6 @@ struct NativeUserToken : ::djinni::JsInterface<::testsuite::UserToken, NativeUse
         JsProxy(const em::val& v) : JsProxyBase(v) {}
         std::string whoami() override;
     };
-    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

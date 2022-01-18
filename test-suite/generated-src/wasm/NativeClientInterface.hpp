@@ -27,7 +27,6 @@ struct NativeClientInterface : ::djinni::JsInterface<::testsuite::ClientInterfac
         std::string meth_taking_interface(const std::shared_ptr<::testsuite::ClientInterface> & i) override;
         std::string meth_taking_optional_interface(const std::shared_ptr<::testsuite::ClientInterface> & i) override;
     };
-    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

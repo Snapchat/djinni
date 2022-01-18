@@ -19,7 +19,6 @@ struct NativeSecondListener : ::djinni::JsInterface<::testsuite::SecondListener,
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
 
 
-    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

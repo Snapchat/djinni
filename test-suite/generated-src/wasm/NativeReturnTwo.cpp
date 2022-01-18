@@ -21,27 +21,13 @@ int8_t NativeReturnTwo::return_two(const CppType& self) {
     return ::djinni::I8::fromCpp(r);
 }
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_return_two, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.ReturnTwo = Module.testsuite_ReturnTwo
-    })
-}
-void NativeReturnTwo::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_return_two);
-}
 EMSCRIPTEN_BINDINGS(testsuite_return_two) {
-    em::class_<::testsuite::ReturnTwo>("testsuite_ReturnTwo")
+    ::djinni::DjinniClass_<::testsuite::ReturnTwo>("testsuite_ReturnTwo", "testsuite.ReturnTwo")
         .smart_ptr<std::shared_ptr<::testsuite::ReturnTwo>>("testsuite_ReturnTwo")
         .function("nativeDestroy", &NativeReturnTwo::nativeDestroy)
         .class_function("getInstance", NativeReturnTwo::get_instance)
         .function("returnTwo", NativeReturnTwo::return_two)
         ;
-    NativeReturnTwo::staticInitialize();
 }
 
 }  // namespace djinni_generated

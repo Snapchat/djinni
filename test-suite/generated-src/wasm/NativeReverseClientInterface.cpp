@@ -31,21 +31,8 @@ em::val NativeReverseClientInterface::create() {
     return ::djinni_generated::NativeReverseClientInterface::fromCpp(r);
 }
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_reverse_client_interface, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.ReverseClientInterface = Module.testsuite_ReverseClientInterface
-    })
-}
-void NativeReverseClientInterface::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_reverse_client_interface);
-}
 EMSCRIPTEN_BINDINGS(testsuite_reverse_client_interface) {
-    em::class_<::testsuite::ReverseClientInterface>("testsuite_ReverseClientInterface")
+    ::djinni::DjinniClass_<::testsuite::ReverseClientInterface>("testsuite_ReverseClientInterface", "testsuite.ReverseClientInterface")
         .smart_ptr<std::shared_ptr<::testsuite::ReverseClientInterface>>("testsuite_ReverseClientInterface")
         .function("nativeDestroy", &NativeReverseClientInterface::nativeDestroy)
         .function("returnStr", NativeReverseClientInterface::return_str)
@@ -53,7 +40,6 @@ EMSCRIPTEN_BINDINGS(testsuite_reverse_client_interface) {
         .function("methTakingOptionalInterface", NativeReverseClientInterface::meth_taking_optional_interface)
         .class_function("create", NativeReverseClientInterface::create)
         ;
-    NativeReverseClientInterface::staticInitialize();
 }
 
 }  // namespace djinni_generated

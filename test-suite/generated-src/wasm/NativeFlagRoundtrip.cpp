@@ -30,21 +30,8 @@ em::val NativeFlagRoundtrip::roundtrip_empty_boxed(const em::val& w_flag) {
     return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeEmptyFlags>::fromCpp(r);
 }
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_flag_roundtrip, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.FlagRoundtrip = Module.testsuite_FlagRoundtrip
-    })
-}
-void NativeFlagRoundtrip::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_flag_roundtrip);
-}
 EMSCRIPTEN_BINDINGS(testsuite_flag_roundtrip) {
-    em::class_<::testsuite::FlagRoundtrip>("testsuite_FlagRoundtrip")
+    ::djinni::DjinniClass_<::testsuite::FlagRoundtrip>("testsuite_FlagRoundtrip", "testsuite.FlagRoundtrip")
         .smart_ptr<std::shared_ptr<::testsuite::FlagRoundtrip>>("testsuite_FlagRoundtrip")
         .function("nativeDestroy", &NativeFlagRoundtrip::nativeDestroy)
         .class_function("roundtripAccess", NativeFlagRoundtrip::roundtrip_access)
@@ -52,7 +39,6 @@ EMSCRIPTEN_BINDINGS(testsuite_flag_roundtrip) {
         .class_function("roundtripAccessBoxed", NativeFlagRoundtrip::roundtrip_access_boxed)
         .class_function("roundtripEmptyBoxed", NativeFlagRoundtrip::roundtrip_empty_boxed)
         ;
-    NativeFlagRoundtrip::staticInitialize();
 }
 
 }  // namespace djinni_generated

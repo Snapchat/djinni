@@ -6,25 +6,11 @@
 namespace djinni_generated {
 
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_second_listener, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.SecondListener = Module.testsuite_SecondListener
-    })
-}
-void NativeSecondListener::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_second_listener);
-}
 EMSCRIPTEN_BINDINGS(testsuite_second_listener) {
-    em::class_<::testsuite::SecondListener>("testsuite_SecondListener")
+    ::djinni::DjinniClass_<::testsuite::SecondListener>("testsuite_SecondListener", "testsuite.SecondListener")
         .smart_ptr<std::shared_ptr<::testsuite::SecondListener>>("testsuite_SecondListener")
         .function("nativeDestroy", &NativeSecondListener::nativeDestroy)
         ;
-    NativeSecondListener::staticInitialize();
 }
 
 }  // namespace djinni_generated

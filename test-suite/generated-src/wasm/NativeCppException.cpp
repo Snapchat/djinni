@@ -21,27 +21,13 @@ em::val NativeCppException::get() {
     return ::djinni_generated::NativeCppException::fromCpp(r);
 }
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_cpp_exception, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.CppException = Module.testsuite_CppException
-    })
-}
-void NativeCppException::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_cpp_exception);
-}
 EMSCRIPTEN_BINDINGS(testsuite_cpp_exception) {
-    em::class_<::testsuite::CppException>("testsuite_CppException")
+    ::djinni::DjinniClass_<::testsuite::CppException>("testsuite_CppException", "testsuite.CppException")
         .smart_ptr<std::shared_ptr<::testsuite::CppException>>("testsuite_CppException")
         .function("nativeDestroy", &NativeCppException::nativeDestroy)
         .function("throwAnException", NativeCppException::throw_an_exception)
         .class_function("get", NativeCppException::get)
         ;
-    NativeCppException::staticInitialize();
 }
 
 }  // namespace djinni_generated

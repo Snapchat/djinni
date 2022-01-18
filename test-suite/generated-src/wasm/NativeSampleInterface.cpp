@@ -12,25 +12,11 @@ em::val NativeSampleInterface::cppProxyMethods() {
 }
 
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_sample_interface, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.SampleInterface = Module.testsuite_SampleInterface
-    })
-}
-void NativeSampleInterface::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_sample_interface);
-}
 EMSCRIPTEN_BINDINGS(testsuite_sample_interface) {
-    em::class_<::testsuite::SampleInterface>("testsuite_SampleInterface")
+    ::djinni::DjinniClass_<::testsuite::SampleInterface>("testsuite_SampleInterface", "testsuite.SampleInterface")
         .smart_ptr<std::shared_ptr<::testsuite::SampleInterface>>("testsuite_SampleInterface")
         .function("nativeDestroy", &NativeSampleInterface::nativeDestroy)
         ;
-    NativeSampleInterface::staticInitialize();
 }
 
 }  // namespace djinni_generated

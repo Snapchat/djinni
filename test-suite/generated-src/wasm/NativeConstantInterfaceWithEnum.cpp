@@ -13,25 +13,11 @@ em::val NativeConstantInterfaceWithEnum::cppProxyMethods() {
 }
 
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_constant_interface_with_enum, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.ConstantInterfaceWithEnum = Module.testsuite_ConstantInterfaceWithEnum
-    })
-}
-void NativeConstantInterfaceWithEnum::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_constant_interface_with_enum);
-}
 EMSCRIPTEN_BINDINGS(testsuite_constant_interface_with_enum) {
-    em::class_<::testsuite::ConstantInterfaceWithEnum>("testsuite_ConstantInterfaceWithEnum")
+    ::djinni::DjinniClass_<::testsuite::ConstantInterfaceWithEnum>("testsuite_ConstantInterfaceWithEnum", "testsuite.ConstantInterfaceWithEnum")
         .smart_ptr<std::shared_ptr<::testsuite::ConstantInterfaceWithEnum>>("testsuite_ConstantInterfaceWithEnum")
         .function("nativeDestroy", &NativeConstantInterfaceWithEnum::nativeDestroy)
         ;
-    NativeConstantInterfaceWithEnum::staticInitialize();
 }
 
 namespace {

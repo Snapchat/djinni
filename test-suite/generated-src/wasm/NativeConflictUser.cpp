@@ -23,27 +23,13 @@ bool NativeConflictUser::conflict_arg(const CppType& self, const em::val& w_cs) 
     return ::djinni::Bool::fromCpp(r);
 }
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_conflict_user, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.ConflictUser = Module.testsuite_ConflictUser
-    })
-}
-void NativeConflictUser::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_conflict_user);
-}
 EMSCRIPTEN_BINDINGS(testsuite_conflict_user) {
-    em::class_<::testsuite::ConflictUser>("testsuite_ConflictUser")
+    ::djinni::DjinniClass_<::testsuite::ConflictUser>("testsuite_ConflictUser", "testsuite.ConflictUser")
         .smart_ptr<std::shared_ptr<::testsuite::ConflictUser>>("testsuite_ConflictUser")
         .function("nativeDestroy", &NativeConflictUser::nativeDestroy)
         .function("Conflict", NativeConflictUser::Conflict)
         .function("conflictArg", NativeConflictUser::conflict_arg)
         ;
-    NativeConflictUser::staticInitialize();
 }
 
 }  // namespace djinni_generated

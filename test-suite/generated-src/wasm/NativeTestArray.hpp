@@ -25,7 +25,6 @@ struct NativeTestArray : ::djinni::JsInterface<::testsuite::TestArray, NativeTes
     static em::val testRecordArray(const em::val& w_a);
     static em::val testArrayOfArray(const em::val& w_a);
 
-    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

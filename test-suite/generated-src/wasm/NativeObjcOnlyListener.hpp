@@ -19,7 +19,6 @@ struct NativeObjcOnlyListener : ::djinni::JsInterface<::testsuite::ObjcOnlyListe
     static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
 
 
-    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

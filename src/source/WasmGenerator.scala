@@ -330,9 +330,6 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         if (!spec.wasmOmitConstants && !i.consts.isEmpty) {
           w.wl("static void staticInitializeConstants();");
         }
-        if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
-          w.wl("static void staticInitialize();");
-        }
       }
     }), (w => {}))
 
@@ -401,22 +398,15 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       val fullyQualifiedName = withCppNamespace(ident.name)
       val fullyQualifiedJsName = withWasmNamespace(idJs.ty(ident.name))
 
-      if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
-        w.w(s"namespace").braced {
-          w.wl(s"EM_JS(void, djinni_init_${fullyQualifiedName}, (), {").nested {
-            writeNamespaceAlias(w, idJs.ty(ident.name))
-          }
-          w.wl("})")
-        }
-        w.w(s"void $helper::staticInitialize()").braced {
-          w.wl("static std::once_flag initOnce;")
-          w.wl(s"std::call_once(initOnce, djinni_init_${fullyQualifiedName});")
-        }
-      }
-
       // embind
       w.w(s"EMSCRIPTEN_BINDINGS(${fullyQualifiedName})").braced {
-        w.wl(s"""em::class_<$cls>("${fullyQualifiedJsName}")""").nested {
+        val classRegister = if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
+          s"""::djinni::DjinniClass_<$cls>("${fullyQualifiedJsName}", "${spec.wasmNamespace.get}.${idJs.ty(ident.name)}")"""
+        } else {
+          s"""em::class_<$cls>("${fullyQualifiedJsName}")"""
+        }
+
+        w.wl(classRegister).nested {
           w.wl(s""".smart_ptr<std::shared_ptr<$cls>>("${fullyQualifiedJsName}")""")
           w.wl(s""".function("${idJs.method("native_destroy")}", &$helper::nativeDestroy)""")
           if (i.ext.cpp) {
@@ -426,9 +416,6 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
             }
           }
           w.wl(";")
-        }
-        if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
-          w.wl(s"$helper::staticInitialize();")
         }
       }
       // constants

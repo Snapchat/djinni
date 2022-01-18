@@ -21,7 +21,6 @@ struct NativeConflict : ::djinni::JsInterface<::testsuite::Conflict, NativeConfl
     static em::val cppProxyMethods();
 
 
-    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

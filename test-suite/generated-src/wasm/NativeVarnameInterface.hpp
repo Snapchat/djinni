@@ -23,7 +23,6 @@ struct NativeVarnameInterface : ::djinni::JsInterface<::testsuite::VarnameInterf
     static em::val _rmethod_(const CppType& self, const em::val& w__r_arg_);
     static em::val _imethod_(const CppType& self, const em::val& w__i_arg_);
 
-    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

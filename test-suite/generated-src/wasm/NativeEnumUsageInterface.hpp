@@ -34,7 +34,6 @@ struct NativeEnumUsageInterface : ::djinni::JsInterface<::testsuite::EnumUsageIn
         std::unordered_set<::testsuite::color> s(const std::unordered_set<::testsuite::color> & s) override;
         std::unordered_map<::testsuite::color, ::testsuite::color> m(const std::unordered_map<::testsuite::color, ::testsuite::color> & m) override;
     };
-    static void staticInitialize();
 };
 
 }  // namespace djinni_generated

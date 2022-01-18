@@ -93,21 +93,8 @@ int64_t NativeTestDuration::unbox(const em::val& w_dt) {
     return ::djinni::I64::fromCpp(r);
 }
 
-namespace {
-    EM_JS(void, djinni_init_testsuite_test_duration, (), {
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.TestDuration = Module.testsuite_TestDuration
-    })
-}
-void NativeTestDuration::staticInitialize() {
-    static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_test_duration);
-}
 EMSCRIPTEN_BINDINGS(testsuite_test_duration) {
-    em::class_<::testsuite::TestDuration>("testsuite_TestDuration")
+    ::djinni::DjinniClass_<::testsuite::TestDuration>("testsuite_TestDuration", "testsuite.TestDuration")
         .smart_ptr<std::shared_ptr<::testsuite::TestDuration>>("testsuite_TestDuration")
         .function("nativeDestroy", &NativeTestDuration::nativeDestroy)
         .class_function("hoursString", NativeTestDuration::hoursString)
@@ -131,7 +118,6 @@ EMSCRIPTEN_BINDINGS(testsuite_test_duration) {
         .class_function("box", NativeTestDuration::box)
         .class_function("unbox", NativeTestDuration::unbox)
         ;
-    NativeTestDuration::staticInitialize();
 }
 
 }  // namespace djinni_generated

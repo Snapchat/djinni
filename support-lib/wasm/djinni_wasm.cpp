@@ -183,6 +183,18 @@ EM_JS(void, djinni_init_wasm, (), {
         };
 });
 
+EM_JS(void, djinni_register_name_in_ns, (const char* prefixedName, const char* namespacedName), {
+        prefixedName = readLatin1String(prefixedName);
+        namespacedName = readLatin1String(namespacedName);
+        let parts = namespacedName.split('.');
+        let name = parts.pop();
+        let ns = parts.reduce(function(path, part) {
+            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
+            return path[part]
+        }, Module);
+        ns[name] = Module[prefixedName];
+});
+
 EMSCRIPTEN_BINDINGS(djinni_wasm) {
     djinni_init_wasm();    
     em::function("allocateWasmBuffer", &allocateWasmBuffer);
