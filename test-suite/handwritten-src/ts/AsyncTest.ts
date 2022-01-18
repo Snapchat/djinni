@@ -25,21 +25,21 @@ class AsyncInterfaceImpl implements test.AsyncInterface {
 
 class AsyncTest extends TestCase {
     m: test.Test_statics;
-    constructor(module: test.Test_module_statics) {
+    constructor(module: test.Test_statics) {
         super(module);
-        this.m = module.testsuite;
+        this.m = module;
     }
     async testConsumeNativeFuture() {
-        const r = await this.m.TestHelpers.getAsyncResult();
+        const r = await this.m.testsuite.TestHelpers.getAsyncResult();
         assertEq(r, 42);
     }
 
     async testConsumeNativeFutureAltSyntax() {
-        return this.m.TestHelpers.getAsyncResult().then(res => assertEq(res, 42)).catch(e => assertTrue(false));
+        return this.m.testsuite.TestHelpers.getAsyncResult().then(res => assertEq(res, 42)).catch(e => assertTrue(false));
     }
 
     async testFutureRoundtrip() {
-        const s = await this.m.TestHelpers.futureRoundtrip(asyncFunc());
+        const s = await this.m.testsuite.TestHelpers.futureRoundtrip(asyncFunc());
         const r = parseInt(s);
         assertEq(r, 36);
     }
@@ -47,7 +47,7 @@ class AsyncTest extends TestCase {
     async testFutureRoundtripWithException() {
         var s = null;
         try {
-            const s = await this.m.TestHelpers.futureRoundtrip(asyncException());
+            const s = await this.m.testsuite.TestHelpers.futureRoundtrip(asyncException());
             const r = parseInt(s);
             assertEq(r, 36);
         } catch (e) {
@@ -58,7 +58,7 @@ class AsyncTest extends TestCase {
     }
 
     async testFutureRoundtripBackwards() {
-        const s = await this.m.TestHelpers.checkAsyncInterface(new AsyncInterfaceImpl());
+        const s = await this.m.testsuite.TestHelpers.checkAsyncInterface(new AsyncInterfaceImpl());
         assertEq(s, "36");
     }
 }

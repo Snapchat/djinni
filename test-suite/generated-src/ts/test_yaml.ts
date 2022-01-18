@@ -22,10 +22,9 @@ export interface /*record*/ TestOptionalExternInterfaceRecord {
     sampleInterface?: SampleInterface;
 }
 
-export interface TestYaml_statics {
+export interface ns_testsuite {
 }
+export interface TestYaml_statics {
 
-export interface TestYaml_module_statics {
-
-    testsuite: TestYaml_statics
+    testsuite: ns_testsuite;
 }

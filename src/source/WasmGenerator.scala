@@ -437,14 +437,6 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     spec.cppNamespace.replaceAll("::", Matcher.quoteReplacement(sep)) + sep + name
   }
 
-  // def writeNamespaceAlias(w: IndentWriter, name: String) = {
-  //   w.wl(s"'${spec.wasmNamespace.get}'.split('.').reduce(function(path, part) {")
-  //   w.wl("    if (!path.hasOwnProperty(part)) { path[part] = {}}; ")
-  //   w.wl("    return path[part]")
-  //   w.wl("}, Module);")
-  //   w.wl(s"Module.${spec.wasmNamespace.get}.${name} = Module.${withWasmNamespace(name)}")
-  // }
-
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: Record) {
     val refs = new WasmRefs(ident.name)
     r.fields.foreach(f => refs.find(f.ty))

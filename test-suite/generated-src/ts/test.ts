@@ -577,7 +577,7 @@ export interface /*record*/ SetRecord {
     iset: Set<number>;
 }
 
-export interface Test_statics {
+export interface ns_testsuite {
     ProtoTests: ProtoTests_statics;
     TestOutcome: TestOutcome_statics;
     TestDuration: TestDuration_statics;
@@ -591,8 +591,7 @@ export interface Test_statics {
     ReverseClientInterface: ReverseClientInterface_statics;
     CppException: CppException_statics;
 }
-
-export interface Test_module_statics {
+export interface Test_statics {
     testsuite_ProtoTests: ProtoTests_statics;
     testsuite_TestOutcome: TestOutcome_statics;
     testsuite_TestDuration: TestDuration_statics;
@@ -606,5 +605,5 @@ export interface Test_module_statics {
     testsuite_ReverseClientInterface: ReverseClientInterface_statics;
     testsuite_CppException: CppException_statics;
 
-    testsuite: Test_statics
+    testsuite: ns_testsuite;
 }

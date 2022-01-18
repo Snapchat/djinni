@@ -260,22 +260,32 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
         case _ =>
       }
       // add static factories
+      w.wl
       if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
-        w.wl
-        w.w(s"export interface ${idJs.ty(spec.tsModule)}_statics").braced {
+        val nsParts = spec.wasmNamespace.get.split("\\.")
+
+        for (i <- 0 until nsParts.length - 1) {
+          w.w(s"export interface ns_${nsParts(i)}").braced {
+            w.wl(s"${nsParts(i+1)}: ns_${nsParts(i+1)}")
+          }
+        }
+        w.w(s"export interface ns_${nsParts.last}").braced {
           for (i <- interfacesWithStatics.toList) {
             w.wl(i + ": " + i + "_statics;")
           }
         }
-      }
-      w.wl
-      w.w(s"export interface ${idJs.ty(spec.tsModule)}_module_statics").braced {
-        for (i <- interfacesWithStatics.toList) {
-          w.wl(withWasmNamespace(i) + ": " + i + "_statics;")
-        }
-        if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
+        w.w(s"export interface ${idJs.ty(spec.tsModule)}_statics").braced {
+          for (i <- interfacesWithStatics.toList) {
+            w.wl(withWasmNamespace(i) + ": " + i + "_statics;")
+          }
           w.wl
-          w.wl(s"${spec.wasmNamespace.get}: ${idJs.ty(spec.tsModule)}_statics")
+          w.wl(s"${nsParts.head}: ns_${nsParts.head};")
+        }
+      } else {
+        w.w(s"export interface ${idJs.ty(spec.tsModule)}_statics").braced {
+          for (i <- interfacesWithStatics.toList) {
+            w.wl(withWasmNamespace(i) + ": " + i + "_statics;")
+          }
         }
       }
     })
