@@ -20,16 +20,14 @@ namespace {
             Module.testsuite_ConstantWithEnum = {};
         }
         Module.testsuite_ConstantWithEnum.CONST_ENUM = Module.testsuite_ConstantEnum.SOME_VALUE;
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.ConstantWithEnum = Module.testsuite_ConstantWithEnum
     })
 }
 void NativeConstantWithEnum::staticInitializeConstants() {
     static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_constant_with_enum_consts);
+    std::call_once(initOnce, [] {
+        djinni_init_testsuite_constant_with_enum_consts();
+        ::djinni::djinni_register_name_in_ns("testsuite_ConstantWithEnum", "testsuite.ConstantWithEnum");
+    });
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_constant_with_enum_consts) {

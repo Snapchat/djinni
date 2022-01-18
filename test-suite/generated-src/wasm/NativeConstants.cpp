@@ -41,16 +41,14 @@ namespace {
         }
         ;
         Module.testsuite_Constants.DUMMY = false;
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.Constants = Module.testsuite_Constants
     })
 }
 void NativeConstants::staticInitializeConstants() {
     static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_constants_consts);
+    std::call_once(initOnce, [] {
+        djinni_init_testsuite_constants_consts();
+        ::djinni::djinni_register_name_in_ns("testsuite_Constants", "testsuite.Constants");
+    });
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_constants_consts) {

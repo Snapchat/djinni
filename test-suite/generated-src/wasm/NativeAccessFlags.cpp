@@ -7,7 +7,7 @@
 namespace djinni_generated {
 
 namespace {
-    EM_JS(void, djinni_init_testsuite_access_flags, (), {
+    EM_JS(void, djinni_init_testsuite_access_flags_consts, (), {
         Module.testsuite_AccessFlags =  {
             NOBODY : 0,
             OWNER_READ : 1 << 0,
@@ -21,18 +21,15 @@ namespace {
             SYSTEM_EXECUTE : 1 << 8,
             EVERYBODY : (1 << 9) - 1,
         }
-        ;
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.AccessFlags = Module.testsuite_AccessFlags
     })
 }
 
 void NativeAccessFlags::staticInitializeConstants() {
     static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_access_flags);
+    std::call_once(initOnce, [] {
+        djinni_init_testsuite_access_flags_consts();
+        ::djinni::djinni_register_name_in_ns("testsuite_AccessFlags", "testsuite.AccessFlags");
+    });
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_access_flags) {

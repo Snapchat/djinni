@@ -194,9 +194,9 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       }
     }
     w.wl
+    val fullyQualifiedName = withWasmNamespace(idJs.ty(ident))
     w.w(s"namespace").braced {
       w.wl(s"EM_JS(void, djinni_init_${withCppNamespace(ident.name)}_consts, (), {").nested {
-        val fullyQualifiedName = withWasmNamespace(idJs.ty(ident))
         w.w(s"if (!('${fullyQualifiedName}' in Module))").braced {
           w.wl(s"Module.${fullyQualifiedName} = {};")
         }
@@ -205,18 +205,19 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
           writeJsConst(w, c.ty, c.value)
           w.wl(";")
         }
-        if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
-          writeNamespaceAlias(w, idJs.ty(ident))
-        }
       }
       w.wl("})")
     }
     w.w(s"void $helper::staticInitializeConstants()").braced {
       w.wl("static std::once_flag initOnce;")
-      w.wl(s"std::call_once(initOnce, djinni_init_${withCppNamespace(ident.name)}_consts);")
+      w.wl(s"std::call_once(initOnce, [] {")
+      w.wl(s"    djinni_init_${withCppNamespace(ident.name)}_consts();")
+      if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
+        w.wl(s"""    ::djinni::djinni_register_name_in_ns("${fullyQualifiedName}", "${spec.wasmNamespace.get}.${idJs.ty(ident)}");""")
+      }
+      w.wl(s"});")
     }
     w.wl
-    val fullyQualifiedName = withWasmNamespace(idJs.ty(ident.name))
     w.w(s"EMSCRIPTEN_BINDINGS(${withCppNamespace(ident.name)}_consts)").braced {
       for (d <- dependentTypes) {
         if (d != helper)
@@ -233,6 +234,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     refs.cpp.add("#include <mutex>")
     val cls = cppMarshal.fqTypename(ident, e)
     val helper = helperClass(ident)
+    val fullyQualifiedName = withWasmNamespace(idJs.ty(ident))
     writeHppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.w(s"struct $helper: ::djinni::WasmEnum<$cls>").bracedSemi{
         if (!spec.wasmOmitConstants) {
@@ -243,15 +245,11 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     if (!spec.wasmOmitConstants) {
       writeCppFileGeneric(spec.wasmOutFolder.get, helperNamespace(), wasmFilenameStyle, spec.wasmIncludePrefix)(ident.name, origin, refs.cpp, (w => {
         w.w(s"namespace").braced {
-          w.wl(s"EM_JS(void, djinni_init_${withCppNamespace(ident.name)}, (), {").nested {
-            w.w(s"Module.${withWasmNamespace(idJs.ty(ident))} = ").braced {
+          w.wl(s"EM_JS(void, djinni_init_${withCppNamespace(ident.name)}_consts, (), {").nested {
+            w.w(s"Module.${fullyQualifiedName} = ").braced {
               writeEnumOptionNone(w, e, idJs.enum, ":")
               writeEnumOptions(w, e, idJs.enum, ":")
               writeEnumOptionAll(w, e, idJs.enum, ":")
-            }
-            w.wl(";")
-            if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
-              writeNamespaceAlias(w, idJs.ty(ident))
             }
           }
           w.wl("})")
@@ -259,7 +257,12 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl
         w.w(s"void $helper::staticInitializeConstants()").braced {
           w.wl("static std::once_flag initOnce;")
-          w.wl(s"std::call_once(initOnce, djinni_init_${withCppNamespace(ident.name)});")
+          w.wl(s"std::call_once(initOnce, [] {")
+          w.wl(s"    djinni_init_${withCppNamespace(ident.name)}_consts();")
+          if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
+            w.wl(s"""    ::djinni::djinni_register_name_in_ns("${fullyQualifiedName}", "${spec.wasmNamespace.get}.${idJs.ty(ident)}");""")
+          }
+          w.wl(s"});")
         }
         w.wl
         w.w(s"EMSCRIPTEN_BINDINGS(${withCppNamespace(ident.name)})").braced {
@@ -434,13 +437,13 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
     spec.cppNamespace.replaceAll("::", Matcher.quoteReplacement(sep)) + sep + name
   }
 
-  def writeNamespaceAlias(w: IndentWriter, name: String) = {
-    w.wl(s"'${spec.wasmNamespace.get}'.split('.').reduce(function(path, part) {")
-    w.wl("    if (!path.hasOwnProperty(part)) { path[part] = {}}; ")
-    w.wl("    return path[part]")
-    w.wl("}, Module);")
-    w.wl(s"Module.${spec.wasmNamespace.get}.${name} = Module.${withWasmNamespace(name)}")
-  }
+  // def writeNamespaceAlias(w: IndentWriter, name: String) = {
+  //   w.wl(s"'${spec.wasmNamespace.get}'.split('.').reduce(function(path, part) {")
+  //   w.wl("    if (!path.hasOwnProperty(part)) { path[part] = {}}; ")
+  //   w.wl("    return path[part]")
+  //   w.wl("}, Module);")
+  //   w.wl(s"Module.${spec.wasmNamespace.get}.${name} = Module.${withWasmNamespace(name)}")
+  // }
 
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: Record) {
     val refs = new WasmRefs(ident.name)

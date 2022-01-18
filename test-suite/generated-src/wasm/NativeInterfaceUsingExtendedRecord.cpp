@@ -39,16 +39,14 @@ namespace {
 
         }
         ;
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.InterfaceUsingExtendedRecord = Module.testsuite_InterfaceUsingExtendedRecord
     })
 }
 void NativeInterfaceUsingExtendedRecord::staticInitializeConstants() {
     static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_interface_using_extended_record_consts);
+    std::call_once(initOnce, [] {
+        djinni_init_testsuite_interface_using_extended_record_consts();
+        ::djinni::djinni_register_name_in_ns("testsuite_InterfaceUsingExtendedRecord", "testsuite.InterfaceUsingExtendedRecord");
+    });
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_interface_using_extended_record_consts) {

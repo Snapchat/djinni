@@ -7,23 +7,20 @@
 namespace djinni_generated {
 
 namespace {
-    EM_JS(void, djinni_init_testsuite_empty_flags, (), {
+    EM_JS(void, djinni_init_testsuite_empty_flags_consts, (), {
         Module.testsuite_EmptyFlags =  {
             NONE : 0,
             ALL : (1 << 0) - 1,
         }
-        ;
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.EmptyFlags = Module.testsuite_EmptyFlags
     })
 }
 
 void NativeEmptyFlags::staticInitializeConstants() {
     static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_empty_flags);
+    std::call_once(initOnce, [] {
+        djinni_init_testsuite_empty_flags_consts();
+        ::djinni::djinni_register_name_in_ns("testsuite_EmptyFlags", "testsuite.EmptyFlags");
+    });
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_empty_flags) {

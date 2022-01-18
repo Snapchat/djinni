@@ -51,16 +51,14 @@ namespace {
             someString: Module.testsuite_ConstantsInterface.STRING_CONSTANT
         }
         ;
-        'testsuite'.split('.').reduce(function(path, part) {
-            if (!path.hasOwnProperty(part)) { path[part] = {}}; 
-            return path[part]
-        }, Module);
-        Module.testsuite.ConstantsInterface = Module.testsuite_ConstantsInterface
     })
 }
 void NativeConstantsInterface::staticInitializeConstants() {
     static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_testsuite_constants_interface_consts);
+    std::call_once(initOnce, [] {
+        djinni_init_testsuite_constants_interface_consts();
+        ::djinni::djinni_register_name_in_ns("testsuite_ConstantsInterface", "testsuite.ConstantsInterface");
+    });
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_constants_interface_consts) {

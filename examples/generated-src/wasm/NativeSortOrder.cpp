@@ -7,19 +7,20 @@
 namespace djinni_generated {
 
 namespace {
-    EM_JS(void, djinni_init_textsort_sort_order, (), {
+    EM_JS(void, djinni_init_textsort_sort_order_consts, (), {
         Module.SortOrder =  {
             ASCENDING : 0,
             DESCENDING : 1,
             RANDOM : 2,
         }
-        ;
     })
 }
 
 void NativeSortOrder::staticInitializeConstants() {
     static std::once_flag initOnce;
-    std::call_once(initOnce, djinni_init_textsort_sort_order);
+    std::call_once(initOnce, [] {
+        djinni_init_textsort_sort_order_consts();
+    });
 }
 
 EMSCRIPTEN_BINDINGS(textsort_sort_order) {
