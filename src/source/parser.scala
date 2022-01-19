@@ -88,6 +88,7 @@ private object IdlParser extends RegexParsers {
   def ext(default: Ext) = (rep1("+" ~> ident) >> checkExts) | success(default)
   def extRecord = ext(Ext(false, false, false, false))
   def extInterface = ext(Ext(true, true, true, true))
+  def supportLang = ext(Ext(true, true, true, true))
 
   def checkExts(parts: List[Ident]): Parser[Ext] = {
     var foundCpp = false
@@ -186,8 +187,8 @@ private object IdlParser extends RegexParsers {
     case "const " => true
     case "" => false
   }
-  def method: Parser[Interface.Method] = doc ~ staticLabel ~ constLabel ~ ident ~ parens(repsepend(field, ",")) ~ opt(ret) ^^ {
-    case doc~staticLabel~constLabel~ ident~params~ret => Interface.Method(ident, params, ret, doc, staticLabel, constLabel)
+  def method: Parser[Interface.Method] = doc ~ staticLabel ~ constLabel ~ ident ~ parens(repsepend(field, ",")) ~ opt(ret) ~ supportLang ^^ {
+    case doc~staticLabel~constLabel~ ident~params~ret~ext => Interface.Method(ident, params, ret, doc, staticLabel, constLabel, ext)
   }
   def ret: Parser[TypeRef] = ":" ~> typeRef
 

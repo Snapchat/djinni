@@ -303,7 +303,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl
         // stubs
         if (i.ext.cpp) {
-          for (m <- i.methods) {
+          for (m <- i.methods.filter(m => !m.static || m.lang.js)) {
             val selfRef = if (m.static) "" else if (m.params.isEmpty) "const CppType& self" else "const CppType& self, "
             w.w(s"static ${stubRetType(m)} ${idCpp.method(m.ident)}(${selfRef}")
             w.w(m.params.map(p => {
@@ -353,7 +353,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       w.wl
       // stub methods
       if (i.ext.cpp) {
-        for (m <- i.methods) {
+        for (m <- i.methods.filter(m => !m.static || m.lang.js)) {
           val selfRef = if (m.static) "" else if (m.params.isEmpty) "const CppType& self" else "const CppType& self, "
           w.w(s"${stubRetType(m)} $helper::${idCpp.method(m.ident)}(${selfRef}")
           w.w(m.params.map(p => {
@@ -413,7 +413,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
           w.wl(s""".smart_ptr<std::shared_ptr<$cls>>("${fullyQualifiedJsName}")""")
           w.wl(s""".function("${idJs.method("native_destroy")}", &$helper::nativeDestroy)""")
           if (i.ext.cpp) {
-            for (m <- i.methods) {
+            for (m <- i.methods.filter(m => !m.static || m.lang.js)) {
               val funcType = if (m.static) "class_function" else "function"
               w.wl(s""".$funcType("${idJs.method(m.ident.name)}", $helper::${idCpp.method(m.ident)})""")
             }

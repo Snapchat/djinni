@@ -192,7 +192,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
           w.wl("public abstract " + ret + " " + idJava.method(m.ident) + params.mkString("(", ", ", ")") + throwException + ";")
         }
 
-        val statics = i.methods.filter(m => m.static)
+        val statics = i.methods.filter(m => m.static && m.lang.java)
 
         if (statics.nonEmpty) {
           writeModuleInitializer(w)
