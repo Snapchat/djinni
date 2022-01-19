@@ -6,7 +6,6 @@
 .clwb/
 # djinni output directories
 djinni-output-temp/
-.bazelversion
 *.d
 *.o
 /support-lib/ts/*.js
