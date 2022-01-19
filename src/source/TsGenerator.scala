@@ -200,7 +200,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
     if (!i.consts.isEmpty) {
       generateTsConstants(w, ident, i.consts);
     }
-    val staticMethods = i.methods.filter(_.static)
+    val staticMethods = i.methods.filter(m => m.static && m.lang.js)
     if (!staticMethods.isEmpty) {
       w.w(s"export interface ${idJs.ty(ident)}_statics").braced {
         for (m <- staticMethods) {
