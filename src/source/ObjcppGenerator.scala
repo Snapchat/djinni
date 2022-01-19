@@ -180,7 +180,7 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
           }
           w.wl("return self;")
         }
-        for (m <- i.methods) {
+        for (m <- i.methods.filter(m => !m.static || m.lang.objc)) {
           w.wl
           writeObjcFuncDecl(m, w)
           w.braced {

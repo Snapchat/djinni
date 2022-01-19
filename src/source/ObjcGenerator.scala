@@ -111,7 +111,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
         writeObjcFile(marshal.implHeaderName(ident), origin, List(protocolHeader), w => {
           w.wl(s"@interface $self : NSObject<$self>")
           for (m <- i.methods) {
-            if (m.static) {
+            if (m.static && m.lang.objc) {
               w.wl
               writeMethodDoc(w, m, idObjc.local)
               writeObjcFuncDecl(m, w)
@@ -138,7 +138,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       if (useProtocol(i.ext, spec)) w.wl(s"@protocol $self <NSObject>") else w.wl(s"@interface $self : NSObject")
 
       for (m <- i.methods) {
-        if (!m.static || !spec.objcGenProtocol) {
+        if (!m.static || (!spec.objcGenProtocol && m.lang.objc)) {
           w.wl
           writeMethodDoc(w, m, idObjc.local)
           writeObjcFuncDecl(m, w)

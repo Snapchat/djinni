@@ -378,7 +378,7 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
         nativeHook("nativeDestroy", false, Seq.empty, None, {
           w.wl(s"delete reinterpret_cast<::djinni::CppProxyHandle<$cppSelf>*>(nativeRef);")
         })
-        for (m <- i.methods) {
+        for (m <- i.methods.filter(m => !m.static || m.lang.java)) {
           val nativeAddon = if (m.static) "" else "native_"
           nativeHook(nativeAddon + idJava.method(m.ident), m.static, m.params, m.ret, {
             //w.wl(s"::${spec.jniNamespace}::JniLocalScope jscope(jniEnv, 10);")
