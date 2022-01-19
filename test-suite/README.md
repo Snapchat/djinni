@@ -10,5 +10,5 @@ like to be generated. After input files are changed, run `./run_djinni.sh` to re
 
 Testing
 -------
-Use `bazel test //test-suite:djinni-objc-tests //test-suite:djinni-java-tests`
+Use `bazelisk test //test-suite:djinni-objc-tests //test-suite:djinni-java-tests`
 to build and run Objective-C and Java tests.

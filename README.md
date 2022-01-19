@@ -21,12 +21,12 @@ either plain Bazel or [Bazelisk](https://github.com/bazelbuild/bazelisk).
 
 `./ci/generate.sh` generates the examples sources.
 
-Use `bazel test //test-suite:djinni-objc-tests //test-suite:djinni-java-tests`
+Use `bazelisk test //test-suite:djinni-objc-tests //test-suite:djinni-java-tests`
 to build and run Objective-C and Java tests.
 
 ### Building and running the mobile example apps
 
-The Android example app can be build with bazel: `bazel build
+The Android example app can be build with bazel: `bazelisk build
 //examples:android-app`, and then install to a device with `adb install
 bazel-bin/examples/android-app.apk`
 
@@ -45,7 +45,7 @@ You can load the project via Bazel
 - Similarly you can also use CLion if you wish to edit the C++ code
     - You can set up any of the cc_* targets after importing the workspace.
 
-You can also use `bazel build //src:djinni` and `bazel run //src:djinni` to
+You can also use `bazelisk build //src:djinni` and `bazelisk run //src:djinni` to
 verify the build and binary from the command line.
 
 ## Modifications
@@ -289,7 +289,7 @@ Notable differences when comparing to the Java/ObjC support:
   easily add extension methods (by add functions to prototype) without having to
   derive from a base class.
 
-The command to run Wasm/TypeScript unit tests is `bazel run
+The command to run Wasm/TypeScript unit tests is `bazelisk run
 //test-suite:server-ts`. You will need the `tsc` compiler and the `browserify`
 tool to run these tests.
 

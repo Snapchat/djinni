@@ -1,8 +1,8 @@
 ## Building the Android example app
 
-Build with bazel: `bazel build //examples:android-app`.
+Build with bazel: `bazelisk build //examples:android-app`.
 
-Build and deploy to device: `bazel mobile-install //examples:android-app`.
+Build and deploy to device: `bazelisk mobile-install //examples:android-app`.
 
 ## Building the iOS example app
 
