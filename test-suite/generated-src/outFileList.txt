@@ -20,6 +20,7 @@ djinni-output-temp/cpp/access_flags.hpp
 djinni-output-temp/cpp/empty_flags.hpp
 djinni-output-temp/cpp/flag_roundtrip.hpp
 djinni-output-temp/cpp/record_with_flags.hpp
+djinni-output-temp/cpp/test_static_method_language.hpp
 djinni-output-temp/cpp/support_copying.hpp
 djinni-output-temp/cpp/vec2.hpp
 djinni-output-temp/cpp/vec2.cpp
@@ -87,6 +88,7 @@ djinni-output-temp/java/AccessFlags.java
 djinni-output-temp/java/EmptyFlags.java
 djinni-output-temp/java/FlagRoundtrip.java
 djinni-output-temp/java/RecordWithFlags.java
+djinni-output-temp/java/TestStaticMethodLanguage.java
 djinni-output-temp/java/SupportCopying.java
 djinni-output-temp/java/Vec2.java
 djinni-output-temp/java/TestArray.java
@@ -159,6 +161,8 @@ djinni-output-temp/jni/NativeFlagRoundtrip.hpp
 djinni-output-temp/jni/NativeFlagRoundtrip.cpp
 djinni-output-temp/jni/NativeRecordWithFlags.hpp
 djinni-output-temp/jni/NativeRecordWithFlags.cpp
+djinni-output-temp/jni/NativeTestStaticMethodLanguage.hpp
+djinni-output-temp/jni/NativeTestStaticMethodLanguage.cpp
 djinni-output-temp/jni/NativeSupportCopying.hpp
 djinni-output-temp/jni/NativeSupportCopying.cpp
 djinni-output-temp/jni/NativeVec2.hpp
@@ -266,6 +270,7 @@ djinni-output-temp/objc/DBEmptyFlags.h
 djinni-output-temp/objc/DBFlagRoundtrip.h
 djinni-output-temp/objc/DBRecordWithFlags.h
 djinni-output-temp/objc/DBRecordWithFlags.mm
+djinni-output-temp/objc/DBTestStaticMethodLanguage.h
 djinni-output-temp/objc/DBSupportCopying.h
 djinni-output-temp/objc/DBSupportCopying.mm
 djinni-output-temp/objc/DBVec2.h
@@ -358,6 +363,8 @@ djinni-output-temp/objc/DBFlagRoundtrip+Private.h
 djinni-output-temp/objc/DBFlagRoundtrip+Private.mm
 djinni-output-temp/objc/DBRecordWithFlags+Private.h
 djinni-output-temp/objc/DBRecordWithFlags+Private.mm
+djinni-output-temp/objc/DBTestStaticMethodLanguage+Private.h
+djinni-output-temp/objc/DBTestStaticMethodLanguage+Private.mm
 djinni-output-temp/objc/DBSupportCopying+Private.h
 djinni-output-temp/objc/DBSupportCopying+Private.mm
 djinni-output-temp/objc/DBVec2+Private.h
@@ -473,6 +480,8 @@ djinni-output-temp/wasm/NativeFlagRoundtrip.hpp
 djinni-output-temp/wasm/NativeFlagRoundtrip.cpp
 djinni-output-temp/wasm/NativeRecordWithFlags.hpp
 djinni-output-temp/wasm/NativeRecordWithFlags.cpp
+djinni-output-temp/wasm/NativeTestStaticMethodLanguage.hpp
+djinni-output-temp/wasm/NativeTestStaticMethodLanguage.cpp
 djinni-output-temp/wasm/NativeSupportCopying.hpp
 djinni-output-temp/wasm/NativeSupportCopying.cpp
 djinni-output-temp/wasm/NativeVec2.hpp

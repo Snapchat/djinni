@@ -17,3 +17,4 @@
 @import "relative_paths.djinni"
 @import "array.djinni"
 @import "nscopying.djinni"
+@import "static_method_language.djinni"
