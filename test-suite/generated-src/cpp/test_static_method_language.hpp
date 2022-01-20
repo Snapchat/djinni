@@ -9,7 +9,10 @@ class TestStaticMethodLanguage {
 public:
     virtual ~TestStaticMethodLanguage() = default;
 
-    /** callable only from c++ */
+    /**
+     * callable only from c++. platform code should compile and link even without
+     * c++ providing the implementation.
+     */
     static void test_method();
 };
 
