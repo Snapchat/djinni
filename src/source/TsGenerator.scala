@@ -253,7 +253,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
         case r: Record => generateRecord(td.origin, td.ident, td.doc, td.params, r, w)
         case i: Interface => {
           generateInterface(td.origin, td.ident, td.doc, td.params, i, w)
-          if (i.methods.exists(_.static)) {
+          if (i.methods.exists(m => m.static && m.lang.js)) {
             interfacesWithStatics += idJs.ty(td.ident.name)
           }
         }
