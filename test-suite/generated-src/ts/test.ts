@@ -151,6 +151,9 @@ export interface /*record*/ RecordWithFlags {
     access: AccessFlags;
 }
 
+export interface TestStaticMethodLanguage {
+}
+
 export interface /*record*/ SupportCopying {
     x: number;
 }

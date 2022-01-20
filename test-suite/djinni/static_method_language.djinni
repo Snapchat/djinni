@@ -1,0 +1,5 @@
+test_static_method_language = interface +c {
+  # callable only from c++. platform code should compile and link even without
+  # c++ providing the implementation.
+  static test_method() +c;
+}
