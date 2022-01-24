@@ -26,6 +26,7 @@ wchar_in="$base_dir/djinni/wchar_test.djinni"
 in_relative="djinni/all.djinni"
 wchar_in_relative="djinni/wchar_test.djinni"
 prologue_in_relative="djinni/function_prologue.djinni"
+ident_explicit_in_relative="djinni/ident_explicit.djinni"
 temp_out_relative="djinni-output-temp"
 
 cpp_out="$base_dir/generated-src/cpp"
@@ -164,7 +165,15 @@ fi
     --objc-type-prefix DB \
     --objcpp-function-prologue-file "../../handwritten-src/cpp/objcpp-prologue.hpp" \
     \
-    --idl "$prologue_in_relative" \
+    --idl "$prologue_in_relative" && \
+"$base_dir/../src/run-assume-built" \
+    --objc-out "$temp_out_relative/objc" \
+    --objcpp-out "$temp_out_relative/objc" \
+    --objc-type-prefix DB \
+    --ident-objc-enum NativeFooBar! \
+    --ident-objc-const NativeFooBar! \
+    \
+    --idl "$ident_explicit_in_relative" \
 )
 
 # Make sure we can parse back our own generated YAML file

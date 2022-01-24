@@ -63,6 +63,12 @@ public:
     static ConstantRecord const OBJECT_CONSTANT;
 
     /**
+     * This constant will not be generated correctly with style FooBar
+     * to get it correct we would have to use "FooBar!" (see ident_explicit)
+     */
+    static std::string const UPPER_CASE_CONSTANT;
+
+    /**
      * No support for null optional constants
      * No support for optional constant records
      * No support for constant binary, list, set, map

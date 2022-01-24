@@ -19,6 +19,11 @@ extern float const DBConstantsInterfaceF32Constant;
 extern double const DBConstantsInterfaceF64Constant;
 extern NSString * __nonnull const DBConstantsInterfaceStringConstant;
 extern NSString * __nullable const DBConstantsInterfaceOptStringConstant;
+/**
+ * This constant will not be generated correctly with style FooBar
+ * to get it correct we would have to use "FooBar!" (see ident_explicit)
+ */
+extern NSString * __nonnull const DBConstantsInterfaceUPPERCASECONSTANT;
 
 /** Interface containing constants */
 @interface DBConstantsInterface : NSObject

@@ -379,6 +379,11 @@ export namespace ConstantsInterface {
         someString: STRING_CONSTANT
     }
     ;
+    /**
+     * This constant will not be generated correctly with style FooBar
+     * to get it correct we would have to use "FooBar!" (see ident_explicit)
+     */
+    export const UPPER_CASE_CONSTANT = "upper-case-constant";
 }
 
 export interface /*record*/ AssortedPrimitives {
