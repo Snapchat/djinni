@@ -19,6 +19,10 @@ extern float const DBConstantsInterfaceF32Constant;
 extern double const DBConstantsInterfaceF64Constant;
 extern NSString * __nonnull const DBConstantsInterfaceStringConstant;
 extern NSString * __nullable const DBConstantsInterfaceOptStringConstant;
+/** An upper-case constant should be parsed correctly */
+extern NSString * __nonnull const DBConstantsInterfaceUpperCaseConstant;
+/** But we should preserve weirdness in casing */
+extern int32_t const DBConstantsInterfaceXXXWeirdCase;
 
 /** Interface containing constants */
 @interface DBConstantsInterface : NSObject
