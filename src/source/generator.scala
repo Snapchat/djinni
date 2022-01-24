@@ -113,6 +113,22 @@ package object generatorTools {
   def q(s: String) = '"' + s + '"'
   def firstUpper(token: String) = if (token.isEmpty()) token else token.charAt(0).toUpper + token.substring(1)
 
+  def leadingUpperStrict(token: String) = {
+    if (token.isEmpty()) {
+      token
+    } else {
+      val head = token.charAt(0)
+      val tail = token.substring(1)
+      // Preserve mixed case identifiers like 'XXFoo':
+      // Convert tail to lowercase only when it is full uppercase.
+      if (tail.toUpperCase == tail) {
+        head.toUpper + tail.toLowerCase
+      } else {
+        head.toUpper + tail
+      }
+    }
+  }
+
   type IdentConverter = String => String
 
   case class CppIdentStyle(ty: IdentConverter, enumType: IdentConverter, typeParam: IdentConverter,
@@ -132,6 +148,16 @@ package object generatorTools {
                           enum: IdentConverter, const: IdentConverter)
 
   object IdentStyle {
+    private val camelUpperStrict = (s: String) => {
+        s.split("[-_]").map(leadingUpperStrict).mkString
+    } 
+    private val camelLowerStrict = (s: String) => {
+      val parts = s.split('_')
+      parts.head.toLowerCase + parts.tail.map(leadingUpperStrict).mkString
+    }
+    private val underLowerStrict = (s: String) => s.toLowerCase
+    private val underUpperStrict = (s: String) => s.split('_').map(leadingUpperStrict).mkString("_")
+
     val camelUpper = (s: String) => s.split("[-_]").map(firstUpper).mkString
     val camelLower = (s: String) => {
       val parts = s.split('_')
@@ -152,8 +178,14 @@ package object generatorTools {
       "fooBar" -> camelLower,
       "foo_bar" -> underLower,
       "Foo_Bar" -> underUpper,
-      "FOO_BAR" -> underCaps)
-
+      "FOO_BAR" -> underCaps,
+      "FooBar!" -> camelUpperStrict,
+      "fooBar!" -> camelLowerStrict,
+      "foo_bar!" -> underLowerStrict,
+      "Foo_Bar!" -> underUpperStrict,
+      "FOO_BAR!" -> underCaps
+    )
+    
     def infer(input: String): Option[IdentConverter] = {
       styles.foreach((e) => {
         val (str, func) = e
