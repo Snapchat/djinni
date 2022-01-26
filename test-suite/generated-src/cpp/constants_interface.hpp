@@ -62,6 +62,12 @@ public:
 
     static ConstantRecord const OBJECT_CONSTANT;
 
+    /** An upper-case constant should be parsed correctly */
+    static std::string const UPPER_CASE_CONSTANT;
+
+    /** But we should preserve weirdness in casing */
+    static constexpr int32_t XXXWEIRD_CASE = 1;
+
     /**
      * No support for null optional constants
      * No support for optional constant records

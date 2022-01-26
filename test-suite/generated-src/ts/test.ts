@@ -379,6 +379,10 @@ export namespace ConstantsInterface {
         someString: STRING_CONSTANT
     }
     ;
+    /** An upper-case constant should be parsed correctly */
+    export const UPPER_CASE_CONSTANT = "upper-case-constant";
+    /** But we should preserve weirdness in casing */
+    export const XXXWEIRD_CASE = 1;
 }
 
 export interface /*record*/ AssortedPrimitives {
