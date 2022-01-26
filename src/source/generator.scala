@@ -111,22 +111,7 @@ package object generatorTools {
     if (s.isEmpty) s else ", " + s
   }
   def q(s: String) = '"' + s + '"'
-
-  def leadingUpper(token: String) = {
-    if (token.isEmpty()) {
-      token
-    } else {
-      val head = token.charAt(0)
-      val tail = token.substring(1)
-      // Preserve mixed case identifiers like 'XXFoo':
-      // Convert tail to lowercase only when it is full uppercase.
-      if (tail.toUpperCase == tail) {
-        head.toUpper + tail.toLowerCase
-      } else {
-        head.toUpper + tail
-      }
-    }
-  }
+  def firstUpper(token: String) = if (token.isEmpty()) token else token.charAt(0).toUpper + token.substring(1)
 
   type IdentConverter = String => String
 
@@ -147,13 +132,13 @@ package object generatorTools {
                           enum: IdentConverter, const: IdentConverter)
 
   object IdentStyle {
-    val camelUpper = (s: String) => s.split("[-_]").map(leadingUpper).mkString
+    val camelUpper = (s: String) => s.split("[-_]").map(firstUpper).mkString
     val camelLower = (s: String) => {
       val parts = s.split('_')
-      parts.head + parts.tail.map(leadingUpper).mkString
+      parts.head + parts.tail.map(firstUpper).mkString
     }
     val underLower = (s: String) => s
-    val underUpper = (s: String) => s.split('_').map(leadingUpper).mkString("_")
+    val underUpper = (s: String) => s.split('_').map(firstUpper).mkString("_")
     val underCaps = (s: String) => s.toUpperCase
     val prefix = (prefix: String, suffix: IdentConverter) => (s: String) => prefix + suffix(s)
 

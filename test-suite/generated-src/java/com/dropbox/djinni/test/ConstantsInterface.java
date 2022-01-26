@@ -68,13 +68,6 @@ public abstract class ConstantsInterface {
         I32_CONSTANT /* mSomeInteger */ ,
         STRING_CONSTANT /* mSomeString */ );
 
-    /** An upper-case constant should be parsed correctly */
-    @Nonnull
-    public static final String UPPER_CASE_CONSTANT = "upper-case-constant";
-
-    /** But we should preserve weirdness in casing */
-    public static final int XXXWEIRD_CASE = 1;
-
     /**
      * No support for null optional constants
      * No support for optional constant records
