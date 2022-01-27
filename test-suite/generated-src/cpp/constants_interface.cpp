@@ -35,7 +35,4 @@ ConstantRecord const ConstantsInterface::OBJECT_CONSTANT = ConstantRecord(
     ConstantsInterface::I32_CONSTANT /* some_integer */ ,
     ConstantsInterface::STRING_CONSTANT /* some_string */ );
 
-std::string const ConstantsInterface::UPPER_CASE_CONSTANT = {"upper-case-constant"};
-
-
 }  // namespace testsuite

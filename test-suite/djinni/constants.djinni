@@ -84,10 +84,4 @@ constants_interface = interface +c {
     # No support for constant binary, list, set, map
 
     dummy();
-
-    # An upper-case constant should be parsed correctly
-    const UPPER_CASE_CONSTANT: string = "upper-case-constant";
-
-    # But we should preserve weirdness in casing
-    const XXXWeird_Case: i32 = 1;
 }
