@@ -25,6 +25,8 @@ import djinni.generatorTools._
 object Main {
 
   def main(args: Array[String]) {
+    val VERSION = "0.5.2"
+
     var idlFile: File = null
     var idlIncludePaths: List[String] = List("")
     var cppOutFolder: Option[File] = None
@@ -115,7 +117,12 @@ object Main {
       }
 
       override def showUsageOnError = false
+      head(
+        "djinni generator version",
+        VERSION
+      )
       help("help")
+      version("version")
       opt[File]("idl").valueName("<in-file>").required().foreach(idlFile = _)
         .text("The IDL file with the type definitions, typically with extension \".djinni\".")
       opt[String]("idl-include-path").valueName("<path> ...").optional().unbounded().foreach(x => idlIncludePaths = idlIncludePaths :+ x)
