@@ -1,16 +1,15 @@
-Test_enum = enum {
-    First_Thing;
-    # Should become EnumSixValueSecond in objective-c, but stay the same in C++
-    SECOND;
+TEST_IDENT_ENUM = enum {
+    snake_enum;
+    # Should become CapsEnum in objective-c, but stay the same in Java/C++
+    CAPS_ENUM;
 }
 
-Test_record = record {
+test_ident_record = record {
     FirstValue: i32;
 
-    # Should become EnumSixValueSecond in objective-c, but stay the same in C++
-    SECOND_Value: string;
+    second_value: string;
 
-    const FIRST_CONST_VALUE: string = "test";
+    const RECORD_CONST_VALUE: string = "test";
 
     # Weirdness in casing should be preserved: this should become XXXWeirdCase in CamelCase
     const XXXWeird_Case: i32 = 1;
