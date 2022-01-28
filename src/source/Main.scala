@@ -25,7 +25,7 @@ import djinni.generatorTools._
 object Main {
 
   def main(args: Array[String]) {
-    val VERSION = "0.5.2"
+    val VERSION = "[DJINNI-VERSION]"
 
     var idlFile: File = null
     var idlIncludePaths: List[String] = List("")

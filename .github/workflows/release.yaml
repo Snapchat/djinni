@@ -23,6 +23,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}-master
 
+      - name: Get the version
+        id: get_version
+        run: |
+          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+
+      - name: Set the version
+        env:
+          SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
+          SOURCE_BRANCH: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
+          SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+        run: sed "s/\[DJINNI\-VERSION\]/$SOURCE_TAG/gi" src/source/Main.scala > src/source/Main.scala.tmp && mv src/source/Main.scala.tmp src/source/Main.scala
+
       - name: Build
         run: bazel build //src:djinni_deploy.jar
 
@@ -30,7 +44,9 @@ jobs:
         run: bazel build //generator:generator
 
       - name: Test generator
-        run: bazel run //generator:generator -- --help
+        run: |
+          bazel run //generator:generator -- --help
+          bazel run //generator:generator -- --version
 
       - name: Creating bat
         run: cp bazel-bin/generator/djinni bazel-bin/generator/djinni.bat
