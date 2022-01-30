@@ -84,4 +84,8 @@ constants_interface = interface +c {
     # No support for constant binary, list, set, map
 
     dummy();
+
+    # This constant will not be generated correctly with style FooBar
+    # to get it correct we would have to use "FooBar!" (see ident_explicit)
+    const UPPER_CASE_CONSTANT: string = "upper-case-constant";
 }

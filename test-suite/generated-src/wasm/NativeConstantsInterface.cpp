@@ -51,6 +51,7 @@ namespace {
             someString: Module.testsuite_ConstantsInterface.STRING_CONSTANT
         }
         ;
+        Module.testsuite_ConstantsInterface.UPPER_CASE_CONSTANT = "upper-case-constant";
     })
 }
 void NativeConstantsInterface::staticInitializeConstants() {

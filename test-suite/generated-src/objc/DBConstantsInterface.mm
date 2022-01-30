@@ -21,3 +21,5 @@ double const DBConstantsInterfaceF64Constant = 5.0;
 NSString * __nonnull const DBConstantsInterfaceStringConstant = @"string-constant";
 
 NSString * __nullable const DBConstantsInterfaceOptStringConstant = @"string-constant";
+
+NSString * __nonnull const DBConstantsInterfaceUPPERCASECONSTANT = @"upper-case-constant";
