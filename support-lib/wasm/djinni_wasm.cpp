@@ -116,7 +116,7 @@ static std::string getExceptionMessage(int eptr)
 }
 
 EM_JS(void, djinni_init_wasm, (), {
-        console.log("djinni_init_wasm");
+        // console.log("djinni_init_wasm");
         Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => {
             // console.log("finalizing cpp object @" + nativeRef);
             nativeRef.nativeDestroy();
