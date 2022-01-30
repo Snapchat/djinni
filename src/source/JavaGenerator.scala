@@ -556,7 +556,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
         }
         case e: MExtern => e.defType match {
           case DRecord => w.wl(e.java.writeToParcel.format(idJava.field(f.ident)) + ";")
-          case DEnum => w.wl(s"out.writeInt((int)this.${idJava.field(f.ident)});")
+          case DEnum => w.wl(s"out.writeInt(this.${idJava.field(f.ident)}.ordinal());")
           case _ => throw new AssertionError("Unreachable")
         }
         case MList => {
