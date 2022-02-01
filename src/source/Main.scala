@@ -32,7 +32,7 @@ object Main {
     var cppIncludePrefix: String = ""
     var cppExtendedRecordIncludePrefix: String = ""
     var cppFileIdentStyle: IdentConverter = IdentStyle.underLower
-    var cppBaseLibIncludePrefix: String = ""
+    var cppBaseLibIncludePrefix: String = "djinni/cpp/"
     var cppOptionalTemplate: String = "std::optional"
     var cppOptionalHeader: String = "<optional>"
     var cppEnumHashWorkaround : Boolean = true
@@ -57,7 +57,7 @@ object Main {
     var jniIncludeCppPrefix: String = ""
     var jniFileIdentStyleOptional: Option[IdentConverter] = None
     var jniBaseLibClassIdentStyleOptional: Option[IdentConverter] = None
-    var jniBaseLibIncludePrefix: String = ""
+    var jniBaseLibIncludePrefix: String = "djinni/jni/"
     var jniUseOnLoad: Boolean = false
     var jniFunctionPrologueFile: Option[String] = None
     var cppHeaderOutFolderOptional: Option[File] = None
@@ -85,11 +85,11 @@ object Main {
     var objcppDisableExceptionTranslation: Boolean = false
     var objcFileIdentStyleOptional: Option[IdentConverter] = None
     var objcppNamespace: String = "djinni_generated"
-    var objcBaseLibIncludePrefix: String = ""
+    var objcBaseLibIncludePrefix: String = "djinni/objc/"
     var wasmOutFolder: Option[File] = None
     var wasmIncludePrefix: String = ""
     var wasmIncludeCppPrefix: String = ""
-    var wasmBaseLibIncludePrefix: String = ""
+    var wasmBaseLibIncludePrefix: String = "djinni/wasm/"
     var wasmOmitConstants: Boolean = false
     var wasmNamespace: Option[String] = None
     var wasmOmitNsAlias: Boolean = false
