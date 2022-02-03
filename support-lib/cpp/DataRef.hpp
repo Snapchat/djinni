@@ -98,7 +98,7 @@ public:
     }
     PlatformObject platformObj() const {
 #if DATAREF_WASM
-        return _impl ? _impl->platformObj() : emscripten::val::null();
+        return _impl ? _impl->platformObj() : emscripten::val::undefined();
 #else
         return _impl ? _impl->platformObj() : nullptr;
 #endif

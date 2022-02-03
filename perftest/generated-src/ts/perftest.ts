@@ -42,23 +42,23 @@ export interface DjinniPerfBenchmark {
     argRecordSixInt(r: RecordSixInt): void;
     argListInt(v: Array<bigint>): void;
     argArrayInt(v: BigInt64Array): void;
-    argObject(c: ObjectPlatform | null): void;
-    argListObject(l: Array<ObjectPlatform | null>): void;
+    argObject(c: ObjectPlatform | undefined): void;
+    argListObject(l: Array<ObjectPlatform>): void;
     argListRecord(l: Array<RecordSixInt>): void;
     argArrayRecord(a: Array<RecordSixInt>): void;
     returnInt(i: bigint): bigint;
     returnString(size: number): string;
     returnBinary(size: number): Uint8Array;
-    returnObject(): ObjectNative | null;
+    returnObject(): ObjectNative | undefined;
     returnListInt(size: number): Array<bigint>;
     returnArrayInt(size: number): BigInt64Array;
-    returnListObject(size: number): Array<ObjectNative | null>;
+    returnListObject(size: number): Array<ObjectNative>;
     returnListRecord(size: number): Array<RecordSixInt>;
     returnArrayRecord(size: number): Array<RecordSixInt>;
     roundTripString(s: string): string;
 }
 export interface DjinniPerfBenchmark_statics {
-    getInstance(): DjinniPerfBenchmark | null;
+    getInstance(): DjinniPerfBenchmark | undefined;
 }
 
 export interface Perftest_statics {

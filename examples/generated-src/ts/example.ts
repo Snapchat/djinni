@@ -17,7 +17,7 @@ export interface SortItems {
     sort(order: SortOrder, items: ItemList): void;
 }
 export interface SortItems_statics {
-    createWithListener(listener: TextboxListener | null): SortItems | null;
+    createWithListener(listener: TextboxListener | undefined): SortItems | undefined;
     /** For the localhost / command-line demo */
     runSort(items: ItemList): ItemList;
 }

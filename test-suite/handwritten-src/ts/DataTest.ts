@@ -9,10 +9,7 @@ class DataTest extends TestCase {
     constructor(module: test.Test_statics & DjinniModule) {
         super(module);
         this.m = module;
-    }
-
-    setUp() {
-        this.test = this.m.testsuite.DataRefTest.create();
+        this.test = this.m.testsuite.DataRefTest.create()!;
     }
 
     testSend() {

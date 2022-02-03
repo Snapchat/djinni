@@ -45,7 +45,7 @@ class EnumTest extends TestCase {
             assertEq(flags[i], this.m.testsuite.FlagRoundtrip.roundtripAccess(flags[i]));
             assertEq(flags[i], this.m.testsuite.FlagRoundtrip.roundtripAccessBoxed(flags[i]));
         }
-        assertUndefined(this.m.testsuite.FlagRoundtrip.roundtripAccessBoxed(null));
+        assertUndefined(this.m.testsuite.FlagRoundtrip.roundtripAccessBoxed(undefined));
     }
     testEmptyFlagRoundtrip() {
         var flags = [
@@ -56,7 +56,7 @@ class EnumTest extends TestCase {
             assertEq(flags[i], this.m.testsuite.FlagRoundtrip.roundtripEmpty(flags[i]));
             assertEq(flags[i], this.m.testsuite.FlagRoundtrip.roundtripEmptyBoxed(flags[i]));
         }
-        assertUndefined(this.m.testsuite.FlagRoundtrip.roundtripEmptyBoxed(null));
+        assertUndefined(this.m.testsuite.FlagRoundtrip.roundtripEmptyBoxed(undefined));
     }
 }
 

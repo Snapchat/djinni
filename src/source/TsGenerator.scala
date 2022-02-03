@@ -66,9 +66,19 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  private def interfaceNullitySuffix(dt: DefType, enable: Boolean) = dt match {
-    case DInterface => if (spec.cppNnType.nonEmpty || enable == false) "" else " | null"
-    case _ => ""
+  private def nullityAnnotation(tm: MExpr) = tm.base match {
+    case MOptional => " | undefined"
+    case e: MExtern => e.defType match {
+      case DInterface => if (spec.cppNnType.nonEmpty) "" else " | undefined"
+      case _ => ""
+    }
+    case o => o match {
+      case d: MDef => d.defType match {
+        case DInterface => if (spec.cppNnType.nonEmpty) "" else " | undefined"
+        case _ => ""
+      }
+      case _ => ""
+    }
   }
 
   def toTsType(tm: MExpr, addNullability: Boolean = true): String = {
@@ -80,10 +90,10 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
           val arg = tm.args.head
           arg.base match {
             case MOptional => throw new AssertionError("nested optional?")
-            case m => f(arg) + (if (addNullability) " | undefined" else "")
+            case m => f(arg)
           }
         case MArray => tsArrayType(tm.args.head)
-        case e: MExtern => e.ts.typename + (if (e.ts.generic) args(tm) else "") + interfaceNullitySuffix(e.defType, addNullability)
+        case e: MExtern => e.ts.typename + (if (e.ts.generic) args(tm) else "")
         case p: MProtobuf => p.name
         case o =>
           val base = o match {
@@ -96,7 +106,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
             case MSet => "Set"
             case MMap => "Map"
             case MArray => throw new AssertionError("array should have been special cased")
-            case d: MDef => idJs.ty(d.name) + interfaceNullitySuffix(d.defType, addNullability)
+            case d: MDef => idJs.ty(d.name)
             case e: MExtern => throw new AssertionError("unreachable")
             case e: MProtobuf => throw new AssertionError("unreachable")
             case p: MParam => idJs.typeParam(p.name)
@@ -104,7 +114,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
           base + args(tm)
       }
     }
-    f(tm)
+    f(tm) + (if (addNullability) nullityAnnotation(tm) else "")
   }
 
   case class TsSymbolRef(sym: String, module: String)

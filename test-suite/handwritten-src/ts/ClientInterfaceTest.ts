@@ -2,7 +2,7 @@ import {TestCase, allTests, assertEq} from "./testutils"
 import * as test from "../../generated-src/ts/test";
 
 class ClientInterfaceImpl implements test.ClientInterface {
-    getRecord(id, utf8String, misc) {
+    getRecord(id: bigint, utf8String: string, misc: string | undefined) {
         if (utf8String != "Non-ASCII /\0 非 ASCII 字符" && utf8String != "Hello World!") {
             throw new Error("Unexpected string. Check UTF-8?");
         }
@@ -10,17 +10,17 @@ class ClientInterfaceImpl implements test.ClientInterface {
                 content: utf8String,
                 misc: misc};
     }
-    identifierCheck(data, r, jret) {
+    identifierCheck(data: Uint8Array, r: number, jret: bigint) {
         return 0.0;
     }
     returnStr() {
         return "test";
     }
-    methTakingInterface(i) {
-        if (i != null) {return i.returnStr();} else {return "";}
+    methTakingInterface(i: test.ClientInterface | undefined) {
+        if (i) {return i.returnStr();} else {return "";}
     }
-    methTakingOptionalInterface(i) {
-        if (i != null) {return i.returnStr();} else {return "";}
+    methTakingOptionalInterface(i: test.ClientInterface | undefined) {
+        if (i) {return i.returnStr();} else {return "";}
     }
 }
 
@@ -30,8 +30,6 @@ class ClientInterfaceTest extends TestCase {
     constructor(module: test.Test_statics) {
         super(module);
         this.m = module;
-    }
-    setUp() {
         this.jsClientInterface = new ClientInterfaceImpl();
     }
     testClientReturn() {
@@ -48,8 +46,8 @@ class ClientInterfaceTest extends TestCase {
 
     testReverseClientInterfaceArgs() {
         var i = this.m.testsuite.ReverseClientInterface.create();
-        assertEq(i.methTakingInterface(i), "test");
-        assertEq(i.methTakingOptionalInterface(i), "test");
+        assertEq(i?.methTakingInterface(i), "test");
+        assertEq(i?.methTakingOptionalInterface(i), "test");
     }
 }
 
