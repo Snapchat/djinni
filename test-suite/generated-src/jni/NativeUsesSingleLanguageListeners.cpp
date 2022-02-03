@@ -15,7 +15,7 @@ NativeUsesSingleLanguageListeners::JavaProxy::JavaProxy(JniType j) : Handle(::dj
 
 NativeUsesSingleLanguageListeners::JavaProxy::~JavaProxy() = default;
 
-void NativeUsesSingleLanguageListeners::JavaProxy::callForObjC(const std::shared_ptr<::testsuite::ObjcOnlyListener> & c_l) {
+void NativeUsesSingleLanguageListeners::JavaProxy::callForObjC(const /*not-null*/ std::shared_ptr<::testsuite::ObjcOnlyListener> & c_l) {
     auto jniEnv = ::djinni::jniGetThreadEnv();
     ::djinni::JniLocalScope jscope(jniEnv, 10);
     const auto& data = ::djinni::JniClass<::djinni_generated::NativeUsesSingleLanguageListeners>::get();
@@ -23,7 +23,7 @@ void NativeUsesSingleLanguageListeners::JavaProxy::callForObjC(const std::shared
                            ::djinni::get(::djinni_generated::NativeObjcOnlyListener::fromCpp(jniEnv, c_l)));
     ::djinni::jniExceptionCheck(jniEnv);
 }
-std::shared_ptr<::testsuite::ObjcOnlyListener> NativeUsesSingleLanguageListeners::JavaProxy::returnForObjC() {
+/*not-null*/ std::shared_ptr<::testsuite::ObjcOnlyListener> NativeUsesSingleLanguageListeners::JavaProxy::returnForObjC() {
     auto jniEnv = ::djinni::jniGetThreadEnv();
     ::djinni::JniLocalScope jscope(jniEnv, 10);
     const auto& data = ::djinni::JniClass<::djinni_generated::NativeUsesSingleLanguageListeners>::get();
@@ -31,7 +31,7 @@ std::shared_ptr<::testsuite::ObjcOnlyListener> NativeUsesSingleLanguageListeners
     ::djinni::jniExceptionCheck(jniEnv);
     return ::djinni_generated::NativeObjcOnlyListener::toCpp(jniEnv, jret);
 }
-void NativeUsesSingleLanguageListeners::JavaProxy::callForJava(const std::shared_ptr<::testsuite::JavaOnlyListener> & c_l) {
+void NativeUsesSingleLanguageListeners::JavaProxy::callForJava(const /*not-null*/ std::shared_ptr<::testsuite::JavaOnlyListener> & c_l) {
     auto jniEnv = ::djinni::jniGetThreadEnv();
     ::djinni::JniLocalScope jscope(jniEnv, 10);
     const auto& data = ::djinni::JniClass<::djinni_generated::NativeUsesSingleLanguageListeners>::get();
@@ -39,7 +39,7 @@ void NativeUsesSingleLanguageListeners::JavaProxy::callForJava(const std::shared
                            ::djinni::get(::djinni_generated::NativeJavaOnlyListener::fromCpp(jniEnv, c_l)));
     ::djinni::jniExceptionCheck(jniEnv);
 }
-std::shared_ptr<::testsuite::JavaOnlyListener> NativeUsesSingleLanguageListeners::JavaProxy::returnForJava() {
+/*not-null*/ std::shared_ptr<::testsuite::JavaOnlyListener> NativeUsesSingleLanguageListeners::JavaProxy::returnForJava() {
     auto jniEnv = ::djinni::jniGetThreadEnv();
     ::djinni::JniLocalScope jscope(jniEnv, 10);
     const auto& data = ::djinni::JniClass<::djinni_generated::NativeUsesSingleLanguageListeners>::get();

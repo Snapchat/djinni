@@ -20,7 +20,7 @@ class ListenerCaller {
 public:
     virtual ~ListenerCaller() = default;
 
-    static std::shared_ptr<ListenerCaller> init(const std::shared_ptr<FirstListener> & first_l, const std::shared_ptr<SecondListener> & second_l);
+    static /*not-null*/ std::shared_ptr<ListenerCaller> init(const /*not-null*/ std::shared_ptr<FirstListener> & first_l, const /*not-null*/ std::shared_ptr<SecondListener> & second_l);
 
     virtual void callFirst() = 0;
 

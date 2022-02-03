@@ -32,23 +32,23 @@ em::val NativeUsesSingleLanguageListeners::returnForJava(const CppType& self) {
     return ::djinni_generated::NativeJavaOnlyListener::fromCpp(r);
 }
 
-void NativeUsesSingleLanguageListeners::JsProxy::callForObjC(const std::shared_ptr<::testsuite::ObjcOnlyListener> & l) {
+void NativeUsesSingleLanguageListeners::JsProxy::callForObjC(const /*not-null*/ std::shared_ptr<::testsuite::ObjcOnlyListener> & l) {
     auto ret = callMethod("callForObjC", ::djinni_generated::NativeObjcOnlyListener::fromCpp(l));
     checkError(ret);
 }
 
-std::shared_ptr<::testsuite::ObjcOnlyListener> NativeUsesSingleLanguageListeners::JsProxy::returnForObjC() {
+/*not-null*/ std::shared_ptr<::testsuite::ObjcOnlyListener> NativeUsesSingleLanguageListeners::JsProxy::returnForObjC() {
     auto ret = callMethod("returnForObjC");
     checkError(ret);
     return ::djinni_generated::NativeObjcOnlyListener::toCpp(ret);
 }
 
-void NativeUsesSingleLanguageListeners::JsProxy::callForJava(const std::shared_ptr<::testsuite::JavaOnlyListener> & l) {
+void NativeUsesSingleLanguageListeners::JsProxy::callForJava(const /*not-null*/ std::shared_ptr<::testsuite::JavaOnlyListener> & l) {
     auto ret = callMethod("callForJava", ::djinni_generated::NativeJavaOnlyListener::fromCpp(l));
     checkError(ret);
 }
 
-std::shared_ptr<::testsuite::JavaOnlyListener> NativeUsesSingleLanguageListeners::JsProxy::returnForJava() {
+/*not-null*/ std::shared_ptr<::testsuite::JavaOnlyListener> NativeUsesSingleLanguageListeners::JsProxy::returnForJava() {
     auto ret = callMethod("returnForJava");
     checkError(ret);
     return ::djinni_generated::NativeJavaOnlyListener::toCpp(ret);

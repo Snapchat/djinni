@@ -31,7 +31,7 @@ public:
 
     virtual ::djinni::DataView recvDataView() = 0;
 
-    static std::shared_ptr<DataRefTest> create();
+    static /*not-null*/ std::shared_ptr<DataRefTest> create();
 };
 
 }  // namespace testsuite

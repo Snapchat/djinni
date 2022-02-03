@@ -21,7 +21,7 @@ struct NativeExternInterface2 : ::djinni::JsInterface<::ExternInterface2, Native
 
     struct JsProxy: ::djinni::JsProxyBase, ::ExternInterface2, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
-        ::ExternRecordWithDerivings foo(const std::shared_ptr<::testsuite::TestHelpers> & i) override;
+        ::ExternRecordWithDerivings foo(const /*not-null*/ std::shared_ptr<::testsuite::TestHelpers> & i) override;
     };
 };
 

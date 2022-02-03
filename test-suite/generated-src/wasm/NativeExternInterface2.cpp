@@ -8,7 +8,7 @@
 namespace djinni_generated {
 
 
-::ExternRecordWithDerivings NativeExternInterface2::JsProxy::foo(const std::shared_ptr<::testsuite::TestHelpers> & i) {
+::ExternRecordWithDerivings NativeExternInterface2::JsProxy::foo(const /*not-null*/ std::shared_ptr<::testsuite::TestHelpers> & i) {
     auto ret = callMethod("foo", ::djinni_generated::NativeTestHelpers::fromCpp(i));
     checkError(ret);
     return ::djinni_generated::NativeExternRecordWithDerivings::toCpp(ret);

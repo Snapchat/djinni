@@ -15,11 +15,11 @@ public:
 
     virtual std::string return_str() const = 0;
 
-    virtual std::string meth_taking_interface(const std::shared_ptr<ReverseClientInterface> & i) = 0;
+    virtual std::string meth_taking_interface(const /*not-null*/ std::shared_ptr<ReverseClientInterface> & i) = 0;
 
-    virtual std::string meth_taking_optional_interface(const std::shared_ptr<ReverseClientInterface> & i) = 0;
+    virtual std::string meth_taking_optional_interface(const /*not-null*/ std::shared_ptr<ReverseClientInterface> & i) = 0;
 
-    static std::shared_ptr<ReverseClientInterface> create();
+    static /*not-null*/ std::shared_ptr<ReverseClientInterface> create();
 };
 
 }  // namespace testsuite

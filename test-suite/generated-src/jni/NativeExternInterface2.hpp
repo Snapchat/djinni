@@ -33,7 +33,7 @@ private:
         JavaProxy(JniType j);
         ~JavaProxy();
 
-        ::ExternRecordWithDerivings foo(const std::shared_ptr<::testsuite::TestHelpers> & i) override;
+        ::ExternRecordWithDerivings foo(const /*not-null*/ std::shared_ptr<::testsuite::TestHelpers> & i) override;
 
     private:
         friend ::djinni::JniInterface<::ExternInterface2, ::djinni_generated::NativeExternInterface2>;

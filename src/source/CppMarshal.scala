@@ -227,7 +227,8 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
           expr(tm.args.head)
         } else {
           val args = if (tm.args.isEmpty) "" else tm.args.map(expr).mkString("<", ", ", ">")
-          base(tm.base) + args
+          val prefix = if (isInterface(tm)) "/*not-null*/ " else ""
+          prefix + base(tm.base) + args
         }
       }
     }

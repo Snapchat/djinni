@@ -67,26 +67,26 @@ class UsesSingleLanguageListeners::ObjcProxy final
     friend class ::djinni_generated::UsesSingleLanguageListeners;
 public:
     using ObjcProxyBase::ObjcProxyBase;
-    void callForObjC(const std::shared_ptr<::testsuite::ObjcOnlyListener> & c_l) override
+    void callForObjC(const /*not-null*/ std::shared_ptr<::testsuite::ObjcOnlyListener> & c_l) override
     {
         @autoreleasepool {
             [djinni_private_get_proxied_objc_object() callForObjC:(::djinni_generated::ObjcOnlyListener::fromCpp(c_l))];
         }
     }
-    std::shared_ptr<::testsuite::ObjcOnlyListener> returnForObjC() override
+    /*not-null*/ std::shared_ptr<::testsuite::ObjcOnlyListener> returnForObjC() override
     {
         @autoreleasepool {
             auto objcpp_result_ = [djinni_private_get_proxied_objc_object() returnForObjC];
             return ::djinni_generated::ObjcOnlyListener::toCpp(objcpp_result_);
         }
     }
-    void callForJava(const std::shared_ptr<::testsuite::JavaOnlyListener> & c_l) override
+    void callForJava(const /*not-null*/ std::shared_ptr<::testsuite::JavaOnlyListener> & c_l) override
     {
         @autoreleasepool {
             [djinni_private_get_proxied_objc_object() callForJava:(::djinni_generated::JavaOnlyListener::fromCpp(c_l))];
         }
     }
-    std::shared_ptr<::testsuite::JavaOnlyListener> returnForJava() override
+    /*not-null*/ std::shared_ptr<::testsuite::JavaOnlyListener> returnForJava() override
     {
         @autoreleasepool {
             auto objcpp_result_ = [djinni_private_get_proxied_objc_object() returnForJava];

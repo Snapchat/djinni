@@ -12,5 +12,5 @@ class ExternInterface2 {
 public:
     virtual ~ExternInterface2() = default;
 
-    virtual ExternRecordWithDerivings foo(const std::shared_ptr<::testsuite::TestHelpers> & i) = 0;
+    virtual ExternRecordWithDerivings foo(const /*not-null*/ std::shared_ptr<::testsuite::TestHelpers> & i) = 0;
 };

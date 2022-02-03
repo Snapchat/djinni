@@ -27,10 +27,10 @@ struct NativeUsesSingleLanguageListeners : ::djinni::JsInterface<::testsuite::Us
 
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::UsesSingleLanguageListeners, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
-        void callForObjC(const std::shared_ptr<::testsuite::ObjcOnlyListener> & l) override;
-        std::shared_ptr<::testsuite::ObjcOnlyListener> returnForObjC() override;
-        void callForJava(const std::shared_ptr<::testsuite::JavaOnlyListener> & l) override;
-        std::shared_ptr<::testsuite::JavaOnlyListener> returnForJava() override;
+        void callForObjC(const /*not-null*/ std::shared_ptr<::testsuite::ObjcOnlyListener> & l) override;
+        /*not-null*/ std::shared_ptr<::testsuite::ObjcOnlyListener> returnForObjC() override;
+        void callForJava(const /*not-null*/ std::shared_ptr<::testsuite::JavaOnlyListener> & l) override;
+        /*not-null*/ std::shared_ptr<::testsuite::JavaOnlyListener> returnForJava() override;
     };
 };
 

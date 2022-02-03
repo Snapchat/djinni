@@ -29,13 +29,13 @@ std::string NativeClientInterface::JsProxy::return_str() {
     return ::djinni::String::toCpp(ret.as<std::string>());
 }
 
-std::string NativeClientInterface::JsProxy::meth_taking_interface(const std::shared_ptr<::testsuite::ClientInterface> & i) {
+std::string NativeClientInterface::JsProxy::meth_taking_interface(const /*not-null*/ std::shared_ptr<::testsuite::ClientInterface> & i) {
     auto ret = callMethod("methTakingInterface", ::djinni_generated::NativeClientInterface::fromCpp(i));
     checkError(ret);
     return ::djinni::String::toCpp(ret.as<std::string>());
 }
 
-std::string NativeClientInterface::JsProxy::meth_taking_optional_interface(const std::shared_ptr<::testsuite::ClientInterface> & i) {
+std::string NativeClientInterface::JsProxy::meth_taking_optional_interface(const /*not-null*/ std::shared_ptr<::testsuite::ClientInterface> & i) {
     auto ret = callMethod("methTakingOptionalInterface", ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeClientInterface>::fromCpp(i));
     checkError(ret);
     return ::djinni::String::toCpp(ret.as<std::string>());
