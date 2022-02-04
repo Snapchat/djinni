@@ -16,12 +16,12 @@
 
 #import "DJFuture.h"
 
-@class DJSharedSate<Value>;
+@class DJSharedSate<DJValue>;
 
 typedef _Nullable id (^Continuation)(DJSharedSate* _Nonnull);
 
-@interface DJSharedSate<Value> : NSObject
-@property (nonatomic) Value value;
+@interface DJSharedSate<DJValue> : NSObject
+@property (nonatomic) DJValue value;
 @property (nonatomic) NSException *exception;
 @property (nonatomic) NSCondition *cond;
 @property (nonatomic) Continuation handler;
