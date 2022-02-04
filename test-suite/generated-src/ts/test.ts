@@ -96,7 +96,7 @@ export interface DataRefTest {
     recvDataView(): Uint8Array;
 }
 export interface DataRefTest_statics {
-    create(): DataRefTest | undefined;
+    create(): DataRefTest;
 }
 
 /** enum for use in constants */
@@ -188,7 +188,7 @@ export interface VarnameInterface {
      * _i_arg_ should not.
      */
     Rmethod(RArg: VarnameRecord): VarnameRecord;
-    Imethod(IArg: VarnameInterface | undefined): VarnameInterface | undefined;
+    Imethod(IArg: VarnameInterface): VarnameInterface;
 }
 
 /** Extended record */
@@ -239,10 +239,10 @@ export interface JavaOnlyListener {
  * on references to interfaces they don't need.
  */
 export interface UsesSingleLanguageListeners {
-    callForObjC(l: ObjcOnlyListener | undefined): void;
-    returnForObjC(): ObjcOnlyListener | undefined;
-    callForJava(l: JavaOnlyListener | undefined): void;
-    returnForJava(): JavaOnlyListener | undefined;
+    callForObjC(l: ObjcOnlyListener): void;
+    returnForObjC(): ObjcOnlyListener;
+    callForJava(l: JavaOnlyListener): void;
+    returnForJava(): JavaOnlyListener;
 }
 
 /** Used for ObjC multiple inheritance tests */
@@ -266,7 +266,7 @@ export interface ListenerCaller {
     callSecond(): void;
 }
 export interface ListenerCaller_statics {
-    init(firstL: FirstListener | undefined, secondL: SecondListener | undefined): ListenerCaller | undefined;
+    init(firstL: FirstListener, secondL: SecondListener): ListenerCaller;
 }
 
 /** Used for C++ multiple inheritance tests */
@@ -274,7 +274,7 @@ export interface ReturnOne {
     returnOne(): number;
 }
 export interface ReturnOne_statics {
-    getInstance(): ReturnOne | undefined;
+    getInstance(): ReturnOne;
 }
 
 /** Used for C++ multiple inheritance tests */
@@ -282,7 +282,7 @@ export interface ReturnTwo {
     returnTwo(): number;
 }
 export interface ReturnTwo_statics {
-    getInstance(): ReturnTwo | undefined;
+    getInstance(): ReturnTwo;
 }
 
 /** Record for use in constants */
@@ -433,23 +433,23 @@ export interface TestHelpers_statics {
     checkEmptyMap(m: Map<string, bigint>): boolean;
     getMapListRecord(): MapListRecord;
     checkMapListRecord(m: MapListRecord): boolean;
-    checkClientInterfaceAscii(i: ClientInterface | undefined): void;
-    checkClientInterfaceNonascii(i: ClientInterface | undefined): void;
-    checkClientInterfaceArgs(i: ClientInterface | undefined): void;
+    checkClientInterfaceAscii(i: ClientInterface): void;
+    checkClientInterfaceNonascii(i: ClientInterface): void;
+    checkClientInterfaceArgs(i: ClientInterface): void;
     checkEnumMap(m: Map<Color, string>): void;
     checkEnum(c: Color): void;
     tokenId(t: UserToken | undefined): UserToken | undefined;
-    createCppToken(): UserToken | undefined;
-    checkCppToken(t: UserToken | undefined): void;
-    cppTokenId(t: UserToken | undefined): bigint;
-    checkTokenType(t: UserToken | undefined, type: string): void;
+    createCppToken(): UserToken;
+    checkCppToken(t: UserToken): void;
+    cppTokenId(t: UserToken): bigint;
+    checkTokenType(t: UserToken, type: string): void;
     returnNone(): number | undefined;
     /** Ensures that we generate integer translation code */
     assortedPrimitivesId(i: AssortedPrimitives): AssortedPrimitives;
     idBinary(b: Uint8Array): Uint8Array;
     getAsyncResult(): Promise<number>;
     futureRoundtrip(f: Promise<number>): Promise<string>;
-    checkAsyncInterface(i: AsyncInterface | undefined): Promise<string>;
+    checkAsyncInterface(i: AsyncInterface): Promise<string>;
 }
 
 /**
@@ -468,7 +468,7 @@ export interface Conflict {
 }
 
 export interface ConflictUser {
-    Conflict(): Conflict | undefined;
+    Conflict(): Conflict;
     conflictArg(cs: Set<Conflict>): boolean;
 }
 
@@ -527,24 +527,24 @@ export interface ClientInterface {
     getRecord(recordId: bigint, utf8string: string, misc: string | undefined): ClientReturnedRecord;
     identifierCheck(data: Uint8Array, r: number, jret: bigint): number;
     returnStr(): string;
-    methTakingInterface(i: ClientInterface | undefined): string;
+    methTakingInterface(i: ClientInterface): string;
     methTakingOptionalInterface(i: ClientInterface | undefined): string;
 }
 
 export interface ReverseClientInterface {
     returnStr(): string;
-    methTakingInterface(i: ReverseClientInterface | undefined): string;
+    methTakingInterface(i: ReverseClientInterface): string;
     methTakingOptionalInterface(i: ReverseClientInterface | undefined): string;
 }
 export interface ReverseClientInterface_statics {
-    create(): ReverseClientInterface | undefined;
+    create(): ReverseClientInterface;
 }
 
 export interface CppException {
     throwAnException(): number;
 }
 export interface CppException_statics {
-    get(): CppException | undefined;
+    get(): CppException;
 }
 
 export interface /*record*/ PrimitiveList {

@@ -36,7 +36,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     return self;
 }
 
-+ (nullable TXSDjinniPerfBenchmark *)getInstance {
++ (nonnull TXSDjinniPerfBenchmark *)getInstance {
     try {
         auto objcpp_result_ = ::snapchat::djinni::benchmark::DjinniPerfBenchmark::getInstance();
         return ::djinni_generated::DjinniPerfBenchmark::fromCpp(objcpp_result_);
@@ -104,7 +104,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-- (void)argObject:(nullable id<TXSObjectPlatform>)c {
+- (void)argObject:(nonnull id<TXSObjectPlatform>)c {
     try {
         _cppRefHandle.get()->argObject(::djinni_generated::ObjectPlatform::toCpp(c));
     } DJINNI_TRANSLATE_EXCEPTIONS()
@@ -149,7 +149,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-- (nullable TXSObjectNative *)returnObject {
+- (nonnull TXSObjectNative *)returnObject {
     try {
         auto objcpp_result_ = _cppRefHandle.get()->returnObject();
         return ::djinni_generated::ObjectNative::fromCpp(objcpp_result_);

@@ -13,14 +13,14 @@ import javax.annotation.Nonnull;
  * on references to interfaces they don't need.
  */
 public abstract class UsesSingleLanguageListeners {
-    public abstract void callForObjC(@CheckForNull ObjcOnlyListener l);
+    public abstract void callForObjC(@Nonnull ObjcOnlyListener l);
 
-    @CheckForNull
+    @Nonnull
     public abstract ObjcOnlyListener returnForObjC();
 
-    public abstract void callForJava(@CheckForNull JavaOnlyListener l);
+    public abstract void callForJava(@Nonnull JavaOnlyListener l);
 
-    @CheckForNull
+    @Nonnull
     public abstract JavaOnlyListener returnForJava();
 
     public static final class CppProxy extends UsesSingleLanguageListeners

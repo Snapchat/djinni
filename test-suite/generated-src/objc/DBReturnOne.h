@@ -8,7 +8,7 @@
 /** Used for C++ multiple inheritance tests */
 @interface DBReturnOne : NSObject
 
-+ (nullable DBReturnOne *)getInstance;
++ (nonnull DBReturnOne *)getInstance;
 
 - (int8_t)returnOne;
 

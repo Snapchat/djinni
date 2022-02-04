@@ -85,8 +85,8 @@ void NativeTestHelpers::check_enum(int32_t w_c) {
     ::testsuite::TestHelpers::check_enum(::djinni_generated::NativeColor::toCpp(w_c));
 }
 em::val NativeTestHelpers::token_id(const em::val& w_t) {
-    auto r = ::testsuite::TestHelpers::token_id(::djinni_generated::NativeUserToken::toCpp(w_t));
-    return ::djinni_generated::NativeUserToken::fromCpp(r);
+    auto r = ::testsuite::TestHelpers::token_id(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeUserToken>::toCpp(w_t));
+    return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeUserToken>::fromCpp(r);
 }
 em::val NativeTestHelpers::create_cpp_token() {
     auto r = ::testsuite::TestHelpers::create_cpp_token();

@@ -124,19 +124,19 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (void)checkClientInterfaceAscii:(nullable id<DBClientInterface>)i {
++ (void)checkClientInterfaceAscii:(nonnull id<DBClientInterface>)i {
     try {
         ::testsuite::TestHelpers::check_client_interface_ascii(::djinni_generated::ClientInterface::toCpp(i));
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (void)checkClientInterfaceNonascii:(nullable id<DBClientInterface>)i {
++ (void)checkClientInterfaceNonascii:(nonnull id<DBClientInterface>)i {
     try {
         ::testsuite::TestHelpers::check_client_interface_nonascii(::djinni_generated::ClientInterface::toCpp(i));
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (void)checkClientInterfaceArgs:(nullable id<DBClientInterface>)i {
++ (void)checkClientInterfaceArgs:(nonnull id<DBClientInterface>)i {
     try {
         ::testsuite::TestHelpers::check_client_interface_args(::djinni_generated::ClientInterface::toCpp(i));
     } DJINNI_TRANSLATE_EXCEPTIONS()
@@ -156,32 +156,32 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
 
 + (nullable id<DBUserToken>)tokenId:(nullable id<DBUserToken>)t {
     try {
-        auto objcpp_result_ = ::testsuite::TestHelpers::token_id(::djinni_generated::UserToken::toCpp(t));
-        return ::djinni_generated::UserToken::fromCpp(objcpp_result_);
+        auto objcpp_result_ = ::testsuite::TestHelpers::token_id(::djinni::Optional<std::experimental::optional, ::djinni_generated::UserToken>::toCpp(t));
+        return ::djinni::Optional<std::experimental::optional, ::djinni_generated::UserToken>::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (nullable id<DBUserToken>)createCppToken {
++ (nonnull id<DBUserToken>)createCppToken {
     try {
         auto objcpp_result_ = ::testsuite::TestHelpers::create_cpp_token();
         return ::djinni_generated::UserToken::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (void)checkCppToken:(nullable id<DBUserToken>)t {
++ (void)checkCppToken:(nonnull id<DBUserToken>)t {
     try {
         ::testsuite::TestHelpers::check_cpp_token(::djinni_generated::UserToken::toCpp(t));
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (int64_t)cppTokenId:(nullable id<DBUserToken>)t {
++ (int64_t)cppTokenId:(nonnull id<DBUserToken>)t {
     try {
         auto objcpp_result_ = ::testsuite::TestHelpers::cpp_token_id(::djinni_generated::UserToken::toCpp(t));
         return ::djinni::I64::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (void)checkTokenType:(nullable id<DBUserToken>)t
++ (void)checkTokenType:(nonnull id<DBUserToken>)t
                   type:(nonnull NSString *)type {
     try {
         ::testsuite::TestHelpers::check_token_type(::djinni_generated::UserToken::toCpp(t),
@@ -224,7 +224,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (nonnull DJFuture<NSString *> *)checkAsyncInterface:(nullable id<DBAsyncInterface>)i {
++ (nonnull DJFuture<NSString *> *)checkAsyncInterface:(nonnull id<DBAsyncInterface>)i {
     try {
         auto objcpp_result_ = ::testsuite::TestHelpers::check_async_interface(::djinni_generated::AsyncInterface::toCpp(i));
         return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(objcpp_result_));

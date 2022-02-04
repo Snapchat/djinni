@@ -9,7 +9,7 @@
 
 @interface DBExternInterface1 : NSObject
 
-- (nonnull DBClientReturnedRecord *)foo:(nullable id<DBClientInterface>)i;
+- (nonnull DBClientReturnedRecord *)foo:(nonnull id<DBClientInterface>)i;
 
 - (DBColor)bar:(DBColor)e;
 

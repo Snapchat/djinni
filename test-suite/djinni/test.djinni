@@ -35,7 +35,7 @@ test_helpers = interface +c {
     static check_enum_map(m: map<color, string>);
     static check_enum(c: color);
 
-    static token_id(t: user_token): user_token;
+    static token_id(t: optional<user_token>): optional<user_token>;
     static create_cpp_token(): user_token;
     static check_cpp_token(t: user_token);
     static cpp_token_id(t: user_token): i64;

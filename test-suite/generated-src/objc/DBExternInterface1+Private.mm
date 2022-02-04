@@ -32,7 +32,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     return self;
 }
 
-- (nonnull DBClientReturnedRecord *)foo:(nullable id<DBClientInterface>)i {
+- (nonnull DBClientReturnedRecord *)foo:(nonnull id<DBClientInterface>)i {
     try {
         auto objcpp_result_ = _cppRefHandle.get()->foo(::djinni_generated::ClientInterface::toCpp(i));
         return ::djinni_generated::ClientReturnedRecord::fromCpp(objcpp_result_);

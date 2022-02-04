@@ -19,8 +19,8 @@ public abstract class ListenerCaller {
 
     public abstract void callSecond();
 
-    @CheckForNull
-    public static native ListenerCaller init(@CheckForNull FirstListener firstL, @CheckForNull SecondListener secondL);
+    @Nonnull
+    public static native ListenerCaller init(@Nonnull FirstListener firstL, @Nonnull SecondListener secondL);
 
     public static final class CppProxy extends ListenerCaller
     {

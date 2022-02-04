@@ -17,8 +17,8 @@ public abstract class VarnameInterface {
     @Nonnull
     public abstract VarnameRecord Rmethod(@Nonnull VarnameRecord RArg);
 
-    @CheckForNull
-    public abstract VarnameInterface Imethod(@CheckForNull VarnameInterface IArg);
+    @Nonnull
+    public abstract VarnameInterface Imethod(@Nonnull VarnameInterface IArg);
 
     public static final class CppProxy extends VarnameInterface
     {

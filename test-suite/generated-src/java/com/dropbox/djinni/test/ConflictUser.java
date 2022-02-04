@@ -10,7 +10,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 public abstract class ConflictUser {
-    @CheckForNull
+    @Nonnull
     public abstract Conflict Conflict();
 
     public abstract boolean conflictArg(@Nonnull HashSet<Conflict> cs);

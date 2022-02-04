@@ -30,7 +30,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     return self;
 }
 
-+ (nullable DBReturnTwo *)getInstance {
++ (nonnull DBReturnTwo *)getInstance {
     try {
         auto objcpp_result_ = ::testsuite::ReturnTwo::get_instance();
         return ::djinni_generated::ReturnTwo::fromCpp(objcpp_result_);

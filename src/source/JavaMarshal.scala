@@ -59,7 +59,7 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
     case _ => List()
   }
 
-  val interfaceNullityAnnotation = if (spec.cppNnType.nonEmpty) javaNonnullAnnotation else javaNullableAnnotation
+  val interfaceNullityAnnotation = javaNonnullAnnotation
 
   def nullityAnnotation(ty: Option[TypeRef]): Option[String] = ty.map(nullityAnnotation).getOrElse(None)
   def nullityAnnotation(ty: TypeRef): Option[String] = {

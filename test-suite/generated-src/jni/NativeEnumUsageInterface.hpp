@@ -18,9 +18,15 @@ public:
 
     ~NativeEnumUsageInterface();
 
-    static CppType toCpp(JNIEnv* jniEnv, JniType j) { return ::djinni::JniClass<NativeEnumUsageInterface>::get()._fromJava(jniEnv, j); }
+    static CppType toCpp(JNIEnv* jniEnv, JniType j) {
+        DJINNI_ASSERT_MSG(j, jniEnv, "NativeEnumUsageInterface::toCpp requires a non-null Java object");
+        return ::djinni::JniClass<$jniSelf>::get()._fromJava(jniEnv, j);
+    };
     static ::djinni::LocalRef<JniType> fromCppOpt(JNIEnv* jniEnv, const CppOptType& c) { return {jniEnv, ::djinni::JniClass<NativeEnumUsageInterface>::get()._toJava(jniEnv, c)}; }
-    static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c) { return fromCppOpt(jniEnv, c); }
+    static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c) {
+        DJINNI_ASSERT_MSG(c, jniEnv, "NativeEnumUsageInterface::fromCpp requires a non-null C++ object");
+        return fromCppOpt(jniEnv, c); }
+    }
 
 private:
     NativeEnumUsageInterface();

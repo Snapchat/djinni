@@ -41,7 +41,7 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
   def nullability(tm: MExpr): Option[String] = {
     val nonnull = Some("nonnull")
     val nullable = Some("nullable")
-    val interfaceNullity = if (spec.cppNnType.nonEmpty) nonnull else nullable
+    val interfaceNullity = nonnull
     tm.base match {
       case MOptional => nullable
       case MPrimitive(_,_,_,_,_,_,_,_) => None

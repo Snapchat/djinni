@@ -23,6 +23,6 @@
 
 - (nonnull NSData *)recvDataView;
 
-+ (nullable DBDataRefTest *)create;
++ (nonnull DBDataRefTest *)create;
 
 @end

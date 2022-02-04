@@ -37,7 +37,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-- (nonnull NSString *)methTakingInterface:(nullable DBReverseClientInterface *)i {
+- (nonnull NSString *)methTakingInterface:(nonnull DBReverseClientInterface *)i {
     try {
         auto objcpp_result_ = _cppRefHandle.get()->meth_taking_interface(::djinni_generated::ReverseClientInterface::toCpp(i));
         return ::djinni::String::fromCpp(objcpp_result_);
@@ -51,7 +51,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (nullable DBReverseClientInterface *)create {
++ (nonnull DBReverseClientInterface *)create {
     try {
         auto objcpp_result_ = ::testsuite::ReverseClientInterface::create();
         return ::djinni_generated::ReverseClientInterface::fromCpp(objcpp_result_);

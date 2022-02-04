@@ -9,6 +9,6 @@
 
 - (int32_t)throwAnException;
 
-+ (nullable DBCppException *)get;
++ (nonnull DBCppException *)get;
 
 @end

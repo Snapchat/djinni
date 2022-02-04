@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
 
     public abstract void argArrayInt(@Nonnull long[] v);
 
-    public abstract void argObject(@CheckForNull ObjectPlatform c);
+    public abstract void argObject(@Nonnull ObjectPlatform c);
 
     public abstract void argListObject(@Nonnull ArrayList<ObjectPlatform> l);
 
@@ -47,7 +47,7 @@ import javax.annotation.Nonnull;
     @Nonnull
     public abstract byte[] returnBinary(int size);
 
-    @CheckForNull
+    @Nonnull
     public abstract ObjectNative returnObject();
 
     @Nonnull
@@ -68,7 +68,7 @@ import javax.annotation.Nonnull;
     @Nonnull
     public abstract String roundTripString(@Nonnull String s);
 
-    @CheckForNull
+    @Nonnull
     public static native DjinniPerfBenchmark getInstance();
 
     public static final class CppProxy extends DjinniPerfBenchmark

@@ -10,16 +10,16 @@ export interface /*record*/ ExternRecordWithDerivings {
 }
 
 export interface ExternInterface1 {
-    foo(i: ClientInterface | undefined): ClientReturnedRecord;
+    foo(i: ClientInterface): ClientReturnedRecord;
     bar(e: Color): Color;
 }
 
 export interface ExternInterface2 {
-    foo(i: TestHelpers | undefined): ExternRecordWithDerivings;
+    foo(i: TestHelpers): ExternRecordWithDerivings;
 }
 
 export interface /*record*/ TestOptionalExternInterfaceRecord {
-    sampleInterface?: SampleInterface | undefined;
+    sampleInterface?: SampleInterface;
 }
 
 export interface ns_testsuite {

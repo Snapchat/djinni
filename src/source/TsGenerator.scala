@@ -68,17 +68,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
 
   private def nullityAnnotation(tm: MExpr) = tm.base match {
     case MOptional => " | undefined"
-    case e: MExtern => e.defType match {
-      case DInterface => if (spec.cppNnType.nonEmpty) "" else " | undefined"
-      case _ => ""
-    }
-    case o => o match {
-      case d: MDef => d.defType match {
-        case DInterface => if (spec.cppNnType.nonEmpty) "" else " | undefined"
-        case _ => ""
-      }
-      case _ => ""
-    }
+    case _ => ""
   }
 
   def toTsType(tm: MExpr, addNullability: Boolean = true): String = {

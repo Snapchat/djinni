@@ -16,7 +16,10 @@ struct NativeClientInterface : ::djinni::JsInterface<::testsuite::ClientInterfac
 
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
-    static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
+    static JsType fromCpp(const CppType& c) {
+        assert(c);
+        return fromCppOpt(c);
+    }
 
 
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ClientInterface, ::djinni::InstanceTracker<JsProxy> {

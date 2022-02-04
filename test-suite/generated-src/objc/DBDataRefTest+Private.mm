@@ -86,7 +86,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (nullable DBDataRefTest *)create {
++ (nonnull DBDataRefTest *)create {
     try {
         auto objcpp_result_ = ::testsuite::DataRefTest::create();
         return ::djinni_generated::DataRefTest::fromCpp(objcpp_result_);

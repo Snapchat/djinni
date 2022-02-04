@@ -8,6 +8,6 @@
 
 @protocol DBExternInterface2 <NSObject>
 
-- (nonnull DBExternRecordWithDerivings *)foo:(nullable DBTestHelpers *)i;
+- (nonnull DBExternRecordWithDerivings *)foo:(nonnull DBTestHelpers *)i;
 
 @end

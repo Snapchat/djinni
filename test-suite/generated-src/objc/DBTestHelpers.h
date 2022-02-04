@@ -51,11 +51,11 @@
 
 + (BOOL)checkMapListRecord:(nonnull DBMapListRecord *)m;
 
-+ (void)checkClientInterfaceAscii:(nullable id<DBClientInterface>)i;
++ (void)checkClientInterfaceAscii:(nonnull id<DBClientInterface>)i;
 
-+ (void)checkClientInterfaceNonascii:(nullable id<DBClientInterface>)i;
++ (void)checkClientInterfaceNonascii:(nonnull id<DBClientInterface>)i;
 
-+ (void)checkClientInterfaceArgs:(nullable id<DBClientInterface>)i;
++ (void)checkClientInterfaceArgs:(nonnull id<DBClientInterface>)i;
 
 + (void)checkEnumMap:(nonnull NSDictionary<NSNumber *, NSString *> *)m;
 
@@ -63,13 +63,13 @@
 
 + (nullable id<DBUserToken>)tokenId:(nullable id<DBUserToken>)t;
 
-+ (nullable id<DBUserToken>)createCppToken;
++ (nonnull id<DBUserToken>)createCppToken;
 
-+ (void)checkCppToken:(nullable id<DBUserToken>)t;
++ (void)checkCppToken:(nonnull id<DBUserToken>)t;
 
-+ (int64_t)cppTokenId:(nullable id<DBUserToken>)t;
++ (int64_t)cppTokenId:(nonnull id<DBUserToken>)t;
 
-+ (void)checkTokenType:(nullable id<DBUserToken>)t
++ (void)checkTokenType:(nonnull id<DBUserToken>)t
                   type:(nonnull NSString *)type;
 
 + (nullable NSNumber *)returnNone;
@@ -83,6 +83,6 @@
 
 + (nonnull DJFuture<NSString *> *)futureRoundtrip:(nonnull DJFuture<NSNumber *> *)f;
 
-+ (nonnull DJFuture<NSString *> *)checkAsyncInterface:(nullable id<DBAsyncInterface>)i;
++ (nonnull DJFuture<NSString *> *)checkAsyncInterface:(nonnull id<DBAsyncInterface>)i;
 
 @end

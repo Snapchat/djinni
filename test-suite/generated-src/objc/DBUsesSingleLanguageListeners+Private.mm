@@ -32,26 +32,26 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     return self;
 }
 
-- (void)callForObjC:(nullable id<DBObjcOnlyListener>)l {
+- (void)callForObjC:(nonnull id<DBObjcOnlyListener>)l {
     try {
         _cppRefHandle.get()->callForObjC(::djinni_generated::ObjcOnlyListener::toCpp(l));
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-- (nullable id<DBObjcOnlyListener>)returnForObjC {
+- (nonnull id<DBObjcOnlyListener>)returnForObjC {
     try {
         auto objcpp_result_ = _cppRefHandle.get()->returnForObjC();
         return ::djinni_generated::ObjcOnlyListener::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-- (void)callForJava:(nullable DBJavaOnlyListener *)l {
+- (void)callForJava:(nonnull DBJavaOnlyListener *)l {
     try {
         _cppRefHandle.get()->callForJava(::djinni_generated::JavaOnlyListener::toCpp(l));
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-- (nullable DBJavaOnlyListener *)returnForJava {
+- (nonnull DBJavaOnlyListener *)returnForJava {
     try {
         auto objcpp_result_ = _cppRefHandle.get()->returnForJava();
         return ::djinni_generated::JavaOnlyListener::fromCpp(objcpp_result_);

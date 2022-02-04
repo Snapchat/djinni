@@ -31,7 +31,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     return self;
 }
 
-- (nullable DBConflict *)Conflict {
+- (nonnull DBConflict *)Conflict {
     try {
         auto objcpp_result_ = _cppRefHandle.get()->Conflict();
         return ::djinni_generated::Conflict::fromCpp(objcpp_result_);

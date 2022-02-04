@@ -13,12 +13,12 @@ public abstract class ReverseClientInterface {
     public abstract String returnStr();
 
     @Nonnull
-    public abstract String methTakingInterface(@CheckForNull ReverseClientInterface i);
+    public abstract String methTakingInterface(@Nonnull ReverseClientInterface i);
 
     @Nonnull
     public abstract String methTakingOptionalInterface(@CheckForNull ReverseClientInterface i);
 
-    @CheckForNull
+    @Nonnull
     public static native ReverseClientInterface create();
 
     public static final class CppProxy extends ReverseClientInterface

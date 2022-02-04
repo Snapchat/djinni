@@ -9,10 +9,10 @@
 
 - (nonnull NSString *)returnStr;
 
-- (nonnull NSString *)methTakingInterface:(nullable DBReverseClientInterface *)i;
+- (nonnull NSString *)methTakingInterface:(nonnull DBReverseClientInterface *)i;
 
 - (nonnull NSString *)methTakingOptionalInterface:(nullable DBReverseClientInterface *)i;
 
-+ (nullable DBReverseClientInterface *)create;
++ (nonnull DBReverseClientInterface *)create;
 
 @end

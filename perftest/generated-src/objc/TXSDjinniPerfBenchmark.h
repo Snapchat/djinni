@@ -12,7 +12,7 @@
 /** djinni_perf_benchmark: This interface will be implemented in C++ and can be called from any language. */
 @interface TXSDjinniPerfBenchmark : NSObject
 
-+ (nullable TXSDjinniPerfBenchmark *)getInstance;
++ (nonnull TXSDjinniPerfBenchmark *)getInstance;
 
 - (int64_t)cppTests;
 
@@ -34,7 +34,7 @@
 
 - (void)argArrayInt:(nonnull NSArray<NSNumber *> *)v;
 
-- (void)argObject:(nullable id<TXSObjectPlatform>)c;
+- (void)argObject:(nonnull id<TXSObjectPlatform>)c;
 
 - (void)argListObject:(nonnull NSArray<id<TXSObjectPlatform>> *)l;
 
@@ -48,7 +48,7 @@
 
 - (nonnull NSData *)returnBinary:(int32_t)size;
 
-- (nullable TXSObjectNative *)returnObject;
+- (nonnull TXSObjectNative *)returnObject;
 
 - (nonnull NSArray<NSNumber *> *)returnListInt:(int32_t)size;
 

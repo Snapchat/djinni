@@ -12,12 +12,12 @@
  */
 @protocol DBUsesSingleLanguageListeners <NSObject>
 
-- (void)callForObjC:(nullable id<DBObjcOnlyListener>)l;
+- (void)callForObjC:(nonnull id<DBObjcOnlyListener>)l;
 
-- (nullable id<DBObjcOnlyListener>)returnForObjC;
+- (nonnull id<DBObjcOnlyListener>)returnForObjC;
 
-- (void)callForJava:(nullable DBJavaOnlyListener *)l;
+- (void)callForJava:(nonnull DBJavaOnlyListener *)l;
 
-- (nullable DBJavaOnlyListener *)returnForJava;
+- (nonnull DBJavaOnlyListener *)returnForJava;
 
 @end

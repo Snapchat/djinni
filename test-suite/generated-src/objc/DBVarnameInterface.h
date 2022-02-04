@@ -15,6 +15,6 @@
  */
 - (nonnull DBVarnameRecord *)Rmethod:(nonnull DBVarnameRecord *)RArg;
 
-- (nullable DBVarnameInterface *)Imethod:(nullable DBVarnameInterface *)IArg;
+- (nonnull DBVarnameInterface *)Imethod:(nonnull DBVarnameInterface *)IArg;
 
 @end

@@ -294,7 +294,10 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         // mashalling
         w.wl("static CppType toCpp(JsType j) { return _fromJs(j); }")
         w.wl("static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }")
-        w.wl("static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }")
+        w.w("static JsType fromCpp(const CppType& c)").braced {
+          w.wl("assert(c);")
+          w.wl("return fromCppOpt(c);")
+        }
         w.wl
         // method list
         if (i.ext.cpp) {

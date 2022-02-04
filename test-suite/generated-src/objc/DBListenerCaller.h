@@ -15,8 +15,8 @@
  */
 @interface DBListenerCaller : NSObject
 
-+ (nullable DBListenerCaller *)init:(nullable id<DBFirstListener>)firstL
-                            secondL:(nullable id<DBSecondListener>)secondL;
++ (nonnull DBListenerCaller *)init:(nonnull id<DBFirstListener>)firstL
+                           secondL:(nonnull id<DBSecondListener>)secondL;
 
 - (void)callFirst;
 

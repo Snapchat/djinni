@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 public abstract class CppException {
     public abstract int throwAnException();
 
-    @CheckForNull
+    @Nonnull
     public static native CppException get();
 
     public static final class CppProxy extends CppException
