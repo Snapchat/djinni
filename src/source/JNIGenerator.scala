@@ -234,7 +234,9 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
         }
         w.wl(s"static ::djinni::LocalRef<JniType> fromCppOpt(JNIEnv* jniEnv, const CppOptType& c) { return {jniEnv, ::djinni::JniClass<$jniSelf>::get()._toJava(jniEnv, c)}; }")
         w.w("static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c)").braced {
-          w.wl(s"""DJINNI_ASSERT_MSG(c, jniEnv, "$jniSelf::fromCpp requires a non-null C++ object");""")
+          if (spec.cppNnType.isEmpty) {
+            w.wl(s"""DJINNI_ASSERT_MSG(c, jniEnv, "$jniSelf::fromCpp requires a non-null C++ object");""")
+          }
           w.wl("return fromCppOpt(jniEnv, c); }")
         }
         w.wl

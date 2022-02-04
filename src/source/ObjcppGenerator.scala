@@ -119,7 +119,9 @@ class ObjcppGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
           w.wl(s"static ObjcType fromCppOpt(const CppOptType& cpp);")
           w.w("static ObjcType fromCpp(const CppType& cpp)").braced {
             w.w("if (!cpp)").braced {
-              w.wl(s"""throw std::invalid_argument("$helperClass::fromCpp requires a non-null C++ object");""")
+              if (spec.cppNnType.isEmpty) {
+                w.wl(s"""throw std::invalid_argument("$helperClass::fromCpp requires a non-null C++ object");""")
+              }
             }
             w.wl("return fromCppOpt(cpp);")
           }
