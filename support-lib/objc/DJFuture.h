@@ -20,26 +20,26 @@
 
 @class DJFuture;
 
-@interface DJFuture<__covariant Value> : NSObject
+@interface DJFuture<__covariant DJValue> : NSObject
 - (nonnull instancetype)init NS_UNAVAILABLE;
 // If the future is ready, then calling its `get` method will not block.
 - (BOOL) isReady;
 // Block and wait for the result (or exception). This can only be called once.
-- (nullable Value) get;
+- (nullable DJValue) get;
 // Tell the future to Call the specified handler routine when it becomes
 // ready. Returns a new future that wraps the return value of the handler
 // routine. The current future becomes invalid after this call.
-- (nonnull DJFuture<id> *)then:(_Nullable id(^_Nonnull)(DJFuture<Value> * _Nonnull))handler;
+- (nonnull DJFuture<id> *)then:(_Nullable id(^_Nonnull)(DJFuture<DJValue> * _Nonnull))handler;
 @end
 
 // ------------------------------------------
 
-@interface DJPromise<Value> : NSObject
+@interface DJPromise<DJValue> : NSObject
 - (nonnull instancetype)init;
 // Get a future object associated with this promise
-- (nonnull DJFuture<Value> *)getFuture;
+- (nonnull DJFuture<DJValue> *)getFuture;
 // `setValue` or `setException` can only be called once on a promise. After
 // which the internal state becomes invalid.
-- (void)setValue:(nullable Value)val;
+- (void)setValue:(nullable DJValue)val;
 - (void)setException:(nonnull NSException *)exception;
 @end
