@@ -25,7 +25,7 @@ public:
     static ::djinni::LocalRef<JniType> fromCppOpt(JNIEnv* jniEnv, const CppOptType& c) { return {jniEnv, ::djinni::JniClass<NativeWcharTestHelpers>::get()._toJava(jniEnv, c)}; }
     static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c) {
         DJINNI_ASSERT_MSG(c, jniEnv, "NativeWcharTestHelpers::fromCpp requires a non-null C++ object");
-        return fromCppOpt(jniEnv, c); }
+        return fromCppOpt(jniEnv, c);
     }
 
 private:

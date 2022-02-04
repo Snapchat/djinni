@@ -237,7 +237,7 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
           if (spec.cppNnType.isEmpty) {
             w.wl(s"""DJINNI_ASSERT_MSG(c, jniEnv, "$jniSelf::fromCpp requires a non-null C++ object");""")
           }
-          w.wl("return fromCppOpt(jniEnv, c); }")
+          w.wl("return fromCppOpt(jniEnv, c);")
         }
         w.wl
         w.wlOutdent("private:")
