@@ -20,7 +20,7 @@ public:
 
     static CppType toCpp(JNIEnv* jniEnv, JniType j) {
         DJINNI_ASSERT_MSG(j, jniEnv, "NativeTestHelpers::toCpp requires a non-null Java object");
-        return ::djinni::JniClass<$jniSelf>::get()._fromJava(jniEnv, j);
+        return ::djinni::JniClass<NativeTestHelpers>::get()._fromJava(jniEnv, j);
     };
     static ::djinni::LocalRef<JniType> fromCppOpt(JNIEnv* jniEnv, const CppOptType& c) { return {jniEnv, ::djinni::JniClass<NativeTestHelpers>::get()._toJava(jniEnv, c)}; }
     static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c) {

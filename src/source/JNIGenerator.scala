@@ -229,7 +229,7 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
             def nnCheck(expr: String): String = spec.cppNnCheckExpression.fold(expr)(check => s"$check($expr)")
             w.wl(s"""return ${nnCheck(s"::djinni::JniClass<$jniSelf>::get()._fromJava(jniEnv, j)")};""")
           } else {
-            w.wl("return ::djinni::JniClass<$jniSelf>::get()._fromJava(jniEnv, j);")
+            w.wl(s"return ::djinni::JniClass<$jniSelf>::get()._fromJava(jniEnv, j);")
           }
         }
         w.wl(s"static ::djinni::LocalRef<JniType> fromCppOpt(JNIEnv* jniEnv, const CppOptType& c) { return {jniEnv, ::djinni::JniClass<$jniSelf>::get()._toJava(jniEnv, c)}; }")
