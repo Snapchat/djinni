@@ -17,7 +17,7 @@ struct NativeTestOutcome : ::djinni::JsInterface<::testsuite::TestOutcome, Nativ
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) {
-        assert(c);
+        djinni::checkForNull(c.get(), "NativeTestOutcome::fromCpp");
         return fromCppOpt(c);
     }
 

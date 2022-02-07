@@ -17,7 +17,7 @@ struct NativeSecondListener : ::djinni::JsInterface<::testsuite::SecondListener,
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) {
-        assert(c);
+        djinni::checkForNull(c.get(), "NativeSecondListener::fromCpp");
         return fromCppOpt(c);
     }
 

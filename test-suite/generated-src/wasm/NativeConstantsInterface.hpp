@@ -17,7 +17,7 @@ struct NativeConstantsInterface : ::djinni::JsInterface<::testsuite::ConstantsIn
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) {
-        assert(c);
+        djinni::checkForNull(c.get(), "NativeConstantsInterface::fromCpp");
         return fromCppOpt(c);
     }
 

@@ -437,6 +437,8 @@ extern std::unordered_map<void*, CppProxyCacheEntry> cppProxyCache;
 extern std::mutex jsProxyCacheMutex;
 extern std::mutex cppProxyCacheMutex;
 
+void checkForNull(void* ptr, const char* context);
+
 template<typename I, typename Self>
 struct JsInterface {
     static void nativeDestroy(const std::shared_ptr<I>& cpp) {

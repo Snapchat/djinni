@@ -77,6 +77,12 @@ void JsProxyBase::checkError(const em::val& v) {
     }
 }
 
+void checkForNull(void* ptr, const char* context) {
+    if (!ptr) {
+        throw JsException(std::string("nullptr is not allowed in ") + context);
+    }
+}
+
 em::val getCppProxyFinalizerRegistry() {
     static auto inst  = em::val::module_property("cppProxyFinalizerRegistry");
     return inst;

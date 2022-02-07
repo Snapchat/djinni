@@ -296,7 +296,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl("static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }")
         w.w("static JsType fromCpp(const CppType& c)").braced {
           if (spec.cppNnType.isEmpty) {
-            w.wl("assert(c);")
+            w.wl(s"""djinni::checkForNull(c.get(), "$helper::fromCpp");""")
           }
           w.wl("return fromCppOpt(c);")
         }
