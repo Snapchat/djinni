@@ -4,5 +4,6 @@
 package com.dropbox.djinni.test;
 
 public abstract class ExternInterface2 {
-    public abstract ExternRecordWithDerivings foo(com.dropbox.djinni.test.TestHelpers i);
+    /*non-null*/
+    public abstract ExternRecordWithDerivings foo(/*non-null*/ com.dropbox.djinni.test.TestHelpers i);
 }
