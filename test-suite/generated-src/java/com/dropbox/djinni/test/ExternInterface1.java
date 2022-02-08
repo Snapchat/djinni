@@ -7,11 +7,11 @@ import com.snapchat.djinni.NativeObjectManager;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class ExternInterface1 {
-    /*non-null*/
-    public abstract com.dropbox.djinni.test.ClientReturnedRecord foo(/*non-null*/ com.dropbox.djinni.test.ClientInterface i);
+    /*not-null*/
+    public abstract com.dropbox.djinni.test.ClientReturnedRecord foo(/*not-null*/ com.dropbox.djinni.test.ClientInterface i);
 
-    /*non-null*/
-    public abstract com.dropbox.djinni.test.Color bar(/*non-null*/ com.dropbox.djinni.test.Color e);
+    /*not-null*/
+    public abstract com.dropbox.djinni.test.Color bar(/*not-null*/ com.dropbox.djinni.test.Color e);
 
     public static final class CppProxy extends ExternInterface1
     {

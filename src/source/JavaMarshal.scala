@@ -27,7 +27,7 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
   val javaNullableAnnotation = spec.javaNullableAnnotation.map(pkg => '@' + pkg.split("\\.").last)
   val javaNonnullAnnotation = spec.javaNonnullAnnotation match {
     case Some(pkg) => Some('@' + pkg.split("\\.").last)
-    case None => Some("/*non-null*/")
+    case None => Some("/*not-null*/")
   }
 
   override def typename(tm: MExpr): String = toJavaType(tm, None)
