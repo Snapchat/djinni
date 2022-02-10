@@ -51,11 +51,11 @@ public abstract class TestHelpers {
 
     public static native boolean checkMapListRecord(@Nonnull MapListRecord m);
 
-    public static native void checkClientInterfaceAscii(@Nonnull ClientInterface i);
+    public static native void checkClientInterfaceAscii(@CheckForNull ClientInterface i);
 
-    public static native void checkClientInterfaceNonascii(@Nonnull ClientInterface i);
+    public static native void checkClientInterfaceNonascii(@CheckForNull ClientInterface i);
 
-    public static native void checkClientInterfaceArgs(@Nonnull ClientInterface i);
+    public static native void checkClientInterfaceArgs(@CheckForNull ClientInterface i);
 
     public static native void checkEnumMap(@Nonnull HashMap<Color, String> m);
 
@@ -64,14 +64,14 @@ public abstract class TestHelpers {
     @CheckForNull
     public static native UserToken tokenId(@CheckForNull UserToken t);
 
-    @Nonnull
+    @CheckForNull
     public static native UserToken createCppToken();
 
-    public static native void checkCppToken(@Nonnull UserToken t);
+    public static native void checkCppToken(@CheckForNull UserToken t);
 
-    public static native long cppTokenId(@Nonnull UserToken t);
+    public static native long cppTokenId(@CheckForNull UserToken t);
 
-    public static native void checkTokenType(@Nonnull UserToken t, @Nonnull String type);
+    public static native void checkTokenType(@CheckForNull UserToken t, @Nonnull String type);
 
     @CheckForNull
     public static native Integer returnNone();
@@ -90,7 +90,7 @@ public abstract class TestHelpers {
     public static native com.snapchat.djinni.Future<String> futureRoundtrip(@Nonnull com.snapchat.djinni.Future<Integer> f);
 
     @Nonnull
-    public static native com.snapchat.djinni.Future<String> checkAsyncInterface(@Nonnull AsyncInterface i);
+    public static native com.snapchat.djinni.Future<String> checkAsyncInterface(@CheckForNull AsyncInterface i);
 
     public static final class CppProxy extends TestHelpers
     {

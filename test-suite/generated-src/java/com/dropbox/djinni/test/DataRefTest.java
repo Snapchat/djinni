@@ -31,7 +31,7 @@ public abstract class DataRefTest {
     @Nonnull
     public abstract java.nio.ByteBuffer recvDataView();
 
-    @Nonnull
+    @CheckForNull
     public static native DataRefTest create();
 
     public static final class CppProxy extends DataRefTest

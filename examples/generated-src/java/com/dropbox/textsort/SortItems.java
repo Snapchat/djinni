@@ -12,8 +12,8 @@ import javax.annotation.Nonnull;
     /** For the iOS / Android demo */
     public abstract void sort(@Nonnull SortOrder order, @Nonnull ItemList items);
 
-    @Nonnull
-    public static native SortItems createWithListener(@Nonnull TextboxListener listener);
+    @CheckForNull
+    public static native SortItems createWithListener(@CheckForNull TextboxListener listener);
 
     /** For the localhost / command-line demo */
     @Nonnull

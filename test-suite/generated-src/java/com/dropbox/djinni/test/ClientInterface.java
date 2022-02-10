@@ -18,7 +18,7 @@ public abstract class ClientInterface {
     public abstract String returnStr();
 
     @Nonnull
-    public abstract String methTakingInterface(@Nonnull ClientInterface i);
+    public abstract String methTakingInterface(@CheckForNull ClientInterface i);
 
     @Nonnull
     public abstract String methTakingOptionalInterface(@CheckForNull ClientInterface i);

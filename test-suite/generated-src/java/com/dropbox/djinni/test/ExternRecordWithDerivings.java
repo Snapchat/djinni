@@ -12,18 +12,16 @@ public final class ExternRecordWithDerivings implements Comparable<ExternRecordW
     /*package*/ final com.dropbox.djinni.test.Color mE;
 
     public ExternRecordWithDerivings(
-            /*not-null*/ com.dropbox.djinni.test.RecordWithDerivings member,
-            /*not-null*/ com.dropbox.djinni.test.Color e) {
+            com.dropbox.djinni.test.RecordWithDerivings member,
+            com.dropbox.djinni.test.Color e) {
         this.mMember = member;
         this.mE = e;
     }
 
-    /*not-null*/
     public com.dropbox.djinni.test.RecordWithDerivings getMember() {
         return mMember;
     }
 
-    /*not-null*/
     public com.dropbox.djinni.test.Color getE() {
         return mE;
     }

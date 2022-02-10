@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
 public abstract class ReturnOne {
     public abstract byte returnOne();
 
-    @Nonnull
+    @CheckForNull
     public static native ReturnOne getInstance();
 
     public static final class CppProxy extends ReturnOne
