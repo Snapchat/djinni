@@ -37,7 +37,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (nonnull DBCppException *)get {
++ (nullable DBCppException *)get {
     try {
         auto objcpp_result_ = ::testsuite::CppException::get();
         return ::djinni_generated::CppException::fromCpp(objcpp_result_);

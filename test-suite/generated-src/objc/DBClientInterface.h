@@ -20,7 +20,7 @@
 
 - (nonnull NSString *)returnStr;
 
-- (nonnull NSString *)methTakingInterface:(nonnull id<DBClientInterface>)i;
+- (nonnull NSString *)methTakingInterface:(nullable id<DBClientInterface>)i;
 
 - (nonnull NSString *)methTakingOptionalInterface:(nullable id<DBClientInterface>)i;
 

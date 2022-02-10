@@ -40,7 +40,7 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (nonnull TXSSortItems *)createWithListener:(nonnull id<TXSTextboxListener>)listener {
++ (nullable TXSSortItems *)createWithListener:(nullable id<TXSTextboxListener>)listener {
     try {
         auto objcpp_result_ = ::textsort::SortItems::create_with_listener(::djinni_generated::TextboxListener::toCpp(listener));
         return ::djinni_generated::SortItems::fromCpp(objcpp_result_);

@@ -7,7 +7,7 @@
 
 @interface DBConflictUser : NSObject
 
-- (nonnull DBConflict *)Conflict;
+- (nullable DBConflict *)Conflict;
 
 - (BOOL)conflictArg:(nonnull NSSet<DBConflict *> *)cs;
 

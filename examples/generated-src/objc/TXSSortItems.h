@@ -14,7 +14,7 @@
 - (void)sort:(TXSSortOrder)order
        items:(nonnull TXSItemList *)items;
 
-+ (nonnull TXSSortItems *)createWithListener:(nonnull id<TXSTextboxListener>)listener;
++ (nullable TXSSortItems *)createWithListener:(nullable id<TXSTextboxListener>)listener;
 
 /** For the localhost / command-line demo */
 + (nonnull TXSItemList *)runSort:(nonnull TXSItemList *)items;

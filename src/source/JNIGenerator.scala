@@ -223,22 +223,17 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
         w.wl
         w.wl(s"~$jniSelf();")
         w.wl
-        w.w("static CppType toCpp(JNIEnv* jniEnv, JniType j)").bracedSemi {
-          w.wl(s"""DJINNI_ASSERT_MSG(j, jniEnv, "$jniSelf::toCpp requires a non-null Java object");""")
-          if (spec.cppNnType.nonEmpty) {
-            def nnCheck(expr: String): String = spec.cppNnCheckExpression.fold(expr)(check => s"$check($expr)")
+        if (spec.cppNnType.nonEmpty) {
+          def nnCheck(expr: String): String = spec.cppNnCheckExpression.fold(expr)(check => s"$check($expr)")
+          w.w("static CppType toCpp(JNIEnv* jniEnv, JniType j)").bracedSemi {
+            w.wl(s"""DJINNI_ASSERT_MSG(j, jniEnv, "$jniSelf::fromCpp requires a non-null Java object");""")
             w.wl(s"""return ${nnCheck(s"::djinni::JniClass<$jniSelf>::get()._fromJava(jniEnv, j)")};""")
-          } else {
-            w.wl(s"return ::djinni::JniClass<$jniSelf>::get()._fromJava(jniEnv, j);")
           }
+        } else {
+          w.wl(s"static CppType toCpp(JNIEnv* jniEnv, JniType j) { return ::djinni::JniClass<$jniSelf>::get()._fromJava(jniEnv, j); }")
         }
         w.wl(s"static ::djinni::LocalRef<JniType> fromCppOpt(JNIEnv* jniEnv, const CppOptType& c) { return {jniEnv, ::djinni::JniClass<$jniSelf>::get()._toJava(jniEnv, c)}; }")
-        w.w("static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c)").braced {
-          if (spec.cppNnType.isEmpty) {
-            w.wl(s"""DJINNI_ASSERT_MSG(c, jniEnv, "$jniSelf::fromCpp requires a non-null C++ object");""")
-          }
-          w.wl("return fromCppOpt(jniEnv, c);")
-        }
+        w.wl(s"static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c) { return fromCppOpt(jniEnv, c); }")
         w.wl
         w.wlOutdent("private:")
         w.wl(s"$jniSelf();")

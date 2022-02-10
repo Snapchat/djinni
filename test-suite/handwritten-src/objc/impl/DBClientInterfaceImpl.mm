@@ -25,7 +25,7 @@ static NSString *DBNonAscii = @"Non-ASCII /\0 非 ASCII 字符";
     return @"test";
 }
 
-- (nonnull NSString *)methTakingInterface:(nonnull id<DBClientInterface>)i {
+- (nonnull NSString *)methTakingInterface:(nullable id<DBClientInterface>)i {
     if (i) {
         return [i returnStr];
     } else {

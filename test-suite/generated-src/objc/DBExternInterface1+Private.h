@@ -21,12 +21,7 @@ public:
 
     static CppType toCpp(ObjcType objc);
     static ObjcType fromCppOpt(const CppOptType& cpp);
-    static ObjcType fromCpp(const CppType& cpp) {
-        if (!cpp) {
-            throw std::invalid_argument("ExternInterface1::fromCpp requires a non-null C++ object");
-        }
-        return fromCppOpt(cpp);
-    }
+    static ObjcType fromCpp(const CppType& cpp) { return fromCppOpt(cpp); }
 
 private:
     class ObjcProxy;

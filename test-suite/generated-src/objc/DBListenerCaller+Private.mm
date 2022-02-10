@@ -31,8 +31,8 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     return self;
 }
 
-+ (nonnull DBListenerCaller *)init:(nonnull id<DBFirstListener>)firstL
-                           secondL:(nonnull id<DBSecondListener>)secondL {
++ (nullable DBListenerCaller *)init:(nullable id<DBFirstListener>)firstL
+                            secondL:(nullable id<DBSecondListener>)secondL {
     try {
         auto objcpp_result_ = ::testsuite::ListenerCaller::init(::djinni_generated::FirstListener::toCpp(firstL),
                                                                 ::djinni_generated::SecondListener::toCpp(secondL));
