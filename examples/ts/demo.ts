@@ -2,7 +2,7 @@ import * as example from "../generated-src/ts/example";
 
 declare function Module(): Promise<example.Example_statics>;
 
-var sorter: example.SortItems | undefined;
+var sorter: example.SortItems;
 
 Module().then(m => {
     sorter = m.SortItems.createWithListener(new SortListener());
@@ -19,7 +19,7 @@ function sort(order: example.SortOrder): void {
     var txt = <HTMLTextAreaElement>document.getElementById('txt');
     var lines = txt.value.split('\n');
     var itemList: example.ItemList = {items: lines};
-    sorter?.sort(order, itemList);
+    sorter.sort(order, itemList);
 }
 
 document.getElementById('btnAsc')!.addEventListener('click', e => {
