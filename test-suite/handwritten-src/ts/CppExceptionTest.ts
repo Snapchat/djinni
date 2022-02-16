@@ -9,17 +9,14 @@ class CppExceptionTest extends TestCase  {
     constructor(module: test.Test_statics & DjinniModule) {
         super(module);
         this.m = module;
-    }
-
-    setUp() {
-        this.cppInterface = this.m.testsuite.CppException.get();
+        this.cppInterface = this.m.testsuite.CppException.get()!;
     }
 
     testCppException() {
         var thrown = null;
         try {
             this.cppInterface.throwAnException();
-        } catch (e) {
+        } catch (e: any) {
             thrown = this.m.getExceptionMessage(e);
         }
         assertEq(thrown, "Exception Thrown");

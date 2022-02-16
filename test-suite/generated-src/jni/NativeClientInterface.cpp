@@ -45,7 +45,7 @@ std::string NativeClientInterface::JavaProxy::return_str() {
     ::djinni::jniExceptionCheck(jniEnv);
     return ::djinni::String::toCpp(jniEnv, jret);
 }
-std::string NativeClientInterface::JavaProxy::meth_taking_interface(const std::shared_ptr<::testsuite::ClientInterface> & c_i) {
+std::string NativeClientInterface::JavaProxy::meth_taking_interface(const /*not-null*/ std::shared_ptr<::testsuite::ClientInterface> & c_i) {
     auto jniEnv = ::djinni::jniGetThreadEnv();
     ::djinni::JniLocalScope jscope(jniEnv, 10);
     const auto& data = ::djinni::JniClass<::djinni_generated::NativeClientInterface>::get();
@@ -54,7 +54,7 @@ std::string NativeClientInterface::JavaProxy::meth_taking_interface(const std::s
     ::djinni::jniExceptionCheck(jniEnv);
     return ::djinni::String::toCpp(jniEnv, jret);
 }
-std::string NativeClientInterface::JavaProxy::meth_taking_optional_interface(const std::shared_ptr<::testsuite::ClientInterface> & c_i) {
+std::string NativeClientInterface::JavaProxy::meth_taking_optional_interface(const /*not-null*/ std::shared_ptr<::testsuite::ClientInterface> & c_i) {
     auto jniEnv = ::djinni::jniGetThreadEnv();
     ::djinni::JniLocalScope jscope(jniEnv, 10);
     const auto& data = ::djinni::JniClass<::djinni_generated::NativeClientInterface>::get();

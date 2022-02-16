@@ -22,12 +22,12 @@ function sort(order: example.SortOrder): void {
     sorter.sort(order, itemList);
 }
 
-document.getElementById('btnAsc').addEventListener('click', e => {
+document.getElementById('btnAsc')!.addEventListener('click', e => {
     sort(example.SortOrder.ASCENDING)
 })
-document.getElementById('btnDesc').addEventListener('click', e => {
+document.getElementById('btnDesc')!.addEventListener('click', e => {
     sort(example.SortOrder.DESCENDING)
 })
-document.getElementById('btnRandom').addEventListener('click', e => {
+document.getElementById('btnRandom')!.addEventListener('click', e => {
     sort(example.SortOrder.RANDOM)
 })

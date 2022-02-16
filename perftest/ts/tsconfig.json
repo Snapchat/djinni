@@ -4,7 +4,8 @@
         "baseUrl": ".",
         "paths": {
             "@djinni_support/*": ["../../support-lib/ts/*"]
-        }
+        },
+        "strict": true,
     },
     "include": ["./*.ts"],
 }

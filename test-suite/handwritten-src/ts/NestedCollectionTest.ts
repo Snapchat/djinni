@@ -8,12 +8,11 @@ class NestedCollectionTest extends TestCase {
     constructor(module: test.Test_statics) {
         super(module);
         this.m = module;
-    }
-    setUp() {
-        var jsSet1 = new Set();
+
+        var jsSet1 = new Set<string>();
         jsSet1.add("String1");
         jsSet1.add("String2");
-        var jsSet2 = new Set();
+        var jsSet2 = new Set<string>();
         jsSet2.add("StringA");
         jsSet2.add("StringB");
         var jsList = [];

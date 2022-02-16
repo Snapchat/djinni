@@ -6,11 +6,11 @@ Module().then(module => {
     main(module);
 })
 
-function percentileFromSortedArray(samples, percentile) {
+function percentileFromSortedArray(samples: number[], percentile: number) {
     return samples[Math.round((samples.length - 1) * percentile)];
 }
 
-function measure(name, func, times = 10) {
+function measure(name: string, func:(()=>void), times = 10) {
     var tbl = <HTMLTableElement>(document.getElementById('tbl'));
     var row = <HTMLTableRowElement>(tbl.insertRow(-1));
     row.align = 'right';
@@ -63,7 +63,7 @@ function main (module: perftest.Perftest_statics & DjinniModule) {
 
     var i64Array = {i1: BigInt(1), i2: BigInt(2), i3: BigInt(3), i4: BigInt(4), i5: BigInt(5), i6: BigInt(6)};
 
-    var dpb = module.benchmark_DjinniPerfBenchmark.getInstance();
+    var dpb = module.benchmark_DjinniPerfBenchmark.getInstance()!!;
     measure('memcpy256b', function(){ dpb.cppTests(); });
     measure("baseline", function() { dpb.baseline(); });
 
@@ -99,7 +99,7 @@ function main (module: perftest.Perftest_statics & DjinniModule) {
         measure("argBinary " + count, function(){dpb.argBinary(u8array)});
     });
 
-    var li = [];
+    var li: bigint[] = [];
     for (var i = 0; i < highCount; ++i) {li.push(BigInt(i));}
     var ai = new BigInt64Array(li);
     measure("argArrayInt " + highCount, function() {dpb.argArrayInt(ai)});
@@ -110,22 +110,22 @@ function main (module: perftest.Perftest_statics & DjinniModule) {
     var r = i64Array;
     measure("argRecordSixInt", function() {dpb.argRecordSixInt(r)});
 
-    var li = [];
+    var li: bigint[] = [];
     for (var i = 0; i < lowCount; ++i) {li.push(BigInt(i));}
     measure("argListInt " + lowCount, function() {dpb.argListInt(li)});
 
     var o = new ObjectPlatformImpl();
     measure("argObject", function(){dpb.argObject(o)});
 
-    var lo = []
+    var lo: ObjectPlatformImpl[] = []
     for (var i = 0; i < lowCount; ++i) {lo.push(new ObjectPlatformImpl())}
     measure("argListObject " + lowCount, function() {dpb.argListObject(lo)});
 
-    var lr = []
+    var lr: (typeof i64Array)[] = []
     for (var i = 0; i < lowCount; ++i) {lr.push(i64Array)}
     measure("argListRecord " + lowCount, function(){dpb.argListRecord(lr)});
 
-    var ar = []
+    var ar: (typeof i64Array)[] = []
     for (var i = 0; i < lowCount; ++i) {ar.push(i64Array)}
     measure("argArrayRecord " + lowCount, function(){dpb.argArrayRecord(ar)});
 

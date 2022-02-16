@@ -12,7 +12,7 @@ class ExternInterface1 {
 public:
     virtual ~ExternInterface1() = default;
 
-    virtual ::testsuite::ClientReturnedRecord foo(const std::shared_ptr<::testsuite::ClientInterface> & i) = 0;
+    virtual ::testsuite::ClientReturnedRecord foo(const /*not-null*/ std::shared_ptr<::testsuite::ClientInterface> & i) = 0;
 
     virtual ::testsuite::color bar(::testsuite::color e) = 0;
 };

@@ -4,7 +4,7 @@ var failed: string[];
 var currentTest: string;
 
 function println(o: string) {
-    let output = document.getElementById('output');
+    let output = document.getElementById('output')!;
     if (o.startsWith('[  FAILED  ]')) {
         var red = document.createElement("SPAN")
         red.style.color="red";
@@ -27,7 +27,7 @@ function units(n: number, u: string) {
 }
 
 export class TestCase {
-    constructor(module) {}
+    constructor(module: any) {}
     setUp() {}
     tearDown() {}
 }
@@ -37,10 +37,10 @@ export async function runTests(module: DjinniModule, tests: Array<typeof TestCas
     var totalTests = 0;
     let runStart = performance.now();
     for (const testClass of tests) {
-        let testCase = new testClass(module);
+        let testCase: any = new testClass(module);
         var count = 0;
         let testCaseStart = performance.now();
-        for (const method of Reflect.ownKeys(Reflect.getPrototypeOf(testCase))) {
+        for (const method of Reflect.ownKeys(Reflect.getPrototypeOf(testCase)!)) {
             let methodName = method.toString();
             if (methodName.startsWith('test')) {
                 currentTest = testClass.name + '.' + methodName;
@@ -54,7 +54,7 @@ export async function runTests(module: DjinniModule, tests: Array<typeof TestCas
                         await r;
                     }
                     testCase.tearDown();
-                }catch (err) {
+                }catch (err: any) {
                     console.log('C++ exception: ' + module.getExceptionMessage(err));
                     assertTrue(false);
                 }
@@ -100,7 +100,7 @@ export function deepEqual(object1:any, object2:any) {
     return true;
 }
 
-export function isObject(object) {
+export function isObject(object: any) {
     return object != null && typeof object === 'object';
 }
 export function assertTrue(a: boolean) {
@@ -112,25 +112,25 @@ export function assertTrue(a: boolean) {
 export function assertFalse(a:boolean) {
     assertTrue(!a);
 }
-export function assertSame(a, b) {
+export function assertSame(a: any, b: any) {
     assertTrue(a === b);
 }
-export function assertNotSame(a, b) {
+export function assertNotSame(a: any, b: any) {
     assertFalse(a === b);
 }
-export function assertEq(a, b) {
+export function assertEq(a: any, b: any) {
     assertTrue(deepEqual(a, b));
 }
-export function assertNe(a, b) {
+export function assertNe(a: any, b: any) {
     assertFalse(deepEqual(a, b));
 }
-export function assertArrayEq(a, b) {
+export function assertArrayEq(a: any, b: any) {
     assertEq(a.length, b.length);
     for (var i = 0; i < a.length; i++) {
         assertEq(a[i], b[i]);
     }
 }
-export function assertUndefined(a) {
+export function assertUndefined(a: any) {
     assertTrue (a === undefined);
 }
 

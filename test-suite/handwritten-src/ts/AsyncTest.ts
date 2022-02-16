@@ -17,7 +17,7 @@ async function asyncException() {
 }
 
 class AsyncInterfaceImpl implements test.AsyncInterface {
-    async futureRoundtrip(f) {
+    async futureRoundtrip(f: Promise<number>) {
         const i = await f;
         return i.toString();
     }
@@ -50,7 +50,7 @@ class AsyncTest extends TestCase {
             const s = await this.m.testsuite.TestHelpers.futureRoundtrip(asyncException());
             const r = parseInt(s);
             assertEq(r, 36);
-        } catch (e) {
+        } catch (e: any) {
             s = e.message;
         }
         console.log(s);

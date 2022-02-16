@@ -13,7 +13,7 @@ class ReturnTwo {
 public:
     virtual ~ReturnTwo() = default;
 
-    static std::shared_ptr<ReturnTwo> get_instance();
+    static /*not-null*/ std::shared_ptr<ReturnTwo> get_instance();
 
     virtual int8_t return_two() = 0;
 };

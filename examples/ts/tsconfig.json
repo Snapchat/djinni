@@ -2,6 +2,7 @@
     "compilerOptions": {
         "lib": ["es2020", "dom"],
         "baseUrl": ".",
+        "strict": true,
     },
     "include": ["./*.ts"],
 }

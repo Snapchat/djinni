@@ -7,8 +7,6 @@ class PrimitiveListTest extends TestCase {
     constructor(module: test.Test_statics) {
         super(module);
         this.m = module;
-    }
-    setUp() {
         var list = [BigInt(1), BigInt(2), BigInt(3)];
         this.jsPrimitiveList = {list: list};
     }

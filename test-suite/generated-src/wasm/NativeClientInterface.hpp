@@ -16,7 +16,10 @@ struct NativeClientInterface : ::djinni::JsInterface<::testsuite::ClientInterfac
 
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
-    static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
+    static JsType fromCpp(const CppType& c) {
+        djinni::checkForNull(c.get(), "NativeClientInterface::fromCpp");
+        return fromCppOpt(c);
+    }
 
 
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::ClientInterface, ::djinni::InstanceTracker<JsProxy> {
@@ -24,8 +27,8 @@ struct NativeClientInterface : ::djinni::JsInterface<::testsuite::ClientInterfac
         ::testsuite::ClientReturnedRecord get_record(int64_t record_id,const std::string & utf8string,const std::experimental::optional<std::string> & misc) override;
         double identifier_check(const std::vector<uint8_t> & data,int32_t r,int64_t jret) override;
         std::string return_str() override;
-        std::string meth_taking_interface(const std::shared_ptr<::testsuite::ClientInterface> & i) override;
-        std::string meth_taking_optional_interface(const std::shared_ptr<::testsuite::ClientInterface> & i) override;
+        std::string meth_taking_interface(const /*not-null*/ std::shared_ptr<::testsuite::ClientInterface> & i) override;
+        std::string meth_taking_optional_interface(const /*not-null*/ std::shared_ptr<::testsuite::ClientInterface> & i) override;
     };
 };
 

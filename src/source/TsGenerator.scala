@@ -66,7 +66,12 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  def toTsType(tm: MExpr): String = {
+  private def nullityAnnotation(tm: MExpr) = tm.base match {
+    case MOptional => " | undefined"
+    case _ => ""
+  }
+
+  def toTsType(tm: MExpr, addNullability: Boolean = true): String = {
     def args(tm: MExpr) = if (tm.args.isEmpty) "" else tm.args.map(f).mkString("<", ", ", ">")
     def f(tm: MExpr): String = {
       tm.base match {
@@ -75,10 +80,10 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
           val arg = tm.args.head
           arg.base match {
             case MOptional => throw new AssertionError("nested optional?")
-            case m => f(arg) + " | undefined"
+            case m => f(arg)
           }
         case MArray => tsArrayType(tm.args.head)
-        case e: MExtern => if (e.ts.generic) e.ts.typename + args(tm) else e.ts.typename
+        case e: MExtern => e.ts.typename + (if (e.ts.generic) args(tm) else "")
         case p: MProtobuf => p.name
         case o =>
           val base = o match {
@@ -99,7 +104,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
           base + args(tm)
       }
     }
-    f(tm)
+    f(tm) + (if (addNullability) nullityAnnotation(tm) else "")
   }
 
   case class TsSymbolRef(sym: String, module: String)

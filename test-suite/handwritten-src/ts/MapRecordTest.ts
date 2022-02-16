@@ -45,7 +45,7 @@ class MapRecordTest extends TestCase {
         return jsMap;
     }
 
-    checkJsMap(jsMap) {
+    checkJsMap(jsMap: Map<string, bigint>) {
         assertEq(3, jsMap.size);
         assertEq(jsMap.get("String1"), BigInt(1));
         assertEq(jsMap.get("String2"), BigInt(2));

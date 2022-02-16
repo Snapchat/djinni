@@ -16,7 +16,10 @@ struct NativeUsesSingleLanguageListeners : ::djinni::JsInterface<::testsuite::Us
 
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
-    static JsType fromCpp(const CppType& c) { return fromCppOpt(c); }
+    static JsType fromCpp(const CppType& c) {
+        djinni::checkForNull(c.get(), "NativeUsesSingleLanguageListeners::fromCpp");
+        return fromCppOpt(c);
+    }
 
     static em::val cppProxyMethods();
 
@@ -27,10 +30,10 @@ struct NativeUsesSingleLanguageListeners : ::djinni::JsInterface<::testsuite::Us
 
     struct JsProxy: ::djinni::JsProxyBase, ::testsuite::UsesSingleLanguageListeners, ::djinni::InstanceTracker<JsProxy> {
         JsProxy(const em::val& v) : JsProxyBase(v) {}
-        void callForObjC(const std::shared_ptr<::testsuite::ObjcOnlyListener> & l) override;
-        std::shared_ptr<::testsuite::ObjcOnlyListener> returnForObjC() override;
-        void callForJava(const std::shared_ptr<::testsuite::JavaOnlyListener> & l) override;
-        std::shared_ptr<::testsuite::JavaOnlyListener> returnForJava() override;
+        void callForObjC(const /*not-null*/ std::shared_ptr<::testsuite::ObjcOnlyListener> & l) override;
+        /*not-null*/ std::shared_ptr<::testsuite::ObjcOnlyListener> returnForObjC() override;
+        void callForJava(const /*not-null*/ std::shared_ptr<::testsuite::JavaOnlyListener> & l) override;
+        /*not-null*/ std::shared_ptr<::testsuite::JavaOnlyListener> returnForJava() override;
     };
 };
 

@@ -438,7 +438,7 @@ export interface TestHelpers_statics {
     checkClientInterfaceArgs(i: ClientInterface): void;
     checkEnumMap(m: Map<Color, string>): void;
     checkEnum(c: Color): void;
-    tokenId(t: UserToken): UserToken;
+    tokenId(t: UserToken | undefined): UserToken | undefined;
     createCppToken(): UserToken;
     checkCppToken(t: UserToken): void;
     cppTokenId(t: UserToken): bigint;

@@ -22,7 +22,7 @@ class DjinniPerfBenchmark {
 public:
     virtual ~DjinniPerfBenchmark() = default;
 
-    static std::shared_ptr<DjinniPerfBenchmark> getInstance();
+    static /*not-null*/ std::shared_ptr<DjinniPerfBenchmark> getInstance();
 
     virtual int64_t cppTests() = 0;
 
@@ -44,9 +44,9 @@ public:
 
     virtual void argArrayInt(const std::vector<int64_t> & v) = 0;
 
-    virtual void argObject(const std::shared_ptr<ObjectPlatform> & c) = 0;
+    virtual void argObject(const /*not-null*/ std::shared_ptr<ObjectPlatform> & c) = 0;
 
-    virtual void argListObject(const std::vector<std::shared_ptr<ObjectPlatform>> & l) = 0;
+    virtual void argListObject(const std::vector</*not-null*/ std::shared_ptr<ObjectPlatform>> & l) = 0;
 
     virtual void argListRecord(const std::vector<RecordSixInt> & l) = 0;
 
@@ -58,13 +58,13 @@ public:
 
     virtual std::vector<uint8_t> returnBinary(int32_t size) = 0;
 
-    virtual std::shared_ptr<ObjectNative> returnObject() = 0;
+    virtual /*not-null*/ std::shared_ptr<ObjectNative> returnObject() = 0;
 
     virtual std::vector<int64_t> returnListInt(int32_t size) = 0;
 
     virtual std::vector<int64_t> returnArrayInt(int32_t size) = 0;
 
-    virtual std::vector<std::shared_ptr<ObjectNative>> returnListObject(int32_t size) = 0;
+    virtual std::vector</*not-null*/ std::shared_ptr<ObjectNative>> returnListObject(int32_t size) = 0;
 
     virtual std::vector<RecordSixInt> returnListRecord(int32_t size) = 0;
 

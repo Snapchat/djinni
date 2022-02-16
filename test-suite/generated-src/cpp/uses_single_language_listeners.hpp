@@ -18,13 +18,13 @@ class UsesSingleLanguageListeners {
 public:
     virtual ~UsesSingleLanguageListeners() = default;
 
-    virtual void callForObjC(const std::shared_ptr<ObjcOnlyListener> & l) = 0;
+    virtual void callForObjC(const /*not-null*/ std::shared_ptr<ObjcOnlyListener> & l) = 0;
 
-    virtual std::shared_ptr<ObjcOnlyListener> returnForObjC() = 0;
+    virtual /*not-null*/ std::shared_ptr<ObjcOnlyListener> returnForObjC() = 0;
 
-    virtual void callForJava(const std::shared_ptr<JavaOnlyListener> & l) = 0;
+    virtual void callForJava(const /*not-null*/ std::shared_ptr<JavaOnlyListener> & l) = 0;
 
-    virtual std::shared_ptr<JavaOnlyListener> returnForJava() = 0;
+    virtual /*not-null*/ std::shared_ptr<JavaOnlyListener> returnForJava() = 0;
 };
 
 }  // namespace testsuite

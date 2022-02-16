@@ -34,8 +34,8 @@ export class ProtoTest extends TestCase {
     }
 
     testEmbeddedProto() {
-        const p = {name: "tom", id: 1, email:"", phones:[]};
-        var rec = {person: p};
+        const p: prototest.Person = {name: "tom", id: 1, email:"", phones:[]};
+        var rec: test.RecordWithEmbeddedProto = {person: p};
         const s = this.m.testsuite.ProtoTests.embeddedProtoToString(rec);
         assertEq(s, p.name);
         rec = this.m.testsuite.ProtoTests.stringToEmbeddedProto(s);
@@ -56,7 +56,7 @@ export class ProtoTest extends TestCase {
         const s = this.m.testsuite.ProtoTests.optionalProtoToString(p1);
         assertEq(s, 'tom');
         const p = this.m.testsuite.ProtoTests.stringToOptionalProto('tom');
-        assertEq(p.name, 'tom');
+        assertEq(p?.name, 'tom');
 
         const r = this.m.testsuite.ProtoTests.stringToProtoOutcome('tom');
         assertEq(r, {result: {name: 'tom', id: 1, email:'', phones:[]}});

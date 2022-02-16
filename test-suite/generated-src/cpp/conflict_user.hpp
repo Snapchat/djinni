@@ -14,9 +14,9 @@ class ConflictUser {
 public:
     virtual ~ConflictUser() = default;
 
-    virtual std::shared_ptr<::testsuite::Conflict> Conflict() = 0;
+    virtual /*not-null*/ std::shared_ptr<::testsuite::Conflict> Conflict() = 0;
 
-    virtual bool conflict_arg(const std::unordered_set<std::shared_ptr<::testsuite::Conflict>> & cs) = 0;
+    virtual bool conflict_arg(const std::unordered_set</*not-null*/ std::shared_ptr<::testsuite::Conflict>> & cs) = 0;
 };
 
 }  // namespace testsuite

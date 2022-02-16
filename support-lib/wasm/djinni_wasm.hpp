@@ -437,6 +437,8 @@ extern std::unordered_map<void*, CppProxyCacheEntry> cppProxyCache;
 extern std::mutex jsProxyCacheMutex;
 extern std::mutex cppProxyCacheMutex;
 
+void checkForNull(void* ptr, const char* context);
+
 template<typename I, typename Self>
 struct JsInterface {
     static void nativeDestroy(const std::shared_ptr<I>& cpp) {
@@ -490,7 +492,7 @@ struct JsInterface {
     static em::val _toJs(const std::shared_ptr<I>& c) {
         if (c == nullptr) {
             // null object
-            return em::val::null();
+            return em::val::undefined();
         }
         else if (auto* p = dynamic_cast<JsProxyBase*>(c.get())) {
             // unwrap existing js proxy

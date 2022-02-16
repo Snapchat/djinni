@@ -19,7 +19,7 @@ class ExternInterface2::ObjcProxy final
     friend class ::djinni_generated::ExternInterface2;
 public:
     using ObjcProxyBase::ObjcProxyBase;
-    ::ExternRecordWithDerivings foo(const std::shared_ptr<::testsuite::TestHelpers> & c_i) override
+    ::ExternRecordWithDerivings foo(const /*not-null*/ std::shared_ptr<::testsuite::TestHelpers> & c_i) override
     {
         @autoreleasepool {
             auto objcpp_result_ = [djinni_private_get_proxied_objc_object() foo:(::djinni_generated::TestHelpers::fromCpp(c_i))];

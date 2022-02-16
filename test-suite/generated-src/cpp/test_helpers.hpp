@@ -62,25 +62,25 @@ public:
 
     static bool check_map_list_record(const MapListRecord & m);
 
-    static void check_client_interface_ascii(const std::shared_ptr<ClientInterface> & i);
+    static void check_client_interface_ascii(const /*not-null*/ std::shared_ptr<ClientInterface> & i);
 
-    static void check_client_interface_nonascii(const std::shared_ptr<ClientInterface> & i);
+    static void check_client_interface_nonascii(const /*not-null*/ std::shared_ptr<ClientInterface> & i);
 
-    static void check_client_interface_args(const std::shared_ptr<ClientInterface> & i);
+    static void check_client_interface_args(const /*not-null*/ std::shared_ptr<ClientInterface> & i);
 
     static void check_enum_map(const std::unordered_map<color, std::string> & m);
 
     static void check_enum(color c);
 
-    static std::shared_ptr<UserToken> token_id(const std::shared_ptr<UserToken> & t);
+    static /*not-null*/ std::shared_ptr<UserToken> token_id(const /*not-null*/ std::shared_ptr<UserToken> & t);
 
-    static std::shared_ptr<UserToken> create_cpp_token();
+    static /*not-null*/ std::shared_ptr<UserToken> create_cpp_token();
 
-    static void check_cpp_token(const std::shared_ptr<UserToken> & t);
+    static void check_cpp_token(const /*not-null*/ std::shared_ptr<UserToken> & t);
 
-    static int64_t cpp_token_id(const std::shared_ptr<UserToken> & t);
+    static int64_t cpp_token_id(const /*not-null*/ std::shared_ptr<UserToken> & t);
 
-    static void check_token_type(const std::shared_ptr<UserToken> & t, const std::string & type);
+    static void check_token_type(const /*not-null*/ std::shared_ptr<UserToken> & t, const std::string & type);
 
     static std::experimental::optional<int32_t> return_none();
 
@@ -93,7 +93,7 @@ public:
 
     static ::djinni::Future<std::string> future_roundtrip(::djinni::Future<int32_t> f);
 
-    static ::djinni::Future<std::string> check_async_interface(const std::shared_ptr<AsyncInterface> & i);
+    static ::djinni::Future<std::string> check_async_interface(const /*not-null*/ std::shared_ptr<AsyncInterface> & i);
 };
 
 }  // namespace testsuite

@@ -156,8 +156,8 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
 
 + (nullable id<DBUserToken>)tokenId:(nullable id<DBUserToken>)t {
     try {
-        auto objcpp_result_ = ::testsuite::TestHelpers::token_id(::djinni_generated::UserToken::toCpp(t));
-        return ::djinni_generated::UserToken::fromCpp(objcpp_result_);
+        auto objcpp_result_ = ::testsuite::TestHelpers::token_id(::djinni::Optional<std::experimental::optional, ::djinni_generated::UserToken>::toCpp(t));
+        return ::djinni::Optional<std::experimental::optional, ::djinni_generated::UserToken>::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 

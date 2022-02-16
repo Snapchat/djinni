@@ -40,7 +40,7 @@ class DurationTest extends TestCase {
         assertUndefined(this.m.testsuite.TestDuration.box(BigInt(-1)));
 
         assertEq(this.m.testsuite.TestDuration.unbox(seconds(1)), 1);
-        assertEq(this.m.testsuite.TestDuration.unbox(null), -1);
+        assertEq(this.m.testsuite.TestDuration.unbox(undefined), -1);
     }
 }
 

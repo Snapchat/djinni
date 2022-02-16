@@ -190,7 +190,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   )
 
   private def ts(td: TypeDecl) = Map[String, Any](
-    "typename" -> tsMarshal.toTsType(mexpr(td)),
+    "typename" -> tsMarshal.toTsType(mexpr(td), /*addNullability*/ false),
     "module" -> QuotedString("./" + spec.tsModule)
     //, "generic" -> false
   )

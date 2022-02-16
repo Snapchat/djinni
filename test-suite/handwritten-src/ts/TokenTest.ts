@@ -21,14 +21,13 @@ export class TokenTest extends TestCase {
     }
 
     testNullToken() {
-        assertSame(this.m.testsuite.TestHelpers.tokenId(null), null);
+        assertSame(this.m.testsuite.TestHelpers.tokenId(undefined), undefined);
     }
 
     testCppToken() {
         var ct = this.m.testsuite.TestHelpers.createCppToken();
         assertSame(this.m.testsuite.TestHelpers.tokenId(ct), ct);
         this.m.testsuite.TestHelpers.checkCppToken(ct);
-        ct = null;
     }
 
     testTokenType() {

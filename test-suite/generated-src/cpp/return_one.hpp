@@ -13,7 +13,7 @@ class ReturnOne {
 public:
     virtual ~ReturnOne() = default;
 
-    static std::shared_ptr<ReturnOne> get_instance();
+    static /*not-null*/ std::shared_ptr<ReturnOne> get_instance();
 
     virtual int8_t return_one() = 0;
 };
