@@ -197,7 +197,7 @@ EM_JS(void, djinni_register_name_in_ns, (const char* prefixedName, const char* n
 });
 
 EM_JS(void, djinni_throw_native_exception, (const char* msg), {
-        throw new Error(readLatin1String(msg));
+        throw new Error("djinni: " + readLatin1String(msg));
 });
 
 EMSCRIPTEN_BINDINGS(djinni_wasm) {

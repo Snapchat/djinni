@@ -14,7 +14,7 @@ class CppExceptionTest {
         } catch (e) {
             thrown = e;
         }
-        assertEq(thrown.message, "Exception Thrown");
+        assertEq(thrown.message, "djinni: Exception Thrown");
     }
 }
 

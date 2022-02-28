@@ -19,7 +19,7 @@ class CppExceptionTest extends TestCase  {
         } catch (e: any) {
             thrown = e;
         }
-        assertEq(thrown.message, "Exception Thrown");
+        assertEq(thrown.message, "djinni: Exception Thrown");
     }
 }
 
