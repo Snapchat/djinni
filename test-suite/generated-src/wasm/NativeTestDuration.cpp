@@ -13,84 +13,204 @@ em::val NativeTestDuration::cppProxyMethods() {
 }
 
 std::string NativeTestDuration::hoursString(const em::val& w_dt) {
-    auto r = ::testsuite::TestDuration::hoursString(::djinni::Duration<::djinni::I32, ::djinni::Duration_h>::toCpp(w_dt));
-    return ::djinni::String::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::hoursString(::djinni::Duration<::djinni::I32, ::djinni::Duration_h>::toCpp(w_dt));
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 std::string NativeTestDuration::minutesString(const em::val& w_dt) {
-    auto r = ::testsuite::TestDuration::minutesString(::djinni::Duration<::djinni::I32, ::djinni::Duration_min>::toCpp(w_dt));
-    return ::djinni::String::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::minutesString(::djinni::Duration<::djinni::I32, ::djinni::Duration_min>::toCpp(w_dt));
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 std::string NativeTestDuration::secondsString(const em::val& w_dt) {
-    auto r = ::testsuite::TestDuration::secondsString(::djinni::Duration<::djinni::I32, ::djinni::Duration_s>::toCpp(w_dt));
-    return ::djinni::String::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::secondsString(::djinni::Duration<::djinni::I32, ::djinni::Duration_s>::toCpp(w_dt));
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 std::string NativeTestDuration::millisString(const em::val& w_dt) {
-    auto r = ::testsuite::TestDuration::millisString(::djinni::Duration<::djinni::I32, ::djinni::Duration_ms>::toCpp(w_dt));
-    return ::djinni::String::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::millisString(::djinni::Duration<::djinni::I32, ::djinni::Duration_ms>::toCpp(w_dt));
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 std::string NativeTestDuration::microsString(const em::val& w_dt) {
-    auto r = ::testsuite::TestDuration::microsString(::djinni::Duration<::djinni::I32, ::djinni::Duration_us>::toCpp(w_dt));
-    return ::djinni::String::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::microsString(::djinni::Duration<::djinni::I32, ::djinni::Duration_us>::toCpp(w_dt));
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 std::string NativeTestDuration::nanosString(const em::val& w_dt) {
-    auto r = ::testsuite::TestDuration::nanosString(::djinni::Duration<::djinni::I32, ::djinni::Duration_ns>::toCpp(w_dt));
-    return ::djinni::String::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::nanosString(::djinni::Duration<::djinni::I32, ::djinni::Duration_ns>::toCpp(w_dt));
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestDuration::hours(int32_t w_count) {
-    auto r = ::testsuite::TestDuration::hours(::djinni::I32::toCpp(w_count));
-    return ::djinni::Duration<::djinni::I32, ::djinni::Duration_h>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::hours(::djinni::I32::toCpp(w_count));
+        return ::djinni::Duration<::djinni::I32, ::djinni::Duration_h>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestDuration::minutes(int32_t w_count) {
-    auto r = ::testsuite::TestDuration::minutes(::djinni::I32::toCpp(w_count));
-    return ::djinni::Duration<::djinni::I32, ::djinni::Duration_min>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::minutes(::djinni::I32::toCpp(w_count));
+        return ::djinni::Duration<::djinni::I32, ::djinni::Duration_min>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestDuration::seconds(int32_t w_count) {
-    auto r = ::testsuite::TestDuration::seconds(::djinni::I32::toCpp(w_count));
-    return ::djinni::Duration<::djinni::I32, ::djinni::Duration_s>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::seconds(::djinni::I32::toCpp(w_count));
+        return ::djinni::Duration<::djinni::I32, ::djinni::Duration_s>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestDuration::millis(int32_t w_count) {
-    auto r = ::testsuite::TestDuration::millis(::djinni::I32::toCpp(w_count));
-    return ::djinni::Duration<::djinni::I32, ::djinni::Duration_ms>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::millis(::djinni::I32::toCpp(w_count));
+        return ::djinni::Duration<::djinni::I32, ::djinni::Duration_ms>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestDuration::micros(int32_t w_count) {
-    auto r = ::testsuite::TestDuration::micros(::djinni::I32::toCpp(w_count));
-    return ::djinni::Duration<::djinni::I32, ::djinni::Duration_us>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::micros(::djinni::I32::toCpp(w_count));
+        return ::djinni::Duration<::djinni::I32, ::djinni::Duration_us>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestDuration::nanos(int32_t w_count) {
-    auto r = ::testsuite::TestDuration::nanos(::djinni::I32::toCpp(w_count));
-    return ::djinni::Duration<::djinni::I32, ::djinni::Duration_ns>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::nanos(::djinni::I32::toCpp(w_count));
+        return ::djinni::Duration<::djinni::I32, ::djinni::Duration_ns>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestDuration::hoursf(double w_count) {
-    auto r = ::testsuite::TestDuration::hoursf(::djinni::F64::toCpp(w_count));
-    return ::djinni::Duration<::djinni::F64, ::djinni::Duration_h>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::hoursf(::djinni::F64::toCpp(w_count));
+        return ::djinni::Duration<::djinni::F64, ::djinni::Duration_h>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestDuration::minutesf(double w_count) {
-    auto r = ::testsuite::TestDuration::minutesf(::djinni::F64::toCpp(w_count));
-    return ::djinni::Duration<::djinni::F64, ::djinni::Duration_min>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::minutesf(::djinni::F64::toCpp(w_count));
+        return ::djinni::Duration<::djinni::F64, ::djinni::Duration_min>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestDuration::secondsf(double w_count) {
-    auto r = ::testsuite::TestDuration::secondsf(::djinni::F64::toCpp(w_count));
-    return ::djinni::Duration<::djinni::F64, ::djinni::Duration_s>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::secondsf(::djinni::F64::toCpp(w_count));
+        return ::djinni::Duration<::djinni::F64, ::djinni::Duration_s>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestDuration::millisf(double w_count) {
-    auto r = ::testsuite::TestDuration::millisf(::djinni::F64::toCpp(w_count));
-    return ::djinni::Duration<::djinni::F64, ::djinni::Duration_ms>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::millisf(::djinni::F64::toCpp(w_count));
+        return ::djinni::Duration<::djinni::F64, ::djinni::Duration_ms>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestDuration::microsf(double w_count) {
-    auto r = ::testsuite::TestDuration::microsf(::djinni::F64::toCpp(w_count));
-    return ::djinni::Duration<::djinni::F64, ::djinni::Duration_us>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::microsf(::djinni::F64::toCpp(w_count));
+        return ::djinni::Duration<::djinni::F64, ::djinni::Duration_us>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestDuration::nanosf(double w_count) {
-    auto r = ::testsuite::TestDuration::nanosf(::djinni::F64::toCpp(w_count));
-    return ::djinni::Duration<::djinni::F64, ::djinni::Duration_ns>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::nanosf(::djinni::F64::toCpp(w_count));
+        return ::djinni::Duration<::djinni::F64, ::djinni::Duration_ns>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestDuration::box(int64_t w_count) {
-    auto r = ::testsuite::TestDuration::box(::djinni::I64::toCpp(w_count));
-    return ::djinni::Optional<std::experimental::optional, ::djinni::Duration<::djinni::I64, ::djinni::Duration_s>>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::box(::djinni::I64::toCpp(w_count));
+        return ::djinni::Optional<std::experimental::optional, ::djinni::Duration<::djinni::I64, ::djinni::Duration_s>>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 int64_t NativeTestDuration::unbox(const em::val& w_dt) {
-    auto r = ::testsuite::TestDuration::unbox(::djinni::Optional<std::experimental::optional, ::djinni::Duration<::djinni::I64, ::djinni::Duration_s>>::toCpp(w_dt));
-    return ::djinni::I64::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestDuration::unbox(::djinni::Optional<std::experimental::optional, ::djinni::Duration<::djinni::I64, ::djinni::Duration_s>>::toCpp(w_dt));
+        return ::djinni::I64::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_test_duration) {

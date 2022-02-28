@@ -18,24 +18,54 @@ em::val NativeEnumUsageInterface::cppProxyMethods() {
 }
 
 int32_t NativeEnumUsageInterface::e(const CppType& self, int32_t w_e) {
-    auto r = self->e(::djinni_generated::NativeColor::toCpp(w_e));
-    return ::djinni_generated::NativeColor::fromCpp(r);
+    try {
+        auto r = self->e(::djinni_generated::NativeColor::toCpp(w_e));
+        return ::djinni_generated::NativeColor::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeEnumUsageInterface::o(const CppType& self, const em::val& w_o) {
-    auto r = self->o(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeColor>::toCpp(w_o));
-    return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeColor>::fromCpp(r);
+    try {
+        auto r = self->o(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeColor>::toCpp(w_o));
+        return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeColor>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeEnumUsageInterface::l(const CppType& self, const em::val& w_l) {
-    auto r = self->l(::djinni::List<::djinni_generated::NativeColor>::toCpp(w_l));
-    return ::djinni::List<::djinni_generated::NativeColor>::fromCpp(r);
+    try {
+        auto r = self->l(::djinni::List<::djinni_generated::NativeColor>::toCpp(w_l));
+        return ::djinni::List<::djinni_generated::NativeColor>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeEnumUsageInterface::s(const CppType& self, const em::val& w_s) {
-    auto r = self->s(::djinni::Set<::djinni_generated::NativeColor>::toCpp(w_s));
-    return ::djinni::Set<::djinni_generated::NativeColor>::fromCpp(r);
+    try {
+        auto r = self->s(::djinni::Set<::djinni_generated::NativeColor>::toCpp(w_s));
+        return ::djinni::Set<::djinni_generated::NativeColor>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeEnumUsageInterface::m(const CppType& self, const em::val& w_m) {
-    auto r = self->m(::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::toCpp(w_m));
-    return ::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::fromCpp(r);
+    try {
+        auto r = self->m(::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::toCpp(w_m));
+        return ::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 
 ::testsuite::color NativeEnumUsageInterface::JsProxy::e(::testsuite::color e) {

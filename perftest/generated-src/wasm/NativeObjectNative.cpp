@@ -13,7 +13,13 @@ em::val NativeObjectNative::cppProxyMethods() {
 }
 
 void NativeObjectNative::baseline(const CppType& self) {
-    self->baseline();
+    try {
+        self->baseline();
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(snapchat_djinni_benchmark_ObjectNative) {

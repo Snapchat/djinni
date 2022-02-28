@@ -16,16 +16,34 @@ em::val NativeSortItems::cppProxyMethods() {
 }
 
 void NativeSortItems::sort(const CppType& self, int32_t w_order,const em::val& w_items) {
-    self->sort(::djinni_generated::NativeSortOrder::toCpp(w_order),
-         ::djinni_generated::NativeItemList::toCpp(w_items));
+    try {
+        self->sort(::djinni_generated::NativeSortOrder::toCpp(w_order),
+             ::djinni_generated::NativeItemList::toCpp(w_items));
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeSortItems::create_with_listener(const em::val& w_listener) {
-    auto r = ::textsort::SortItems::create_with_listener(::djinni_generated::NativeTextboxListener::toCpp(w_listener));
-    return ::djinni_generated::NativeSortItems::fromCpp(r);
+    try {
+        auto r = ::textsort::SortItems::create_with_listener(::djinni_generated::NativeTextboxListener::toCpp(w_listener));
+        return ::djinni_generated::NativeSortItems::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeSortItems::run_sort(const em::val& w_items) {
-    auto r = ::textsort::SortItems::run_sort(::djinni_generated::NativeItemList::toCpp(w_items));
-    return ::djinni_generated::NativeItemList::fromCpp(r);
+    try {
+        auto r = ::textsort::SortItems::run_sort(::djinni_generated::NativeItemList::toCpp(w_items));
+        return ::djinni_generated::NativeItemList::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(textsort_sort_items) {

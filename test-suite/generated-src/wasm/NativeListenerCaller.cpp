@@ -16,15 +16,33 @@ em::val NativeListenerCaller::cppProxyMethods() {
 }
 
 em::val NativeListenerCaller::init(const em::val& w_first_l,const em::val& w_second_l) {
-    auto r = ::testsuite::ListenerCaller::init(::djinni_generated::NativeFirstListener::toCpp(w_first_l),
-         ::djinni_generated::NativeSecondListener::toCpp(w_second_l));
-    return ::djinni_generated::NativeListenerCaller::fromCpp(r);
+    try {
+        auto r = ::testsuite::ListenerCaller::init(::djinni_generated::NativeFirstListener::toCpp(w_first_l),
+             ::djinni_generated::NativeSecondListener::toCpp(w_second_l));
+        return ::djinni_generated::NativeListenerCaller::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 void NativeListenerCaller::callFirst(const CppType& self) {
-    self->callFirst();
+    try {
+        self->callFirst();
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 void NativeListenerCaller::callSecond(const CppType& self) {
-    self->callSecond();
+    try {
+        self->callSecond();
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_listener_caller) {

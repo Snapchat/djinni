@@ -22,38 +22,92 @@ em::val NativeDataRefTest::cppProxyMethods() {
 }
 
 void NativeDataRefTest::sendData(const CppType& self, const em::val& w_data) {
-    self->sendData(::djinni::NativeDataRef::toCpp(w_data));
+    try {
+        self->sendData(::djinni::NativeDataRef::toCpp(w_data));
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeDataRefTest::retriveAsBin(const CppType& self) {
-    auto r = self->retriveAsBin();
-    return ::djinni::Binary::fromCpp(r);
+    try {
+        auto r = self->retriveAsBin();
+        return ::djinni::Binary::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 void NativeDataRefTest::sendMutableData(const CppType& self, const em::val& w_data) {
-    self->sendMutableData(::djinni::NativeDataRef::toCpp(w_data));
+    try {
+        self->sendMutableData(::djinni::NativeDataRef::toCpp(w_data));
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeDataRefTest::generateData(const CppType& self) {
-    auto r = self->generateData();
-    return ::djinni::NativeDataRef::fromCpp(r);
+    try {
+        auto r = self->generateData();
+        return ::djinni::NativeDataRef::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeDataRefTest::dataFromVec(const CppType& self) {
-    auto r = self->dataFromVec();
-    return ::djinni::NativeDataRef::fromCpp(r);
+    try {
+        auto r = self->dataFromVec();
+        return ::djinni::NativeDataRef::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeDataRefTest::dataFromStr(const CppType& self) {
-    auto r = self->dataFromStr();
-    return ::djinni::NativeDataRef::fromCpp(r);
+    try {
+        auto r = self->dataFromStr();
+        return ::djinni::NativeDataRef::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeDataRefTest::sendDataView(const CppType& self, const em::val& w_data) {
-    auto r = self->sendDataView(::djinni::NativeDataView::toCpp(w_data));
-    return ::djinni::Binary::fromCpp(r);
+    try {
+        auto r = self->sendDataView(::djinni::NativeDataView::toCpp(w_data));
+        return ::djinni::Binary::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeDataRefTest::recvDataView(const CppType& self) {
-    auto r = self->recvDataView();
-    return ::djinni::NativeDataView::fromCpp(r);
+    try {
+        auto r = self->recvDataView();
+        return ::djinni::NativeDataView::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeDataRefTest::create() {
-    auto r = ::testsuite::DataRefTest::create();
-    return ::djinni_generated::NativeDataRefTest::fromCpp(r);
+    try {
+        auto r = ::testsuite::DataRefTest::create();
+        return ::djinni_generated::NativeDataRefTest::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_DataRefTest) {

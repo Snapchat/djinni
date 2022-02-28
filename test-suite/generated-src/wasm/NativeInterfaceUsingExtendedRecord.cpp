@@ -15,8 +15,14 @@ em::val NativeInterfaceUsingExtendedRecord::cppProxyMethods() {
 }
 
 em::val NativeInterfaceUsingExtendedRecord::meth(const CppType& self, const em::val& w_er) {
-    auto r = self->meth(::djinni_generated::NativeExtendedRecord::toCpp(w_er));
-    return ::djinni_generated::NativeExtendedRecord::fromCpp(r);
+    try {
+        auto r = self->meth(::djinni_generated::NativeExtendedRecord::toCpp(w_er));
+        return ::djinni_generated::NativeExtendedRecord::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_interface_using_extended_record) {

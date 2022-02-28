@@ -13,12 +13,24 @@ em::val NativeCppException::cppProxyMethods() {
 }
 
 int32_t NativeCppException::throw_an_exception(const CppType& self) {
-    auto r = self->throw_an_exception();
-    return ::djinni::I32::fromCpp(r);
+    try {
+        auto r = self->throw_an_exception();
+        return ::djinni::I32::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeCppException::get() {
-    auto r = ::testsuite::CppException::get();
-    return ::djinni_generated::NativeCppException::fromCpp(r);
+    try {
+        auto r = ::testsuite::CppException::get();
+        return ::djinni_generated::NativeCppException::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_cpp_exception) {

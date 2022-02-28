@@ -13,12 +13,24 @@ em::val NativeReturnTwo::cppProxyMethods() {
 }
 
 em::val NativeReturnTwo::get_instance() {
-    auto r = ::testsuite::ReturnTwo::get_instance();
-    return ::djinni_generated::NativeReturnTwo::fromCpp(r);
+    try {
+        auto r = ::testsuite::ReturnTwo::get_instance();
+        return ::djinni_generated::NativeReturnTwo::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 int8_t NativeReturnTwo::return_two(const CppType& self) {
-    auto r = self->return_two();
-    return ::djinni::I8::fromCpp(r);
+    try {
+        auto r = self->return_two();
+        return ::djinni::I8::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_return_two) {

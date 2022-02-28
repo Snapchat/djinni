@@ -17,9 +17,9 @@ class CppExceptionTest extends TestCase  {
         try {
             this.cppInterface.throwAnException();
         } catch (e: any) {
-            thrown = this.m.getExceptionMessage(e);
+            thrown = e;
         }
-        assertEq(thrown, "Exception Thrown");
+        assertEq(thrown.message, "Exception Thrown");
     }
 }
 

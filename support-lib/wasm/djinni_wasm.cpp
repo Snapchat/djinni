@@ -116,11 +116,6 @@ void releaseWasmBuffer(unsigned addr) {
     delete reinterpret_cast<DataObject*>(addr);
 }
 
-static std::string getExceptionMessage(int eptr)
-{
-    return reinterpret_cast<std::exception*>(eptr)->what();
-}
-
 EM_JS(void, djinni_init_wasm, (), {
         // console.log("djinni_init_wasm");
         Module.cppProxyFinalizerRegistry = new FinalizationRegistry(nativeRef => {
@@ -201,10 +196,13 @@ EM_JS(void, djinni_register_name_in_ns, (const char* prefixedName, const char* n
         ns[name] = Module[prefixedName];
 });
 
+EM_JS(void, djinni_throw_native_exception, (const char* msg), {
+        throw new Error(readLatin1String(msg));
+});
+
 EMSCRIPTEN_BINDINGS(djinni_wasm) {
     djinni_init_wasm();    
     em::function("allocateWasmBuffer", &allocateWasmBuffer);
-    em::function("getExceptionMessage", &getExceptionMessage);
     em::function("initCppResolveHandler", &CppResolveHandlerBase::initInstance);
     em::function("resolveNativePromise", &CppResolveHandlerBase::resolveNativePromise);
 }

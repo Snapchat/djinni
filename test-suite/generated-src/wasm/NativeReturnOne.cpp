@@ -13,12 +13,24 @@ em::val NativeReturnOne::cppProxyMethods() {
 }
 
 em::val NativeReturnOne::get_instance() {
-    auto r = ::testsuite::ReturnOne::get_instance();
-    return ::djinni_generated::NativeReturnOne::fromCpp(r);
+    try {
+        auto r = ::testsuite::ReturnOne::get_instance();
+        return ::djinni_generated::NativeReturnOne::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 int8_t NativeReturnOne::return_one(const CppType& self) {
-    auto r = self->return_one();
-    return ::djinni::I8::fromCpp(r);
+    try {
+        auto r = self->return_one();
+        return ::djinni::I8::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_return_one) {

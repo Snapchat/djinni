@@ -14,36 +14,84 @@ em::val NativeTestOutcome::cppProxyMethods() {
 }
 
 em::val NativeTestOutcome::getSuccessOutcome() {
-    auto r = ::testsuite::TestOutcome::getSuccessOutcome();
-    return ::djinni::Outcome<::djinni::String, ::djinni::I32>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestOutcome::getSuccessOutcome();
+        return ::djinni::Outcome<::djinni::String, ::djinni::I32>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestOutcome::getErrorOutcome() {
-    auto r = ::testsuite::TestOutcome::getErrorOutcome();
-    return ::djinni::Outcome<::djinni::String, ::djinni::I32>::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestOutcome::getErrorOutcome();
+        return ::djinni::Outcome<::djinni::String, ::djinni::I32>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 std::string NativeTestOutcome::putSuccessOutcome(const em::val& w_x) {
-    auto r = ::testsuite::TestOutcome::putSuccessOutcome(::djinni::Outcome<::djinni::String, ::djinni::I32>::toCpp(w_x));
-    return ::djinni::String::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestOutcome::putSuccessOutcome(::djinni::Outcome<::djinni::String, ::djinni::I32>::toCpp(w_x));
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 int32_t NativeTestOutcome::putErrorOutcome(const em::val& w_x) {
-    auto r = ::testsuite::TestOutcome::putErrorOutcome(::djinni::Outcome<::djinni::String, ::djinni::I32>::toCpp(w_x));
-    return ::djinni::I32::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestOutcome::putErrorOutcome(::djinni::Outcome<::djinni::String, ::djinni::I32>::toCpp(w_x));
+        return ::djinni::I32::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestOutcome::getNestedSuccessOutcome() {
-    auto r = ::testsuite::TestOutcome::getNestedSuccessOutcome();
-    return ::djinni_generated::NativeNestedOutcome::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestOutcome::getNestedSuccessOutcome();
+        return ::djinni_generated::NativeNestedOutcome::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeTestOutcome::getNestedErrorOutcome() {
-    auto r = ::testsuite::TestOutcome::getNestedErrorOutcome();
-    return ::djinni_generated::NativeNestedOutcome::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestOutcome::getNestedErrorOutcome();
+        return ::djinni_generated::NativeNestedOutcome::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 int32_t NativeTestOutcome::putNestedSuccessOutcome(const em::val& w_x) {
-    auto r = ::testsuite::TestOutcome::putNestedSuccessOutcome(::djinni_generated::NativeNestedOutcome::toCpp(w_x));
-    return ::djinni::I32::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestOutcome::putNestedSuccessOutcome(::djinni_generated::NativeNestedOutcome::toCpp(w_x));
+        return ::djinni::I32::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 std::string NativeTestOutcome::putNestedErrorOutcome(const em::val& w_x) {
-    auto r = ::testsuite::TestOutcome::putNestedErrorOutcome(::djinni_generated::NativeNestedOutcome::toCpp(w_x));
-    return ::djinni::String::fromCpp(r);
+    try {
+        auto r = ::testsuite::TestOutcome::putNestedErrorOutcome(::djinni_generated::NativeNestedOutcome::toCpp(w_x));
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_test_outcome) {

@@ -580,6 +580,7 @@ private:
 };
 
 extern "C" void djinni_register_name_in_ns(const char* prefixedName, const char* namespacedName);
+extern "C" void djinni_throw_native_exception(const char* msg);
 
 template<typename ClassType>
 class DjinniClass_ : public em::class_<ClassType> {

@@ -15,7 +15,7 @@ class TokenTest {
     }
 
     testNullToken() {
-        assertSame(this.m.testsuite.TestHelpers.tokenId(null), null);
+        assertSame(this.m.testsuite.TestHelpers.tokenId(undefined), undefined);
     }
 
     testCppToken() {

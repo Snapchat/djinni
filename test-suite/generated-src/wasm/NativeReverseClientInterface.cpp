@@ -15,20 +15,44 @@ em::val NativeReverseClientInterface::cppProxyMethods() {
 }
 
 std::string NativeReverseClientInterface::return_str(const CppType& self) {
-    auto r = self->return_str();
-    return ::djinni::String::fromCpp(r);
+    try {
+        auto r = self->return_str();
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 std::string NativeReverseClientInterface::meth_taking_interface(const CppType& self, const em::val& w_i) {
-    auto r = self->meth_taking_interface(::djinni_generated::NativeReverseClientInterface::toCpp(w_i));
-    return ::djinni::String::fromCpp(r);
+    try {
+        auto r = self->meth_taking_interface(::djinni_generated::NativeReverseClientInterface::toCpp(w_i));
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 std::string NativeReverseClientInterface::meth_taking_optional_interface(const CppType& self, const em::val& w_i) {
-    auto r = self->meth_taking_optional_interface(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeReverseClientInterface>::toCpp(w_i));
-    return ::djinni::String::fromCpp(r);
+    try {
+        auto r = self->meth_taking_optional_interface(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeReverseClientInterface>::toCpp(w_i));
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 em::val NativeReverseClientInterface::create() {
-    auto r = ::testsuite::ReverseClientInterface::create();
-    return ::djinni_generated::NativeReverseClientInterface::fromCpp(r);
+    try {
+        auto r = ::testsuite::ReverseClientInterface::create();
+        return ::djinni_generated::NativeReverseClientInterface::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e.what());
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_reverse_client_interface) {
