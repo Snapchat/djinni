@@ -24,6 +24,7 @@ struct NativeCppException : ::djinni::JsInterface<::testsuite::CppException, Nat
     static em::val cppProxyMethods();
 
     static int32_t throw_an_exception(const CppType& self);
+    static int32_t throw_js_exception(const CppType& self, const em::val& w_cb);
     static em::val get();
 
 };

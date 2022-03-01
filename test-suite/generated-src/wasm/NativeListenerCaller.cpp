@@ -22,7 +22,7 @@ em::val NativeListenerCaller::init(const em::val& w_first_l,const em::val& w_sec
         return ::djinni_generated::NativeListenerCaller::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -31,7 +31,7 @@ void NativeListenerCaller::callFirst(const CppType& self) {
         self->callFirst();
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -40,7 +40,7 @@ void NativeListenerCaller::callSecond(const CppType& self) {
         self->callSecond();
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }

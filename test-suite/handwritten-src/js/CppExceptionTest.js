@@ -1,3 +1,9 @@
+class JsThrower {
+    throwJsException() {
+        throw new Error("JS Error");
+    }
+}
+
 class CppExceptionTest {
     constructor(module) {
         this.m = module;
@@ -15,6 +21,17 @@ class CppExceptionTest {
             thrown = e;
         }
         assertEq(thrown.message, "djinni: Exception Thrown");
+    }
+
+    testJsExceptionPassthrough() {
+        var thrown = null;
+        try {
+            this.cppInterface.throwJsException(new JsThrower());
+        } catch (e) {
+            thrown = e;
+        }
+        assertTrue(thrown instanceof Error);
+        assertEq(thrown.message, "JS Error");
     }
 }
 

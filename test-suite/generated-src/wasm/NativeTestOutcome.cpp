@@ -19,7 +19,7 @@ em::val NativeTestOutcome::getSuccessOutcome() {
         return ::djinni::Outcome<::djinni::String, ::djinni::I32>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -29,7 +29,7 @@ em::val NativeTestOutcome::getErrorOutcome() {
         return ::djinni::Outcome<::djinni::String, ::djinni::I32>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -39,7 +39,7 @@ std::string NativeTestOutcome::putSuccessOutcome(const em::val& w_x) {
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -49,7 +49,7 @@ int32_t NativeTestOutcome::putErrorOutcome(const em::val& w_x) {
         return ::djinni::I32::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -59,7 +59,7 @@ em::val NativeTestOutcome::getNestedSuccessOutcome() {
         return ::djinni_generated::NativeNestedOutcome::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -69,7 +69,7 @@ em::val NativeTestOutcome::getNestedErrorOutcome() {
         return ::djinni_generated::NativeNestedOutcome::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -79,7 +79,7 @@ int32_t NativeTestOutcome::putNestedSuccessOutcome(const em::val& w_x) {
         return ::djinni::I32::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -89,7 +89,7 @@ std::string NativeTestOutcome::putNestedErrorOutcome(const em::val& w_x) {
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }

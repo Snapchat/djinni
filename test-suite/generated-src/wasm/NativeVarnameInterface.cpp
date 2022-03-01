@@ -20,7 +20,7 @@ em::val NativeVarnameInterface::_rmethod_(const CppType& self, const em::val& w_
         return ::djinni_generated::NativeVarnameRecord::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -30,7 +30,7 @@ em::val NativeVarnameInterface::_imethod_(const CppType& self, const em::val& w_
         return ::djinni_generated::NativeVarnameInterface::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }

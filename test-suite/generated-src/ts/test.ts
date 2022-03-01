@@ -540,8 +540,13 @@ export interface ReverseClientInterface_statics {
     create(): ReverseClientInterface;
 }
 
+export interface JsException {
+    throwJsException(): void;
+}
+
 export interface CppException {
     throwAnException(): number;
+    throwJsException(cb: JsException): number;
 }
 export interface CppException_statics {
     get(): CppException;

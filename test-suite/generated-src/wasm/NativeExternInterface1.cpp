@@ -22,7 +22,7 @@ em::val NativeExternInterface1::foo(const CppType& self, const em::val& w_i) {
         return ::djinni_generated::NativeClientReturnedRecord::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -32,7 +32,7 @@ int32_t NativeExternInterface1::bar(const CppType& self, int32_t w_e) {
         return ::djinni_generated::NativeColor::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }

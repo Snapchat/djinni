@@ -60,26 +60,13 @@ const em::val& JsProxyBase::_jsRef() const {
 
 void JsProxyBase::checkError(const em::val& v) {
     if (v.instanceof(em::val::global("Error"))) {
-         // The stack property is non-standard, but well supported in browsers
-         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/Stack#browser_compatibility
-         // It also seems to include the name and message properties, so no need to access them separately
-         //
-         // >>> function doThrow() { throw new Error("foo")}
-         // >>> try { doThrow() } catch (e) { console.log(e.stack) }
-         // Error: foo
-         //     at doThrow (<anonymous>:1:25)
-         //     at <anonymous>:1:7
-         // >>> try { doThrow() } catch (e) { console.log(e.name) }
-         // Error
-         // >>> try { doThrow() } catch (e) { console.log(e.message) }
-         // foo
-        throw JsException(v["stack"].as<std::string>());
+        throw JsException(v);
     }
 }
 
 void checkForNull(void* ptr, const char* context) {
     if (!ptr) {
-        throw JsException(std::string("nullptr is not allowed in ") + context);
+        throw std::invalid_argument(std::string("nullptr is not allowed in ") + context);
     }
 }
 
@@ -175,6 +162,10 @@ EM_JS(void, djinni_init_wasm, (), {
             Module.protobuf[name] = proto;
         };
 
+        Module.djinni_throw_cpp_exception = function(e) {
+            throw (e instanceof Error) ? e : new Error("djinni: " + e);
+        };
+
         Module.callJsProxyMethod = function(obj, method, ...args) {
             try {
                 return obj[method].apply(obj, args);
@@ -196,9 +187,14 @@ EM_JS(void, djinni_register_name_in_ns, (const char* prefixedName, const char* n
         ns[name] = Module[prefixedName];
 });
 
-EM_JS(void, djinni_throw_native_exception, (const char* msg), {
-        throw new Error("djinni: " + readLatin1String(msg));
-});
+void djinni_throw_native_exception(const std::exception& e) {
+    static auto throwCppException = em::val::module_property("djinni_throw_cpp_exception");
+    if (const auto* jsEx = dynamic_cast<const JsException*>(&e)) {
+        throwCppException(jsEx->cause());
+    } else {
+        throwCppException(em::val(e.what()));
+    }
+}
 
 EMSCRIPTEN_BINDINGS(djinni_wasm) {
     djinni_init_wasm();    

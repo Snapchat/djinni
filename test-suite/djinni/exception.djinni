@@ -1,4 +1,9 @@
+js_exception = interface +w {
+    throw_js_exception();
+}
+
 cpp_exception = interface +c {
     throw_an_exception(): i32;
+    throw_js_exception(cb: js_exception): i32;
     static get(): cpp_exception;
 }

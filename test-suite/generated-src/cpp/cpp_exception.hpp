@@ -8,11 +8,15 @@
 
 namespace testsuite {
 
+class JsException;
+
 class CppException {
 public:
     virtual ~CppException() = default;
 
     virtual int32_t throw_an_exception() = 0;
+
+    virtual int32_t throw_js_exception(const /*not-null*/ std::shared_ptr<JsException> & cb) = 0;
 
     static /*not-null*/ std::shared_ptr<CppException> get();
 };

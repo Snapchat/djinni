@@ -18,7 +18,7 @@ void NativeConstantsInterface::dummy(const CppType& self) {
         self->dummy();
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }

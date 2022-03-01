@@ -404,9 +404,29 @@ public:
 
 using JsProxyId = uint64_t;
 
+// The stack property is non-standard, but well supported in browsers
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/Stack#browser_compatibility
+// It also seems to include the name and message properties, so no need to access them separately
+//
+// >>> function doThrow() { throw new Error("foo")}
+// >>> try { doThrow() } catch (e) { console.log(e.stack) }
+// Error: foo
+//     at doThrow (<anonymous>:1:25)
+//     at <anonymous>:1:7
+// >>> try { doThrow() } catch (e) { console.log(e.name) }
+// Error
+// >>> try { doThrow() } catch (e) { console.log(e.message) }
+// foo
 class JsException : public std::runtime_error {
 public:
-    JsException(const std::string& what): std::runtime_error(what) {}
+    JsException(const em::val& e):
+        std::runtime_error(e["stack"].as<std::string>()),
+        _jsEx(e)
+    {}
+
+    const em::val& cause() const { return _jsEx; }
+private:
+    em::val _jsEx;
 };
 
 class JsProxyBase {
@@ -580,7 +600,7 @@ private:
 };
 
 extern "C" void djinni_register_name_in_ns(const char* prefixedName, const char* namespacedName);
-extern "C" void djinni_throw_native_exception(const char* msg);
+extern "C" void djinni_throw_native_exception(const std::exception& e);
 
 template<typename ClassType>
 class DjinniClass_ : public em::class_<ClassType> {

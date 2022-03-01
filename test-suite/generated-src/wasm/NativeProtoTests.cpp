@@ -20,7 +20,7 @@ em::val NativeProtoTests::protoToStrings(const em::val& w_x) {
         return ::djinni::List<::djinni::String>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -30,7 +30,7 @@ em::val NativeProtoTests::stringsToProto(const em::val& w_x) {
         return ::djinni::Protobuf<::djinni::test::AddressBook, ::djinni::JsClassName<'p','r','o','t','o','t','e','s','t','.','A','d','d','r','e','s','s','B','o','o','k'>>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -40,7 +40,7 @@ std::string NativeProtoTests::embeddedProtoToString(const em::val& w_x) {
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -50,7 +50,7 @@ em::val NativeProtoTests::stringToEmbeddedProto(const std::string& w_x) {
         return ::djinni_generated::NativeRecordWithEmbeddedProto::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -60,7 +60,7 @@ std::string NativeProtoTests::cppProtoToString(const em::val& w_x) {
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -70,7 +70,7 @@ em::val NativeProtoTests::stringToCppProto(const std::string& w_x) {
         return ::djinni::Protobuf<::djinni::test2::PersistingState, ::djinni::JsClassName<'p','r','o','t','o','t','e','s','t','2','.','P','e','r','s','i','s','t','i','n','g','S','t','a','t','e'>>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -80,7 +80,7 @@ std::string NativeProtoTests::embeddedCppProtoToString(const em::val& w_x) {
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -90,7 +90,7 @@ em::val NativeProtoTests::stringToEmbeddedCppProto(const std::string& w_x) {
         return ::djinni_generated::NativeRecordWithEmbeddedCppProto::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -100,7 +100,7 @@ em::val NativeProtoTests::protoListToStrings(const em::val& w_x) {
         return ::djinni::List<::djinni::String>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -110,7 +110,7 @@ em::val NativeProtoTests::stringsToProtoList(const em::val& w_x) {
         return ::djinni::List<::djinni::Protobuf<::djinni::test::Person, ::djinni::JsClassName<'p','r','o','t','o','t','e','s','t','.','P','e','r','s','o','n'>>>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -120,7 +120,7 @@ std::string NativeProtoTests::optionalProtoToString(const em::val& w_x) {
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -130,7 +130,7 @@ em::val NativeProtoTests::stringToOptionalProto(const std::string& w_x) {
         return ::djinni::Optional<std::experimental::optional, ::djinni::Protobuf<::djinni::test::Person, ::djinni::JsClassName<'p','r','o','t','o','t','e','s','t','.','P','e','r','s','o','n'>>>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }
@@ -140,7 +140,7 @@ em::val NativeProtoTests::stringToProtoOutcome(const std::string& w_x) {
         return ::djinni::Outcome<::djinni::Protobuf<::djinni::test::Person, ::djinni::JsClassName<'p','r','o','t','o','t','e','s','t','.','P','e','r','s','o','n'>>, ::djinni::I32>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e.what());
+        djinni::djinni_throw_native_exception(e);
         throw;
     }
 }

@@ -11,6 +11,8 @@ import javax.annotation.Nonnull;
 public abstract class CppException {
     public abstract int throwAnException();
 
+    public abstract int throwJsException(@CheckForNull JsException cb);
+
     @CheckForNull
     public static native CppException get();
 
@@ -34,5 +36,13 @@ public abstract class CppException {
             return native_throwAnException(this.nativeRef);
         }
         private native int native_throwAnException(long _nativeRef);
+
+        @Override
+        public int throwJsException(JsException cb)
+        {
+            assert !this.destroyed.get() : "trying to use a destroyed object";
+            return native_throwJsException(this.nativeRef, cb);
+        }
+        private native int native_throwJsException(long _nativeRef, JsException cb);
     }
 }
