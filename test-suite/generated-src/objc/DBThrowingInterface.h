@@ -4,8 +4,8 @@
 #import <Foundation/Foundation.h>
 
 
-@interface DBJsException : NSObject
+@interface DBThrowingInterface : NSObject
 
-- (void)throwJsException;
+- (void)throwException;
 
 @end

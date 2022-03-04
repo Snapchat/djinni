@@ -3,7 +3,7 @@
 
 #include "NativeCppException.hpp"  // my header
 #include "Marshal.hpp"
-#include "NativeJsException.hpp"
+#include "NativeThrowingInterface.hpp"
 
 namespace djinni_generated {
 
@@ -28,12 +28,21 @@ CJNIEXPORT jint JNICALL Java_com_dropbox_djinni_test_CppException_00024CppProxy_
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT jint JNICALL Java_com_dropbox_djinni_test_CppException_00024CppProxy_native_1throwJsException(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jobject j_cb)
+CJNIEXPORT jint JNICALL Java_com_dropbox_djinni_test_CppException_00024CppProxy_native_1callThrowingInterface(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jobject j_cb)
 {
     try {
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::CppException>(nativeRef);
-        auto r = ref->throw_js_exception(::djinni_generated::NativeJsException::toCpp(jniEnv, j_cb));
+        auto r = ref->call_throwing_interface(::djinni_generated::NativeThrowingInterface::toCpp(jniEnv, j_cb));
         return ::djinni::release(::djinni::I32::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jstring JNICALL Java_com_dropbox_djinni_test_CppException_00024CppProxy_native_1callThrowingAndCatch(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jobject j_cb)
+{
+    try {
+        const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::CppException>(nativeRef);
+        auto r = ref->call_throwing_and_catch(::djinni_generated::NativeThrowingInterface::toCpp(jniEnv, j_cb));
+        return ::djinni::release(::djinni::String::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 

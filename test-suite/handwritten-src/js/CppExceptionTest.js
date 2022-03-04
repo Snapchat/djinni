@@ -1,5 +1,5 @@
 class JsThrower {
-    throwJsException() {
+    throwException() {
         throw new Error("JS Error");
     }
 }
@@ -20,13 +20,13 @@ class CppExceptionTest {
         } catch (e) {
             thrown = e;
         }
-        assertEq(thrown.message, "djinni: Exception Thrown");
+        assertEq(thrown.message, "C++: Exception Thrown");
     }
 
     testJsExceptionPassthrough() {
         var thrown = null;
         try {
-            this.cppInterface.throwJsException(new JsThrower());
+            this.cppInterface.callThrowingInterface(new JsThrower());
         } catch (e) {
             thrown = e;
         }

@@ -17,7 +17,8 @@ class CppExceptionImpl : public CppException {
     virtual ~CppExceptionImpl() {}
 
     virtual int32_t throw_an_exception () override;
-    virtual int32_t throw_js_exception(const /*not-null*/ std::shared_ptr<JsException>& cb) override;
+    virtual int32_t call_throwing_interface(const /*not-null*/ std::shared_ptr<ThrowingInterface>& cb) override;
+    virtual std::string call_throwing_and_catch(const /*not-null*/ std::shared_ptr<ThrowingInterface>& cb) override;
 };
 
 } // namespace testsuite

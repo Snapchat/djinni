@@ -5,10 +5,11 @@
 
 #include <cstdint>
 #include <memory>
+#include <string>
 
 namespace testsuite {
 
-class JsException;
+class ThrowingInterface;
 
 class CppException {
 public:
@@ -16,7 +17,9 @@ public:
 
     virtual int32_t throw_an_exception() = 0;
 
-    virtual int32_t throw_js_exception(const /*not-null*/ std::shared_ptr<JsException> & cb) = 0;
+    virtual int32_t call_throwing_interface(const /*not-null*/ std::shared_ptr<ThrowingInterface> & cb) = 0;
+
+    virtual std::string call_throwing_and_catch(const /*not-null*/ std::shared_ptr<ThrowingInterface> & cb) = 0;
 
     static /*not-null*/ std::shared_ptr<CppException> get();
 };

@@ -6,6 +6,6 @@ package com.dropbox.djinni.test;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public abstract class JsException {
-    public abstract void throwJsException();
+public abstract class ThrowingInterface {
+    public abstract void throwException();
 }

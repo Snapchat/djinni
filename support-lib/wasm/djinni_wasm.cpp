@@ -60,7 +60,13 @@ const em::val& JsProxyBase::_jsRef() const {
 
 void JsProxyBase::checkError(const em::val& v) {
     if (v.instanceof(em::val::global("Error"))) {
-        throw JsException(v);
+        auto cppExceptionPtr = v["cppExceptionPtr"];
+        if (!cppExceptionPtr.isUndefined()) {
+            std::exception_ptr* exptr = reinterpret_cast<std::exception_ptr*>(cppExceptionPtr.as<int>());
+            std::rethrow_exception(*exptr);
+        } else {
+            throw JsException(v);
+        }
     }
 }
 
@@ -162,10 +168,6 @@ EM_JS(void, djinni_init_wasm, (), {
             Module.protobuf[name] = proto;
         };
 
-        Module.djinni_throw_cpp_exception = function(e) {
-            throw (e instanceof Error) ? e : new Error("djinni: " + e);
-        };
-
         Module.callJsProxyMethod = function(obj, method, ...args) {
             try {
                 return obj[method].apply(obj, args);
@@ -188,11 +190,15 @@ EM_JS(void, djinni_register_name_in_ns, (const char* prefixedName, const char* n
 });
 
 void djinni_throw_native_exception(const std::exception& e) {
-    static auto throwCppException = em::val::module_property("djinni_throw_cpp_exception");
     if (const auto* jsEx = dynamic_cast<const JsException*>(&e)) {
-        throwCppException(jsEx->cause());
+        jsEx->cause().throw_();
     } else {
-        throwCppException(em::val(e.what()));
+        static std::exception_ptr exptr;
+        static auto ErrorClass = em::val::global("Error");
+        auto error = ErrorClass.new_(std::string("C++: ") + e.what());
+        exptr = std::current_exception();
+        error.set("cppExceptionPtr", em::val(reinterpret_cast<int>(&exptr)));
+        error.throw_();
     }
 }
 

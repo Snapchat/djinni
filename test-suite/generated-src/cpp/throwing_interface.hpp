@@ -5,11 +5,11 @@
 
 namespace testsuite {
 
-class JsException {
+class ThrowingInterface {
 public:
-    virtual ~JsException() = default;
+    virtual ~ThrowingInterface() = default;
 
-    virtual void throw_js_exception() = 0;
+    virtual void throw_exception() = 0;
 };
 
 }  // namespace testsuite

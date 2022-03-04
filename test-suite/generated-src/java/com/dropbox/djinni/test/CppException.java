@@ -11,7 +11,10 @@ import javax.annotation.Nonnull;
 public abstract class CppException {
     public abstract int throwAnException();
 
-    public abstract int throwJsException(@CheckForNull JsException cb);
+    public abstract int callThrowingInterface(@CheckForNull ThrowingInterface cb);
+
+    @Nonnull
+    public abstract String callThrowingAndCatch(@CheckForNull ThrowingInterface cb);
 
     @CheckForNull
     public static native CppException get();
@@ -38,11 +41,19 @@ public abstract class CppException {
         private native int native_throwAnException(long _nativeRef);
 
         @Override
-        public int throwJsException(JsException cb)
+        public int callThrowingInterface(ThrowingInterface cb)
         {
             assert !this.destroyed.get() : "trying to use a destroyed object";
-            return native_throwJsException(this.nativeRef, cb);
+            return native_callThrowingInterface(this.nativeRef, cb);
         }
-        private native int native_throwJsException(long _nativeRef, JsException cb);
+        private native int native_callThrowingInterface(long _nativeRef, ThrowingInterface cb);
+
+        @Override
+        public String callThrowingAndCatch(ThrowingInterface cb)
+        {
+            assert !this.destroyed.get() : "trying to use a destroyed object";
+            return native_callThrowingAndCatch(this.nativeRef, cb);
+        }
+        private native String native_callThrowingAndCatch(long _nativeRef, ThrowingInterface cb);
     }
 }

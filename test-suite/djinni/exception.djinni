@@ -1,9 +1,10 @@
-js_exception = interface +w {
-    throw_js_exception();
+throwing_interface = interface +w {
+    throw_exception();
 }
 
 cpp_exception = interface +c {
     throw_an_exception(): i32;
-    throw_js_exception(cb: js_exception): i32;
+    call_throwing_interface(cb: throwing_interface): i32;
+    call_throwing_and_catch(cb: throwing_interface): string;
     static get(): cpp_exception;
 }
