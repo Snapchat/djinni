@@ -60,7 +60,7 @@ const em::val& JsProxyBase::_jsRef() const {
 
 void JsProxyBase::checkError(const em::val& v) {
     if (v.instanceof(em::val::global("Error"))) {
-        auto cppExceptionPtr = v["cppExceptionPtr"];
+        auto cppExceptionPtr = v["_djinni_cpp_exception_ptr"];
         if (!cppExceptionPtr.isUndefined()) {
             std::exception_ptr* exptr = reinterpret_cast<std::exception_ptr*>(cppExceptionPtr.as<int>());
             std::rethrow_exception(*exptr);
@@ -197,7 +197,7 @@ void djinni_throw_native_exception(const std::exception& e) {
         static auto ErrorClass = em::val::global("Error");
         auto error = ErrorClass.new_(std::string("C++: ") + e.what());
         exptr = std::current_exception();
-        error.set("cppExceptionPtr", em::val(reinterpret_cast<int>(&exptr)));
+        error.set("_djinni_cpp_exception_ptr", em::val(reinterpret_cast<int>(&exptr)));
         error.throw_();
     }
 }
