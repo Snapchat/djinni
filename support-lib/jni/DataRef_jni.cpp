@@ -79,12 +79,15 @@ public:
     // wrap a ByteBuffer object from java
     explicit DataRefJNI(jobject data) {
         auto* env = jniGetThreadEnv();
+        auto len = env->GetDirectBufferCapacity(data);
+        if (len == -1) {
+            // GetDirectBufferCapacity() returns -1 when the ByteBuffer is not direct
+            throw std::invalid_argument("ByteBuffer is not allocated with allocateDirect()");
+        }
         _data = {env, data};
         // call ByteBuffer.isReadOnly() to determine mutability
         _readonly = env->CallBooleanMethod(_data.get(), JniClass<BufferClassInfo>::get().isReadOnly) != 0;
         jniExceptionCheck(env);
-        auto len = env->GetDirectBufferCapacity(_data.get());
-        assert(len != -1); // GetDirectBufferCapacity() returns -1 when the ByteBuffer is not direct
         _len = static_cast<size_t>(len);
         _buf = reinterpret_cast<uint8_t*>(env->GetDirectBufferAddress(_data.get()));
     }
