@@ -540,8 +540,14 @@ export interface ReverseClientInterface_statics {
     create(): ReverseClientInterface;
 }
 
+export interface ThrowingInterface {
+    throwException(): void;
+}
+
 export interface CppException {
     throwAnException(): number;
+    callThrowingInterface(cb: ThrowingInterface): number;
+    callThrowingAndCatch(cb: ThrowingInterface): string;
 }
 export interface CppException_statics {
     get(): CppException;

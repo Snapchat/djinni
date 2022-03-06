@@ -14,20 +14,44 @@ em::val NativeFlagRoundtrip::cppProxyMethods() {
 }
 
 int32_t NativeFlagRoundtrip::roundtrip_access(int32_t w_flag) {
-    auto r = ::testsuite::FlagRoundtrip::roundtrip_access(::djinni_generated::NativeAccessFlags::toCpp(w_flag));
-    return ::djinni_generated::NativeAccessFlags::fromCpp(r);
+    try {
+        auto r = ::testsuite::FlagRoundtrip::roundtrip_access(::djinni_generated::NativeAccessFlags::toCpp(w_flag));
+        return ::djinni_generated::NativeAccessFlags::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
 }
 int32_t NativeFlagRoundtrip::roundtrip_empty(int32_t w_flag) {
-    auto r = ::testsuite::FlagRoundtrip::roundtrip_empty(::djinni_generated::NativeEmptyFlags::toCpp(w_flag));
-    return ::djinni_generated::NativeEmptyFlags::fromCpp(r);
+    try {
+        auto r = ::testsuite::FlagRoundtrip::roundtrip_empty(::djinni_generated::NativeEmptyFlags::toCpp(w_flag));
+        return ::djinni_generated::NativeEmptyFlags::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
 }
 em::val NativeFlagRoundtrip::roundtrip_access_boxed(const em::val& w_flag) {
-    auto r = ::testsuite::FlagRoundtrip::roundtrip_access_boxed(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeAccessFlags>::toCpp(w_flag));
-    return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeAccessFlags>::fromCpp(r);
+    try {
+        auto r = ::testsuite::FlagRoundtrip::roundtrip_access_boxed(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeAccessFlags>::toCpp(w_flag));
+        return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeAccessFlags>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
 }
 em::val NativeFlagRoundtrip::roundtrip_empty_boxed(const em::val& w_flag) {
-    auto r = ::testsuite::FlagRoundtrip::roundtrip_empty_boxed(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeEmptyFlags>::toCpp(w_flag));
-    return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeEmptyFlags>::fromCpp(r);
+    try {
+        auto r = ::testsuite::FlagRoundtrip::roundtrip_empty_boxed(::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeEmptyFlags>::toCpp(w_flag));
+        return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeEmptyFlags>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_flag_roundtrip) {

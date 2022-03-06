@@ -18,18 +18,42 @@ em::val NativeUsesSingleLanguageListeners::cppProxyMethods() {
 }
 
 void NativeUsesSingleLanguageListeners::callForObjC(const CppType& self, const em::val& w_l) {
-    self->callForObjC(::djinni_generated::NativeObjcOnlyListener::toCpp(w_l));
+    try {
+        self->callForObjC(::djinni_generated::NativeObjcOnlyListener::toCpp(w_l));
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
 }
 em::val NativeUsesSingleLanguageListeners::returnForObjC(const CppType& self) {
-    auto r = self->returnForObjC();
-    return ::djinni_generated::NativeObjcOnlyListener::fromCpp(r);
+    try {
+        auto r = self->returnForObjC();
+        return ::djinni_generated::NativeObjcOnlyListener::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
 }
 void NativeUsesSingleLanguageListeners::callForJava(const CppType& self, const em::val& w_l) {
-    self->callForJava(::djinni_generated::NativeJavaOnlyListener::toCpp(w_l));
+    try {
+        self->callForJava(::djinni_generated::NativeJavaOnlyListener::toCpp(w_l));
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
 }
 em::val NativeUsesSingleLanguageListeners::returnForJava(const CppType& self) {
-    auto r = self->returnForJava();
-    return ::djinni_generated::NativeJavaOnlyListener::fromCpp(r);
+    try {
+        auto r = self->returnForJava();
+        return ::djinni_generated::NativeJavaOnlyListener::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
 }
 
 void NativeUsesSingleLanguageListeners::JsProxy::callForObjC(const /*not-null*/ std::shared_ptr<::testsuite::ObjcOnlyListener> & l) {
