@@ -365,13 +365,22 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
             s"${stubParamType(p.ty)} ${stubParamName(p.ident)}"
           }).mkString(","))
           w.w(")").braced {
-            if (!m.ret.isEmpty) w.w("auto r = ")
-            if (m.static) w.w(s"$cls::") else w.w("self->")
-            writeAlignedCall(w, s"""${idCpp.method(m.ident)}(""", m.params, ")", p => {
-              s"${helperClass(p.ty.resolved)}::toCpp(${stubParamName(p.ident)})"
-            })
-            w.wl(";")
-            m.ret.fold()(r => w.wl(s"return ${helperClass(r.resolved)}::fromCpp(${cppMarshal.maybeMove("r", r)});"))
+            w.w("try").braced {
+              if (!m.ret.isEmpty) w.w("auto r = ")
+              if (m.static) w.w(s"$cls::") else w.w("self->")
+              writeAlignedCall(w, s"""${idCpp.method(m.ident)}(""", m.params, ")", p => {
+                s"${helperClass(p.ty.resolved)}::toCpp(${stubParamName(p.ident)})"
+              })
+              w.wl(";")
+              m.ret.fold()(r => w.wl(s"return ${helperClass(r.resolved)}::fromCpp(${cppMarshal.maybeMove("r", r)});"))
+            }
+            w.w("catch(const std::exception& e)").braced {
+              w.wl("djinni::djinni_throw_native_exception(e);");
+              // The throw line is just to let the C++ compiler know that this
+              // branch won't return a value. Execution will never reach this
+              // line as the previous line already throws in JS code.
+              w.wl("throw;");
+            }
           }
         }
         w.wl

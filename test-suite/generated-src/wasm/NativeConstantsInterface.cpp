@@ -14,7 +14,13 @@ em::val NativeConstantsInterface::cppProxyMethods() {
 }
 
 void NativeConstantsInterface::dummy(const CppType& self) {
-    self->dummy();
+    try {
+        self->dummy();
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_constants_interface) {

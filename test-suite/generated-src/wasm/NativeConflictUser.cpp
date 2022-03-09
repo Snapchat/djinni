@@ -15,12 +15,24 @@ em::val NativeConflictUser::cppProxyMethods() {
 }
 
 em::val NativeConflictUser::Conflict(const CppType& self) {
-    auto r = self->Conflict();
-    return ::djinni_generated::NativeConflict::fromCpp(r);
+    try {
+        auto r = self->Conflict();
+        return ::djinni_generated::NativeConflict::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
 }
 bool NativeConflictUser::conflict_arg(const CppType& self, const em::val& w_cs) {
-    auto r = self->conflict_arg(::djinni::Set<::djinni_generated::NativeConflict>::toCpp(w_cs));
-    return ::djinni::Bool::fromCpp(r);
+    try {
+        auto r = self->conflict_arg(::djinni::Set<::djinni_generated::NativeConflict>::toCpp(w_cs));
+        return ::djinni::Bool::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
 }
 
 EMSCRIPTEN_BINDINGS(testsuite_conflict_user) {

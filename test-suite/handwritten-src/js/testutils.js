@@ -46,7 +46,7 @@ async function runTests(module, tests) {
                     }
                     if (t['tearDown'] !== undefined) {t.tearDown();}
                 } catch (err) {
-                    console.log(err);
+                    console.log("C++ exception: " + err);
                     assertTrue(false);
                 }
                 var status = failed.length > failedBefore ? '[  FAILED  ] ' : '[       OK ] ';

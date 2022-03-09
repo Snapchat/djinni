@@ -3,6 +3,7 @@
 
 #import "DBCppException+Private.h"
 #import "DBCppException.h"
+#import "DBThrowingInterface+Private.h"
 #import "DJICppWrapperCache+Private.h"
 #import "DJIError.h"
 #import "DJIMarshal+Private.h"
@@ -34,6 +35,20 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     try {
         auto objcpp_result_ = _cppRefHandle.get()->throw_an_exception();
         return ::djinni::I32::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
+- (int32_t)callThrowingInterface:(nullable DBThrowingInterface *)cb {
+    try {
+        auto objcpp_result_ = _cppRefHandle.get()->call_throwing_interface(::djinni_generated::ThrowingInterface::toCpp(cb));
+        return ::djinni::I32::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
+- (nonnull NSString *)callThrowingAndCatch:(nullable DBThrowingInterface *)cb {
+    try {
+        auto objcpp_result_ = _cppRefHandle.get()->call_throwing_and_catch(::djinni_generated::ThrowingInterface::toCpp(cb));
+        return ::djinni::String::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 

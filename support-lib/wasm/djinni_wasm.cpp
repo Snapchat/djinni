@@ -60,26 +60,19 @@ const em::val& JsProxyBase::_jsRef() const {
 
 void JsProxyBase::checkError(const em::val& v) {
     if (v.instanceof(em::val::global("Error"))) {
-         // The stack property is non-standard, but well supported in browsers
-         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/Stack#browser_compatibility
-         // It also seems to include the name and message properties, so no need to access them separately
-         //
-         // >>> function doThrow() { throw new Error("foo")}
-         // >>> try { doThrow() } catch (e) { console.log(e.stack) }
-         // Error: foo
-         //     at doThrow (<anonymous>:1:25)
-         //     at <anonymous>:1:7
-         // >>> try { doThrow() } catch (e) { console.log(e.name) }
-         // Error
-         // >>> try { doThrow() } catch (e) { console.log(e.message) }
-         // foo
-        throw JsException(v["stack"].as<std::string>());
+        auto cppExceptionPtr = v["_djinni_cpp_exception_ptr"];
+        if (!cppExceptionPtr.isUndefined()) {
+            std::exception_ptr* exptr = reinterpret_cast<std::exception_ptr*>(cppExceptionPtr.as<int>());
+            std::rethrow_exception(*exptr);
+        } else {
+            throw JsException(v);
+        }
     }
 }
 
 void checkForNull(void* ptr, const char* context) {
     if (!ptr) {
-        throw JsException(std::string("nullptr is not allowed in ") + context);
+        throw std::invalid_argument(std::string("nullptr is not allowed in ") + context);
     }
 }
 
@@ -114,11 +107,6 @@ static em::val allocateWasmBuffer(unsigned size) {
 extern "C" EMSCRIPTEN_KEEPALIVE
 void releaseWasmBuffer(unsigned addr) {
     delete reinterpret_cast<DataObject*>(addr);
-}
-
-static std::string getExceptionMessage(int eptr)
-{
-    return reinterpret_cast<std::exception*>(eptr)->what();
 }
 
 EM_JS(void, djinni_init_wasm, (), {
@@ -201,10 +189,22 @@ EM_JS(void, djinni_register_name_in_ns, (const char* prefixedName, const char* n
         ns[name] = Module[prefixedName];
 });
 
+void djinni_throw_native_exception(const std::exception& e) {
+    if (const auto* jsEx = dynamic_cast<const JsException*>(&e)) {
+        jsEx->cause().throw_();
+    } else {
+        static std::exception_ptr exptr;
+        static auto ErrorClass = em::val::global("Error");
+        auto error = ErrorClass.new_(std::string("C++: ") + e.what());
+        exptr = std::current_exception();
+        error.set("_djinni_cpp_exception_ptr", em::val(reinterpret_cast<int>(&exptr)));
+        error.throw_();
+    }
+}
+
 EMSCRIPTEN_BINDINGS(djinni_wasm) {
     djinni_init_wasm();    
     em::function("allocateWasmBuffer", &allocateWasmBuffer);
-    em::function("getExceptionMessage", &getExceptionMessage);
     em::function("initCppResolveHandler", &CppResolveHandlerBase::initInstance);
     em::function("resolveNativePromise", &CppResolveHandlerBase::resolveNativePromise);
 }

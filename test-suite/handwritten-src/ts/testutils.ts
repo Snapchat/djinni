@@ -55,7 +55,7 @@ export async function runTests(module: DjinniModule, tests: Array<typeof TestCas
                     }
                     testCase.tearDown();
                 }catch (err: any) {
-                    console.log('C++ exception: ' + module.getExceptionMessage(err));
+                    console.log('C++ exception: ' + err);
                     assertTrue(false);
                 }
                 let status = failed.length > numberOfFailsBeforeThisTest ? '[  FAILED  ] ' : '[       OK ] ';
