@@ -283,8 +283,8 @@ yaml and zero-copy buffer passing.
 
 Notable differences when comparing to the Java/ObjC support:
 
-- deriving(ord, eq, hash) is not applicable to Javascript because JS doesn't
-  support overloading standard comparison methods.
+- deriving(ord, eq) is not applicable to Javascript because JS doesn't support
+  overloading standard comparison methods.
 - Extended records generate the same code as regular records. Because JS can
   easily add extension methods (by add functions to prototype) without having to
   derive from a base class.
