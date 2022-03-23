@@ -32,7 +32,7 @@ investigated. Bug reports should have:
 
 Pull requests are the best way to propose code changes:
 
-1. Fork the repo and create your branch from `master`.
+1. Fork the repo and create your branch from `main`.
 2. Run `./ci/generate.sh` and check in any changes to generated code.
 3. Add tests, if appropriate.
 4. If you add or change code generator command line options, update the
