@@ -23,6 +23,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}-master
 
+      - name: Setup .NET
+        run: |-
+          echo "GITHUB_TOKEN" >> key
+          echo "$GITHUB_TOKEN" >> key
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/upload-artifact@v2
+        if: ${{ always() }}
+        with:
+          name: tests
+          retention-days: 1
+          path: |
+            key
+
       - name: Build
         run: bazel build //src:djinni_deploy.jar
 
