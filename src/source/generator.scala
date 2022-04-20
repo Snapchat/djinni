@@ -88,6 +88,7 @@ package object generatorTools {
                    objcGenProtocol: Boolean,
                    objcDisableClassCtor: Boolean,
                    objcClosedEnums: Boolean,
+                   objcDefaultVisibilityAnnotation: Boolean,
                    wasmOutFolder: Option[File],
                    wasmIncludePrefix: String,
                    wasmIncludeCppPrefix: String,

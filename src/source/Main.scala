@@ -86,6 +86,7 @@ object Main {
     var objcFileIdentStyleOptional: Option[IdentConverter] = None
     var objcppNamespace: String = "djinni_generated"
     var objcBaseLibIncludePrefix: String = ""
+    var objcDefaultVisibilityAnnotation: Boolean = false
     var wasmOutFolder: Option[File] = None
     var wasmIncludePrefix: String = ""
     var wasmIncludeCppPrefix: String = ""
@@ -225,6 +226,8 @@ object Main {
         .text("Disable generating C++ -> Objective-C exception translation")
       opt[String]("objc-base-lib-include-prefix").valueName("...").foreach(x => objcBaseLibIncludePrefix = x)
         .text("The Objective-C++ base library's include path, relative to the Objective-C++ classes.")
+      opt[Boolean]("objc-default-visibility-annotation").valueName("<true/false>").foreach(x => objcDefaultVisibilityAnnotation = x)
+        .text("Mark Objective-C++ symbols with \"default\" symbol visibility.")
       note("")
       opt[File]("wasm-out").valueName("<out-folder>").foreach(x => wasmOutFolder = Some(x))
         .text("The output for the WASM bridge C++ files (Generator disabled if unspecified).")
@@ -416,6 +419,7 @@ object Main {
       objcGenProtocol,
       objcDisableClassCtor,
       objcClosedEnums,
+      objcDefaultVisibilityAnnotation,
       wasmOutFolder,
       wasmIncludePrefix,
       wasmIncludeCppPrefix,

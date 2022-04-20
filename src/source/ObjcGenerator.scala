@@ -30,6 +30,8 @@ import scala.collection.parallel.immutable
 
 class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
 
+  val visibilityAnnotation = if (spec.objcDefaultVisibilityAnnotation) "__attribute__((visibility(\"default\"))) " else ""
+
   class ObjcRefs() {
     var body = mutable.TreeSet[String]()
     var header = mutable.TreeSet[String]()
@@ -109,7 +111,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       if(i.methods.exists(_.static)) {
         val protocolHeader = "#import " + q(spec.objcIncludePrefix + marshal.headerName(ident))
         writeObjcFile(marshal.implHeaderName(ident), origin, List(protocolHeader), w => {
-          w.wl(s"@interface $self : NSObject<$self>")
+          w.wl(s"${visibilityAnnotation}@interface $self : NSObject<$self>")
           for (m <- i.methods) {
             if (m.static && m.lang.objc) {
               w.wl
@@ -128,14 +130,14 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
     writeObjcFile(marshal.headerName(ident), origin, refs.header, w => {
       for (c <- i.consts if marshal.canBeConstVariable(c)) {
         writeDoc(w, c.doc)
-        w.w(s"extern ")
+        w.w(s"${visibilityAnnotation}extern ")
         writeObjcConstVariableDecl(w, c, self)
         w.wl(s";")
       }
 
       w.wl
       writeDoc(w, doc)
-      if (useProtocol(i.ext, spec)) w.wl(s"@protocol $self <NSObject>") else w.wl(s"@interface $self : NSObject")
+      if (useProtocol(i.ext, spec)) w.wl(s"@protocol $self <NSObject>") else w.wl(s"${visibilityAnnotation}@interface $self : NSObject")
 
       for (m <- i.methods) {
         if (!m.static || (!spec.objcGenProtocol && m.lang.objc)) {
@@ -200,9 +202,9 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       writeDoc(w, doc)
 
       if (r.derivingTypes.contains(DerivingType.NSCopying)) {
-        w.wl(s"@interface $self : NSObject<NSCopying>")
+        w.wl(s"${visibilityAnnotation}@interface $self : NSObject<NSCopying>")
       } else {
-        w.wl(s"@interface $self : NSObject")
+        w.wl(s"${visibilityAnnotation}@interface $self : NSObject")
       }
 
       def writeInitializer(sign: String, prefix: String) {
@@ -249,7 +251,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
         w.wl
         for (c <- r.consts if marshal.canBeConstVariable(c)) {
           writeDoc(w, c.doc)
-          w.w(s"extern ")
+          w.w(s"${visibilityAnnotation}extern ")
           writeObjcConstVariableDecl(w, c, noBaseSelf);
           w.wl(s";")
         }
