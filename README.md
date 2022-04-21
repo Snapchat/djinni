@@ -60,6 +60,7 @@ verify the build and binary from the command line.
  - Option to generate function prologue
  - Option to omit objc helper methods
  - Option to disable exception translation in ObjC
+ - Option to mark ObjC symbols (records and constants) with `default` visibility
  - array<> type support
  - outcome<> type support
  - Protobuf type support
@@ -115,6 +116,18 @@ You can also remove the `description` method in Djinni generated classes by
 defining the `DJINNI_DISABLE_DESCRIPTION_METHODS` preprocessor symbol.
 
 These help reducing the binary size of the app slightly.
+
+### Mark ObjC symbols (records and constants) with `default` visibility
+
+You can use `--objc-default-visibility-annotation true` to mark records and
+constants with the default visibility attribute:
+
+```objc
+__attribute__((visibility("default")))
+```
+
+This ensures that they will have external linkage even when compiled with
+`-fvisibility=hidden`.
 
 ### Disable C++ exception translation in ObjC
 
