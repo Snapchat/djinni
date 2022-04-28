@@ -223,7 +223,11 @@ public:
         auto sharedState = std::atomic_load(&_sharedState);
         assert(sharedState);    // call on invalid future will trigger assertion
         std::unique_lock lk(sharedState->mutex);
+#if defined(__EMSCRIPTEN__)
+        assert(state->isReady()); // in wasm we must not block and wait
+#else
         sharedState->cv.wait(lk, [state = sharedState] {return state->isReady();});
+#endif
     }
     // wait until future becomes `isReady()` and return the result. This can
     // only be called once.
@@ -232,7 +236,11 @@ public:
         sharedState = std::atomic_exchange(&_sharedState, sharedState);
         assert(sharedState);    // call on invalid future will trigger assertion
         std::unique_lock lk(sharedState->mutex);
+#if defined(__EMSCRIPTEN__)
+        assert(state->isReady()); // in wasm we must not block and wait
+#else
         sharedState->cv.wait(lk, [state = sharedState] {return state->isReady();});
+#endif
         if (!sharedState->exception) {
             return sharedState->getValueUnsafe();
         } else {
