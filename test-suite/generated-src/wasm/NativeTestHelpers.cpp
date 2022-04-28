@@ -295,6 +295,16 @@ em::val NativeTestHelpers::check_async_interface(const em::val& w_i) {
         throw;
     }
 }
+em::val NativeTestHelpers::check_async_composition(const em::val& w_i) {
+    try {
+        auto r = ::testsuite::TestHelpers::check_async_composition(::djinni_generated::NativeAsyncInterface::toCpp(w_i));
+        return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(r));
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
+}
 
 EMSCRIPTEN_BINDINGS(testsuite_test_helpers) {
     ::djinni::DjinniClass_<::testsuite::TestHelpers>("testsuite_TestHelpers", "testsuite.TestHelpers")
@@ -328,6 +338,7 @@ EMSCRIPTEN_BINDINGS(testsuite_test_helpers) {
         .class_function("getAsyncResult", NativeTestHelpers::get_async_result)
         .class_function("futureRoundtrip", NativeTestHelpers::future_roundtrip)
         .class_function("checkAsyncInterface", NativeTestHelpers::check_async_interface)
+        .class_function("checkAsyncComposition", NativeTestHelpers::check_async_composition)
         ;
 }
 

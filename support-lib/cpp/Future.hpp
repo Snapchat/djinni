@@ -313,4 +313,33 @@ Future<T> detail::PromiseBase<T>::getFuture() {
     return Future<T>(std::atomic_load(&_sharedState));
 }
 
+template <typename U>
+Future<void> combine(U&& futures, size_t c) {
+    struct Context {
+        std::atomic<int> counter;
+        Promise<void> promise;
+        Context(size_t c) : counter(c) {}
+    };
+    auto context = std::make_shared<Context>(c);
+    auto future = context->promise.getFuture();
+    for (auto& f: futures) {
+        f.then([context] (auto f) {
+            if (--(context->counter) == 0) {
+                context->promise.setValue();
+            }
+        });
+    }
+    return future;
+}
+
+template <typename U>
+Future<void> whenAll(U&& futures) {
+    return combine(std::forward<U>(futures), futures.size());
+}
+
+template <typename U>
+Future<void> whenAny(U&& futures) {
+    return combine(std::forward<U>(futures), 1);
+}
+
 } // namespace djinni

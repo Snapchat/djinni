@@ -55,6 +55,11 @@ class AsyncTest {
         const s = await this.module.testsuite.TestHelpers.checkAsyncInterface(new AsyncInterfaceImpl());
         assertEq(s, "36");
     }
+
+    async testFutureComposition() {
+        const s = await this.module.testsuite.TestHelpers.checkAsyncComposition(new AsyncInterfaceImpl());
+        assertEq(s, "42");
+    }
 }
 
 allTests.push(AsyncTest);

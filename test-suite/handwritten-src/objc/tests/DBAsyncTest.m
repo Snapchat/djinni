@@ -76,4 +76,9 @@
     XCTAssertEqualObjects([s get], @"36");
 }
 
+- (void) testFutureComposition {
+    DJFuture<NSString *> *s = [DBTestHelpers checkAsyncComposition: [[AsyncInterfaceImpl alloc] init]];
+    XCTAssertEqualObjects([s get], @"42");
+}
+
 @end

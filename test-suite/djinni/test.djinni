@@ -52,6 +52,7 @@ test_helpers = interface +c {
     static future_roundtrip(f: future<i32>): future<string>;
 
     static check_async_interface(i: async_interface): future<string>;
+    static check_async_composition(i: async_interface): future<string>;
 }
 
 # Empty record
