@@ -224,7 +224,7 @@ public:
         assert(sharedState);    // call on invalid future will trigger assertion
         std::unique_lock lk(sharedState->mutex);
 #if defined(__EMSCRIPTEN__)
-        assert(state->isReady()); // in wasm we must not block and wait
+        assert(sharedState->isReady()); // in wasm we must not block and wait
 #else
         sharedState->cv.wait(lk, [state = sharedState] {return state->isReady();});
 #endif
@@ -237,7 +237,7 @@ public:
         assert(sharedState);    // call on invalid future will trigger assertion
         std::unique_lock lk(sharedState->mutex);
 #if defined(__EMSCRIPTEN__)
-        assert(state->isReady()); // in wasm we must not block and wait
+        assert(sharedState->isReady()); // in wasm we must not block and wait
 #else
         sharedState->cv.wait(lk, [state = sharedState] {return state->isReady();});
 #endif
