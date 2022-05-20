@@ -61,6 +61,10 @@ class AsyncTest extends TestCase {
         const s = await this.m.testsuite.TestHelpers.checkAsyncInterface(new AsyncInterfaceImpl());
         assertEq(s, "36");
     }
+    async testFutureComposition() {
+        const s = await this.m.testsuite.TestHelpers.checkAsyncComposition(new AsyncInterfaceImpl());
+        assertEq(s, "42");
+    }
 }
 
 allTests.push(AsyncTest);

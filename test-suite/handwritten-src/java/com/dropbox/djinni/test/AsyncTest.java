@@ -61,6 +61,11 @@ public class AsyncTest extends TestCase {
         assertEquals(s.get(), "36");
     }
 
+    public void testFutureComposition() throws Throwable {
+        Future<String> s = TestHelpers.checkAsyncComposition(new AsyncInterfaceImpl());
+        assertEquals(s.get(), "42");
+    }
+
     public void testRx() throws Throwable {
         Future<Integer> f = TestHelpers.getAsyncResult();
         Single<Integer> s = Single.create(o -> f.then((i) -> {

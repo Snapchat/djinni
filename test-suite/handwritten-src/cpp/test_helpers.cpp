@@ -206,4 +206,29 @@ djinni::Future<std::string> TestHelpers::check_async_interface(const std::shared
     return f3;
 }
 
+djinni::Future<std::string> TestHelpers::check_async_composition(const std::shared_ptr<AsyncInterface> & i) {
+    djinni::Promise<std::string> p1;
+    djinni::Promise<std::string> p2;
+    auto f1 = p1.getFuture();
+    auto f2 = p2.getFuture();
+
+    auto str2num = [] (djinni::Future<std::string> s) {
+        return std::stoi(s.get());
+    };
+    
+    auto f3 = f1.then(str2num);
+    auto f4 = f2.then(str2num);
+    
+    std::vector<djinni::Future<std::string>> futures;
+    futures.push_back(i->future_roundtrip(std::move(f3)));
+    futures.push_back(i->future_roundtrip(std::move(f4)));
+
+    p1.setValue("36");
+    p2.setValue("36");
+    
+    return djinni::whenAll(futures).then([] (auto f) {
+        return std::string("42");
+    });
+}
+
 } // namespace testsuite

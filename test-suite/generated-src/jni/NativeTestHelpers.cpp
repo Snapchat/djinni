@@ -246,4 +246,12 @@ CJNIEXPORT ::djinni::FutureAdaptor<::djinni::String>::JniType JNICALL Java_com_d
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
+CJNIEXPORT ::djinni::FutureAdaptor<::djinni::String>::JniType JNICALL Java_com_dropbox_djinni_test_TestHelpers_checkAsyncComposition(JNIEnv* jniEnv, jobject /*this*/, jobject j_i)
+{
+    try {
+        auto r = ::testsuite::TestHelpers::check_async_composition(::djinni_generated::NativeAsyncInterface::toCpp(jniEnv, j_i));
+        return ::djinni::release(::djinni::FutureAdaptor<::djinni::String>::fromCpp(jniEnv, std::move(r)));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
 }  // namespace djinni_generated

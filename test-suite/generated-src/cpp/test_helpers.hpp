@@ -94,6 +94,8 @@ public:
     static ::djinni::Future<std::string> future_roundtrip(::djinni::Future<int32_t> f);
 
     static ::djinni::Future<std::string> check_async_interface(const /*not-null*/ std::shared_ptr<AsyncInterface> & i);
+
+    static ::djinni::Future<std::string> check_async_composition(const /*not-null*/ std::shared_ptr<AsyncInterface> & i);
 };
 
 }  // namespace testsuite

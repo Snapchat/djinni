@@ -450,6 +450,7 @@ export interface TestHelpers_statics {
     getAsyncResult(): Promise<number>;
     futureRoundtrip(f: Promise<number>): Promise<string>;
     checkAsyncInterface(i: AsyncInterface): Promise<string>;
+    checkAsyncComposition(i: AsyncInterface): Promise<string>;
 }
 
 /**
