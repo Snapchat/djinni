@@ -32,7 +32,7 @@ cc_library(
 )
 
 cc_library(
-    name = "djinni-tests-jni",
+    name = "djinni-tests-jni-static",
     srcs = glob(["generated-src/jni/*.cpp"]),
     hdrs = glob(["generated-src/jni/*.hpp"]),
     includes = ["generated-src/jni"],
@@ -47,7 +47,7 @@ cc_library(
 cc_binary(
     name = "libdjinni-tests-jni.so",
     linkshared = 1,
-    deps = [":djinni-tests-jni"],
+    deps = [":djinni-tests-jni-static"],
 )
 
 objc_library(
@@ -125,7 +125,7 @@ java_test(
     use_testrunner = False,
     runtime_deps = [":libdjinni-tests-jni.so"],
     deps = [
-        ":djinni-tests-jni",
+        ":djinni-tests-jni-static",
         "//support-lib:djinni-support-java",
         "@maven_djinni//:com_google_code_findbugs_jsr305",
         "@maven_djinni//:junit_junit",
