@@ -324,7 +324,7 @@ Future<T> detail::PromiseBase<T>::getFuture() {
 template <typename U>
 Future<void> combine(U&& futures, size_t c) {
     struct Context {
-        std::atomic<int> counter;
+        std::atomic<size_t> counter;
         Promise<void> promise;
         Context(size_t c) : counter(c) {}
     };
