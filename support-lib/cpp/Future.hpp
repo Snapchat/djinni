@@ -330,6 +330,10 @@ Future<void> combine(U&& futures, size_t c) {
     };
     auto context = std::make_shared<Context>(c);
     auto future = context->promise.getFuture();
+    if (futures.empty()) {
+        context->promise.setValue();
+        return future;
+    }
     for (auto& f: futures) {
         f.then([context] (auto f) {
             if (--(context->counter) == 0) {
