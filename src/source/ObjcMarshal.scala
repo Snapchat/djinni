@@ -175,9 +175,10 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
                   (s"id<${e.objc.typename}>", false)
                 else
                   (e.objc.typename, true)
-              case _ => if(needRef) (e.objc.boxed, true)
-                        else if (e.objc.generic) (e.objc.typename + args(tm), e.objc.pointer)
-                        else (e.objc.typename, e.objc.pointer)
+              case _ =>
+                if (e.objc.generic) (e.objc.typename + args(tm), e.objc.pointer)
+                else if(needRef) (e.objc.boxed, true)
+                else (e.objc.typename, e.objc.pointer)
             }
             case p: MProtobuf => p.body.objc match {
               case Some(o) => (o.prefix + p.name, true)
