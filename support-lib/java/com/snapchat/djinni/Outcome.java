@@ -35,15 +35,15 @@ public abstract class Outcome<Result, Error> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null) return false;
-        if (!(o instanceof Outcome)) return false;
-        Outcome other = (Outcome) o;
+        if (!(o instanceof Outcome<?, ?>)) return false;
+        Outcome<?, ?> other = (Outcome<?, ?>) o;
         return match(x -> x.equals(other.resultOr(null)),
                      x -> x.equals(other.errorOrNull()));
     }
 
     @Override
     public int hashCode() {
-        Class cls = getClass();
+        Class<?> cls = getClass();
         return match(x -> Objects.hash(cls, 1, x),
                      x -> Objects.hash(cls, 0, x));
     }

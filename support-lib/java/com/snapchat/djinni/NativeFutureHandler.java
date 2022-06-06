@@ -16,7 +16,7 @@
 
 package com.snapchat.djinni;
 
-public class NativeFutureHandler implements Future.FutureHandler {
+public class NativeFutureHandler<T> implements Future.FutureHandler<T> {
     private final long mNativeFunc;
     private final long mNativePromise;
     
@@ -26,8 +26,8 @@ public class NativeFutureHandler implements Future.FutureHandler {
     }
 
     @Override
-    public void handleResult(Future future) {
-        Object res = null;
+    public void handleResult(Future<T> future) {
+        T res = null;
         Throwable ex = null;
         try {
             res = future.get();
