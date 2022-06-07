@@ -23,7 +23,7 @@ public class Promise<T> {
     private AtomicReference<SharedState<T>> _sharedState;
 
     public Promise() {
-        _sharedState = new AtomicReference(new SharedState<T>());
+        _sharedState = new AtomicReference<>(new SharedState<T>());
     }
 
     // Get a future object associated with this promise

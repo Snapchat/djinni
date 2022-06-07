@@ -57,10 +57,12 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     }
     
     // Handler routine for type U that does not return a value
+    @FunctionalInterface
     public interface FutureHandler<U> {
         public void handleResult(Future<U> res) throws Throwable;
     }
     // Handler routine for type U that returns a value of type R
+    @FunctionalInterface
     public interface FutureHandlerWithReturn<U, R> {
         public R handleResult(Future<U> res) throws Throwable;
     }
@@ -68,7 +70,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     private AtomicReference<SharedState<T>> _sharedState;
 
     Future(SharedState<T> state) {
-        _sharedState = new AtomicReference(state);
+        _sharedState = new AtomicReference<>(state);
     }
     // If the future is ready, then calling its `get()` method will not block.
     public boolean isReady() {
@@ -80,6 +82,10 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     // Tell the future to Call the specified handler routine when it becomes
     // ready. Returns a new void future. The current future becomes invalid
     // after this call.
+    // If a class were to implement both FutureHandler and FutureHandlerWithReturn, the overload
+    // selected at runtime would be ambiguous. In practice these objects are always created using
+    // a lambda so suppress the warning.
+    @SuppressWarnings("overloads")
     public Future<Void> then (FutureHandler<T> handler) {
         final Promise<Void> nextPromise = new Promise<Void>();
         final Future<Void> nextFuture = nextPromise.getFuture();
@@ -108,6 +114,7 @@ public class Future<T> implements java.util.concurrent.Future<T> {
     // Tell the future to Call the specified handler routine when it becomes
     // ready. Returns a new future that wraps the return value of the handler
     // routine. The current future becomes invalid after this call.
+    @SuppressWarnings("overloads")
     public <R> Future<R> then (final FutureHandlerWithReturn<T, R> handler) {
         final Promise<R> nextPromise = new Promise<R>();
         final Future<R> nextFuture = nextPromise.getFuture();
