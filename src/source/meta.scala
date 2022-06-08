@@ -128,7 +128,11 @@ def isInterface(ty: MExpr): Boolean = {
   }
 }
 
+def isOptional(ty: MExpr): Boolean = {
+  ty.base == MOptional && ty.args.length == 1
+}
+
 def isOptionalInterface(ty: MExpr): Boolean = {
-  ty.base == MOptional && ty.args.length == 1 && isInterface(ty.args.head)
+  isOptional(ty) && isInterface(ty.args.head)
 }
 }

@@ -222,14 +222,11 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
           }
         }
         case None =>
-          if (isOptionalInterface(tm)) {
-            // otherwise, interfaces are always plain old shared_ptr
-            expr(tm.args.head)
-          } else {
-            val args = if (tm.args.isEmpty) "" else tm.args.map(expr).mkString("<", ", ", ">")
-            val prefix = if (isInterface(tm)) "/*not-null*/ " else ""
-            prefix + base(tm.base) + args
-          }
+          val ty = if (isOptionalInterface(tm)) { tm.args.head } else { tm }
+          val prefix = if (!isInterface(ty)) {""} else { /* isInterface */
+            if (isOptional(tm)) {"/*nullable*/ "} else {"/*not-null*/ "}}
+          val args = if (ty.args.isEmpty) "" else ty.args.map(expr).mkString("<", ", ", ">")
+          prefix + base(ty.base) + args
       }
     }
     expr(tm)

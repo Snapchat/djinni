@@ -72,7 +72,7 @@ public:
 
     static void check_enum(color c);
 
-    static /*not-null*/ std::shared_ptr<UserToken> token_id(const /*not-null*/ std::shared_ptr<UserToken> & t);
+    static /*nullable*/ std::shared_ptr<UserToken> token_id(const /*nullable*/ std::shared_ptr<UserToken> & t);
 
     static /*not-null*/ std::shared_ptr<UserToken> create_cpp_token();
 

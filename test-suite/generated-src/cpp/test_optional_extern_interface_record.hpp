@@ -9,10 +9,10 @@
 #include <utility>
 
 struct TestOptionalExternInterfaceRecord final {
-    /*not-null*/ std::shared_ptr<::testsuite::SampleInterface> sample_interface;
+    /*nullable*/ std::shared_ptr<::testsuite::SampleInterface> sample_interface;
 
     //NOLINTNEXTLINE(google-explicit-constructor)
-    TestOptionalExternInterfaceRecord(/*not-null*/ std::shared_ptr<::testsuite::SampleInterface> sample_interface_)
+    TestOptionalExternInterfaceRecord(/*nullable*/ std::shared_ptr<::testsuite::SampleInterface> sample_interface_)
     : sample_interface(std::move(sample_interface_))
     {}
 };
