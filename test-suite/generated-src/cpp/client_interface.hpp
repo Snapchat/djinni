@@ -27,7 +27,7 @@ public:
 
     virtual std::string meth_taking_interface(const /*not-null*/ std::shared_ptr<ClientInterface> & i) = 0;
 
-    virtual std::string meth_taking_optional_interface(const /*not-null*/ std::shared_ptr<ClientInterface> & i) = 0;
+    virtual std::string meth_taking_optional_interface(const /*nullable*/ std::shared_ptr<ClientInterface> & i) = 0;
 };
 
 }  // namespace testsuite

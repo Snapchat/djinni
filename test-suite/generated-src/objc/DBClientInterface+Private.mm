@@ -51,7 +51,7 @@ public:
             return ::djinni::String::toCpp(objcpp_result_);
         }
     }
-    std::string meth_taking_optional_interface(const /*not-null*/ std::shared_ptr<::testsuite::ClientInterface> & c_i) override
+    std::string meth_taking_optional_interface(const /*nullable*/ std::shared_ptr<::testsuite::ClientInterface> & c_i) override
     {
         @autoreleasepool {
             auto objcpp_result_ = [djinni_private_get_proxied_objc_object() methTakingOptionalInterface:(::djinni::Optional<std::experimental::optional, ::djinni_generated::ClientInterface>::fromCpp(c_i))];
