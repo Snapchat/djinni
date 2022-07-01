@@ -4,7 +4,7 @@
 #import <Foundation/Foundation.h>
 
 
-@protocol DBUserToken <NSObject>
+@protocol DBUserToken
 
 - (nonnull NSString *)whoami;
 

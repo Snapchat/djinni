@@ -5,7 +5,7 @@
 
 
 /** Used for ObjC multiple inheritance tests */
-@protocol DBFirstListener <NSObject>
+@protocol DBFirstListener
 
 - (void)first;
 

@@ -4,6 +4,6 @@
 #import <Foundation/Foundation.h>
 
 
-@protocol DBObjcOnlyListener <NSObject>
+@protocol DBObjcOnlyListener
 
 @end
