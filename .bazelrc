@@ -1,1 +1,1 @@
-build --cxxopt=-std=c++17
+build --cxxopt=-std=c++17 --incompatible_java_common_parameters=false
