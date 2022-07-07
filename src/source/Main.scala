@@ -84,6 +84,7 @@ object Main {
     var objcppFunctionPrologueFile: Option[String] = None
     var objcppDisableExceptionTranslation: Boolean = false
     var objcFileIdentStyleOptional: Option[IdentConverter] = None
+    var objcStrictProtocol: Boolean = true
     var objcppNamespace: String = "djinni_generated"
     var objcBaseLibIncludePrefix: String = ""
     var wasmOutFolder: Option[File] = None
@@ -202,6 +203,9 @@ object Main {
         .text("Disable generating Objective-C class init helper method.")
       opt[Boolean]("objc-closed-enums").valueName("<true/false>").foreach(x => objcClosedEnums = x)
         .text("All generated Objective-C enums will be NS_CLOSED_ENUM (default: false). ")
+      opt[Boolean]("objc-strict-protocols")
+        .valueName("<true/false>").foreach(x => objcStrictProtocol = x)
+        .text("All generated @protocol will implement <NSObject> (default: true). ")
       note("")
       opt[File]("objcpp-out").valueName("<out-folder>").foreach(x => objcppOutFolder = Some(x))
         .text("The output folder for private Objective-C++ files (Generator disabled if unspecified).")
@@ -416,6 +420,7 @@ object Main {
       objcGenProtocol,
       objcDisableClassCtor,
       objcClosedEnums,
+      objcStrictProtocol,
       wasmOutFolder,
       wasmIncludePrefix,
       wasmIncludeCppPrefix,

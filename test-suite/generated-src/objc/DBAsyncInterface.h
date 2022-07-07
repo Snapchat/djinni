@@ -5,7 +5,7 @@
 #import <Foundation/Foundation.h>
 
 
-@protocol DBAsyncInterface
+@protocol DBAsyncInterface <NSObject>
 
 - (nonnull DJFuture<NSString *> *)futureRoundtrip:(nonnull DJFuture<NSNumber *> *)f;
 
