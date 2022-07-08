@@ -87,8 +87,13 @@ em::val getCppProxyClass() {
 }
 
 em::val getWasmMemoryBuffer() {
-    static auto memoryBuffer = em::val::module_property("HEAPU32")["buffer"];
-    return memoryBuffer;
+    // When ALLOW_MEMORY_GROWTH is turned on, the WebAssembly.Memory object's underlying buffer changes as it grows,
+    // and the HEAP* views in the Emscripten module object get reset to new views over the bigger memory buffer.
+    // In this mode, capturing the heap here as a static variable is incorrect, and leads to runtime errors.
+    // https://github.com/emscripten-core/emscripten/blob/3.1.7/src/settings.js#L194-L207 is the growth setting
+    // https://github.com/emscripten-core/emscripten/blob/3.1.7/src/library.js#L127 is the call to reset the views after grow()
+    // https://github.com/emscripten-core/emscripten/blob/3.1.7/src/preamble.js#L269-L286 is where the views get reset
+    return em::val::module_property("HEAPU32")["buffer"];
 }
 
 em::val DataObject::createJsObject() {
