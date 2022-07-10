@@ -135,7 +135,12 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
 
       w.wl
       writeDoc(w, doc)
-      if (useProtocol(i.ext, spec)) w.wl(s"@protocol $self <NSObject>") else w.wl(s"@interface $self : NSObject")
+      if (useProtocol(i.ext, spec)) {
+        val baseProtocol = if (spec.objcStrictProtocol) " <NSObject>" else ""
+        w.wl(s"@protocol $self$baseProtocol")
+      } else {
+        w.wl(s"@interface $self : NSObject")
+      }
 
       for (m <- i.methods) {
         if (!m.static || (!spec.objcGenProtocol && m.lang.objc)) {
