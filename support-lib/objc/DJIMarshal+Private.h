@@ -277,7 +277,11 @@ public:
         assert(v.size() <= std::numeric_limits<NSUInteger>::max());
         auto array = [NSMutableArray arrayWithCapacity:static_cast<NSUInteger>(v.size())];
         for(const auto& value : v) {
-            [array addObject:T::Boxed::fromCpp(value)];
+            id elem = T::Boxed::fromCpp(value);
+            if (elem == nil) {
+                elem = [NSNull null];
+            }
+            [array addObject:elem];
         }
         return [array copy];
     }
