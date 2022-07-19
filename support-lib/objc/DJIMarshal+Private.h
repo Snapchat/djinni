@@ -233,7 +233,9 @@ public:
     using Boxed = Optional;
 
     static CppType toCpp(ObjcType obj) {
-        if (obj) {
+        // In addition to nil, detect NSNull objects and convert to empty
+        // optional, too.
+        if (obj && obj != [NSNull null]) {
             return T::Boxed::toCpp(obj);
         } else {
             return CppType();
@@ -278,6 +280,8 @@ public:
         auto array = [NSMutableArray arrayWithCapacity:static_cast<NSUInteger>(v.size())];
         for(const auto& value : v) {
             id elem = T::Boxed::fromCpp(value);
+            // NSArray does not allow nil elements, so convert Nil to NSNull
+            // before adding to array.
             if (elem == nil) {
                 elem = [NSNull null];
             }
