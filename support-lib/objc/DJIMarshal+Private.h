@@ -233,7 +233,7 @@ public:
     using Boxed = Optional;
 
     static CppType toCpp(ObjcType obj) {
-        if (obj/* && (id)obj != [NSNull null]*/) {
+        if (obj) {
             return T::Boxed::toCpp(obj);
         } else {
             return CppType();
