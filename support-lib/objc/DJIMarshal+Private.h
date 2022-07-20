@@ -233,9 +233,7 @@ public:
     using Boxed = Optional;
 
     static CppType toCpp(ObjcType obj) {
-        // In addition to nil, detect NSNull objects and convert to empty
-        // optional, too.
-        if (obj && (id)obj != [NSNull null]) {
+        if (obj/* && (id)obj != [NSNull null]*/) {
             return T::Boxed::toCpp(obj);
         } else {
             return CppType();
@@ -256,17 +254,26 @@ public:
 
 // base template, default conversion
 template<typename T>
-struct ElemFromCpp {
-    static id convert(const typename T::CppType& cppElem) {
-        return T::Boxed::fromCpp(cppElem);
+struct ContainerElem {
+    static id fromCpp(const typename T::CppType& elem) {
+        return T::Boxed::fromCpp(elem);
+    }
+    static typename T::CppType toCpp(typename T::Boxed::ObjcType obj) {
+        return T::Boxed::toCpp(obj);
     }
 };
-// specialize for Optional<T>, check for nil and convert to NSNull
+// specialize for Optional<T>
 template<template<class> class OptionalType, class T>
-struct ElemFromCpp<Optional<OptionalType, T>> {
-    static id convert(const typename Optional<OptionalType, T>::CppType& cppElem) {
-        id elem = Optional<OptionalType, T>::fromCpp(cppElem);
-        return (elem != nil)? elem : [NSNull null];
+struct ContainerElem<Optional<OptionalType, T>> {
+    // check for empty optional and convert to NSNull
+    static id fromCpp(const typename Optional<OptionalType, T>::CppType& opt) {
+        return opt ? Optional<OptionalType, T>::fromCpp(opt) : [NSNull null];
+    }
+    // check for NSNull and convert to empty optional
+    static typename Optional<OptionalType, T>::CppType toCpp(typename Optional<OptionalType, T>::ObjcType obj) {
+        return (id)obj != [NSNull null] ?
+            Optional<OptionalType, T>::toCpp(obj) :
+            typename Optional<OptionalType, T>::CppType();
     }
 };
 
@@ -286,7 +293,7 @@ public:
         auto v = CppType();
         v.reserve(array.count);
         for(EObjcType value in array) {
-            v.push_back(T::Boxed::toCpp(value));
+            v.push_back(ContainerElem<T>::toCpp(value));
         }
         return v;
     }
@@ -295,7 +302,7 @@ public:
         assert(v.size() <= std::numeric_limits<NSUInteger>::max());
         auto array = [NSMutableArray arrayWithCapacity:static_cast<NSUInteger>(v.size())];
         for(const auto& value : v) {
-            [array addObject:ElemFromCpp<T>::convert(value)];
+            [array addObject:ContainerElem<T>::fromCpp(value)];
         }
         return [array copy];
     }
@@ -320,7 +327,7 @@ public:
         assert(set);
         auto s = CppType();
         for(EObjcType value in set) {
-            s.insert(T::Boxed::toCpp(value));
+            s.insert(ContainerElem<T>::toCpp(value));
         }
         return s;
     }
@@ -329,7 +336,7 @@ public:
         assert(s.size() <= std::numeric_limits<NSUInteger>::max());
         auto set = [NSMutableSet setWithCapacity:static_cast<NSUInteger>(s.size())];
         for(const auto& value : s) {
-            [set addObject:ElemFromCpp<T>::convert(value)];
+            [set addObject:ContainerElem<T>::fromCpp(value)];
         }
         return [set copy];
     }
@@ -353,7 +360,7 @@ public:
         __block auto m = CppType();
         m.reserve(map.count);
         [map enumerateKeysAndObjectsUsingBlock:^(ObjcKeyType key, ObjcValueType obj, BOOL *) {
-            m.emplace(Key::Boxed::toCpp(key), Value::Boxed::toCpp(obj));
+            m.emplace(ContainerElem<Key>::toCpp(key), ContainerElem<Value>::toCpp(obj));
         }];
         return m;
     }
@@ -362,8 +369,8 @@ public:
         assert(m.size() <= std::numeric_limits<NSUInteger>::max());
         auto map = [NSMutableDictionary dictionaryWithCapacity:static_cast<NSUInteger>(m.size())];
         for(const auto& kvp : m) {
-            [map setObject:ElemFromCpp<Value>::convert(kvp.second)
-                    forKey:ElemFromCpp<Key>::convert(kvp.first)];
+            [map setObject:ContainerElem<Value>::fromCpp(kvp.second)
+                    forKey:ContainerElem<Key>::fromCpp(kvp.first)];
         }
         return [map copy];
     }
