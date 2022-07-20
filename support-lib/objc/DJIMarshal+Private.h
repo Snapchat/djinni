@@ -235,7 +235,7 @@ public:
     static CppType toCpp(ObjcType obj) {
         // In addition to nil, detect NSNull objects and convert to empty
         // optional, too.
-        if (obj && obj != [NSNull null]) {
+        if (obj && (id)obj != [NSNull null]) {
             return T::Boxed::toCpp(obj);
         } else {
             return CppType();
@@ -251,6 +251,22 @@ public:
     template <typename C = T>
     static ObjcType fromCpp(const typename C::CppOptType & cppOpt) {
         return T::Boxed::fromCppOpt(cppOpt);
+    }
+};
+
+// base template, default conversion
+template<typename T>
+struct ElemFromCpp {
+    static id convert(const typename T::CppType& cppElem) {
+        return T::Boxed::fromCpp(cppElem);
+    }
+};
+// specialize for Optional<T>, check for nil and convert to NSNull
+template<template<class> class OptionalType, class T>
+struct ElemFromCpp<Optional<OptionalType, T>> {
+    static id convert(const typename Optional<OptionalType, T>::CppType& cppElem) {
+        id elem = Optional<OptionalType, T>::fromCpp(cppElem);
+        return (elem != nil)? elem : [NSNull null];
     }
 };
 
@@ -279,13 +295,7 @@ public:
         assert(v.size() <= std::numeric_limits<NSUInteger>::max());
         auto array = [NSMutableArray arrayWithCapacity:static_cast<NSUInteger>(v.size())];
         for(const auto& value : v) {
-            id elem = T::Boxed::fromCpp(value);
-            // NSArray does not allow nil elements, so convert Nil to NSNull
-            // before adding to array.
-            if (elem == nil) {
-                elem = [NSNull null];
-            }
-            [array addObject:elem];
+            [array addObject:ElemFromCpp<T>::convert(value)];
         }
         return [array copy];
     }
@@ -319,7 +329,7 @@ public:
         assert(s.size() <= std::numeric_limits<NSUInteger>::max());
         auto set = [NSMutableSet setWithCapacity:static_cast<NSUInteger>(s.size())];
         for(const auto& value : s) {
-            [set addObject:T::Boxed::fromCpp(value)];
+            [set addObject:ElemFromCpp<T>::convert(value)];
         }
         return [set copy];
     }
@@ -352,7 +362,8 @@ public:
         assert(m.size() <= std::numeric_limits<NSUInteger>::max());
         auto map = [NSMutableDictionary dictionaryWithCapacity:static_cast<NSUInteger>(m.size())];
         for(const auto& kvp : m) {
-            [map setObject:Value::Boxed::fromCpp(kvp.second) forKey:Key::Boxed::fromCpp(kvp.first)];
+            [map setObject:ElemFromCpp<Value>::convert(kvp.second)
+                    forKey:ElemFromCpp<Key>::convert(kvp.first)];
         }
         return [map copy];
     }

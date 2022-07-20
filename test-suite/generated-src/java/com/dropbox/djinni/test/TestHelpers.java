@@ -4,7 +4,9 @@
 package com.dropbox.djinni.test;
 
 import com.snapchat.djinni.NativeObjectManager;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -94,6 +96,21 @@ public abstract class TestHelpers {
 
     @Nonnull
     public static native com.snapchat.djinni.Future<String> checkAsyncComposition(@CheckForNull AsyncInterface i);
+
+    @Nonnull
+    public static native ArrayList<String> getOptionalList();
+
+    public static native boolean checkOptionalList(@Nonnull ArrayList<String> ol);
+
+    @Nonnull
+    public static native HashSet<String> getOptionalSet();
+
+    public static native boolean checkOptionalSet(@Nonnull HashSet<String> os);
+
+    @Nonnull
+    public static native HashMap<String, String> getOptionalMap();
+
+    public static native boolean checkOptionalMap(@Nonnull HashMap<String, String> om);
 
     public static final class CppProxy extends TestHelpers
     {

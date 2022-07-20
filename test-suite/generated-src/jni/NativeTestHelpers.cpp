@@ -254,4 +254,52 @@ CJNIEXPORT ::djinni::FutureAdaptor<::djinni::String>::JniType JNICALL Java_com_d
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
+CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestHelpers_getOptionalList(JNIEnv* jniEnv, jobject /*this*/)
+{
+    try {
+        auto r = ::testsuite::TestHelpers::get_optional_list();
+        return ::djinni::release(::djinni::List<::djinni::Optional<std::experimental::optional, ::djinni::String>>::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jboolean JNICALL Java_com_dropbox_djinni_test_TestHelpers_checkOptionalList(JNIEnv* jniEnv, jobject /*this*/, jobject j_ol)
+{
+    try {
+        auto r = ::testsuite::TestHelpers::check_optional_list(::djinni::List<::djinni::Optional<std::experimental::optional, ::djinni::String>>::toCpp(jniEnv, j_ol));
+        return ::djinni::release(::djinni::Bool::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestHelpers_getOptionalSet(JNIEnv* jniEnv, jobject /*this*/)
+{
+    try {
+        auto r = ::testsuite::TestHelpers::get_optional_set();
+        return ::djinni::release(::djinni::Set<::djinni::Optional<std::experimental::optional, ::djinni::String>>::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jboolean JNICALL Java_com_dropbox_djinni_test_TestHelpers_checkOptionalSet(JNIEnv* jniEnv, jobject /*this*/, jobject j_os)
+{
+    try {
+        auto r = ::testsuite::TestHelpers::check_optional_set(::djinni::Set<::djinni::Optional<std::experimental::optional, ::djinni::String>>::toCpp(jniEnv, j_os));
+        return ::djinni::release(::djinni::Bool::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_TestHelpers_getOptionalMap(JNIEnv* jniEnv, jobject /*this*/)
+{
+    try {
+        auto r = ::testsuite::TestHelpers::get_optional_map();
+        return ::djinni::release(::djinni::Map<::djinni::Optional<std::experimental::optional, ::djinni::String>, ::djinni::Optional<std::experimental::optional, ::djinni::String>>::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jboolean JNICALL Java_com_dropbox_djinni_test_TestHelpers_checkOptionalMap(JNIEnv* jniEnv, jobject /*this*/, jobject j_om)
+{
+    try {
+        auto r = ::testsuite::TestHelpers::check_optional_map(::djinni::Map<::djinni::Optional<std::experimental::optional, ::djinni::String>, ::djinni::Optional<std::experimental::optional, ::djinni::String>>::toCpp(jniEnv, j_om));
+        return ::djinni::release(::djinni::Bool::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
 }  // namespace djinni_generated
