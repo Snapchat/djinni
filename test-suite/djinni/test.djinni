@@ -53,6 +53,13 @@ test_helpers = interface +c {
 
     static check_async_interface(i: async_interface): future<string>;
     static check_async_composition(i: async_interface): future<string>;
+
+    static get_optional_list(): list<optional<string>>;
+    static check_optional_list(ol: list<optional<string>>): bool;
+    static get_optional_set(): set<optional<string>>;
+    static check_optional_set(os: set<optional<string>>): bool;
+    static get_optional_map(): map<optional<string>, optional<string>>;
+    static check_optional_map(om: map<optional<string>, optional<string>>): bool;
 }
 
 # Empty record

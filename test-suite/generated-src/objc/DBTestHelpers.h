@@ -87,4 +87,16 @@
 
 + (nonnull DJFuture<NSString *> *)checkAsyncComposition:(nullable id<DBAsyncInterface>)i;
 
++ (nonnull NSArray<NSString *> *)getOptionalList;
+
++ (BOOL)checkOptionalList:(nonnull NSArray<NSString *> *)ol;
+
++ (nonnull NSSet<NSString *> *)getOptionalSet;
+
++ (BOOL)checkOptionalSet:(nonnull NSSet<NSString *> *)os;
+
++ (nonnull NSDictionary<NSString *, NSString *> *)getOptionalMap;
+
++ (BOOL)checkOptionalMap:(nonnull NSDictionary<NSString *, NSString *> *)om;
+
 @end

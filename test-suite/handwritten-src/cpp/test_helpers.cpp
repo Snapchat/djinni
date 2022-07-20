@@ -231,4 +231,36 @@ djinni::Future<std::string> TestHelpers::check_async_composition(const std::shar
     });
 }
 
+std::vector<std::experimental::optional<std::string>> TestHelpers::get_optional_list() {
+    return {std::experimental::nullopt, std::string("hello")};
+}
+
+bool TestHelpers::check_optional_list(const std::vector<std::experimental::optional<std::string>> & ol) {
+    return ol.size() == 2 &&
+        ol[0] == std::experimental::nullopt &&
+        ol[1] == std::string("hello");
+}
+
+std::unordered_set<std::experimental::optional<std::string>> TestHelpers::get_optional_set() {
+    return {std::experimental::nullopt, std::string("hello")};
+}
+
+bool TestHelpers::check_optional_set(const std::unordered_set<std::experimental::optional<std::string>> & os) {
+    return os.size() == 2 &&
+        os.find(std::experimental::nullopt) != os.end() &&
+        os.find(std::string("hello")) != os.end();
+}
+
+std::unordered_map<std::experimental::optional<std::string>, std::experimental::optional<std::string>> TestHelpers::get_optional_map() {
+    return {{std::experimental::nullopt, std::string("hello")}, {std::string("hello"), std::experimental::nullopt}};
+}
+
+bool TestHelpers::check_optional_map(const std::unordered_map<std::experimental::optional<std::string>, std::experimental::optional<std::string>> & om) {
+    auto i1 = om.find(std::experimental::nullopt);
+    auto i2 = om.find(std::string("hello"));
+    return om.size() == 2 &&
+        i1->second == std::string("hello") &&
+        i2->second == std::experimental::nullopt;
+}
+
 } // namespace testsuite

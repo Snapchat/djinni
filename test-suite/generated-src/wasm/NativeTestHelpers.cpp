@@ -305,6 +305,66 @@ em::val NativeTestHelpers::check_async_composition(const em::val& w_i) {
         throw;
     }
 }
+em::val NativeTestHelpers::get_optional_list() {
+    try {
+        auto r = ::testsuite::TestHelpers::get_optional_list();
+        return ::djinni::List<::djinni::Optional<std::experimental::optional, ::djinni::String>>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
+}
+bool NativeTestHelpers::check_optional_list(const em::val& w_ol) {
+    try {
+        auto r = ::testsuite::TestHelpers::check_optional_list(::djinni::List<::djinni::Optional<std::experimental::optional, ::djinni::String>>::toCpp(w_ol));
+        return ::djinni::Bool::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
+}
+em::val NativeTestHelpers::get_optional_set() {
+    try {
+        auto r = ::testsuite::TestHelpers::get_optional_set();
+        return ::djinni::Set<::djinni::Optional<std::experimental::optional, ::djinni::String>>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
+}
+bool NativeTestHelpers::check_optional_set(const em::val& w_os) {
+    try {
+        auto r = ::testsuite::TestHelpers::check_optional_set(::djinni::Set<::djinni::Optional<std::experimental::optional, ::djinni::String>>::toCpp(w_os));
+        return ::djinni::Bool::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
+}
+em::val NativeTestHelpers::get_optional_map() {
+    try {
+        auto r = ::testsuite::TestHelpers::get_optional_map();
+        return ::djinni::Map<::djinni::Optional<std::experimental::optional, ::djinni::String>, ::djinni::Optional<std::experimental::optional, ::djinni::String>>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
+}
+bool NativeTestHelpers::check_optional_map(const em::val& w_om) {
+    try {
+        auto r = ::testsuite::TestHelpers::check_optional_map(::djinni::Map<::djinni::Optional<std::experimental::optional, ::djinni::String>, ::djinni::Optional<std::experimental::optional, ::djinni::String>>::toCpp(w_om));
+        return ::djinni::Bool::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        djinni::djinni_throw_native_exception(e);
+        throw;
+    }
+}
 
 EMSCRIPTEN_BINDINGS(testsuite_test_helpers) {
     ::djinni::DjinniClass_<::testsuite::TestHelpers>("testsuite_TestHelpers", "testsuite.TestHelpers")
@@ -339,6 +399,12 @@ EMSCRIPTEN_BINDINGS(testsuite_test_helpers) {
         .class_function("futureRoundtrip", NativeTestHelpers::future_roundtrip)
         .class_function("checkAsyncInterface", NativeTestHelpers::check_async_interface)
         .class_function("checkAsyncComposition", NativeTestHelpers::check_async_composition)
+        .class_function("getOptionalList", NativeTestHelpers::get_optional_list)
+        .class_function("checkOptionalList", NativeTestHelpers::check_optional_list)
+        .class_function("getOptionalSet", NativeTestHelpers::get_optional_set)
+        .class_function("checkOptionalSet", NativeTestHelpers::check_optional_set)
+        .class_function("getOptionalMap", NativeTestHelpers::get_optional_map)
+        .class_function("checkOptionalMap", NativeTestHelpers::check_optional_map)
         ;
 }
 

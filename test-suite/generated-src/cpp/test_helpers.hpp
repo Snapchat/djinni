@@ -9,6 +9,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace testsuite {
@@ -96,6 +97,18 @@ public:
     static ::djinni::Future<std::string> check_async_interface(const /*not-null*/ std::shared_ptr<AsyncInterface> & i);
 
     static ::djinni::Future<std::string> check_async_composition(const /*not-null*/ std::shared_ptr<AsyncInterface> & i);
+
+    static std::vector<std::experimental::optional<std::string>> get_optional_list();
+
+    static bool check_optional_list(const std::vector<std::experimental::optional<std::string>> & ol);
+
+    static std::unordered_set<std::experimental::optional<std::string>> get_optional_set();
+
+    static bool check_optional_set(const std::unordered_set<std::experimental::optional<std::string>> & os);
+
+    static std::unordered_map<std::experimental::optional<std::string>, std::experimental::optional<std::string>> get_optional_map();
+
+    static bool check_optional_map(const std::unordered_map<std::experimental::optional<std::string>, std::experimental::optional<std::string>> & om);
 };
 
 }  // namespace testsuite

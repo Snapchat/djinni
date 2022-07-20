@@ -451,6 +451,12 @@ export interface TestHelpers_statics {
     futureRoundtrip(f: Promise<number>): Promise<string>;
     checkAsyncInterface(i: AsyncInterface): Promise<string>;
     checkAsyncComposition(i: AsyncInterface): Promise<string>;
+    getOptionalList(): Array<string>;
+    checkOptionalList(ol: Array<string>): boolean;
+    getOptionalSet(): Set<string>;
+    checkOptionalSet(os: Set<string>): boolean;
+    getOptionalMap(): Map<string, string>;
+    checkOptionalMap(om: Map<string, string>): boolean;
 }
 
 /**

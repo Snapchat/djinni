@@ -52,6 +52,12 @@ struct NativeTestHelpers : ::djinni::JsInterface<::testsuite::TestHelpers, Nativ
     static em::val future_roundtrip(const em::val& w_f);
     static em::val check_async_interface(const em::val& w_i);
     static em::val check_async_composition(const em::val& w_i);
+    static em::val get_optional_list();
+    static bool check_optional_list(const em::val& w_ol);
+    static em::val get_optional_set();
+    static bool check_optional_set(const em::val& w_os);
+    static em::val get_optional_map();
+    static bool check_optional_map(const em::val& w_om);
 
 };
 
