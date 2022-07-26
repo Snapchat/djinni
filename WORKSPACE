@@ -58,14 +58,14 @@ apple_support_dependencies()
 kotlin_repositories()
 kt_register_toolchains()
 
-emsdk_version = "2.0.29"
+emsdk_version = "3.1.8"
 
 http_archive(
     name = "emsdk",
     strip_prefix = "emsdk-%s/bazel" % emsdk_version,
     type = "zip",
     url = "https://github.com/emscripten-core/emsdk/archive/%s.zip" % emsdk_version,
-    sha256 = "e0194dba792a978bd2dfd5ba3b5855e8ff391d48be76238bc9faec1e95ba1d31",
+    sha256 = "7795202a50ab09958d8943f79110de4386ff0f38bf4c97ec1a896885f28fe1cf",
 )
 
 load("@emsdk//:deps.bzl", emsdk_deps = "deps")
