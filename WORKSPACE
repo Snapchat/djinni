@@ -13,26 +13,26 @@ android_ndk_repository(name = "androidndk", api_level = 21)
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-build_bazel_rules_apple_version = "0.31.3"
+build_bazel_rules_apple_version = "1.0.1"
 http_archive(
     name = "build_bazel_rules_apple",
-    sha256 = "0052d452af7742c8f3a4e0929763388a66403de363775db7e90adecb2ba4944b",
+    sha256 = "36072d4f3614d309d6a703da0dfe48684ec4c65a89611aeb9590b45af7a3e592",
     url = "https://github.com/bazelbuild/rules_apple/releases/download/{0}/rules_apple.{0}.tar.gz"
         .format(build_bazel_rules_apple_version),
 )
 
-build_bazel_rules_swift_version = "0.23.0"
+build_bazel_rules_swift_version = "1.0.0"
 http_archive(
     name = "build_bazel_rules_swift",
-    sha256 = "f872c0388808c3f8de67e0c6d39b0beac4a65d7e07eff3ced123d0b102046fb6",
+    sha256 = "12057b7aa904467284eee640de5e33853e51d8e31aae50b3fb25d2823d51c6b8",
     url = "https://github.com/bazelbuild/rules_swift/releases/download/{0}/rules_swift.{0}.tar.gz"
         .format(build_bazel_rules_swift_version),
 )
 
-build_bazel_apple_support_version = "0.11.0"
+build_bazel_apple_support_version = "1.0.0"
 http_archive(
     name = "build_bazel_apple_support",
-    sha256 = "76df040ade90836ff5543888d64616e7ba6c3a7b33b916aa3a4b68f342d1b447",
+    sha256 = "df317473b5894dd8eb432240d209271ebc83c76bb30c55481374b36ddf1e4fd1",
     url = "https://github.com/bazelbuild/apple_support/releases/download/{0}/apple_support.{0}.tar.gz"
         .format(build_bazel_apple_support_version),
 )
@@ -58,14 +58,14 @@ apple_support_dependencies()
 kotlin_repositories()
 kt_register_toolchains()
 
-emsdk_version = "2.0.29"
+emsdk_version = "3.1.8"
 
 http_archive(
     name = "emsdk",
     strip_prefix = "emsdk-%s/bazel" % emsdk_version,
     type = "zip",
     url = "https://github.com/emscripten-core/emsdk/archive/%s.zip" % emsdk_version,
-    sha256 = "e0194dba792a978bd2dfd5ba3b5855e8ff391d48be76238bc9faec1e95ba1d31",
+    sha256 = "7795202a50ab09958d8943f79110de4386ff0f38bf4c97ec1a896885f28fe1cf",
 )
 
 load("@emsdk//:deps.bzl", emsdk_deps = "deps")
