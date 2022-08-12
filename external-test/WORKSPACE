@@ -7,6 +7,7 @@ local_repository(
 
 load("@djinni//bzl:deps.bzl", "djinni_deps")
 djinni_deps()
-
+load("@djinni//bzl:scala_config.bzl", "djinni_scala_config")
+djinni_scala_config()
 load("@djinni//bzl:setup_deps.bzl", "djinni_setup_deps")
 djinni_setup_deps()
