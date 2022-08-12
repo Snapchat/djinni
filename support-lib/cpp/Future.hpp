@@ -108,6 +108,49 @@ class PromiseBase {
 public:
     Future<T> getFuture();
 
+    // Use to immediately resolve a promise and return the resulting future.
+    // Useful for returning from trivial cases in functions that return djinni::Future<>
+    // Examples:
+    //   return Promise<int>::resolve(4);
+    //   return Promise<std::string>::resolve(std::move(someStr));
+    static Future<T> resolve(const typename ValueHolder<T>::type& val) {
+        PromiseBase<T> promise;
+        promise.setValue(val);
+        return promise.getFuture();
+    }
+    static Future<T> resolve(typename ValueHolder<T>::type&& val) {
+        PromiseBase<T> promise;
+        promise.setValue(std::move(val));
+        return promise.getFuture();
+    }
+
+    // Use to immediately reject a promise and return the resulting future.
+    // Useful for returning from synchronous error handling in functions that return djinni::Future<>
+    // Examples:
+    //   return Promise<int>::reject(std::runtime_error("something bad"));
+    //
+    //   try {
+    //     throwingFunc();
+    //   } catch (const std::exception& e) {
+    //     return Promise<std::string>::reject(e);
+    //   }
+    //
+    //   try {
+    //     throwingFunc();
+    //   } catch (...) {
+    //     return Promise<std::string>::reject(std::current_exception());
+    //   }
+    static Future<T> reject(const std::exception& e) {
+        PromiseBase<T> promise;
+        promise.setException(e);
+        return promise.getFuture();
+    }
+    static Future<T> reject(std::exception_ptr ex) {
+        PromiseBase<T> promise;
+        promise.setException(ex);
+        return promise.getFuture();
+    }
+
 protected:
     // `setValue()` or `setException()` can only be called once. After which the
     // shared state is set to null and further calls to `setValue()` or
