@@ -238,6 +238,48 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
++ (nonnull NSArray<NSString *> *)getOptionalList {
+    try {
+        auto objcpp_result_ = ::testsuite::TestHelpers::get_optional_list();
+        return ::djinni::List<::djinni::Optional<std::experimental::optional, ::djinni::String>>::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
++ (BOOL)checkOptionalList:(nonnull NSArray<NSString *> *)ol {
+    try {
+        auto objcpp_result_ = ::testsuite::TestHelpers::check_optional_list(::djinni::List<::djinni::Optional<std::experimental::optional, ::djinni::String>>::toCpp(ol));
+        return ::djinni::Bool::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
++ (nonnull NSSet<NSString *> *)getOptionalSet {
+    try {
+        auto objcpp_result_ = ::testsuite::TestHelpers::get_optional_set();
+        return ::djinni::Set<::djinni::Optional<std::experimental::optional, ::djinni::String>>::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
++ (BOOL)checkOptionalSet:(nonnull NSSet<NSString *> *)os {
+    try {
+        auto objcpp_result_ = ::testsuite::TestHelpers::check_optional_set(::djinni::Set<::djinni::Optional<std::experimental::optional, ::djinni::String>>::toCpp(os));
+        return ::djinni::Bool::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
++ (nonnull NSDictionary<NSString *, NSString *> *)getOptionalMap {
+    try {
+        auto objcpp_result_ = ::testsuite::TestHelpers::get_optional_map();
+        return ::djinni::Map<::djinni::Optional<std::experimental::optional, ::djinni::String>, ::djinni::Optional<std::experimental::optional, ::djinni::String>>::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
++ (BOOL)checkOptionalMap:(nonnull NSDictionary<NSString *, NSString *> *)om {
+    try {
+        auto objcpp_result_ = ::testsuite::TestHelpers::check_optional_map(::djinni::Map<::djinni::Optional<std::experimental::optional, ::djinni::String>, ::djinni::Optional<std::experimental::optional, ::djinni::String>>::toCpp(om));
+        return ::djinni::Bool::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
 namespace djinni_generated {
 
 auto TestHelpers::toCpp(ObjcType objc) -> CppType
