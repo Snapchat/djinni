@@ -267,11 +267,11 @@ template<template<class> class OptionalType, class T>
 struct ContainerElem<Optional<OptionalType, T>> {
     // check for empty optional and convert to NSNull
     static id fromCpp(const typename Optional<OptionalType, T>::CppType& opt) {
-        return opt ? Optional<OptionalType, T>::fromCpp(opt) : [NSNull null];
+        return opt ? Optional<OptionalType, T>::fromCpp(opt) : (__bridge NSNull *)kCFNull;
     }
     // check for NSNull and convert to empty optional
     static typename Optional<OptionalType, T>::CppType toCpp(typename Optional<OptionalType, T>::ObjcType obj) {
-        return (id)obj != [NSNull null] ?
+        return (id)obj != (__bridge NSNull *)kCFNull ?
             Optional<OptionalType, T>::toCpp(obj) :
             typename Optional<OptionalType, T>::CppType();
     }
