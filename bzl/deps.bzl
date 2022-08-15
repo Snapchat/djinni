@@ -3,7 +3,7 @@ load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
 
 def djinni_deps():
     # Bazel Skylib needed for Scala rules
-    bazel_skylib_version = "1.0.2"
+    bazel_skylib_version = "1.0.3"
     maybe(
         name = "bazel_skylib",
         repo_rule = http_archive,
@@ -13,19 +13,17 @@ def djinni_deps():
             "https://github.com/bazelbuild/bazel-skylib/releases/download/{0}/bazel-skylib-{0}.tar.gz"
                 .format(bazel_skylib_version),
         ],
-        sha256 = "97e70364e9249702246c0e9444bccdc4b847bed1eb03c5a3ece4f83dfe6abc44",
+        sha256 = "1c531376ac7e5a180e0237938a2536de0c54d93f5c278634818e0efc952dd56c",
     )
-
-    rules_scala_version = "2aba2cd5499f2f926c903cb5ef7c023b8cb28508"
+    rules_scala_version = "e7a948ad1948058a7a5ddfbd9d1629d6db839933"
     maybe(
         name = "io_bazel_rules_scala",
         repo_rule = http_archive,
         strip_prefix = "rules_scala-{}".format(rules_scala_version),
         type = "zip",
         url = "https://github.com/bazelbuild/rules_scala/archive/{}.zip".format(rules_scala_version),
-        sha256 = "f0c7b96e3e778cec41125501782734ea41ecb42f3e00c05786818438a434b4c7",
-    )
-
+        sha256 = "76e1abb8a54f61ada974e6e9af689c59fd9f0518b49be6be7a631ce9fa45f236",
+    )    
     protobuf_version = "3.12.4"
     maybe(
         name = "com_google_protobuf",
