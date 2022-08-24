@@ -18,8 +18,7 @@ em::val NativeTestArray::testStringArray(const em::val& w_a) {
         return ::djinni::Array<::djinni::String>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::Array<::djinni::String>>::handleNativeException(e);
     }
 }
 em::val NativeTestArray::testIntArray(const em::val& w_a) {
@@ -28,8 +27,7 @@ em::val NativeTestArray::testIntArray(const em::val& w_a) {
         return ::djinni::Array<::djinni::I32>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::Array<::djinni::I32>>::handleNativeException(e);
     }
 }
 em::val NativeTestArray::testRecordArray(const em::val& w_a) {
@@ -38,8 +36,7 @@ em::val NativeTestArray::testRecordArray(const em::val& w_a) {
         return ::djinni::Array<::djinni_generated::NativeVec2>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::Array<::djinni_generated::NativeVec2>>::handleNativeException(e);
     }
 }
 em::val NativeTestArray::testArrayOfArray(const em::val& w_a) {
@@ -48,8 +45,7 @@ em::val NativeTestArray::testArrayOfArray(const em::val& w_a) {
         return ::djinni::Array<::djinni::Array<::djinni::I32>>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::Array<::djinni::Array<::djinni::I32>>>::handleNativeException(e);
     }
 }
 

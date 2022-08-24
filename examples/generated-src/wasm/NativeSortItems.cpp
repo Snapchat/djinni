@@ -21,8 +21,7 @@ void NativeSortItems::sort(const CppType& self, int32_t w_order,const em::val& w
              ::djinni_generated::NativeItemList::toCpp(w_items));
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 em::val NativeSortItems::create_with_listener(const em::val& w_listener) {
@@ -31,8 +30,7 @@ em::val NativeSortItems::create_with_listener(const em::val& w_listener) {
         return ::djinni_generated::NativeSortItems::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeSortItems>::handleNativeException(e);
     }
 }
 em::val NativeSortItems::run_sort(const em::val& w_items) {
@@ -41,8 +39,7 @@ em::val NativeSortItems::run_sort(const em::val& w_items) {
         return ::djinni_generated::NativeItemList::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeItemList>::handleNativeException(e);
     }
 }
 

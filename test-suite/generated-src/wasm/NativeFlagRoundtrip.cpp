@@ -19,8 +19,7 @@ int32_t NativeFlagRoundtrip::roundtrip_access(int32_t w_flag) {
         return ::djinni_generated::NativeAccessFlags::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeAccessFlags>::handleNativeException(e);
     }
 }
 int32_t NativeFlagRoundtrip::roundtrip_empty(int32_t w_flag) {
@@ -29,8 +28,7 @@ int32_t NativeFlagRoundtrip::roundtrip_empty(int32_t w_flag) {
         return ::djinni_generated::NativeEmptyFlags::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeEmptyFlags>::handleNativeException(e);
     }
 }
 em::val NativeFlagRoundtrip::roundtrip_access_boxed(const em::val& w_flag) {
@@ -39,8 +37,7 @@ em::val NativeFlagRoundtrip::roundtrip_access_boxed(const em::val& w_flag) {
         return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeAccessFlags>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeAccessFlags>>::handleNativeException(e);
     }
 }
 em::val NativeFlagRoundtrip::roundtrip_empty_boxed(const em::val& w_flag) {
@@ -49,8 +46,7 @@ em::val NativeFlagRoundtrip::roundtrip_empty_boxed(const em::val& w_flag) {
         return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeEmptyFlags>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeEmptyFlags>>::handleNativeException(e);
     }
 }
 
