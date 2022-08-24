@@ -602,6 +602,30 @@ private:
 extern "C" void djinni_register_name_in_ns(const char* prefixedName, const char* namespacedName);
 extern "C" void djinni_throw_native_exception(const std::exception& e);
 
+template<typename U>
+struct DefaultInit {
+    static U get() { return U{}; }
+};
+template<>
+struct DefaultInit<em::val> {
+    static em::val get() { return em::val::undefined(); }
+};
+
+template<typename T>
+struct ExceptionHandlingTraits {
+    using R = typename T::JsType;
+    static R handleNativeException(const std::exception& e) {
+        djinni_throw_native_exception(e);
+        return DefaultInit<R>::get();
+    }
+};
+template<>
+struct ExceptionHandlingTraits<void> {
+    static void handleNativeException(const std::exception& e) {
+        djinni_throw_native_exception(e);
+    }
+};
+
 template<typename ClassType>
 class DjinniClass_ : public em::class_<ClassType> {
 public:

@@ -449,6 +449,7 @@ export interface TestHelpers_statics {
     idBinary(b: Uint8Array): Uint8Array;
     getAsyncResult(): Promise<number>;
     futureRoundtrip(f: Promise<number>): Promise<string>;
+    asyncEarlyThrow(): Promise<number>;
     checkAsyncInterface(i: AsyncInterface): Promise<string>;
     checkAsyncComposition(i: AsyncInterface): Promise<string>;
     getOptionalList(): Array<string>;

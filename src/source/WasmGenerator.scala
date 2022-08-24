@@ -375,11 +375,8 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
               m.ret.fold()(r => w.wl(s"return ${helperClass(r.resolved)}::fromCpp(${cppMarshal.maybeMove("r", r)});"))
             }
             w.w("catch(const std::exception& e)").braced {
-              w.wl("djinni::djinni_throw_native_exception(e);");
-              // The throw line is just to let the C++ compiler know that this
-              // branch won't return a value. Execution will never reach this
-              // line as the previous line already throws in JS code.
-              w.wl("throw;");
+              val helper = if (!m.ret.isEmpty) helperClass(m.ret.get.resolved) else "void"
+              w.wl(s"return djinni::ExceptionHandlingTraits<${helper}>::handleNativeException(e);");
             }
           }
         }

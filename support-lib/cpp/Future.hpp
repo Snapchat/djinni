@@ -179,6 +179,7 @@ protected:
     }
 private:
     detail::SharedStatePtr<T> _sharedState = std::make_shared<SharedState<T>>();
+    detail::SharedStatePtr<T> _sharedStateReadOnly = _sharedState; // allow calling getFuture() after setValue()
 
     template <typename UpdateFunc>
     void updateAndCallResultHandler(UpdateFunc&& updater) {
@@ -362,7 +363,7 @@ private:
 
 template <typename T>
 Future<T> detail::PromiseBase<T>::getFuture() {
-    return Future<T>(std::atomic_load(&_sharedState));
+    return Future<T>(_sharedStateReadOnly);
 }
 
 template <typename U>

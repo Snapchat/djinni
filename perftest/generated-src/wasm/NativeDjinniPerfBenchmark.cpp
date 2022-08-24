@@ -47,8 +47,7 @@ em::val NativeDjinniPerfBenchmark::getInstance() {
         return ::djinni_generated::NativeDjinniPerfBenchmark::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeDjinniPerfBenchmark>::handleNativeException(e);
     }
 }
 int64_t NativeDjinniPerfBenchmark::cppTests(const CppType& self) {
@@ -57,8 +56,7 @@ int64_t NativeDjinniPerfBenchmark::cppTests(const CppType& self) {
         return ::djinni::I64::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::I64>::handleNativeException(e);
     }
 }
 void NativeDjinniPerfBenchmark::baseline(const CppType& self) {
@@ -66,8 +64,7 @@ void NativeDjinniPerfBenchmark::baseline(const CppType& self) {
         self->baseline();
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeDjinniPerfBenchmark::argString(const CppType& self, const std::string& w_s) {
@@ -75,8 +72,7 @@ void NativeDjinniPerfBenchmark::argString(const CppType& self, const std::string
         self->argString(::djinni::String::toCpp(w_s));
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeDjinniPerfBenchmark::argBinary(const CppType& self, const em::val& w_b) {
@@ -84,8 +80,7 @@ void NativeDjinniPerfBenchmark::argBinary(const CppType& self, const em::val& w_
         self->argBinary(::djinni::Binary::toCpp(w_b));
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeDjinniPerfBenchmark::argDataRef(const CppType& self, const em::val& w_r) {
@@ -93,8 +88,7 @@ void NativeDjinniPerfBenchmark::argDataRef(const CppType& self, const em::val& w
         self->argDataRef(::djinni::NativeDataRef::toCpp(w_r));
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeDjinniPerfBenchmark::argDataView(const CppType& self, const em::val& w_d) {
@@ -102,8 +96,7 @@ void NativeDjinniPerfBenchmark::argDataView(const CppType& self, const em::val& 
         self->argDataView(::djinni::NativeDataView::toCpp(w_d));
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeDjinniPerfBenchmark::argEnumSixValue(const CppType& self, int32_t w_e) {
@@ -111,8 +104,7 @@ void NativeDjinniPerfBenchmark::argEnumSixValue(const CppType& self, int32_t w_e
         self->argEnumSixValue(::djinni_generated::NativeEnumSixValue::toCpp(w_e));
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeDjinniPerfBenchmark::argRecordSixInt(const CppType& self, const em::val& w_r) {
@@ -120,8 +112,7 @@ void NativeDjinniPerfBenchmark::argRecordSixInt(const CppType& self, const em::v
         self->argRecordSixInt(::djinni_generated::NativeRecordSixInt::toCpp(w_r));
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeDjinniPerfBenchmark::argListInt(const CppType& self, const em::val& w_v) {
@@ -129,8 +120,7 @@ void NativeDjinniPerfBenchmark::argListInt(const CppType& self, const em::val& w
         self->argListInt(::djinni::List<::djinni::I64>::toCpp(w_v));
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeDjinniPerfBenchmark::argArrayInt(const CppType& self, const em::val& w_v) {
@@ -138,8 +128,7 @@ void NativeDjinniPerfBenchmark::argArrayInt(const CppType& self, const em::val& 
         self->argArrayInt(::djinni::Array<::djinni::I64>::toCpp(w_v));
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeDjinniPerfBenchmark::argObject(const CppType& self, const em::val& w_c) {
@@ -147,8 +136,7 @@ void NativeDjinniPerfBenchmark::argObject(const CppType& self, const em::val& w_
         self->argObject(::djinni_generated::NativeObjectPlatform::toCpp(w_c));
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeDjinniPerfBenchmark::argListObject(const CppType& self, const em::val& w_l) {
@@ -156,8 +144,7 @@ void NativeDjinniPerfBenchmark::argListObject(const CppType& self, const em::val
         self->argListObject(::djinni::List<::djinni_generated::NativeObjectPlatform>::toCpp(w_l));
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeDjinniPerfBenchmark::argListRecord(const CppType& self, const em::val& w_l) {
@@ -165,8 +152,7 @@ void NativeDjinniPerfBenchmark::argListRecord(const CppType& self, const em::val
         self->argListRecord(::djinni::List<::djinni_generated::NativeRecordSixInt>::toCpp(w_l));
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeDjinniPerfBenchmark::argArrayRecord(const CppType& self, const em::val& w_a) {
@@ -174,8 +160,7 @@ void NativeDjinniPerfBenchmark::argArrayRecord(const CppType& self, const em::va
         self->argArrayRecord(::djinni::List<::djinni_generated::NativeRecordSixInt>::toCpp(w_a));
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 int64_t NativeDjinniPerfBenchmark::returnInt(const CppType& self, int64_t w_i) {
@@ -184,8 +169,7 @@ int64_t NativeDjinniPerfBenchmark::returnInt(const CppType& self, int64_t w_i) {
         return ::djinni::I64::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::I64>::handleNativeException(e);
     }
 }
 std::string NativeDjinniPerfBenchmark::returnString(const CppType& self, int32_t w_size) {
@@ -194,8 +178,7 @@ std::string NativeDjinniPerfBenchmark::returnString(const CppType& self, int32_t
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
     }
 }
 em::val NativeDjinniPerfBenchmark::returnBinary(const CppType& self, int32_t w_size) {
@@ -204,8 +187,7 @@ em::val NativeDjinniPerfBenchmark::returnBinary(const CppType& self, int32_t w_s
         return ::djinni::Binary::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::Binary>::handleNativeException(e);
     }
 }
 em::val NativeDjinniPerfBenchmark::returnObject(const CppType& self) {
@@ -214,8 +196,7 @@ em::val NativeDjinniPerfBenchmark::returnObject(const CppType& self) {
         return ::djinni_generated::NativeObjectNative::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeObjectNative>::handleNativeException(e);
     }
 }
 em::val NativeDjinniPerfBenchmark::returnListInt(const CppType& self, int32_t w_size) {
@@ -224,8 +205,7 @@ em::val NativeDjinniPerfBenchmark::returnListInt(const CppType& self, int32_t w_
         return ::djinni::List<::djinni::I64>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::List<::djinni::I64>>::handleNativeException(e);
     }
 }
 em::val NativeDjinniPerfBenchmark::returnArrayInt(const CppType& self, int32_t w_size) {
@@ -234,8 +214,7 @@ em::val NativeDjinniPerfBenchmark::returnArrayInt(const CppType& self, int32_t w
         return ::djinni::Array<::djinni::I64>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::Array<::djinni::I64>>::handleNativeException(e);
     }
 }
 em::val NativeDjinniPerfBenchmark::returnListObject(const CppType& self, int32_t w_size) {
@@ -244,8 +223,7 @@ em::val NativeDjinniPerfBenchmark::returnListObject(const CppType& self, int32_t
         return ::djinni::List<::djinni_generated::NativeObjectNative>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::List<::djinni_generated::NativeObjectNative>>::handleNativeException(e);
     }
 }
 em::val NativeDjinniPerfBenchmark::returnListRecord(const CppType& self, int32_t w_size) {
@@ -254,8 +232,7 @@ em::val NativeDjinniPerfBenchmark::returnListRecord(const CppType& self, int32_t
         return ::djinni::List<::djinni_generated::NativeRecordSixInt>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::List<::djinni_generated::NativeRecordSixInt>>::handleNativeException(e);
     }
 }
 em::val NativeDjinniPerfBenchmark::returnArrayRecord(const CppType& self, int32_t w_size) {
@@ -264,8 +241,7 @@ em::val NativeDjinniPerfBenchmark::returnArrayRecord(const CppType& self, int32_
         return ::djinni::List<::djinni_generated::NativeRecordSixInt>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::List<::djinni_generated::NativeRecordSixInt>>::handleNativeException(e);
     }
 }
 std::string NativeDjinniPerfBenchmark::roundTripString(const CppType& self, const std::string& w_s) {
@@ -274,8 +250,7 @@ std::string NativeDjinniPerfBenchmark::roundTripString(const CppType& self, cons
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
     }
 }
 

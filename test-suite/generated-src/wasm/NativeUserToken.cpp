@@ -18,8 +18,7 @@ std::string NativeUserToken::whoami(const CppType& self) {
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
     }
 }
 

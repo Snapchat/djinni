@@ -18,8 +18,7 @@ em::val NativeReturnTwo::get_instance() {
         return ::djinni_generated::NativeReturnTwo::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeReturnTwo>::handleNativeException(e);
     }
 }
 int8_t NativeReturnTwo::return_two(const CppType& self) {
@@ -28,8 +27,7 @@ int8_t NativeReturnTwo::return_two(const CppType& self) {
         return ::djinni::I8::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::I8>::handleNativeException(e);
     }
 }
 

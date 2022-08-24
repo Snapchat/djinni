@@ -60,6 +60,17 @@ class AsyncTest {
         const s = await this.module.testsuite.TestHelpers.checkAsyncComposition(new AsyncInterfaceImpl());
         assertEq(s, "42");
     }
+
+    async testEarlyThrow() {
+        const r = this.module.testsuite.TestHelpers.asyncEarlyThrow();
+        let s = null;
+        try {
+            await r;
+        } catch (e) {
+            s = e.message;
+        }
+        assertEq(s, "error");
+    }
 }
 
 allTests.push(AsyncTest);

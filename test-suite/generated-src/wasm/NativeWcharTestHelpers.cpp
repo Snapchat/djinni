@@ -18,8 +18,7 @@ em::val NativeWcharTestHelpers::get_record() {
         return ::djinni_generated::NativeWcharTestRec::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeWcharTestRec>::handleNativeException(e);
     }
 }
 std::wstring NativeWcharTestHelpers::get_string() {
@@ -28,8 +27,7 @@ std::wstring NativeWcharTestHelpers::get_string() {
         return ::djinni::WString::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::WString>::handleNativeException(e);
     }
 }
 bool NativeWcharTestHelpers::check_string(const std::wstring& w_str) {
@@ -38,8 +36,7 @@ bool NativeWcharTestHelpers::check_string(const std::wstring& w_str) {
         return ::djinni::Bool::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
     }
 }
 bool NativeWcharTestHelpers::check_record(const em::val& w_rec) {
@@ -48,8 +45,7 @@ bool NativeWcharTestHelpers::check_record(const em::val& w_rec) {
         return ::djinni::Bool::fromCpp(r);
     }
     catch(const std::exception& e) {
-        djinni::djinni_throw_native_exception(e);
-        throw;
+        return djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
     }
 }
 

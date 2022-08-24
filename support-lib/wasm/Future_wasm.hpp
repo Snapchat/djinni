@@ -105,4 +105,12 @@ public:
     }
 };
 
+template<typename U>
+struct ExceptionHandlingTraits<FutureAdaptor<U>> {
+    static em::val handleNativeException(const std::exception& e) {
+        auto r = FutureAdaptor<U>::NativePromiseType::reject(std::current_exception());
+        return FutureAdaptor<U>::fromCpp(std::move(r));
+    }
+};
+
 } // namespace djinni
