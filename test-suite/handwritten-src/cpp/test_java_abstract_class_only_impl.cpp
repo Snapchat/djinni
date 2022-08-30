@@ -2,7 +2,7 @@
 
 namespace testsuite {
 
-bool TestJavaAbstractClassOnlyImpl::test_method()
+bool TestJavaAbstractClassOnly::test_method()
 {
     return true;
 }

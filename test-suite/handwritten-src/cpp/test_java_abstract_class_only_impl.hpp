@@ -7,8 +7,6 @@ public:
 public:
     TestJavaAbstractClassOnlyImpl() {}
     virtual ~TestJavaAbstractClassOnlyImpl() {}
-
-    static bool test_method();
 };
 
 }  // namespace testsuite
