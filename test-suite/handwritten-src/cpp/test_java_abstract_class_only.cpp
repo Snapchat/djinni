@@ -1,4 +1,4 @@
-#include "test_java_abstract_class_only_impl.hpp"
+#include "test_java_abstract_class_only.hpp"
 
 namespace testsuite {
 
