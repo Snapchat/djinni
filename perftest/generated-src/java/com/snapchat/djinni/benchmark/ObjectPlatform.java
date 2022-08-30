@@ -8,5 +8,5 @@ import javax.annotation.Nonnull;
 
 /** interfaces for platform Java or Objective-C objects, to be passed to C++ */
 /*package*/ interface ObjectPlatform {
-    public abstract void onDone();
+    void onDone();
 }

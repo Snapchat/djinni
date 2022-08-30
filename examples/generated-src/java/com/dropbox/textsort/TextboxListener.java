@@ -7,5 +7,5 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 /*package*/ interface TextboxListener {
-    public abstract void update(@Nonnull ItemList items);
+    void update(@Nonnull ItemList items);
 }
