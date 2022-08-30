@@ -8,5 +8,5 @@ import javax.annotation.Nonnull;
 
 public interface AsyncInterface {
     @Nonnull
-    public abstract com.snapchat.djinni.Future<String> futureRoundtrip(@Nonnull com.snapchat.djinni.Future<Integer> f);
+    com.snapchat.djinni.Future<String> futureRoundtrip(@Nonnull com.snapchat.djinni.Future<Integer> f);
 }

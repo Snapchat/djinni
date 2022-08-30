@@ -10,16 +10,16 @@ import javax.annotation.Nonnull;
 public interface ClientInterface {
     /** Returns record of given string */
     @Nonnull
-    public abstract ClientReturnedRecord getRecord(long recordId, @Nonnull String utf8string, @CheckForNull String misc);
+    ClientReturnedRecord getRecord(long recordId, @Nonnull String utf8string, @CheckForNull String misc);
 
-    public abstract double identifierCheck(@Nonnull byte[] data, int r, long jret);
-
-    @Nonnull
-    public abstract String returnStr();
+    double identifierCheck(@Nonnull byte[] data, int r, long jret);
 
     @Nonnull
-    public abstract String methTakingInterface(@CheckForNull ClientInterface i);
+    String returnStr();
 
     @Nonnull
-    public abstract String methTakingOptionalInterface(@CheckForNull ClientInterface i);
+    String methTakingInterface(@CheckForNull ClientInterface i);
+
+    @Nonnull
+    String methTakingOptionalInterface(@CheckForNull ClientInterface i);
 }

@@ -7,5 +7,5 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 public interface TestJavaInterfaceOnly {
-    public abstract boolean testMethod();
+    boolean testMethod();
 }

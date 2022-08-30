@@ -180,8 +180,11 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
 
       // if no static and no cpp will use interface instead of abstract class
       var classOrInterfaceDesc = "abstract class";
+      var methodPrefixDesc = "public abstract ";
+
       if (!statics.nonEmpty && !i.ext.cpp) {
         classOrInterfaceDesc = "interface"
+        methodPrefixDesc = ""
       }
 
       w.w(s"${javaClassAccessModifierString}${classOrInterfaceDesc} $javaClass$typeParamList").braced {
@@ -198,7 +201,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
             nullityAnnotation + marshal.paramType(p.ty) + " " + idJava.local(p.ident)
           })
           marshal.nullityAnnotation(m.ret).foreach(w.wl)
-          w.wl("public abstract " + ret + " " + idJava.method(m.ident) + params.mkString("(", ", ", ")") + throwException + ";")
+          w.wl(methodPrefixDesc + ret + " " + idJava.method(m.ident) + params.mkString("(", ", ", ")") + throwException + ";")
         }
 
         val statics = i.methods.filter(m => m.static && m.lang.java)

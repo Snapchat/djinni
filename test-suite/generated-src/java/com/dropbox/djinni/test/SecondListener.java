@@ -8,5 +8,5 @@ import javax.annotation.Nonnull;
 
 /** Used for ObjC multiple inheritance tests */
 public interface SecondListener {
-    public abstract void second();
+    void second();
 }

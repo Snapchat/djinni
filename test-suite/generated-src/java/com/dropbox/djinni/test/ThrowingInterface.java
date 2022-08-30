@@ -7,5 +7,5 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 public interface ThrowingInterface {
-    public abstract void throwException();
+    void throwException();
 }
