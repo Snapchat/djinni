@@ -7,6 +7,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 /** interfaces for platform Java or Objective-C objects, to be passed to C++ */
-/*package*/ abstract class ObjectPlatform {
+/*package*/ interface ObjectPlatform {
     public abstract void onDone();
 }

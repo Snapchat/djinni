@@ -21,6 +21,7 @@ djinni/relative_paths.djinni
 djinni/array.djinni
 djinni/nscopying.djinni
 djinni/static_method_language.djinni
+djinni/interface_and_abstract_class.djinni
 djinni/enum_flags.djinni
 djinni/constant_enum.djinni
 djinni/data_ref_view.djinni

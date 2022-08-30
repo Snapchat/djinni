@@ -1,0 +1,7 @@
+test_java_interface_only = interface +j {
+  test_method(): bool;
+}
+
+test_java_abstract_class_only = interface +c {
+  static test_method(): bool;
+}

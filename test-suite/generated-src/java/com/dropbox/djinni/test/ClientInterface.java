@@ -7,7 +7,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 /** Client interface */
-public abstract class ClientInterface {
+public interface ClientInterface {
     /** Returns record of given string */
     @Nonnull
     public abstract ClientReturnedRecord getRecord(long recordId, @Nonnull String utf8string, @CheckForNull String misc);

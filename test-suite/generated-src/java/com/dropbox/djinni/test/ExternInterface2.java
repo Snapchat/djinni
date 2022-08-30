@@ -3,6 +3,6 @@
 
 package com.dropbox.djinni.test;
 
-public abstract class ExternInterface2 {
+public interface ExternInterface2 {
     public abstract ExternRecordWithDerivings foo(com.dropbox.djinni.test.TestHelpers i);
 }

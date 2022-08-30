@@ -6,6 +6,6 @@ package com.dropbox.textsort;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-/*package*/ abstract class TextboxListener {
+/*package*/ interface TextboxListener {
     public abstract void update(@Nonnull ItemList items);
 }

@@ -174,8 +174,17 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
       val typeParamList = javaTypeParams(typeParams)
       writeDoc(w, doc)
 
+      val statics = i.methods.filter(m => m.static && m.lang.java)
+
       javaAnnotationHeader.foreach(w.wl)
-      w.w(s"${javaClassAccessModifierString}abstract class $javaClass$typeParamList").braced {
+
+      // if no static and no cpp will use interface instead of abstract class
+      var classOrInterfaceDesc = "abstract class";
+      if (!statics.nonEmpty && !i.ext.cpp) {
+        classOrInterfaceDesc = "interface"
+      }
+
+      w.w(s"${javaClassAccessModifierString}${classOrInterfaceDesc} $javaClass$typeParamList").braced {
         val skipFirst = SkipFirst()
         generateJavaConstants(w, i.consts)
 

@@ -6,6 +6,6 @@ package com.dropbox.djinni.test;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public abstract class ThrowingInterface {
+public interface ThrowingInterface {
     public abstract void throwException();
 }
