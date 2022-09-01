@@ -9,7 +9,7 @@ import io.reactivex.Single;
 
 public class AsyncTest extends TestCase {
 
-    static class AsyncInterfaceImpl implements AsyncInterface {
+    static class AsyncInterfaceImpl extends AsyncInterface {
         public com.snapchat.djinni.Future<String> futureRoundtrip(com.snapchat.djinni.Future<Integer> f) {
             return f.then((i) -> {return i.get().toString();});
         }

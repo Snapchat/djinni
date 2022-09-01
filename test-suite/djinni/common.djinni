@@ -18,4 +18,3 @@
 @import "array.djinni"
 @import "nscopying.djinni"
 @import "static_method_language.djinni"
-@import "interface_and_abstract_class.djinni"

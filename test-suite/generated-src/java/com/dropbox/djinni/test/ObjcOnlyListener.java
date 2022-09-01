@@ -6,5 +6,5 @@ package com.dropbox.djinni.test;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public interface ObjcOnlyListener {
+public abstract class ObjcOnlyListener {
 }

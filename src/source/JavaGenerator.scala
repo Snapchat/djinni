@@ -12,7 +12,7 @@
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
-  * 
+  *
   * This file has been modified by Snap, Inc.
   */
 
@@ -179,13 +179,9 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
       javaAnnotationHeader.foreach(w.wl)
 
       // if no static and no cpp will use interface instead of abstract class
-      var classOrInterfaceDesc = "abstract class";
-      var methodPrefixDesc = "public abstract ";
-
-      if (!statics.nonEmpty && !i.ext.cpp) {
-        classOrInterfaceDesc = "interface"
-        methodPrefixDesc = ""
-      }
+      val genJavaInterface = spec.javaGenInterface && !statics.nonEmpty && !i.ext.cpp
+      val classOrInterfaceDesc = if (genJavaInterface) "interface" else "abstract class";
+      val methodPrefixDesc = if (genJavaInterface) "" else "public abstract ";
 
       w.w(s"${javaClassAccessModifierString}${classOrInterfaceDesc} $javaClass$typeParamList").braced {
         val skipFirst = SkipFirst()

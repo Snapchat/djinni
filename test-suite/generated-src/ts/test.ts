@@ -151,16 +151,6 @@ export interface /*record*/ RecordWithFlags {
     access: AccessFlags;
 }
 
-export interface TestJavaInterfaceOnly {
-    testMethod(): boolean;
-}
-
-export interface TestJavaAbstractClassOnly {
-}
-export interface TestJavaAbstractClassOnly_statics {
-    testMethod(): boolean;
-}
-
 export interface TestStaticMethodLanguage {
 }
 
@@ -615,7 +605,6 @@ export interface ns_testsuite {
     TestDuration: TestDuration_statics;
     DataRefTest: DataRefTest_statics;
     FlagRoundtrip: FlagRoundtrip_statics;
-    TestJavaAbstractClassOnly: TestJavaAbstractClassOnly_statics;
     TestArray: TestArray_statics;
     ListenerCaller: ListenerCaller_statics;
     ReturnOne: ReturnOne_statics;
@@ -630,7 +619,6 @@ export interface Test_statics {
     testsuite_TestDuration: TestDuration_statics;
     testsuite_DataRefTest: DataRefTest_statics;
     testsuite_FlagRoundtrip: FlagRoundtrip_statics;
-    testsuite_TestJavaAbstractClassOnly: TestJavaAbstractClassOnly_statics;
     testsuite_TestArray: TestArray_statics;
     testsuite_ListenerCaller: ListenerCaller_statics;
     testsuite_ReturnOne: ReturnOne_statics;

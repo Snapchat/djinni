@@ -49,6 +49,7 @@ object Main {
     var javaNonnullAnnotation: Option[String] = None
     var javaImplementAndroidOsParcelable : Boolean = false
     var javaUseFinalForRecord: Boolean = true
+    var javaGenInterface: Boolean = false
     var jniOutFolder: Option[File] = None
     var jniHeaderOutFolderOptional: Option[File] = None
     var jniNamespace: String = "djinni_generated"
@@ -140,6 +141,8 @@ object Main {
         .text("all generated java classes will implement the interface android.os.Parcelable")
       opt[Boolean]("java-use-final-for-record").valueName("<use-final-for-record>").foreach(x => javaUseFinalForRecord = x)
         .text("Whether generated Java classes for records should be marked 'final' (default: true). ")
+      opt[Boolean]("java-gen-interface").valueName("<true/false>").foreach(x => javaGenInterface = x)
+        .text("Generate Java interface instead of abstract class.")
       note("")
       opt[File]("cpp-out").valueName("<out-folder>").foreach(x => cppOutFolder = Some(x))
         .text("The output folder for C++ files (Generator disabled if unspecified).")
@@ -373,6 +376,7 @@ object Main {
       javaNonnullAnnotation,
       javaImplementAndroidOsParcelable,
       javaUseFinalForRecord,
+      javaGenInterface,
       cppOutFolder,
       cppHeaderOutFolder,
       cppIncludePrefix,

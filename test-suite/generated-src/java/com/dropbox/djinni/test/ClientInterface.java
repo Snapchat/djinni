@@ -7,19 +7,19 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 /** Client interface */
-public interface ClientInterface {
+public abstract class ClientInterface {
     /** Returns record of given string */
     @Nonnull
-    ClientReturnedRecord getRecord(long recordId, @Nonnull String utf8string, @CheckForNull String misc);
+    public abstract ClientReturnedRecord getRecord(long recordId, @Nonnull String utf8string, @CheckForNull String misc);
 
-    double identifierCheck(@Nonnull byte[] data, int r, long jret);
-
-    @Nonnull
-    String returnStr();
+    public abstract double identifierCheck(@Nonnull byte[] data, int r, long jret);
 
     @Nonnull
-    String methTakingInterface(@CheckForNull ClientInterface i);
+    public abstract String returnStr();
 
     @Nonnull
-    String methTakingOptionalInterface(@CheckForNull ClientInterface i);
+    public abstract String methTakingInterface(@CheckForNull ClientInterface i);
+
+    @Nonnull
+    public abstract String methTakingOptionalInterface(@CheckForNull ClientInterface i);
 }

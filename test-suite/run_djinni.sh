@@ -27,6 +27,7 @@ in_relative="djinni/all.djinni"
 wchar_in_relative="djinni/wchar_test.djinni"
 prologue_in_relative="djinni/function_prologue.djinni"
 ident_explicit_in_relative="djinni/ident_explicit.djinni"
+interface_and_abstract_class_in_relative="djinni/interface_and_abstract_class.djinni"
 temp_out_relative="djinni-output-temp"
 
 cpp_out="$base_dir/generated-src/cpp"
@@ -196,7 +197,39 @@ fi
     --ident-objc-enum NativeFooBar! \
     --ident-objc-const NativeFooBar! \
     \
-    --idl "$ident_explicit_in_relative" \
+    --idl "$ident_explicit_in_relative" && \
+"$base_dir/../src/run-assume-built" \
+    --java-out "$temp_out_relative/java" \
+    --java-package $java_package \
+    --java-nullable-annotation "javax.annotation.CheckForNull" \
+    --java-nonnull-annotation "javax.annotation.Nonnull" \
+    --java-use-final-for-record false \
+    --java-implement-android-os-parcelable true \
+    --java-gen-interface true \
+    --ident-java-field mFooBar \
+    \
+    --cpp-out "$temp_out_relative/cpp" \
+    --cpp-namespace testsuite \
+    --ident-cpp-enum-type foo_bar \
+    --cpp-optional-template "std::experimental::optional" \
+    --cpp-optional-header "\"../../handwritten-src/cpp/optional.hpp\"" \
+    --cpp-extended-record-include-prefix "../../handwritten-src/cpp/" \
+    \
+    --jni-out "$temp_out_relative/jni" \
+    --jni-use-on-load-initializer false \
+    --ident-jni-class NativeFooBar \
+    --ident-jni-file NativeFooBar \
+    \
+    --objc-out "$temp_out_relative/objc" \
+    --objcpp-out "$temp_out_relative/objc" \
+    --objc-type-prefix DB \
+    \
+    --yaml-out "$temp_out_relative/yaml" \
+    --yaml-out-file "yaml-interface-test.yaml" \
+    --yaml-prefix "test_" \
+    \
+    --idl "$interface_and_abstract_class_in_relative" \
+    --idl-include-path "djinni/vendor" \
 )
 
 # Make sure we can parse back our own generated YAML file
