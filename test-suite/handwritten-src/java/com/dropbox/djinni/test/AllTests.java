@@ -30,6 +30,7 @@ public class AllTests extends TestSuite {
         mySuite.addTestSuite(ArrayTest.class);
         mySuite.addTestSuite(DataTest.class);
         mySuite.addTestSuite(AsyncTest.class);
+        mySuite.addTestSuite(InterfaceAndAbstractClass.class);
         return mySuite;
     }
 

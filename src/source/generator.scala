@@ -41,6 +41,7 @@ package object generatorTools {
                    javaNonnullAnnotation: Option[String],
                    javaImplementAndroidOsParcelable: Boolean,
                    javaUseFinalForRecord: Boolean,
+                   javaGenInterface: Boolean,
                    cppOutFolder: Option[File],
                    cppHeaderOutFolder: Option[File],
                    cppIncludePrefix: String,

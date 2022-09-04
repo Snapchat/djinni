@@ -12,7 +12,7 @@
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
-  * 
+  *
   * This file has been modified by Snap, Inc.
   */
 
@@ -174,8 +174,16 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
       val typeParamList = javaTypeParams(typeParams)
       writeDoc(w, doc)
 
+      val statics = i.methods.filter(m => m.static && m.lang.java)
+
       javaAnnotationHeader.foreach(w.wl)
-      w.w(s"${javaClassAccessModifierString}abstract class $javaClass$typeParamList").braced {
+
+      // if no static and no cpp will use interface instead of abstract class
+      val genJavaInterface = spec.javaGenInterface && !statics.nonEmpty && !i.ext.cpp
+      val classOrInterfaceDesc = if (genJavaInterface) "interface" else "abstract class";
+      val methodPrefixDesc = if (genJavaInterface) "" else "public abstract ";
+
+      w.w(s"${javaClassAccessModifierString}${classOrInterfaceDesc} $javaClass$typeParamList").braced {
         val skipFirst = SkipFirst()
         generateJavaConstants(w, i.consts)
 
@@ -189,7 +197,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
             nullityAnnotation + marshal.paramType(p.ty) + " " + idJava.local(p.ident)
           })
           marshal.nullityAnnotation(m.ret).foreach(w.wl)
-          w.wl("public abstract " + ret + " " + idJava.method(m.ident) + params.mkString("(", ", ", ")") + throwException + ";")
+          w.wl(methodPrefixDesc + ret + " " + idJava.method(m.ident) + params.mkString("(", ", ", ")") + throwException + ";")
         }
 
         val statics = i.methods.filter(m => m.static && m.lang.java)
