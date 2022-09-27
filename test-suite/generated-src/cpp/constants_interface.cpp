@@ -6,13 +6,6 @@
 
 namespace testsuite {
 
-
-
-
-
-
-
-
 std::experimental::optional<bool> const ConstantsInterface::OPT_BOOL_CONSTANT = true;
 
 std::experimental::optional<int8_t> const ConstantsInterface::OPT_I8_CONSTANT = 1;
