@@ -5,13 +5,6 @@
 
 namespace testsuite {
 
-
-
-
-
-
-
-
 std::experimental::optional<bool> const Constants::OPT_BOOL_CONSTANT = true;
 
 std::experimental::optional<int8_t> const Constants::OPT_I8_CONSTANT = 1;
@@ -33,6 +26,5 @@ std::experimental::optional<std::string> const Constants::OPT_STRING_CONSTANT = 
 ConstantRecord const Constants::OBJECT_CONSTANT = ConstantRecord(
     Constants::I32_CONSTANT /* some_integer */ ,
     Constants::STRING_CONSTANT /* some_string */ );
-
 
 }  // namespace testsuite
