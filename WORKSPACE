@@ -9,7 +9,8 @@ djinni_setup_deps()
 
 # --- Everything below is only used for examples and tests
 
-android_sdk_repository(name = "androidsdk")
+# android_sdk_repository fails to find build_tools if we don't explicitly set a version.
+android_sdk_repository(name = "androidsdk", build_tools_version = "32.0.0")
 android_ndk_repository(name = "androidndk", api_level = 21)
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
