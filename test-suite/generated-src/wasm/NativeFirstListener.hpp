@@ -24,4 +24,4 @@ struct NativeFirstListener : ::djinni::JsInterface<::testsuite::FirstListener, N
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

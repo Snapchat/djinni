@@ -17,4 +17,4 @@ struct RecordWithEmbeddedProto final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

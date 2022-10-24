@@ -21,4 +21,4 @@ void NativeObjectPlatform::JavaProxy::onDone() {
     ::djinni::jniExceptionCheck(jniEnv);
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

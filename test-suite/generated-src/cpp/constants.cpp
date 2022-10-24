@@ -27,4 +27,4 @@ ConstantRecord const Constants::OBJECT_CONSTANT = ConstantRecord(
     Constants::I32_CONSTANT /* some_integer */ ,
     Constants::STRING_CONSTANT /* some_string */ );
 
-}  // namespace testsuite
+} // namespace testsuite

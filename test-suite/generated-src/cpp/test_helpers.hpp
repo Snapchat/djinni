@@ -113,4 +113,4 @@ public:
     static bool check_optional_map(const std::unordered_map<std::experimental::optional<std::string>, std::experimental::optional<std::string>> & om);
 };
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -23,4 +23,4 @@ public:
     virtual /*not-null*/ std::shared_ptr<VarnameInterface> _imethod_(const /*not-null*/ std::shared_ptr<VarnameInterface> & _i_arg_) = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

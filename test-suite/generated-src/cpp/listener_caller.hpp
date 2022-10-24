@@ -27,4 +27,4 @@ public:
     virtual void callSecond() = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

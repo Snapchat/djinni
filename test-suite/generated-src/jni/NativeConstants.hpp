@@ -28,4 +28,4 @@ private:
     const jmethodID jconstructor { ::djinni::jniGetMethodID(clazz.get(), "<init>", "()V") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

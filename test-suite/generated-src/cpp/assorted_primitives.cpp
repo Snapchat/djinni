@@ -27,4 +27,4 @@ bool operator!=(const AssortedPrimitives& lhs, const AssortedPrimitives& rhs) {
     return !(lhs == rhs);
 }
 
-}  // namespace testsuite
+} // namespace testsuite

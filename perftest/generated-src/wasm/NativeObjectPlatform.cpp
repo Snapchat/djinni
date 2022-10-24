@@ -18,4 +18,4 @@ EMSCRIPTEN_BINDINGS(snapchat_djinni_benchmark_ObjectPlatform) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -18,4 +18,4 @@ auto MapDateRecord::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBMapDateRecord alloc] initWithDatesById:(::djinni::Map<::djinni::String, ::djinni::Date>::fromCpp(cpp.dates_by_id))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

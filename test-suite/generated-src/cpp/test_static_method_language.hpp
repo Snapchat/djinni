@@ -16,4 +16,4 @@ public:
     static void test_method();
 };
 
-}  // namespace testsuite
+} // namespace testsuite

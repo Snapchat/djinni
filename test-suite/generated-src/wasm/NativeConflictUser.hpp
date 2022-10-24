@@ -28,4 +28,4 @@ struct NativeConflictUser : ::djinni::JsInterface<::testsuite::ConflictUser, Nat
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -29,4 +29,4 @@ private:
     const jfieldID field_mDatesById { ::djinni::jniGetFieldID(clazz.get(), "mDatesById", "Ljava/util/HashMap;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

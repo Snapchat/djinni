@@ -19,4 +19,4 @@ EMSCRIPTEN_BINDINGS(testsuite_Conflict) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

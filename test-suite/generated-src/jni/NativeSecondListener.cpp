@@ -10,4 +10,4 @@ NativeSecondListener::NativeSecondListener() : ::djinni::JniInterface<::testsuit
 NativeSecondListener::~NativeSecondListener() = default;
 
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

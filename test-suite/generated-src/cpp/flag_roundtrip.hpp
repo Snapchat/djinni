@@ -23,4 +23,4 @@ public:
     static std::experimental::optional<empty_flags> roundtrip_empty_boxed(std::experimental::optional<empty_flags> flag);
 };
 
-}  // namespace testsuite
+} // namespace testsuite

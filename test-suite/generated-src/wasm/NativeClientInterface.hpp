@@ -32,4 +32,4 @@ struct NativeClientInterface : ::djinni::JsInterface<::testsuite::ClientInterfac
     };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

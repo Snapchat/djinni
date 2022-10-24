@@ -30,4 +30,4 @@ EMSCRIPTEN_BINDINGS(snapchat_djinni_benchmark_EnumSixValue) {
     NativeEnumSixValue::staticInitializeConstants();
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

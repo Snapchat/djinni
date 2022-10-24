@@ -43,4 +43,4 @@ private:
     const jmethodID method_whoami { ::djinni::jniGetMethodID(clazz.get(), "whoami", "()Ljava/lang/String;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

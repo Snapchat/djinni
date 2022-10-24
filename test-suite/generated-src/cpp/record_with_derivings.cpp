@@ -85,4 +85,4 @@ bool operator>=(const RecordWithDerivings& lhs, const RecordWithDerivings& rhs) 
     return !(lhs < rhs);
 }
 
-}  // namespace testsuite
+} // namespace testsuite

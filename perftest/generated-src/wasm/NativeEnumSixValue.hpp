@@ -12,4 +12,4 @@ struct NativeEnumSixValue: ::djinni::WasmEnum<::snapchat::djinni::benchmark::Enu
     static void staticInitializeConstants();
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

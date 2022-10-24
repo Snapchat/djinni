@@ -30,4 +30,4 @@ private:
     const jfieldID field_mSomeString { ::djinni::jniGetFieldID(clazz.get(), "mSomeString", "Ljava/lang/String;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -12,4 +12,4 @@ public:
     virtual bool test_method() = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

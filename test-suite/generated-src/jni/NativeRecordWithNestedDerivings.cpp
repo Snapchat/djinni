@@ -28,4 +28,4 @@ auto NativeRecordWithNestedDerivings::toCpp(JNIEnv* jniEnv, JniType j) -> CppTyp
             ::djinni_generated::NativeRecordWithDerivings::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mRec))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

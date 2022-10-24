@@ -77,6 +77,6 @@ auto WcharTestHelpers::fromCppOpt(const CppOptType& cpp) -> ObjcType
     return ::djinni::get_cpp_proxy<DBWcharTestHelpers>(cpp);
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated
 
 @end

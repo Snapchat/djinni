@@ -48,4 +48,4 @@ struct RecordWithDerivings final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -27,4 +27,4 @@ auto NativeMapRecord::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
             ::djinni::Map<::djinni::I32, ::djinni::I32>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mImap))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

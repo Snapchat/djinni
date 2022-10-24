@@ -47,4 +47,4 @@ public:
     static djinni::expected<::djinni::test::Person, int32_t> stringToProtoOutcome(const std::string & x);
 };
 
-}  // namespace testsuite
+} // namespace testsuite

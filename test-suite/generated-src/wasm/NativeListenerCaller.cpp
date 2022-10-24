@@ -52,4 +52,4 @@ EMSCRIPTEN_BINDINGS(testsuite_listener_caller) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

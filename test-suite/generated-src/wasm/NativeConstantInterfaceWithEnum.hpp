@@ -27,4 +27,4 @@ struct NativeConstantInterfaceWithEnum : ::djinni::JsInterface<::testsuite::Cons
     static void staticInitializeConstants();
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

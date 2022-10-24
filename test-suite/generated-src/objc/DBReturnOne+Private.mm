@@ -62,6 +62,6 @@ auto ReturnOne::fromCppOpt(const CppOptType& cpp) -> ObjcType
     return ::djinni::get_cpp_proxy<DBReturnOne>(cpp);
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated
 
 @end

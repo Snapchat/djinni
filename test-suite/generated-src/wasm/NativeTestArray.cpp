@@ -60,4 +60,4 @@ EMSCRIPTEN_BINDINGS(testsuite_test_array) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

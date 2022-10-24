@@ -13,4 +13,4 @@ public:
     virtual void first() = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

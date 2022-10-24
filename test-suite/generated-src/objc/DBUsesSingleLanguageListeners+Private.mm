@@ -95,7 +95,7 @@ public:
     }
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated
 
 namespace djinni_generated {
 
@@ -121,6 +121,6 @@ auto UsesSingleLanguageListeners::fromCppOpt(const CppOptType& cpp) -> ObjcType
     return ::djinni::get_cpp_proxy<DBUsesSingleLanguageListenersCppProxy>(cpp);
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated
 
 @end

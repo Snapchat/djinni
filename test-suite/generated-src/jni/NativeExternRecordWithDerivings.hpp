@@ -30,4 +30,4 @@ private:
     const jfieldID field_mE { ::djinni::jniGetFieldID(clazz.get(), "mE", "Lcom/dropbox/djinni/test/Color;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

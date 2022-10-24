@@ -21,7 +21,7 @@ constexpr const char* to_string(test_ident_enum e) noexcept {
     return names[static_cast<int>(e)];
 }
 
-}  // namespace testsuite
+} // namespace testsuite
 
 namespace std {
 
@@ -32,4 +32,4 @@ struct hash<::testsuite::test_ident_enum> {
     }
 };
 
-}  // namespace std
+} // namespace std

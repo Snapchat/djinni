@@ -43,4 +43,4 @@ private:
     const jmethodID method_onDone { ::djinni::jniGetMethodID(clazz.get(), "onDone", "()V") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

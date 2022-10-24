@@ -89,4 +89,4 @@ CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_UsesSingleLanguageListen
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

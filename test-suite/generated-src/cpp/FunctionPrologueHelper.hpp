@@ -14,4 +14,4 @@ public:
     static std::string foo();
 };
 
-}  // namespace testsuite
+} // namespace testsuite

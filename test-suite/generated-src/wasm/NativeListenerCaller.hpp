@@ -29,4 +29,4 @@ struct NativeListenerCaller : ::djinni::JsInterface<::testsuite::ListenerCaller,
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

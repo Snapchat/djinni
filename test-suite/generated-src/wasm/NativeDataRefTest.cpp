@@ -117,4 +117,4 @@ EMSCRIPTEN_BINDINGS(testsuite_DataRefTest) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

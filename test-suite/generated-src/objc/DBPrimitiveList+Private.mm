@@ -18,4 +18,4 @@ auto PrimitiveList::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBPrimitiveList alloc] initWithList:(::djinni::List<::djinni::I64>::fromCpp(cpp.list))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

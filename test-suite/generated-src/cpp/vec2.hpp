@@ -22,4 +22,4 @@ struct Vec2 final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

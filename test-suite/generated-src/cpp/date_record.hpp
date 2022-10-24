@@ -26,4 +26,4 @@ struct DateRecord final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

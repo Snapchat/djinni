@@ -19,4 +19,4 @@ auto TestOptionalExternInterfaceRecord::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBTestOptionalExternInterfaceRecord alloc] initWithSampleInterface:(::djinni::Optional<std::experimental::optional, ::djinni_generated::SampleInterface>::fromCpp(cpp.sample_interface))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

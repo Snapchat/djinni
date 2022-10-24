@@ -30,4 +30,4 @@ struct NativeWcharTestHelpers : ::djinni::JsInterface<::testsuite::WcharTestHelp
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

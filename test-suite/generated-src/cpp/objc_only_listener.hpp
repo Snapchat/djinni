@@ -10,4 +10,4 @@ public:
     virtual ~ObjcOnlyListener() = default;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

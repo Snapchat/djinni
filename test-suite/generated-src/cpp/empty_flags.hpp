@@ -33,7 +33,7 @@ constexpr empty_flags operator~(empty_flags x) noexcept {
     return static_cast<empty_flags>(~static_cast<unsigned>(x));
 }
 
-}  // namespace testsuite
+} // namespace testsuite
 
 namespace std {
 
@@ -44,4 +44,4 @@ struct hash<::testsuite::empty_flags> {
     }
 };
 
-}  // namespace std
+} // namespace std

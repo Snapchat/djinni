@@ -21,4 +21,4 @@ auto ExternRecordWithDerivings::fromCpp(const CppType& cpp) -> ObjcType
                                                              e:(::djinni::Enum<::testsuite::color, DBColor>::fromCpp(cpp.e))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

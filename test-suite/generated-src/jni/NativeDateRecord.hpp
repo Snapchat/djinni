@@ -29,4 +29,4 @@ private:
     const jfieldID field_mCreatedAt { ::djinni::jniGetFieldID(clazz.get(), "mCreatedAt", "Ljava/util/Date;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

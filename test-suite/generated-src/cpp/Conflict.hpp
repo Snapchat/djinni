@@ -14,4 +14,4 @@ public:
     virtual ~Conflict() = default;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

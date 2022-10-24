@@ -76,4 +76,4 @@ public:
     virtual void dummy() = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

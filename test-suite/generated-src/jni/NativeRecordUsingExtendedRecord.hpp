@@ -29,4 +29,4 @@ private:
     const jfieldID field_mEr { ::djinni::jniGetFieldID(clazz.get(), "mEr", "Lcom/dropbox/djinni/test/ExtendedRecord;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

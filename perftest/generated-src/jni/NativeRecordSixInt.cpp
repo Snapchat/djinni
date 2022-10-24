@@ -35,4 +35,4 @@ auto NativeRecordSixInt::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
             ::djinni::I64::toCpp(jniEnv, jniEnv->GetLongField(j, data.field_mI6))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -18,4 +18,4 @@ auto MapListRecord::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBMapListRecord alloc] initWithMapList:(::djinni::List<::djinni::Map<::djinni::String, ::djinni::I64>>::fromCpp(cpp.map_list))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

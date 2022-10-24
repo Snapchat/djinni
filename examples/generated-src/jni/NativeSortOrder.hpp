@@ -23,4 +23,4 @@ private:
     friend ::djinni::JniClass<NativeSortOrder>;
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

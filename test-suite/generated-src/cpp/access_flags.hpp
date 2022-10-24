@@ -42,7 +42,7 @@ constexpr access_flags operator~(access_flags x) noexcept {
     return static_cast<access_flags>(~static_cast<unsigned>(x));
 }
 
-}  // namespace testsuite
+} // namespace testsuite
 
 namespace std {
 
@@ -53,4 +53,4 @@ struct hash<::testsuite::access_flags> {
     }
 };
 
-}  // namespace std
+} // namespace std

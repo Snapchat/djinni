@@ -30,4 +30,4 @@ public:
     virtual std::string meth_taking_optional_interface(const /*nullable*/ std::shared_ptr<ClientInterface> & i) = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

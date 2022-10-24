@@ -44,4 +44,4 @@ CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_ListenerCaller_00024CppProx
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -25,4 +25,4 @@ auto NativeVarnameRecord::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
     return {::djinni::I8::toCpp(jniEnv, jniEnv->GetByteField(j, data.field_mField))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

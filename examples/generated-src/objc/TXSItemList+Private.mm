@@ -18,4 +18,4 @@ auto ItemList::fromCpp(const CppType& cpp) -> ObjcType
     return [[TXSItemList alloc] initWithItems:(::djinni::List<::djinni::String>::fromCpp(cpp.items))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

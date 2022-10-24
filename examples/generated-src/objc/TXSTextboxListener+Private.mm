@@ -26,7 +26,7 @@ public:
     }
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated
 
 namespace djinni_generated {
 
@@ -46,4 +46,4 @@ auto TextboxListener::fromCppOpt(const CppOptType& cpp) -> ObjcType
     return dynamic_cast<ObjcProxy&>(*cpp).djinni_private_get_proxied_objc_object();
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

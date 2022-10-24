@@ -26,4 +26,4 @@ auto NativeRecordWithDurationAndDerivings::toCpp(JNIEnv* jniEnv, JniType j) -> C
     return {::djinni::Duration<::djinni::F64, ::djinni::Duration_ns>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mDt))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

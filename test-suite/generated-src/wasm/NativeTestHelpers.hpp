@@ -62,4 +62,4 @@ struct NativeTestHelpers : ::djinni::JsInterface<::testsuite::TestHelpers, Nativ
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -383,4 +383,4 @@ EMSCRIPTEN_BINDINGS(testsuite_test_helpers) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

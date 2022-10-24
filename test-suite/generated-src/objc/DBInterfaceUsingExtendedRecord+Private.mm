@@ -63,6 +63,6 @@ auto InterfaceUsingExtendedRecord::fromCppOpt(const CppOptType& cpp) -> ObjcType
     return ::djinni::get_cpp_proxy<DBInterfaceUsingExtendedRecord>(cpp);
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated
 
 @end

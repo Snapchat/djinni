@@ -14,4 +14,4 @@ struct ConstantWithEnum final {
     static constant_enum const CONST_ENUM;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -25,4 +25,4 @@ CJNIEXPORT void JNICALL Java_com_snapchat_djinni_benchmark_ObjectNative_00024Cpp
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

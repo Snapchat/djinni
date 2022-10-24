@@ -29,4 +29,4 @@ struct RecordWithNestedDerivings final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

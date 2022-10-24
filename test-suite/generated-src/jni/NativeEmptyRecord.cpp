@@ -24,4 +24,4 @@ auto NativeEmptyRecord::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
     return {};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -19,4 +19,4 @@ struct MapDateRecord final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

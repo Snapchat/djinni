@@ -17,4 +17,4 @@ struct RecordWithEmbeddedCppProto final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -18,4 +18,4 @@ struct NativeRecordWithDurationAndDerivings
     static JsType fromCpp(const CppType& c);
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

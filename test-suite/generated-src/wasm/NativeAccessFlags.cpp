@@ -36,4 +36,4 @@ EMSCRIPTEN_BINDINGS(testsuite_access_flags) {
     NativeAccessFlags::staticInitializeConstants();
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

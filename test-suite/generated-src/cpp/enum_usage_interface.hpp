@@ -27,4 +27,4 @@ public:
     virtual std::unordered_map<color, color> m(const std::unordered_map<color, color> & m) = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

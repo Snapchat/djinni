@@ -51,4 +51,4 @@ auto NativeAssortedPrimitives::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
             ::djinni::Optional<std::experimental::optional, ::djinni::F64>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mOFsixtyfour))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

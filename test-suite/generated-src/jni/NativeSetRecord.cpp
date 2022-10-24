@@ -27,4 +27,4 @@ auto NativeSetRecord::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
             ::djinni::Set<::djinni::I32>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mIset))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

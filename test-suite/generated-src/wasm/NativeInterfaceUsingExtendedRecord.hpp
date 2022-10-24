@@ -28,4 +28,4 @@ struct NativeInterfaceUsingExtendedRecord : ::djinni::JsInterface<::testsuite::I
     static void staticInitializeConstants();
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

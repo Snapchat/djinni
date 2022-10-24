@@ -36,4 +36,4 @@ EMSCRIPTEN_BINDINGS(testsuite_user_token) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -24,4 +24,4 @@ public:
     static std::vector<std::vector<int32_t>> testArrayOfArray(const std::vector<std::vector<int32_t>> & a);
 };
 
-}  // namespace testsuite
+} // namespace testsuite

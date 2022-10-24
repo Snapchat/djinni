@@ -26,4 +26,4 @@ struct NativeConflict : ::djinni::JsInterface<::testsuite::Conflict, NativeConfl
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

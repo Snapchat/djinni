@@ -37,4 +37,4 @@ struct NativeUsesSingleLanguageListeners : ::djinni::JsInterface<::testsuite::Us
     };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

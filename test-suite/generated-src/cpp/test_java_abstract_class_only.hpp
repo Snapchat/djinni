@@ -12,4 +12,4 @@ public:
     static bool test_method();
 };
 
-}  // namespace testsuite
+} // namespace testsuite

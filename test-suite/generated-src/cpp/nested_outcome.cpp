@@ -14,4 +14,4 @@ bool operator!=(const NestedOutcome& lhs, const NestedOutcome& rhs) {
     return !(lhs == rhs);
 }
 
-}  // namespace testsuite
+} // namespace testsuite

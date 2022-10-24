@@ -12,4 +12,4 @@ public:
     virtual void throw_exception() = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

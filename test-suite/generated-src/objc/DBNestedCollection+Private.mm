@@ -18,4 +18,4 @@ auto NestedCollection::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBNestedCollection alloc] initWithSetList:(::djinni::List<::djinni::Set<::djinni::String>>::fromCpp(cpp.set_list))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

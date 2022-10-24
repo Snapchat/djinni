@@ -63,4 +63,4 @@ EMSCRIPTEN_BINDINGS(testsuite_cpp_exception) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

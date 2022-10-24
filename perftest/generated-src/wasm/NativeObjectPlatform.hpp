@@ -28,4 +28,4 @@ struct NativeObjectPlatform : ::djinni::JsInterface<::snapchat::djinni::benchmar
     };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

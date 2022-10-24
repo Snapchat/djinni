@@ -32,4 +32,4 @@ struct EnumUsageRecord final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -25,4 +25,4 @@ NativeExternInterface2::JavaProxy::~JavaProxy() = default;
     return ::djinni_generated::NativeExternRecordWithDerivings::toCpp(jniEnv, jret);
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

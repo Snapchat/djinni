@@ -25,4 +25,4 @@ auto NativeSupportCopying::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
     return {::djinni::I32::toCpp(jniEnv, jniEnv->GetIntField(j, data.field_mX))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -26,4 +26,4 @@ auto NativeTestOptionalExternInterfaceRecord::toCpp(JNIEnv* jniEnv, JniType j) -
     return {::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeSampleInterface>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mSampleInterface))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

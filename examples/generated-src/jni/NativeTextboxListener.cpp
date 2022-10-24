@@ -23,4 +23,4 @@ void NativeTextboxListener::JavaProxy::update(const ::textsort::ItemList & c_ite
     ::djinni::jniExceptionCheck(jniEnv);
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

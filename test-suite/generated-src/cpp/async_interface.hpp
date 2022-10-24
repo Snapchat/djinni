@@ -16,4 +16,4 @@ public:
     virtual ::djinni::Future<std::string> future_roundtrip(::djinni::Future<int32_t> f) = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

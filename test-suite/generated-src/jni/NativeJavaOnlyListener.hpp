@@ -41,4 +41,4 @@ private:
     const ::djinni::GlobalRef<jclass> clazz { ::djinni::jniFindClass("com/dropbox/djinni/test/JavaOnlyListener") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

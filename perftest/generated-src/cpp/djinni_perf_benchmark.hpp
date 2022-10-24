@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-namespace snapchat { namespace djinni { namespace benchmark {
+namespace snapchat::djinni::benchmark {
 
 class ObjectNative;
 class ObjectPlatform;
@@ -73,4 +73,4 @@ public:
     virtual std::string roundTripString(const std::string & s) = 0;
 };
 
-} } }  // namespace snapchat::djinni::benchmark
+} // namespace snapchat::djinni::benchmark

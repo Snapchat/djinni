@@ -152,4 +152,4 @@ EMSCRIPTEN_BINDINGS(testsuite_proto_tests) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

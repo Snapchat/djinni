@@ -27,4 +27,4 @@ auto NativeVec2::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
             ::djinni::I32::toCpp(jniEnv, jniEnv->GetIntField(j, data.field_mY))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

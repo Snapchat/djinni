@@ -29,4 +29,4 @@ private:
     const jfieldID field_mSetList { ::djinni::jniGetFieldID(clazz.get(), "mSetList", "Ljava/util/ArrayList;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

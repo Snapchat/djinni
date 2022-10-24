@@ -12,4 +12,4 @@ struct NativeAccessFlags: ::djinni::WasmEnum<::testsuite::access_flags> {
     static void staticInitializeConstants();
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

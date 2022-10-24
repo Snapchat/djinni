@@ -21,4 +21,4 @@ struct MapRecord final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

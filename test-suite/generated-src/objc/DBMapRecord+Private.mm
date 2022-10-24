@@ -20,4 +20,4 @@ auto MapRecord::fromCpp(const CppType& cpp) -> ObjcType
                                        imap:(::djinni::Map<::djinni::I32, ::djinni::I32>::fromCpp(cpp.imap))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

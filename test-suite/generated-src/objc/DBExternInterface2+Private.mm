@@ -28,7 +28,7 @@ public:
     }
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated
 
 namespace djinni_generated {
 
@@ -48,4 +48,4 @@ auto ExternInterface2::fromCppOpt(const CppOptType& cpp) -> ObjcType
     return dynamic_cast<ObjcProxy&>(*cpp).djinni_private_get_proxied_objc_object();
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

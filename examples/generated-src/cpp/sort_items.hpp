@@ -24,4 +24,4 @@ public:
     static ItemList run_sort(const ItemList & items);
 };
 
-}  // namespace textsort
+} // namespace textsort

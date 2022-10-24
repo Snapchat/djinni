@@ -20,4 +20,4 @@ auto TestIdentRecord::fromCpp(const CppType& cpp) -> ObjcType
                                              secondValue:(::djinni::String::fromCpp(cpp.second_value))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

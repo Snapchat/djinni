@@ -57,6 +57,6 @@ auto FunctionPrologueHelper::fromCppOpt(const CppOptType& cpp) -> ObjcType
     return ::djinni::get_cpp_proxy<DBFunctionPrologueHelper>(cpp);
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated
 
 @end

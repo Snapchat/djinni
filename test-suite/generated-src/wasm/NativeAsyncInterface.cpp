@@ -20,4 +20,4 @@ EMSCRIPTEN_BINDINGS(testsuite_async_interface) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -20,4 +20,4 @@ auto Vec2::fromCpp(const CppType& cpp) -> ObjcType
                                    y:(::djinni::I32::fromCpp(cpp.y))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

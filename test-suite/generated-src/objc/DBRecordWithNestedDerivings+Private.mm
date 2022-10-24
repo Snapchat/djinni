@@ -21,4 +21,4 @@ auto RecordWithNestedDerivings::fromCpp(const CppType& cpp) -> ObjcType
                                                         rec:(::djinni_generated::RecordWithDerivings::fromCpp(cpp.rec))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

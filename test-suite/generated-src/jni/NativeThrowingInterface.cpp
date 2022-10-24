@@ -10,4 +10,4 @@ NativeThrowingInterface::NativeThrowingInterface() : ::djinni::JniInterface<::te
 NativeThrowingInterface::~NativeThrowingInterface() = default;
 
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

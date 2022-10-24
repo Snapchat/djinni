@@ -29,4 +29,4 @@ private:
     const jfieldID field_mO { ::djinni::jniGetFieldID(clazz.get(), "mO", "Lcom/snapchat/djinni/Outcome;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

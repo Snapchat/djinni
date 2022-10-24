@@ -37,4 +37,4 @@ EMSCRIPTEN_BINDINGS(testsuite_extended_record_consts) {
     NativeExtendedRecord::staticInitializeConstants();
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -42,4 +42,4 @@ private:
     const jfieldID field_mOFsixtyfour { ::djinni::jniGetFieldID(clazz.get(), "mOFsixtyfour", "Ljava/lang/Double;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

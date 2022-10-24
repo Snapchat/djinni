@@ -25,4 +25,4 @@ auto NativeRecordUsingExtendedRecord::toCpp(JNIEnv* jniEnv, JniType j) -> CppTyp
     return {::djinni_generated::NativeExtendedRecord::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mEr))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

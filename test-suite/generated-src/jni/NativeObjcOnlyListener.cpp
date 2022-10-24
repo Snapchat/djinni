@@ -10,4 +10,4 @@ NativeObjcOnlyListener::NativeObjcOnlyListener() : ::djinni::JniInterface<::test
 NativeObjcOnlyListener::~NativeObjcOnlyListener() = default;
 
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

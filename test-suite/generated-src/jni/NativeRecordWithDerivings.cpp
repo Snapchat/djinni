@@ -39,4 +39,4 @@ auto NativeRecordWithDerivings::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
             ::djinni::String::toCpp(jniEnv, (jstring)jniEnv->GetObjectField(j, data.field_mS))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

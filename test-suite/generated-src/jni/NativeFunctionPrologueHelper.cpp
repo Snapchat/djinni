@@ -29,4 +29,4 @@ CJNIEXPORT jstring JNICALL Java_com_dropbox_djinni_test_FunctionPrologueHelper_f
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

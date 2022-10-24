@@ -18,4 +18,4 @@ auto WcharTestRec::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBWcharTestRec alloc] initWithS:(::djinni::WString::fromCpp(cpp.s))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

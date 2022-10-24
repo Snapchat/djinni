@@ -24,4 +24,4 @@ struct NativeObjcOnlyListener : ::djinni::JsInterface<::testsuite::ObjcOnlyListe
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -28,4 +28,4 @@ struct NativeExternInterface2 : ::djinni::JsInterface<::ExternInterface2, Native
     };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -17,4 +17,4 @@ struct SupportCopying final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

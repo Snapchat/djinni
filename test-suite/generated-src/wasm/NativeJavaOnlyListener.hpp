@@ -24,4 +24,4 @@ struct NativeJavaOnlyListener : ::djinni::JsInterface<::testsuite::JavaOnlyListe
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -28,4 +28,4 @@ auto NativeExternRecordWithDerivings::toCpp(JNIEnv* jniEnv, JniType j) -> CppTyp
             ::djinni_generated::NativeColor::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mE))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

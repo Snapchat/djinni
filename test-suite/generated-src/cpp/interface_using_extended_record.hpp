@@ -17,4 +17,4 @@ public:
     virtual ExtendedRecord meth(const ExtendedRecord & er) = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

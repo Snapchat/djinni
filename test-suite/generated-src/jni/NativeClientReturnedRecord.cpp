@@ -29,4 +29,4 @@ auto NativeClientReturnedRecord::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
             ::djinni::Optional<std::experimental::optional, ::djinni::String>::toCpp(jniEnv, (jstring)jniEnv->GetObjectField(j, data.field_mMisc))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

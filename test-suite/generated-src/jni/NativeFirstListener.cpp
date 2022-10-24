@@ -10,4 +10,4 @@ NativeFirstListener::NativeFirstListener() : ::djinni::JniInterface<::testsuite:
 NativeFirstListener::~NativeFirstListener() = default;
 
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

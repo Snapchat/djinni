@@ -36,4 +36,4 @@ bool operator>=(const DateRecord& lhs, const DateRecord& rhs) {
     return !(lhs < rhs);
 }
 
-}  // namespace testsuite
+} // namespace testsuite

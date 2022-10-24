@@ -17,4 +17,4 @@ struct RecordWithFlags final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -43,4 +43,4 @@ bool operator>=(const RecordWithNestedDerivings& lhs, const RecordWithNestedDeri
     return !(lhs < rhs);
 }
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -58,4 +58,4 @@ EMSCRIPTEN_BINDINGS(testsuite_interface_using_extended_record_consts) {
     NativeInterfaceUsingExtendedRecord::staticInitializeConstants();
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

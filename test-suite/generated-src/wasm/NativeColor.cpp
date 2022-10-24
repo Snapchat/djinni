@@ -37,4 +37,4 @@ EMSCRIPTEN_BINDINGS(testsuite_color) {
     NativeColor::staticInitializeConstants();
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

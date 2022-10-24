@@ -44,4 +44,4 @@ auto AssortedPrimitives::fromCpp(const CppType& cpp) -> ObjcType
                                        oFsixtyfour:(::djinni::Optional<std::experimental::optional, ::djinni::F64>::fromCpp(cpp.o_fsixtyfour))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated
