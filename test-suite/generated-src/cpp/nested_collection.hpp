@@ -19,4 +19,4 @@ struct NestedCollection final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

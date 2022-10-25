@@ -17,4 +17,4 @@ struct WcharTestRec final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

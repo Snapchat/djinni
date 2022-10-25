@@ -15,4 +15,4 @@ auto NativeTestOptionalExternInterfaceRecord::fromCpp(const CppType& c) -> JsTyp
     return js;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

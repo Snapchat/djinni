@@ -22,4 +22,4 @@ public:
     static /*not-null*/ std::shared_ptr<ReverseClientInterface> create();
 };
 
-}  // namespace testsuite
+} // namespace testsuite

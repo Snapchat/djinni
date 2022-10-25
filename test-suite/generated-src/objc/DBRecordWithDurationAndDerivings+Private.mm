@@ -19,4 +19,4 @@ auto RecordWithDurationAndDerivings::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBRecordWithDurationAndDerivings alloc] initWithDt:(::djinni::Duration<::djinni::F64, ::djinni::Duration_ns>::fromCpp(cpp.dt))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

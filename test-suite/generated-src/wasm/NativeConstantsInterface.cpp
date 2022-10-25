@@ -71,4 +71,4 @@ EMSCRIPTEN_BINDINGS(testsuite_constants_interface_consts) {
     NativeConstantsInterface::staticInitializeConstants();
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

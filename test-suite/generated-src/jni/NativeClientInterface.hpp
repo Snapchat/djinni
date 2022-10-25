@@ -51,4 +51,4 @@ private:
     const jmethodID method_methTakingOptionalInterface { ::djinni::jniGetMethodID(clazz.get(), "methTakingOptionalInterface", "(Lcom/dropbox/djinni/test/ClientInterface;)Ljava/lang/String;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

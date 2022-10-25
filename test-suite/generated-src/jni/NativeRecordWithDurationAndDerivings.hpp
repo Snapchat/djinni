@@ -29,4 +29,4 @@ private:
     const jfieldID field_mDt { ::djinni::jniGetFieldID(clazz.get(), "mDt", "Ljava/time/Duration;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

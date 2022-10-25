@@ -19,4 +19,4 @@ auto RecordWithEmbeddedProto::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBRecordWithEmbeddedProto alloc] initWithPerson:(::djinni::Protobuf<::djinni::test::Person, DJTestPerson>::fromCpp(cpp.person))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

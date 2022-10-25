@@ -85,4 +85,4 @@ EMSCRIPTEN_BINDINGS(testsuite_uses_single_language_listeners) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

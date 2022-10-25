@@ -10,4 +10,4 @@ public:
     virtual ~JavaOnlyListener() = default;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

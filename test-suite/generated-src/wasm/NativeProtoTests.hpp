@@ -39,4 +39,4 @@ struct NativeProtoTests : ::djinni::JsInterface<::testsuite::ProtoTests, NativeP
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

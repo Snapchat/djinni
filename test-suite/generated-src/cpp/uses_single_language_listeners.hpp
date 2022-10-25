@@ -27,4 +27,4 @@ public:
     virtual /*not-null*/ std::shared_ptr<JavaOnlyListener> returnForJava() = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

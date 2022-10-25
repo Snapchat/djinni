@@ -28,4 +28,4 @@ auto RecordSixInt::fromCpp(const CppType& cpp) -> ObjcType
                                             i6:(::djinni::I64::fromCpp(cpp.i6))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

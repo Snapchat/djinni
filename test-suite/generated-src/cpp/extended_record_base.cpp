@@ -9,4 +9,4 @@ namespace testsuite {
 ExtendedRecord const ExtendedRecordBase::EXTENDED_RECORD_CONST = ExtendedRecord(
     true /* foo */ );
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -27,4 +27,4 @@ CJNIEXPORT void JNICALL Java_com_dropbox_djinni_test_ConstantsInterface_00024Cpp
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, )
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

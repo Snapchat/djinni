@@ -27,4 +27,4 @@ EMSCRIPTEN_BINDINGS(testsuite_constant_enum) {
     NativeConstantEnum::staticInitializeConstants();
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

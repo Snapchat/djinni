@@ -26,4 +26,4 @@ auto NativeNestedOutcome::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
     return {::djinni::Outcome<::djinni::I32, ::djinni::String>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mO))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

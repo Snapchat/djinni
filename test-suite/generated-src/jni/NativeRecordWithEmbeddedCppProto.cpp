@@ -25,4 +25,4 @@ auto NativeRecordWithEmbeddedCppProto::toCpp(JNIEnv* jniEnv, JniType j) -> CppTy
     return {::djinni::Protobuf<::djinni::test2::PersistingState, ::djinni::JavaClassName<'d','j','i','n','n','i','/','t','e','s','t','2','/','T','e','s','t','2','$','P','e','r','s','i','s','t','i','n','g','S','t','a','t','e'>>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mState))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

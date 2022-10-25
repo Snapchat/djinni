@@ -26,4 +26,4 @@ struct NativeTestStaticMethodLanguage : ::djinni::JsInterface<::testsuite::TestS
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

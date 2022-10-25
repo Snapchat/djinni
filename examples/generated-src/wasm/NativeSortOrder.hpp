@@ -12,4 +12,4 @@ struct NativeSortOrder: ::djinni::WasmEnum<::textsort::sort_order> {
     static void staticInitializeConstants();
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -19,4 +19,4 @@ EMSCRIPTEN_BINDINGS(textsort_textbox_listener) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

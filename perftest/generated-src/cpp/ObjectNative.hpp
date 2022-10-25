@@ -3,7 +3,7 @@
 
 #pragma once
 
-namespace snapchat { namespace djinni { namespace benchmark {
+namespace snapchat::djinni::benchmark {
 
 /** interfaces for native C++ objects, to be returned from C++ */
 class ObjectNative {
@@ -13,4 +13,4 @@ public:
     virtual void baseline() = 0;
 };
 
-} } }  // namespace snapchat::djinni::benchmark
+} // namespace snapchat::djinni::benchmark

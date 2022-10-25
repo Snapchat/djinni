@@ -25,4 +25,4 @@ auto NativePrimitiveList::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
     return {::djinni::List<::djinni::I64>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mList))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

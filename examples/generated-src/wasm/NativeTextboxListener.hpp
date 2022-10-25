@@ -28,4 +28,4 @@ struct NativeTextboxListener : ::djinni::JsInterface<::textsort::TextboxListener
     };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

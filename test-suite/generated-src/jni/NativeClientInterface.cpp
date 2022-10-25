@@ -64,4 +64,4 @@ std::string NativeClientInterface::JavaProxy::meth_taking_optional_interface(con
     return ::djinni::String::toCpp(jniEnv, jret);
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

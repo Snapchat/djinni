@@ -18,4 +18,4 @@ auto DateRecord::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBDateRecord alloc] initWithCreatedAt:(::djinni::Date::fromCpp(cpp.created_at))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

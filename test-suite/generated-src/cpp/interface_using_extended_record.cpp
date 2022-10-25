@@ -11,4 +11,4 @@ RecordUsingExtendedRecord const InterfaceUsingExtendedRecord::CR = RecordUsingEx
     ExtendedRecord(
         false /* foo */ ) /* er */ );
 
-}  // namespace testsuite
+} // namespace testsuite

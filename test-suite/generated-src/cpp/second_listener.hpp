@@ -13,4 +13,4 @@ public:
     virtual void second() = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

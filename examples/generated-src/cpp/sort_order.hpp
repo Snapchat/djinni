@@ -22,7 +22,7 @@ constexpr const char* to_string(sort_order e) noexcept {
     return names[static_cast<int>(e)];
 }
 
-}  // namespace textsort
+} // namespace textsort
 
 namespace std {
 
@@ -33,4 +33,4 @@ struct hash<::textsort::sort_order> {
     }
 };
 
-}  // namespace std
+} // namespace std

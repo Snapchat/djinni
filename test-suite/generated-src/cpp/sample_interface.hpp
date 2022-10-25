@@ -14,4 +14,4 @@ public:
     virtual ~SampleInterface() = default;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

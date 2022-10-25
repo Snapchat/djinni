@@ -3,7 +3,7 @@
 
 #pragma once
 
-namespace snapchat { namespace djinni { namespace benchmark {
+namespace snapchat::djinni::benchmark {
 
 /** interfaces for platform Java or Objective-C objects, to be passed to C++ */
 class ObjectPlatform {
@@ -13,4 +13,4 @@ public:
     virtual void onDone() = 0;
 };
 
-} } }  // namespace snapchat::djinni::benchmark
+} // namespace snapchat::djinni::benchmark

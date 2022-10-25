@@ -22,4 +22,4 @@ public:
     static bool check_record(const WcharTestRec & rec);
 };
 
-}  // namespace testsuite
+} // namespace testsuite

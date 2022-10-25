@@ -43,4 +43,4 @@ private:
     const jmethodID method_futureRoundtrip { ::djinni::jniGetMethodID(clazz.get(), "futureRoundtrip", "(Lcom/snapchat/djinni/Future;)Lcom/snapchat/djinni/Future;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -25,4 +25,4 @@ struct ClientReturnedRecord final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

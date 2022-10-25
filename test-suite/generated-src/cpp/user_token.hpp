@@ -14,4 +14,4 @@ public:
     virtual std::string whoami() = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

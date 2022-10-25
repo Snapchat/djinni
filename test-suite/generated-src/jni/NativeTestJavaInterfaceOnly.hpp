@@ -43,4 +43,4 @@ private:
     const jmethodID method_testMethod { ::djinni::jniGetMethodID(clazz.get(), "testMethod", "()Z") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

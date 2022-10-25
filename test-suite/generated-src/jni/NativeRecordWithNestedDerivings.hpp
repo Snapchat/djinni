@@ -30,4 +30,4 @@ private:
     const jfieldID field_mRec { ::djinni::jniGetFieldID(clazz.get(), "mRec", "Lcom/dropbox/djinni/test/RecordWithDerivings;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

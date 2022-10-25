@@ -32,4 +32,4 @@ public:
     static std::string putNestedErrorOutcome(const NestedOutcome & x);
 };
 
-}  // namespace testsuite
+} // namespace testsuite

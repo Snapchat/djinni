@@ -25,4 +25,4 @@ auto NativeNestedCollection::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
     return {::djinni::List<::djinni::Set<::djinni::String>>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mSetList))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

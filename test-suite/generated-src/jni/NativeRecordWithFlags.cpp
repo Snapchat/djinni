@@ -25,4 +25,4 @@ auto NativeRecordWithFlags::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
     return {::djinni_generated::NativeAccessFlags::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mAccess))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

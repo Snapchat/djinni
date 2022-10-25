@@ -26,4 +26,4 @@ struct NativeSampleInterface : ::djinni::JsInterface<::testsuite::SampleInterfac
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

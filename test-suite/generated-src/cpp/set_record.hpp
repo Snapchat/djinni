@@ -21,4 +21,4 @@ struct SetRecord final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

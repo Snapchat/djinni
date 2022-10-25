@@ -25,4 +25,4 @@ auto NativeExtendedRecord::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
     return {::djinni::Bool::toCpp(jniEnv, jniEnv->GetBooleanField(j, data.field_mFoo))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

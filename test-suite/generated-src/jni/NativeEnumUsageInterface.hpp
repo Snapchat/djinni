@@ -51,4 +51,4 @@ private:
     const jmethodID method_m { ::djinni::jniGetMethodID(clazz.get(), "m", "(Ljava/util/HashMap;)Ljava/util/HashMap;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

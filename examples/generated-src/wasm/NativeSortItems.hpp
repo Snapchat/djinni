@@ -29,4 +29,4 @@ struct NativeSortItems : ::djinni::JsInterface<::textsort::SortItems, NativeSort
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

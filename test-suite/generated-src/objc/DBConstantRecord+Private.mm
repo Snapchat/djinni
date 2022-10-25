@@ -20,4 +20,4 @@ auto ConstantRecord::fromCpp(const CppType& cpp) -> ObjcType
                                               someString:(::djinni::String::fromCpp(cpp.some_string))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

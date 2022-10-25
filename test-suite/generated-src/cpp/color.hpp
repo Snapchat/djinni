@@ -35,7 +35,7 @@ constexpr const char* to_string(color e) noexcept {
     return names[static_cast<int>(e)];
 }
 
-}  // namespace testsuite
+} // namespace testsuite
 
 namespace std {
 
@@ -46,4 +46,4 @@ struct hash<::testsuite::color> {
     }
 };
 
-}  // namespace std
+} // namespace std

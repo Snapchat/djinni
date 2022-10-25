@@ -25,4 +25,4 @@ NativeAsyncInterface::JavaProxy::~JavaProxy() = default;
     return ::djinni::FutureAdaptor<::djinni::String>::toCpp(jniEnv, jret);
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

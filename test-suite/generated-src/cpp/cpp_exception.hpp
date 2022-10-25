@@ -24,4 +24,4 @@ public:
     static /*not-null*/ std::shared_ptr<CppException> get();
 };
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -28,4 +28,4 @@ struct NativeConstantsInterface : ::djinni::JsInterface<::testsuite::ConstantsIn
     static void staticInitializeConstants();
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

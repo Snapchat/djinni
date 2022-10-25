@@ -30,4 +30,4 @@ private:
     const jfieldID field_mImap { ::djinni::jniGetFieldID(clazz.get(), "mImap", "Ljava/util/HashMap;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -31,4 +31,4 @@ private:
     const jfieldID field_mMisc { ::djinni::jniGetFieldID(clazz.get(), "mMisc", "Ljava/lang/String;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

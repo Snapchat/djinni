@@ -18,4 +18,4 @@ struct PrimitiveList final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

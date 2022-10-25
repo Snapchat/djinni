@@ -18,4 +18,4 @@ auto ExtendedRecord::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBExtendedRecord alloc] initWithFoo:(::djinni::Bool::fromCpp(cpp.foo))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

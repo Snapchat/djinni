@@ -55,4 +55,4 @@ public:
     static int64_t unbox(std::experimental::optional<std::chrono::duration<int64_t, std::ratio<1>>> dt);
 };
 
-}  // namespace testsuite
+} // namespace testsuite

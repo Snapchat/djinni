@@ -28,4 +28,4 @@ struct NativeVarnameInterface : ::djinni::JsInterface<::testsuite::VarnameInterf
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

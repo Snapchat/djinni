@@ -18,4 +18,4 @@ auto SupportCopying::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBSupportCopying alloc] initWithX:(::djinni::I32::fromCpp(cpp.x))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

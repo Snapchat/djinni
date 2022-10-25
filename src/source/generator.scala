@@ -361,11 +361,10 @@ abstract class Generator(spec: Spec)
     ns match {
       case "" => f(w)
       case s =>
-        val parts = s.split("::")
-        w.wl(parts.map("namespace "+_+" {").mkString(" ")).wl
+        w.wl(s"namespace $s {").wl
         f(w)
         w.wl
-        w.wl(parts.map(p => "}").mkString(" ") + s"  // namespace $s")
+        w.wl(s"} // namespace $s")
     }
   }
 

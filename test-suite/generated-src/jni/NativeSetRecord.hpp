@@ -30,4 +30,4 @@ private:
     const jfieldID field_mIset { ::djinni::jniGetFieldID(clazz.get(), "mIset", "Ljava/util/HashSet;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

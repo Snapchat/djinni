@@ -25,4 +25,4 @@ auto NativeItemList::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
     return {::djinni::List<::djinni::String>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mItems))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

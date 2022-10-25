@@ -34,4 +34,4 @@ auto NativeEnumUsageRecord::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
             ::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mM))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

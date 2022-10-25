@@ -49,4 +49,4 @@ private:
     const jmethodID method_returnForJava { ::djinni::jniGetMethodID(clazz.get(), "returnForJava", "()Lcom/dropbox/djinni/test/JavaOnlyListener;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

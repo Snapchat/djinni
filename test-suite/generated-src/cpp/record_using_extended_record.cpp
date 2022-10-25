@@ -9,4 +9,4 @@ RecordUsingExtendedRecord const RecordUsingExtendedRecord::CR = RecordUsingExten
     ExtendedRecord(
         false /* foo */ ) /* er */ );
 
-}  // namespace testsuite
+} // namespace testsuite

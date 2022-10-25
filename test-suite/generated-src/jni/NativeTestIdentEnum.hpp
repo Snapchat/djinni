@@ -23,4 +23,4 @@ private:
     friend ::djinni::JniClass<NativeTestIdentEnum>;
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

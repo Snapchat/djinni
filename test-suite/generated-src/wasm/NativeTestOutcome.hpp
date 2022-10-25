@@ -34,4 +34,4 @@ struct NativeTestOutcome : ::djinni::JsInterface<::testsuite::TestOutcome, Nativ
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

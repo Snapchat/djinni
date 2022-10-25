@@ -18,4 +18,4 @@ struct ItemList final {
     {}
 };
 
-}  // namespace textsort
+} // namespace textsort

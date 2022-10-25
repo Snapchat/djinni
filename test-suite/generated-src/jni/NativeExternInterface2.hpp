@@ -43,4 +43,4 @@ private:
     const jmethodID method_foo { ::djinni::jniGetMethodID(clazz.get(), "foo", "(Lcom/dropbox/djinni/test/TestHelpers;)Lcom/dropbox/djinni/test/ExternRecordWithDerivings;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

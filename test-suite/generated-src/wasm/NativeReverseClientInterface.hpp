@@ -30,4 +30,4 @@ struct NativeReverseClientInterface : ::djinni::JsInterface<::testsuite::Reverse
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

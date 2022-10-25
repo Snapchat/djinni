@@ -18,4 +18,4 @@ auto RecordWithEmbeddedCppProto::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBRecordWithEmbeddedCppProto alloc] initWithState:(::djinni::ProtobufPassthrough<::djinni::test2::PersistingState>::fromCpp(cpp.state))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

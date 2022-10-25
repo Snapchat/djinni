@@ -30,4 +30,4 @@ private:
     const jfieldID field_mY { ::djinni::jniGetFieldID(clazz.get(), "mY", "I") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

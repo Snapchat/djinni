@@ -35,4 +35,4 @@ struct NativeDataRefTest : ::djinni::JsInterface<::testsuite::DataRefTest, Nativ
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

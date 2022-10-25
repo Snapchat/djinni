@@ -32,4 +32,4 @@ auto RecordWithDerivings::fromCpp(const CppType& cpp) -> ObjcType
                                                       s:(::djinni::String::fromCpp(cpp.s))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

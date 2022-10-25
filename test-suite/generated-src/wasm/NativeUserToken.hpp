@@ -31,4 +31,4 @@ struct NativeUserToken : ::djinni::JsInterface<::testsuite::UserToken, NativeUse
     };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

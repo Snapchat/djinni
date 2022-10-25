@@ -43,4 +43,4 @@ private:
     const jmethodID method_update { ::djinni::jniGetMethodID(clazz.get(), "update", "(Lcom/dropbox/textsort/ItemList;)V") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

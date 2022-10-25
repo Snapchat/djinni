@@ -19,4 +19,4 @@ auto EmptyRecord::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBEmptyRecord alloc] init];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

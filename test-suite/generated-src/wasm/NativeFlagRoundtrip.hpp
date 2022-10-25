@@ -30,4 +30,4 @@ struct NativeFlagRoundtrip : ::djinni::JsInterface<::testsuite::FlagRoundtrip, N
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

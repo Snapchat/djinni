@@ -20,4 +20,4 @@ auto SetRecord::fromCpp(const CppType& cpp) -> ObjcType
                                        iset:(::djinni::Set<::djinni::I32>::fromCpp(cpp.iset))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

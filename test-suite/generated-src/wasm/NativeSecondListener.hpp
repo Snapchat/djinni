@@ -24,4 +24,4 @@ struct NativeSecondListener : ::djinni::JsInterface<::testsuite::SecondListener,
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

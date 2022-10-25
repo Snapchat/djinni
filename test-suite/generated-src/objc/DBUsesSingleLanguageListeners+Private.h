@@ -27,5 +27,5 @@ private:
     class ObjcProxy;
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated
 

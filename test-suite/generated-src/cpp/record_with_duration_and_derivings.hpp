@@ -26,4 +26,4 @@ struct RecordWithDurationAndDerivings final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

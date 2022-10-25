@@ -18,4 +18,4 @@ EMSCRIPTEN_BINDINGS(testsuite_throwing_interface) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

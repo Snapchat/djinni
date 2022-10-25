@@ -30,4 +30,4 @@ ConstantRecord const ConstantsInterface::OBJECT_CONSTANT = ConstantRecord(
 
 std::string const ConstantsInterface::UPPER_CASE_CONSTANT = {"upper-case-constant"};
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -22,4 +22,4 @@ struct NestedOutcome final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -27,4 +27,4 @@ EMSCRIPTEN_BINDINGS(textsort_sort_order) {
     NativeSortOrder::staticInitializeConstants();
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

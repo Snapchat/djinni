@@ -48,4 +48,4 @@ EMSCRIPTEN_BINDINGS(testsuite_client_interface) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

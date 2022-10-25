@@ -25,4 +25,4 @@ auto NativeMapListRecord::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
     return {::djinni::List<::djinni::Map<::djinni::String, ::djinni::I64>>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mMapList))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

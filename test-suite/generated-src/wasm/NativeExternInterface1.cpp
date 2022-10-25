@@ -44,4 +44,4 @@ EMSCRIPTEN_BINDINGS(_extern_interface_1) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

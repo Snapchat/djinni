@@ -27,4 +27,4 @@ struct NativeObjectNative : ::djinni::JsInterface<::snapchat::djinni::benchmark:
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

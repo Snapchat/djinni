@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <utility>
 
-namespace snapchat { namespace djinni { namespace benchmark {
+namespace snapchat::djinni::benchmark {
 
 struct RecordSixInt final {
     int64_t i1;
@@ -31,4 +31,4 @@ struct RecordSixInt final {
     {}
 };
 
-} } }  // namespace snapchat::djinni::benchmark
+} // namespace snapchat::djinni::benchmark

@@ -53,4 +53,4 @@ EMSCRIPTEN_BINDINGS(textsort_sort_items) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

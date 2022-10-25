@@ -27,4 +27,4 @@ auto EnumUsageRecord::fromCpp(const CppType& cpp) -> ObjcType
                                               m:(::djinni::Map<::djinni::Enum<::testsuite::color, DBColor>, ::djinni::Enum<::testsuite::color, DBColor>>::fromCpp(cpp.m))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

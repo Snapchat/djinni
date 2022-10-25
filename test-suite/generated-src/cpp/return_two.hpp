@@ -18,4 +18,4 @@ public:
     virtual int8_t return_two() = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

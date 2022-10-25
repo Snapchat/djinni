@@ -25,4 +25,4 @@ auto NativeMapDateRecord::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
     return {::djinni::Map<::djinni::String, ::djinni::Date>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mDatesById))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

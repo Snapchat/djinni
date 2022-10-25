@@ -19,4 +19,4 @@ EMSCRIPTEN_BINDINGS(testsuite_test_static_method_language) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

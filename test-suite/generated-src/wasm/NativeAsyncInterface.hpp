@@ -28,4 +28,4 @@ struct NativeAsyncInterface : ::djinni::JsInterface<::testsuite::AsyncInterface,
     };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

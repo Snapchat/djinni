@@ -59,4 +59,4 @@ struct AssortedPrimitives final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

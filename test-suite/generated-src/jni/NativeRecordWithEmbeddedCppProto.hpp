@@ -29,4 +29,4 @@ private:
     const jfieldID field_mState { ::djinni::jniGetFieldID(clazz.get(), "mState", "Ldjinni/test2/Test2$PersistingState;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

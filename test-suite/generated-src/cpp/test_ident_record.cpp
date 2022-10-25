@@ -7,4 +7,4 @@ namespace testsuite {
 
 std::string const TestIdentRecord::RECORD_CONST_VALUE = {"test"};
 
-}  // namespace testsuite
+} // namespace testsuite

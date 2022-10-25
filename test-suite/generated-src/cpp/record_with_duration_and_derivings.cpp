@@ -36,4 +36,4 @@ bool operator>=(const RecordWithDurationAndDerivings& lhs, const RecordWithDurat
     return !(lhs < rhs);
 }
 
-}  // namespace testsuite
+} // namespace testsuite

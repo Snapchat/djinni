@@ -14,4 +14,4 @@ NativeJavaOnlyListener::JavaProxy::JavaProxy(JniType j) : Handle(::djinni::jniGe
 NativeJavaOnlyListener::JavaProxy::~JavaProxy() = default;
 
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

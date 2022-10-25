@@ -26,4 +26,4 @@ auto JavaOnlyListener::fromCppOpt(const CppOptType& cpp) -> ObjcType
     DJINNI_UNIMPLEMENTED(@"Interface not implementable in any language.");
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

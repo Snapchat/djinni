@@ -25,4 +25,4 @@ auto NativeDateRecord::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
     return {::djinni::Date::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mCreatedAt))};
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

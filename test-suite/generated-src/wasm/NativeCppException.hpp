@@ -30,4 +30,4 @@ struct NativeCppException : ::djinni::JsInterface<::testsuite::CppException, Nat
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

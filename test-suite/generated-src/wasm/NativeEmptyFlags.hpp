@@ -12,4 +12,4 @@ struct NativeEmptyFlags: ::djinni::WasmEnum<::testsuite::empty_flags> {
     static void staticInitializeConstants();
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

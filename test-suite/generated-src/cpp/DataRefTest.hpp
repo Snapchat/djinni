@@ -34,4 +34,4 @@ public:
     static /*not-null*/ std::shared_ptr<DataRefTest> create();
 };
 
-}  // namespace testsuite
+} // namespace testsuite

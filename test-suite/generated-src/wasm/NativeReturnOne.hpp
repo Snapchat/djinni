@@ -28,4 +28,4 @@ struct NativeReturnOne : ::djinni::JsInterface<::testsuite::ReturnOne, NativeRet
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -29,4 +29,4 @@ private:
     const jfieldID field_mSampleInterface { ::djinni::jniGetFieldID(clazz.get(), "mSampleInterface", "Lcom/dropbox/djinni/test/SampleInterface;") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

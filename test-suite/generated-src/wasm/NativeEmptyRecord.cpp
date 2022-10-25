@@ -13,4 +13,4 @@ auto NativeEmptyRecord::fromCpp(const CppType& c) -> JsType {
     return js;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

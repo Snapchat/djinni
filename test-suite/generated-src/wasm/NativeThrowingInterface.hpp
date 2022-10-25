@@ -28,4 +28,4 @@ struct NativeThrowingInterface : ::djinni::JsInterface<::testsuite::ThrowingInte
     };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

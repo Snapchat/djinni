@@ -18,4 +18,4 @@ auto RecordWithFlags::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBRecordWithFlags alloc] initWithAccess:(::djinni::Enum<::testsuite::access_flags, DBAccessFlags>::fromCpp(cpp.access))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

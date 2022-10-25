@@ -51,4 +51,4 @@ struct NativeDjinniPerfBenchmark : ::djinni::JsInterface<::snapchat::djinni::ben
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

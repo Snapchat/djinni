@@ -30,4 +30,4 @@ struct NativeTestArray : ::djinni::JsInterface<::testsuite::TestArray, NativeTes
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -23,4 +23,4 @@ bool NativeTestJavaInterfaceOnly::JavaProxy::test_method() {
     return ::djinni::Bool::toCpp(jniEnv, jret);
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

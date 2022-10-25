@@ -21,4 +21,4 @@ struct ConstantRecord final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

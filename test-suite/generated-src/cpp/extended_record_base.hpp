@@ -29,4 +29,4 @@ protected:
     ExtendedRecordBase& operator=(ExtendedRecordBase&&) = default;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

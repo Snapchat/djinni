@@ -68,4 +68,4 @@ struct Constants final {
     static constexpr bool DUMMY = false;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

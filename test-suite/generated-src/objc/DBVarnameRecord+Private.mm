@@ -18,4 +18,4 @@ auto VarnameRecord::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBVarnameRecord alloc] initWithField:(::djinni::I8::fromCpp(cpp._field_))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

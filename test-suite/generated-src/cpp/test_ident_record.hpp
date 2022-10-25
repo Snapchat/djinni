@@ -25,4 +25,4 @@ struct TestIdentRecord final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -14,4 +14,4 @@ public:
     virtual void update(const ItemList & items) = 0;
 };
 
-}  // namespace textsort
+} // namespace textsort

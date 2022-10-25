@@ -5,7 +5,7 @@
 
 #include <functional>
 
-namespace snapchat { namespace djinni { namespace benchmark {
+namespace snapchat::djinni::benchmark {
 
 enum class EnumSixValue : int {
     FIRST = 0,
@@ -28,7 +28,7 @@ constexpr const char* to_string(EnumSixValue e) noexcept {
     return names[static_cast<int>(e)];
 }
 
-} } }  // namespace snapchat::djinni::benchmark
+} // namespace snapchat::djinni::benchmark
 
 namespace std {
 
@@ -39,4 +39,4 @@ struct hash<::snapchat::djinni::benchmark::EnumSixValue> {
     }
 };
 
-}  // namespace std
+} // namespace std

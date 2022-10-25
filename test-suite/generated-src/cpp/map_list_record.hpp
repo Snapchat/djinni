@@ -20,4 +20,4 @@ struct MapListRecord final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

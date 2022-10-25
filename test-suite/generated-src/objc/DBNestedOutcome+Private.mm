@@ -19,4 +19,4 @@ auto NestedOutcome::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBNestedOutcome alloc] initWithO:(::djinni::Outcome<::djinni::I32, ::djinni::String>::fromCpp(cpp.o))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

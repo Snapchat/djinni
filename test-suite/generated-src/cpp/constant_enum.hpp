@@ -20,7 +20,7 @@ constexpr const char* to_string(constant_enum e) noexcept {
     return names[static_cast<int>(e)];
 }
 
-}  // namespace testsuite
+} // namespace testsuite
 
 namespace std {
 
@@ -31,4 +31,4 @@ struct hash<::testsuite::constant_enum> {
     }
 };
 
-}  // namespace std
+} // namespace std

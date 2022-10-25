@@ -22,4 +22,4 @@ auto ClientReturnedRecord::fromCpp(const CppType& cpp) -> ObjcType
                                                        misc:(::djinni::Optional<std::experimental::optional, ::djinni::String>::fromCpp(cpp.misc))];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

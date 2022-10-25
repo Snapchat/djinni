@@ -19,4 +19,4 @@ struct RecordUsingExtendedRecord final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -21,4 +21,4 @@ auto Constants::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBConstants alloc] init];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -46,4 +46,4 @@ struct NativeTestDuration : ::djinni::JsInterface<::testsuite::TestDuration, Nat
 
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

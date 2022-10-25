@@ -34,4 +34,4 @@ private:
     const jfieldID field_mI6 { ::djinni::jniGetFieldID(clazz.get(), "mI6", "J") };
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

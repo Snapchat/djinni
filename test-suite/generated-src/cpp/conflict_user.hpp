@@ -19,4 +19,4 @@ public:
     virtual bool conflict_arg(const std::unordered_set</*not-null*/ std::shared_ptr<::testsuite::Conflict>> & cs) = 0;
 };
 
-}  // namespace testsuite
+} // namespace testsuite

@@ -15,4 +15,4 @@ namespace testsuite {
 struct EmptyRecord final {
 };
 
-}  // namespace testsuite
+} // namespace testsuite

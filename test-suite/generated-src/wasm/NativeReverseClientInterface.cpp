@@ -62,4 +62,4 @@ EMSCRIPTEN_BINDINGS(testsuite_reverse_client_interface) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

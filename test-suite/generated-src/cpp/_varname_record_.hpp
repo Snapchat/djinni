@@ -22,4 +22,4 @@ struct VarnameRecord final {
     {}
 };
 
-}  // namespace testsuite
+} // namespace testsuite

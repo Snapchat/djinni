@@ -20,4 +20,4 @@ auto ConstantWithEnum::fromCpp(const CppType& cpp) -> ObjcType
     return [[DBConstantWithEnum alloc] init];
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

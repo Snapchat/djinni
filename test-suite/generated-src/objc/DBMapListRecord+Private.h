@@ -21,4 +21,4 @@ struct MapListRecord
     static ObjcType fromCpp(const CppType& cpp);
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

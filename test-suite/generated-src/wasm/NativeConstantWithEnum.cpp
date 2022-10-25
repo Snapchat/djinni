@@ -35,4 +35,4 @@ EMSCRIPTEN_BINDINGS(testsuite_constant_with_enum_consts) {
     NativeConstantWithEnum::staticInitializeConstants();
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

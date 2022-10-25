@@ -12,4 +12,4 @@ struct NativeConstantEnum: ::djinni::WasmEnum<::testsuite::constant_enum> {
     static void staticInitializeConstants();
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

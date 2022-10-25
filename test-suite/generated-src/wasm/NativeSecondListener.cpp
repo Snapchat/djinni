@@ -13,4 +13,4 @@ EMSCRIPTEN_BINDINGS(testsuite_second_listener) {
         ;
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

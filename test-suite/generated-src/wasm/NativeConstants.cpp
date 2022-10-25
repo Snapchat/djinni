@@ -55,4 +55,4 @@ EMSCRIPTEN_BINDINGS(testsuite_constants_consts) {
     NativeConstants::staticInitializeConstants();
 }
 
-}  // namespace djinni_generated
+} // namespace djinni_generated

@@ -8,4 +8,4 @@ namespace testsuite {
 
 constant_enum const ConstantInterfaceWithEnum::CONST_ENUM = constant_enum::SOME_VALUE;
 
-}  // namespace testsuite
+} // namespace testsuite

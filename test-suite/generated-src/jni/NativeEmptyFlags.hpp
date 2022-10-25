@@ -23,4 +23,4 @@ private:
     friend ::djinni::JniClass<NativeEmptyFlags>;
 };
 
-}  // namespace djinni_generated
+} // namespace djinni_generated
