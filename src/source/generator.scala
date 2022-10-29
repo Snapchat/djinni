@@ -481,7 +481,7 @@ abstract class Generator(spec: Spec)
     var shift = 0
     for (o <- normalEnumOptions(e)) {
       writeDoc(w, o.doc)
-      w.wl(ident(o.ident.name) + (if(e.flags) s" $delim 1 << $shift" else s" $delim $shift") + ",")
+      w.wl(ident(o.ident.name) + (if(e.flags) s" $delim 1u << $shift" else s" $delim $shift") + ",")
       shift += 1
     }
   }
