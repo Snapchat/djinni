@@ -490,7 +490,7 @@ abstract class Generator(spec: Spec)
     for (o <- e.options.find(_.specialFlag == Some(Enum.SpecialFlag.AllFlags))) {
       writeDoc(w, o.doc)
       w.w(ident(o.ident.name) + s" $delim ")
-      w.wl(s"(1 << ${normalEnumOptions(e).size}) - 1,")
+      w.wl(s"(1u << ${normalEnumOptions(e).size}) - 1,")
     }
   }
 

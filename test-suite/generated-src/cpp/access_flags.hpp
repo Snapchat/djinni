@@ -9,16 +9,16 @@ namespace testsuite {
 
 enum class access_flags : unsigned {
     NOBODY = 0,
-    OWNER_READ = 1 << 0,
-    OWNER_WRITE = 1 << 1,
-    OWNER_EXECUTE = 1 << 2,
-    GROUP_READ = 1 << 3,
-    GROUP_WRITE = 1 << 4,
-    GROUP_EXECUTE = 1 << 5,
-    SYSTEM_READ = 1 << 6,
-    SYSTEM_WRITE = 1 << 7,
-    SYSTEM_EXECUTE = 1 << 8,
-    EVERYBODY = (1 << 9) - 1,
+    OWNER_READ = 1u << 0,
+    OWNER_WRITE = 1u << 1,
+    OWNER_EXECUTE = 1u << 2,
+    GROUP_READ = 1u << 3,
+    GROUP_WRITE = 1u << 4,
+    GROUP_EXECUTE = 1u << 5,
+    SYSTEM_READ = 1u << 6,
+    SYSTEM_WRITE = 1u << 7,
+    SYSTEM_EXECUTE = 1u << 8,
+    EVERYBODY = (1u << 9) - 1,
 };
 constexpr access_flags operator|(access_flags lhs, access_flags rhs) noexcept {
     return static_cast<access_flags>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs));

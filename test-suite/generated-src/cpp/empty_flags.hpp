@@ -9,7 +9,7 @@ namespace testsuite {
 
 enum class empty_flags : unsigned {
     NONE = 0,
-    ALL = (1 << 0) - 1,
+    ALL = (1u << 0) - 1,
 };
 constexpr empty_flags operator|(empty_flags lhs, empty_flags rhs) noexcept {
     return static_cast<empty_flags>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs));
