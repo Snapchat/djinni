@@ -487,10 +487,17 @@ abstract class Generator(spec: Spec)
   }
 
   def writeEnumOptionAll(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=") {
-    for (o <- e.options.find(_.specialFlag == Some(Enum.SpecialFlag.AllFlags))) {
+    for (
+      o <- e.options.find(_.specialFlag.contains(Enum.SpecialFlag.AllFlags))
+    ) {
       writeDoc(w, o.doc)
       w.w(ident(o.ident.name) + s" $delim ")
-      w.wl(s"(1u << ${normalEnumOptions(e).size}) - 1,")
+      w.w(
+        normalEnumOptions(e)
+          .map(o => ident(o.ident.name))
+          .fold("0")((acc, o) => acc + " | " + o)
+      )
+      w.wl(",")
     }
   }
 

@@ -18,7 +18,7 @@ enum class access_flags : unsigned {
     SYSTEM_READ = 1u << 6,
     SYSTEM_WRITE = 1u << 7,
     SYSTEM_EXECUTE = 1u << 8,
-    EVERYBODY = (1u << 9) - 1,
+    EVERYBODY = 0 | OWNER_READ | OWNER_WRITE | OWNER_EXECUTE | GROUP_READ | GROUP_WRITE | GROUP_EXECUTE | SYSTEM_READ | SYSTEM_WRITE | SYSTEM_EXECUTE,
 };
 constexpr access_flags operator|(access_flags lhs, access_flags rhs) noexcept {
     return static_cast<access_flags>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs));
