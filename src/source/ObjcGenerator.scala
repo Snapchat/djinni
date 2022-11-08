@@ -54,7 +54,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
     writeObjcFile(marshal.headerName(ident), origin, refs.header, w => {
       writeDoc(w, doc)
       w.wl(if(e.flags) {
-        s"typedef NS_OPTIONS(NSUInteger, $self)"
+        s"typedef NS_OPTIONS(NSInteger, $self)"
       } else {
         if (spec.objcClosedEnums) {
           s"typedef NS_CLOSED_ENUM(NSInteger, $self)"

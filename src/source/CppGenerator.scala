@@ -65,7 +65,7 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
       refs.hpp.add("#include <functional>") // needed for std::hash
     }
 
-    val flagsType = "unsigned"
+    val flagsType = "int32_t"
     val enumType = "int"
     val underlyingType = if(e.flags) flagsType else enumType
 
