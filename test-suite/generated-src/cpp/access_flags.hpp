@@ -7,7 +7,7 @@
 
 namespace testsuite {
 
-enum class access_flags : int_32_t {
+enum class access_flags : int32_t {
     NOBODY = 0,
     OWNER_READ = 1 << 0,
     OWNER_WRITE = 1 << 1,
