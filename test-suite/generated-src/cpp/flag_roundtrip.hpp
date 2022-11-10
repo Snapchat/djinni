@@ -7,8 +7,8 @@
 
 namespace testsuite {
 
-enum class access_flags : unsigned;
-enum class empty_flags : unsigned;
+enum class access_flags : int32_t;
+enum class empty_flags : int32_t;
 
 class FlagRoundtrip {
 public:
