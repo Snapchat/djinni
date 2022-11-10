@@ -39,7 +39,7 @@ public:
         if (err.isNull() || err.isUndefined()) {
             pNativePromise->setValue(RESULT::Boxed::toCpp(res));
         } else {
-            pNativePromise->setException(std::runtime_error(err["message"].as<std::string>()));
+            pNativePromise->setException(JsException(err));
         }
         delete pNativePromise;
     }
