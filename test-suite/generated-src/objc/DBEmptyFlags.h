@@ -3,8 +3,8 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_OPTIONS(NSUInteger, DBEmptyFlags)
+typedef NS_OPTIONS(NSInteger, DBEmptyFlags)
 {
     DBEmptyFlagsNone = 0,
-    DBEmptyFlagsAll = (1 << 0) - 1,
+    DBEmptyFlagsAll = 0,
 };

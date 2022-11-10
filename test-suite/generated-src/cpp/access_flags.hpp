@@ -7,7 +7,7 @@
 
 namespace testsuite {
 
-enum class access_flags : unsigned {
+enum class access_flags : int32_t {
     NOBODY = 0,
     OWNER_READ = 1 << 0,
     OWNER_WRITE = 1 << 1,
@@ -18,28 +18,28 @@ enum class access_flags : unsigned {
     SYSTEM_READ = 1 << 6,
     SYSTEM_WRITE = 1 << 7,
     SYSTEM_EXECUTE = 1 << 8,
-    EVERYBODY = (1 << 9) - 1,
+    EVERYBODY = 0 | OWNER_READ | OWNER_WRITE | OWNER_EXECUTE | GROUP_READ | GROUP_WRITE | GROUP_EXECUTE | SYSTEM_READ | SYSTEM_WRITE | SYSTEM_EXECUTE,
 };
 constexpr access_flags operator|(access_flags lhs, access_flags rhs) noexcept {
-    return static_cast<access_flags>(static_cast<unsigned>(lhs) | static_cast<unsigned>(rhs));
+    return static_cast<access_flags>(static_cast<int32_t>(lhs) | static_cast<int32_t>(rhs));
 }
 constexpr access_flags& operator|=(access_flags& lhs, access_flags rhs) noexcept {
     return lhs = lhs | rhs;
 }
 constexpr access_flags operator&(access_flags lhs, access_flags rhs) noexcept {
-    return static_cast<access_flags>(static_cast<unsigned>(lhs) & static_cast<unsigned>(rhs));
+    return static_cast<access_flags>(static_cast<int32_t>(lhs) & static_cast<int32_t>(rhs));
 }
 constexpr access_flags& operator&=(access_flags& lhs, access_flags rhs) noexcept {
     return lhs = lhs & rhs;
 }
 constexpr access_flags operator^(access_flags lhs, access_flags rhs) noexcept {
-    return static_cast<access_flags>(static_cast<unsigned>(lhs) ^ static_cast<unsigned>(rhs));
+    return static_cast<access_flags>(static_cast<int32_t>(lhs) ^ static_cast<int32_t>(rhs));
 }
 constexpr access_flags& operator^=(access_flags& lhs, access_flags rhs) noexcept {
     return lhs = lhs ^ rhs;
 }
 constexpr access_flags operator~(access_flags x) noexcept {
-    return static_cast<access_flags>(~static_cast<unsigned>(x));
+    return static_cast<access_flags>(~static_cast<int32_t>(x));
 }
 
 } // namespace testsuite
@@ -49,7 +49,7 @@ namespace std {
 template <>
 struct hash<::testsuite::access_flags> {
     size_t operator()(::testsuite::access_flags type) const {
-        return std::hash<unsigned>()(static_cast<unsigned>(type));
+        return std::hash<int32_t>()(static_cast<int32_t>(type));
     }
 };
 

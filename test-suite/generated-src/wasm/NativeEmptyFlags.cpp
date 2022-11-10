@@ -10,7 +10,7 @@ namespace {
     EM_JS(void, djinni_init_testsuite_empty_flags_consts, (), {
         Module.testsuite_EmptyFlags =  {
             NONE : 0,
-            ALL : (1 << 0) - 1,
+            ALL : 0,
         }
     })
 }

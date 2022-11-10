@@ -3,7 +3,7 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_OPTIONS(NSUInteger, DBAccessFlags)
+typedef NS_OPTIONS(NSInteger, DBAccessFlags)
 {
     DBAccessFlagsNobody = 0,
     DBAccessFlagsOwnerRead = 1 << 0,
@@ -15,5 +15,5 @@ typedef NS_OPTIONS(NSUInteger, DBAccessFlags)
     DBAccessFlagsSystemRead = 1 << 6,
     DBAccessFlagsSystemWrite = 1 << 7,
     DBAccessFlagsSystemExecute = 1 << 8,
-    DBAccessFlagsEverybody = (1 << 9) - 1,
+    DBAccessFlagsEverybody = 0 | DBAccessFlagsOwnerRead | DBAccessFlagsOwnerWrite | DBAccessFlagsOwnerExecute | DBAccessFlagsGroupRead | DBAccessFlagsGroupWrite | DBAccessFlagsGroupExecute | DBAccessFlagsSystemRead | DBAccessFlagsSystemWrite | DBAccessFlagsSystemExecute,
 };

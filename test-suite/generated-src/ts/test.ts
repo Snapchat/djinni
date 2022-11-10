@@ -130,12 +130,12 @@ export enum AccessFlags {
     SYSTEM_READ = 1 << 6,
     SYSTEM_WRITE = 1 << 7,
     SYSTEM_EXECUTE = 1 << 8,
-    EVERYBODY = (1 << 9) - 1,
+    EVERYBODY = 0 | OWNER_READ | OWNER_WRITE | OWNER_EXECUTE | GROUP_READ | GROUP_WRITE | GROUP_EXECUTE | SYSTEM_READ | SYSTEM_WRITE | SYSTEM_EXECUTE,
 }
 
 export enum EmptyFlags {
     NONE = 0,
-    ALL = (1 << 0) - 1,
+    ALL = 0,
 }
 
 export interface FlagRoundtrip {
