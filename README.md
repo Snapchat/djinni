@@ -148,7 +148,7 @@ Example:
 Use `@extern` directive to include support of `outcome` type to your `idl` file.
 
 ```
-@extern "../submodules/djinni/support-lib/outcome.yaml"
+@extern "../djinni/support-lib/outcome.yaml"
 
 my_interface = interface +c {
     query(): outcome<string, i32>;
