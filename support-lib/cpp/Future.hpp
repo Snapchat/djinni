@@ -29,11 +29,13 @@
     #include <coroutine>
     namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::coroutine_handle<Promise>;
+        using SuspendNever = std::suspend_never;
     }
 #elif __has_include(<experimental/coroutine>)
     #include <experimental/coroutine>
     namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::experimental::coroutine_handle<Promise>;
+        using SuspendNever = std::experimental::suspend_never;
     }
 #endif
 #endif
@@ -360,8 +362,8 @@ public:
     struct PromiseTypeBase {
         Promise<T> _promise;
 
-        std::experimental::suspend_never initial_suspend() { return {}; }
-        std::experimental::suspend_never final_suspend() noexcept { return {}; }
+        detail::SuspendNever initial_suspend() { return {}; }
+        detail::SuspendNever final_suspend() noexcept { return {}; }
 
         Future<T> get_return_object() noexcept {
             return _promise.getFuture();
