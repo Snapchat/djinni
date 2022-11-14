@@ -29,11 +29,13 @@
     #include <coroutine>
     namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::coroutine_handle<Promise>;
+        using SuspendNever = std::suspend_never;
     }
 #elif __has_include(<experimental/coroutine>)
     #include <experimental/coroutine>
     namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::experimental::coroutine_handle<Promise>;
+        using SuspendNever = std::experimental::suspend_never;
     }
 #endif
 #endif
@@ -356,6 +358,35 @@ public:
         });
         return true;
     }
+
+    struct PromiseTypeBase {
+        Promise<T> _promise;
+
+        detail::SuspendNever initial_suspend() { return {}; }
+        detail::SuspendNever final_suspend() noexcept { return {}; }
+
+        Future<T> get_return_object() noexcept {
+            return _promise.getFuture();
+        }
+        void unhandled_exception() {
+            _promise.setException(std::current_exception());
+        }
+    };
+    template <typename U>
+    struct PromiseType: PromiseTypeBase{
+        template <typename V>
+        void return_value(V&& value) {
+            this->_promise.setValue(std::forward<V>(value));
+        }
+    };
+    template <>
+    struct PromiseType<void>: PromiseTypeBase {
+        void return_void() {
+            this->_promise.setValue();
+        }
+    };
+    using promise_type = PromiseType<T>;
+
 private:
     detail::SharedStatePtr<T> _coroState;
 #endif
