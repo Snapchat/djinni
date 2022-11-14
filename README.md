@@ -143,6 +143,18 @@ In C++, the `outcome<>` type maps to the template class `djinni::expected<>`.
 In Java, it maps to the generic class `com.snapchat.djinni.Outcome<>`. In ObjC,
 it maps to the generic class `DJOutcome<>`.
 
+Example:
+
+Use `@extern` directive to include support of `outcome` type to your `idl` file.
+
+```
+@extern "../djinni/support-lib/outcome.yaml"
+
+my_interface = interface +c {
+    query(): outcome<string, i32>;
+}
+```
+
 ### Use Protobuf types in Djinni
 
 We support using Protobuf types directly in Djinni IDL. In order to use Protobuf
@@ -311,7 +323,11 @@ Foo = interface {
 
 We can now write:
 
+(use `@extern` directive to include support of `future` type to your `idl` file)
+
 ```
+@extern "../djinni/support-lib/future.yaml"
+
 Foo = interface {
   bar(): future<i32>;
 }
