@@ -24,6 +24,7 @@
 #include <mutex>
 #include <cassert>
 
+#ifdef __cpp_coroutines
 #if __has_include(<coroutine>)
     #include <coroutine>
     namespace djinni::detail {
@@ -38,6 +39,7 @@
         using SuspendNever = std::experimental::suspend_never;
     }
     #define DJINNI_FUTURE_HAS_COROUTINE_SUPPORT 1
+#endif
 #endif
 
 namespace djinni {
