@@ -1,77 +1,74 @@
 package com.dropbox.djinni.test;
 
-import junit.framework.TestCase;
 import static org.junit.Assert.*;
-import com.snapchat.djinni.Promise;
-import com.snapchat.djinni.Future;
+import junit.framework.TestCase;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import io.reactivex.Single;
 
 public class AsyncTest extends TestCase {
 
     static class AsyncInterfaceImpl extends AsyncInterface {
-        public com.snapchat.djinni.Future<String> futureRoundtrip(com.snapchat.djinni.Future<Integer> f) {
-            return f.then((i) -> {return i.get().toString();});
+        public CompletableFuture<String> futureRoundtrip(CompletableFuture<Integer> f) {
+            return f.thenApply((i) -> {return i.toString();});
         }
     }
     
     public void testConsumeNativeFuture() throws Throwable {
-        Future<Integer> f = TestHelpers.getAsyncResult();
-        Future<Integer> f2 = f.then((i) -> {
-                return i.get().toString();
-            }).then((s) -> {
-                    return Integer.parseInt(s.get());
+        CompletableFuture<Integer> f = TestHelpers.getAsyncResult();
+        CompletableFuture<Integer> f2 = f.thenApply((i) -> {
+                return i.toString();
+            }).thenApply((s) -> {
+                    return Integer.parseInt(s);
                 });
         assertEquals(Integer.valueOf(42), f2.get());
     }
 
     public void testFutureRoundtrip() throws Throwable {
-        final Promise<String> p = new Promise<String>();
-        Future<String> f = p.getFuture();
-        Future<Integer> f2 = f.then((s) -> {
-                return Integer.parseInt(s.get());
+        final CompletableFuture<String> f = new CompletableFuture();
+        CompletableFuture<Integer> f2 = f.thenApply((s) -> {
+                return Integer.parseInt(s);
             });
-        Future<String> f3 = TestHelpers.futureRoundtrip(f2);
-        p.setValue("36");
+        CompletableFuture<String> f3 = TestHelpers.futureRoundtrip(f2);
+        f.complete("36");
         assertEquals(f3.get(), "36");
     }
 
     public void testFutureRoundtripWithException() throws Throwable {
-        final Promise<String> p = new Promise<String>();
-        Future<String> f = p.getFuture();
-        Future<Integer> f2 = f.then((s) -> {
+        final CompletableFuture<String> f = new CompletableFuture();
+        CompletableFuture<Integer> f2 = f.thenApply((s) -> {
                 if (true) {
-                    throw new Exception("123");
+                    throw new RuntimeException("123");
                 }
                 return 0;
             });
-        Future<String> f3 = TestHelpers.futureRoundtrip(f2);
-        p.setValue("36");
+        CompletableFuture<String> f3 = TestHelpers.futureRoundtrip(f2);
+        f.complete("36");
         String s = null;
         try {
             f3.get();
         } catch (ExecutionException e) {
-            s = e.getMessage();
+            s = e.getCause().getMessage();
         }
-        assertEquals(s, "123");
+        assertEquals(s, "java.lang.RuntimeException: 123");
     }
 
     public void testFutureRoundtripBackwards() throws Throwable {
-        Future<String> s = TestHelpers.checkAsyncInterface(new AsyncInterfaceImpl());
+        CompletableFuture<String> s = TestHelpers.checkAsyncInterface(new AsyncInterfaceImpl());
         assertEquals(s.get(), "36");
     }
 
     public void testFutureComposition() throws Throwable {
-        Future<String> s = TestHelpers.checkAsyncComposition(new AsyncInterfaceImpl());
+        CompletableFuture<String> s = TestHelpers.checkAsyncComposition(new AsyncInterfaceImpl());
         assertEquals(s.get(), "42");
     }
 
     public void testRx() throws Throwable {
-        Future<Integer> f = TestHelpers.getAsyncResult();
-        Single<Integer> s = Single.create(o -> f.then((i) -> {
-                    try {
-                        o.onSuccess(i.get());
-                    } catch (Throwable e) {
+        CompletableFuture<Integer> f = TestHelpers.getAsyncResult();
+        Single<Integer> s = Single.create(o -> f.whenComplete((i, e) -> {
+                    if (e == null) {
+                        o.onSuccess(i);
+                    } else { 
                         o.onError(e);
                     }
                 }));
@@ -79,7 +76,7 @@ public class AsyncTest extends TestCase {
     }
     
     public void testRxFromFuture() throws Throwable {
-        Future<Integer> f = TestHelpers.getAsyncResult();
+        CompletableFuture<Integer> f = TestHelpers.getAsyncResult();
         Single<Integer> s = Single.fromFuture(f);
         assertEquals(Integer.valueOf(42), s.blockingGet());
     }

@@ -18,8 +18,8 @@ objcpp:
   translator: '::djinni::FutureAdaptor'
   header: '"$Future_objc.hpp"'
 java:
-  typename: 'com.snapchat.djinni.Future'
-  boxed: 'com.snapchat.djinni.Future'
+  typename: 'java.util.concurrent.CompletableFuture'
+  boxed: 'java.util.concurrent.CompletableFuture'
   reference: true
   generic: true
   hash: '%s.hashCode()'
@@ -27,7 +27,7 @@ jni:
   translator: '::djinni::FutureAdaptor'
   header: '"$Future_jni.hpp"'
   typename: jobject
-  typeSignature: 'Lcom/snapchat/djinni/Future;'
+  typeSignature: 'Ljava/util/concurrent/CompletableFuture;'
 wasm:
   typename: 'em::val'
   translator: '::djinni::FutureAdaptor'

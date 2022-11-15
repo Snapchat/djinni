@@ -86,19 +86,19 @@ public abstract class TestHelpers {
     public static native byte[] idBinary(@Nonnull byte[] b);
 
     @Nonnull
-    public static native com.snapchat.djinni.Future<Integer> getAsyncResult();
+    public static native java.util.concurrent.CompletableFuture<Integer> getAsyncResult();
 
     @Nonnull
-    public static native com.snapchat.djinni.Future<String> futureRoundtrip(@Nonnull com.snapchat.djinni.Future<Integer> f);
+    public static native java.util.concurrent.CompletableFuture<String> futureRoundtrip(@Nonnull java.util.concurrent.CompletableFuture<Integer> f);
 
     @Nonnull
-    public static native com.snapchat.djinni.Future<Integer> asyncEarlyThrow();
+    public static native java.util.concurrent.CompletableFuture<Integer> asyncEarlyThrow();
 
     @Nonnull
-    public static native com.snapchat.djinni.Future<String> checkAsyncInterface(@CheckForNull AsyncInterface i);
+    public static native java.util.concurrent.CompletableFuture<String> checkAsyncInterface(@CheckForNull AsyncInterface i);
 
     @Nonnull
-    public static native com.snapchat.djinni.Future<String> checkAsyncComposition(@CheckForNull AsyncInterface i);
+    public static native java.util.concurrent.CompletableFuture<String> checkAsyncComposition(@CheckForNull AsyncInterface i);
 
     @Nonnull
     public static native ArrayList<String> getOptionalList();

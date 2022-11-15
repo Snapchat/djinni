@@ -16,7 +16,9 @@
 
 package com.snapchat.djinni;
 
-public class NativeFutureHandler<T> implements Future.FutureHandler<T> {
+import java.util.function.BiConsumer;
+
+public class NativeFutureHandler<T> implements BiConsumer<T, Throwable> {
     private final long mNativeFunc;
     private final long mNativePromise;
     
@@ -26,15 +28,8 @@ public class NativeFutureHandler<T> implements Future.FutureHandler<T> {
     }
 
     @Override
-    public void handleResult(Future<T> future) {
-        T res = null;
-        Throwable ex = null;
-        try {
-            res = future.get();
-        } catch (Throwable e) {
-            ex = e;
-        }
-        nativeHandleResult(mNativeFunc, mNativePromise, res, ex);
+    public void accept(T t, Throwable e) {
+        nativeHandleResult(mNativeFunc, mNativePromise, t, e);
     }
 
     private static native void nativeHandleResult(long nativeFunc, long nativePromise, Object res, Throwable ex);

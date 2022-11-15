@@ -40,7 +40,7 @@ private:
     };
 
     const ::djinni::GlobalRef<jclass> clazz { ::djinni::jniFindClass("com/dropbox/djinni/test/AsyncInterface") };
-    const jmethodID method_futureRoundtrip { ::djinni::jniGetMethodID(clazz.get(), "futureRoundtrip", "(Lcom/snapchat/djinni/Future;)Lcom/snapchat/djinni/Future;") };
+    const jmethodID method_futureRoundtrip { ::djinni::jniGetMethodID(clazz.get(), "futureRoundtrip", "(Ljava/util/concurrent/CompletableFuture;)Ljava/util/concurrent/CompletableFuture;") };
 };
 
 } // namespace djinni_generated
