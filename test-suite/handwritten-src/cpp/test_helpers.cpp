@@ -194,7 +194,7 @@ djinni::Future<int32_t> TestHelpers::async_early_throw() {
 }
 
 djinni::Future<std::string> TestHelpers::future_roundtrip(djinni::Future<int32_t> f) {
-#ifdef DJINNI_FUTURE_COROUTINE_SUPPORT
+#ifdef DJINNI_FUTURE_HAS_COROUTINE_SUPPORT
     auto i = co_await f;
     co_return std::to_string(i);
 #else
@@ -235,7 +235,7 @@ djinni::Future<std::string> TestHelpers::check_async_composition(const std::shar
     p1.setValue("36");
     p2.setValue("36");
     
-#ifdef DJINNI_FUTURE_COROUTINE_SUPPORT
+#ifdef DJINNI_FUTURE_HAS_COROUTINE_SUPPORT
     co_await djinni::whenAll(futures);
     co_return std::string("42");
 #else

@@ -24,20 +24,20 @@
 #include <mutex>
 #include <cassert>
 
-#if defined(DJINNI_FUTURE_COROUTINE_SUPPORT)
 #if __has_include(<coroutine>)
     #include <coroutine>
     namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::coroutine_handle<Promise>;
         using SuspendNever = std::suspend_never;
     }
+    #define DJINNI_FUTURE_HAS_COROUTINE_SUPPORT 1
 #elif __has_include(<experimental/coroutine>)
     #include <experimental/coroutine>
     namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::experimental::coroutine_handle<Promise>;
         using SuspendNever = std::experimental::suspend_never;
     }
-#endif
+    #define DJINNI_FUTURE_HAS_COROUTINE_SUPPORT 1
 #endif
 
 namespace djinni {
@@ -338,7 +338,7 @@ public:
 private:
     detail::SharedStatePtr<T> _sharedState;
 
-#if defined(DJINNI_FUTURE_COROUTINE_SUPPORT)
+#if defined(DJINNI_FUTURE_HAS_COROUTINE_SUPPORT)
 public:
     bool await_ready() {
         return isReady();
