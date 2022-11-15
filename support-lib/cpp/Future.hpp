@@ -339,6 +339,7 @@ public:
 
 private:
     detail::SharedStatePtr<T> _sharedState;
+    detail::SharedStatePtr<T> _coroState;
 
 #if defined(DJINNI_FUTURE_HAS_COROUTINE_SUPPORT)
 public:
@@ -388,9 +389,6 @@ public:
         }
     };
     using promise_type = PromiseType<T>;
-
-private:
-    detail::SharedStatePtr<T> _coroState;
 #endif
 };
 
