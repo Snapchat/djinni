@@ -601,6 +601,7 @@ private:
 
 extern "C" void djinni_register_name_in_ns(const char* prefixedName, const char* namespacedName);
 extern "C" void djinni_throw_native_exception(const std::exception& e);
+em::val djinni_native_exception_to_js(const std::exception& e);
 
 template<typename U>
 struct DefaultInit {

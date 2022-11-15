@@ -194,17 +194,21 @@ EM_JS(void, djinni_register_name_in_ns, (const char* prefixedName, const char* n
         ns[name] = Module[prefixedName];
 });
 
-void djinni_throw_native_exception(const std::exception& e) {
+em::val djinni_native_exception_to_js(const std::exception& e) {
     if (const auto* jsEx = dynamic_cast<const JsException*>(&e)) {
-        jsEx->cause().throw_();
+        return jsEx->cause();
     } else {
         static std::exception_ptr exptr;
         static auto ErrorClass = em::val::global("Error");
         auto error = ErrorClass.new_(std::string("C++: ") + e.what());
         exptr = std::current_exception();
         error.set("_djinni_cpp_exception_ptr", em::val(reinterpret_cast<int>(&exptr)));
-        error.throw_();
+        return error;
     }
+}
+
+void djinni_throw_native_exception(const std::exception& e) {
+    djinni_native_exception_to_js(e).throw_();
 }
 
 EMSCRIPTEN_BINDINGS(djinni_wasm) {

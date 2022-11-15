@@ -130,7 +130,7 @@ export enum AccessFlags {
     SYSTEM_READ = 1 << 6,
     SYSTEM_WRITE = 1 << 7,
     SYSTEM_EXECUTE = 1 << 8,
-    EVERYBODY = 0 | OWNER_READ | OWNER_WRITE | OWNER_EXECUTE | GROUP_READ | GROUP_WRITE | GROUP_EXECUTE | SYSTEM_READ | SYSTEM_WRITE | SYSTEM_EXECUTE,
+    EVERYBODY = 0 | (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5) | (1 << 6) | (1 << 7) | (1 << 8),
 }
 
 export enum EmptyFlags {

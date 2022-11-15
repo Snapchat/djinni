@@ -79,9 +79,7 @@ public:
             try {
                 _resolveFunc(RESULT::Boxed::fromCpp(_future->get()));
             } catch (const std::exception& e) {
-                auto errorClass = em::val::global("Error");
-                auto error = errorClass.new_(std::string(e.what()));
-                _rejectFunc(error);
+                _rejectFunc(djinni_native_exception_to_js(e));
             }
         }
         static void trampoline (void *context) {

@@ -72,9 +72,9 @@ class AsyncTest extends TestCase {
         try {
             await r;
         } catch (e: any) {
-            s = e.message;
+            s = e.message.split(/\r?\n/).shift();
         }
-        assertEq(s, "error");
+        assertEq(s, "C++: error");
     }
 }
 

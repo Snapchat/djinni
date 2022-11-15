@@ -494,7 +494,8 @@ abstract class Generator(spec: Spec)
       w.w(ident(o.ident.name) + s" $delim ")
       w.w(
         normalEnumOptions(e)
-          .map(o => ident(o.ident.name))
+          .zipWithIndex
+          .map{case(o, i) => s"(1 << $i)"}
           .fold("0")((acc, o) => acc + " | " + o)
       )
       w.wl(",")
