@@ -194,7 +194,7 @@ djinni::Future<int32_t> TestHelpers::async_early_throw() {
 }
 
 djinni::Future<std::string> TestHelpers::future_roundtrip(djinni::Future<int32_t> f) {
-#ifdef DJINNI_FUTURE_COROUTINE_SUPPORT
+#ifdef DJINNI_FUTURE_HAS_COROUTINE_SUPPORT
     auto i = co_await f;
     co_return std::to_string(i);
 #else
@@ -205,6 +205,16 @@ djinni::Future<std::string> TestHelpers::future_roundtrip(djinni::Future<int32_t
 }
 
 djinni::Future<std::string> TestHelpers::check_async_interface(const std::shared_ptr<AsyncInterface> & i) {
+#ifdef DJINNI_FUTURE_HAS_COROUTINE_SUPPORT
+    auto f1 = [] () -> djinni::Future<std::string> {
+        co_return "36";
+    };
+    auto f2 = [] (auto f1) -> djinni::Future<int> {
+        co_return std::stoi(co_await f1);
+    };
+    auto f3 = i->future_roundtrip(f2(f1()));
+    return f3;
+#else
     djinni::Promise<std::string> p;
     auto f = p.getFuture();
     auto f2 = f.then([] (djinni::Future<std::string> s) {
@@ -213,6 +223,7 @@ djinni::Future<std::string> TestHelpers::check_async_interface(const std::shared
     auto f3 = i->future_roundtrip(std::move(f2));
     p.setValue("36");
     return f3;
+#endif
 }
 
 djinni::Future<std::string> TestHelpers::check_async_composition(const std::shared_ptr<AsyncInterface> & i) {
@@ -235,7 +246,7 @@ djinni::Future<std::string> TestHelpers::check_async_composition(const std::shar
     p1.setValue("36");
     p2.setValue("36");
     
-#ifdef DJINNI_FUTURE_COROUTINE_SUPPORT
+#ifdef DJINNI_FUTURE_HAS_COROUTINE_SUPPORT
     co_await djinni::whenAll(futures);
     co_return std::string("42");
 #else

@@ -337,9 +337,9 @@ The `future<>` djinni type is mapped to the `Future` types defined in the C++,
 Java and ObjC djinni support library. In Javascript, `future<>` is mapped to the
 builtin `Promise` type (and therefore supports the `await` syntax).
 
-The C++ `Future` type has optional support for coroutines. If the preprocessor
-symbol `DJINNI_FUTURE_COROUTINE_SUPPORT` is defined, then you can use `co_await`
-on a future object.
+The C++ `Future` type has optional support for coroutines. If coroutines are
+availble (eg. compiling with C++20 or C++17 with -fcoroutines-ts), then you can
+use `co_await` on future objects.
 
 ## FAQ
 

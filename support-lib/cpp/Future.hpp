@@ -24,19 +24,21 @@
 #include <mutex>
 #include <cassert>
 
-#if defined(DJINNI_FUTURE_COROUTINE_SUPPORT)
+#ifdef __cpp_coroutines
 #if __has_include(<coroutine>)
     #include <coroutine>
     namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::coroutine_handle<Promise>;
         using SuspendNever = std::suspend_never;
     }
+    #define DJINNI_FUTURE_HAS_COROUTINE_SUPPORT 1
 #elif __has_include(<experimental/coroutine>)
     #include <experimental/coroutine>
     namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::experimental::coroutine_handle<Promise>;
         using SuspendNever = std::experimental::suspend_never;
     }
+    #define DJINNI_FUTURE_HAS_COROUTINE_SUPPORT 1
 #endif
 #endif
 
@@ -338,22 +340,21 @@ public:
 private:
     detail::SharedStatePtr<T> _sharedState;
 
-#if defined(DJINNI_FUTURE_COROUTINE_SUPPORT)
+#if defined(DJINNI_FUTURE_HAS_COROUTINE_SUPPORT)
 public:
     bool await_ready() {
         return isReady();
     }
     auto await_resume() {
-        auto sharedState = std::atomic_load(&_sharedState);
-        if (sharedState) {
-            return Future<T>(sharedState).get();
-        } else {
-            return Future<T>(_coroState).get();
-        }
+        // after resuming from await, the future should be in an invalid state
+        // (_sharedState is null)
+        detail::SharedStatePtr<T> sharedState;
+        sharedState = std::atomic_exchange(&_sharedState, sharedState);
+        return Future<T>(sharedState).get();
     }
     bool await_suspend(detail::CoroutineHandle<> h) {
         this->then([h, this] (Future<T> x) mutable {
-            _coroState = x._sharedState;
+            std::atomic_store(&_sharedState, x._sharedState);
             h();
         });
         return true;
@@ -386,9 +387,6 @@ public:
         }
     };
     using promise_type = PromiseType<T>;
-
-private:
-    detail::SharedStatePtr<T> _coroState;
 #endif
 };
 
