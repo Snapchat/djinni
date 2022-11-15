@@ -339,7 +339,6 @@ public:
 
 private:
     detail::SharedStatePtr<T> _sharedState;
-    detail::SharedStatePtr<T> _coroState;
 
 #if defined(DJINNI_FUTURE_HAS_COROUTINE_SUPPORT)
 public:
@@ -347,16 +346,15 @@ public:
         return isReady();
     }
     auto await_resume() {
-        auto sharedState = std::atomic_load(&_sharedState);
-        if (sharedState) {
-            return Future<T>(sharedState).get();
-        } else {
-            return Future<T>(_coroState).get();
-        }
+        // after resuming from await, the future should be in an invalid state
+        // (_sharedState is null)
+        detail::SharedStatePtr<T> sharedState;
+        sharedState = std::atomic_exchange(&_sharedState, sharedState);
+        return Future<T>(sharedState).get();
     }
     bool await_suspend(detail::CoroutineHandle<> h) {
         this->then([h, this] (Future<T> x) mutable {
-            _coroState = x._sharedState;
+            std::atomic_store(&_sharedState, x._sharedState);
             h();
         });
         return true;
