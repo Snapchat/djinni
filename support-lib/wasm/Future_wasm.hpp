@@ -37,7 +37,11 @@ public:
     static void resolveNativePromise(int context, em::val res, em::val err) {
         auto* pNativePromise = reinterpret_cast<NativePromiseType*>(context);
         if (err.isNull() || err.isUndefined()) {
-            pNativePromise->setValue(RESULT::Boxed::toCpp(res));
+            if constexpr (std::is_void_v<CppResType>) {
+                pNativePromise->setValue();
+            } else {
+                pNativePromise->setValue(RESULT::Boxed::toCpp(res));
+            }
         } else {
             pNativePromise->setException(JsException(err));
         }
@@ -77,7 +81,11 @@ public:
         // runs in main thread
         void doResolve() {
             try {
-                _resolveFunc(RESULT::Boxed::fromCpp(_future->get()));
+                if constexpr (std::is_void_v<typename RESULT::CppType>) {
+                    _resolveFunc(em::val::undefined());
+                } else {
+                    _resolveFunc(RESULT::Boxed::fromCpp(_future->get()));
+                }
             } catch (const std::exception& e) {
                 _rejectFunc(djinni_native_exception_to_js(e));
             }

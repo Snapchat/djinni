@@ -100,6 +100,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
             case e: MExtern => throw new AssertionError("unreachable")
             case e: MProtobuf => throw new AssertionError("unreachable")
             case p: MParam => idJs.typeParam(p.name)
+            case MVoid => "void"
           }
           base + args(tm)
       }

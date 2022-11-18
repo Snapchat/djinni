@@ -256,6 +256,10 @@ djinni::Future<std::string> TestHelpers::check_async_composition(const std::shar
 #endif
 }
 
+::djinni::Future<void> TestHelpers::void_async_method(djinni::Future<void> f) {
+    return f;
+}
+
 std::vector<std::experimental::optional<std::string>> TestHelpers::get_optional_list() {
     return {std::experimental::nullopt, std::string("hello")};
 }

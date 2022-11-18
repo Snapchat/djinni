@@ -427,4 +427,12 @@ public:
     }
 };
 
+struct Void
+{
+    using CppType = void;
+    using ObjcType = NSNull*;
+    
+    using Boxed = Void;
+};
+
 } // namespace djinni

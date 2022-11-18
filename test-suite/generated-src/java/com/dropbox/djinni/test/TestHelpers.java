@@ -95,6 +95,9 @@ public abstract class TestHelpers {
     public static native com.snapchat.djinni.Future<Integer> asyncEarlyThrow();
 
     @Nonnull
+    public static native com.snapchat.djinni.Future<Void> voidAsyncMethod(@Nonnull com.snapchat.djinni.Future<Void> f);
+
+    @Nonnull
     public static native com.snapchat.djinni.Future<String> checkAsyncInterface(@CheckForNull AsyncInterface i);
 
     @Nonnull

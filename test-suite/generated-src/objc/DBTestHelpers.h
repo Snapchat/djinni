@@ -85,6 +85,8 @@
 
 + (nonnull DJFuture<NSNumber *> *)asyncEarlyThrow;
 
++ (nonnull DJFuture<NSNull *> *)voidAsyncMethod:(nonnull DJFuture<NSNull *> *)f;
+
 + (nonnull DJFuture<NSString *> *)checkAsyncInterface:(nullable id<DBAsyncInterface>)i;
 
 + (nonnull DJFuture<NSString *> *)checkAsyncComposition:(nullable id<DBAsyncInterface>)i;

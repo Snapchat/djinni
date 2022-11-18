@@ -28,8 +28,9 @@ class SharedState<T> {
     public T value;
     public Throwable exception;
     public Continuation<T> handler;
+    public boolean ready = false;
 
     public boolean isReady() {
-        return (value != null) || (exception != null);
+        return ready || (exception != null);
     }
 }

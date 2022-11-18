@@ -25,6 +25,7 @@ typedef _Nullable id (^Continuation)(DJSharedSate* _Nonnull);
 @property (nonatomic) NSException *exception;
 @property (nonatomic) NSCondition *cond;
 @property (nonatomic) Continuation handler;
+@property (nonatomic) BOOL ready;
 @property (readonly) BOOL isReady;
 @end
 
@@ -32,11 +33,12 @@ typedef _Nullable id (^Continuation)(DJSharedSate* _Nonnull);
 - (instancetype)init {
     if (self = [super init]) {
         _cond = [[NSCondition alloc] init];
+        _ready = NO;
     }
     return self;
 }
 - (BOOL)isReady {
-    return _value != nil || _exception != nil;
+    return _ready || _exception != nil;
 }
 @end
 
@@ -122,17 +124,19 @@ T withLockHeld(id<NSLocking> lock, T(^block)()) {
 
 @implementation DJPromise {
     DJSharedSate *_sharedState;
+    DJSharedSate *_sharedStateReadonly;
 }
 - (instancetype)init {
     if (self = [super init]) {
         _sharedState = [[DJSharedSate alloc] init];
+        _sharedStateReadonly = _sharedState;
     }
     return self;
 }
 
 - (DJFuture<id> *)getFuture {
     @synchronized (self) {
-        return [[DJFuture alloc] initWithSharedState: _sharedState];
+        return [[DJFuture alloc] initWithSharedState: _sharedStateReadonly];
     }
 }
 
@@ -156,7 +160,14 @@ T withLockHeld(id<NSLocking> lock, T(^block)()) {
 }
 
 - (void)setValue:(id)val {
-    [self updateAndCallResultHandler: ^(DJSharedSate *sharedState){sharedState.value = val;}];
+    [self updateAndCallResultHandler: ^(DJSharedSate *sharedState){
+            sharedState.value = val;
+            sharedState.ready = YES;
+        }];
+}
+
+- (void)setValue {
+    [self setValue:[NSNull null]];
 }
 
 - (void)setException:(NSException *)exception {

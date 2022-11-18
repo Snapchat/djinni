@@ -21,14 +21,16 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Promise<T> {
 
     private AtomicReference<SharedState<T>> _sharedState;
+    private final SharedState<T> _sharedStateReadOnly;
 
     public Promise() {
-        _sharedState = new AtomicReference<>(new SharedState<T>());
+        _sharedStateReadOnly = new SharedState<T>();
+        _sharedState = new AtomicReference<>(_sharedStateReadOnly);
     }
 
     // Get a future object associated with this promise
     public Future<T> getFuture() {
-        return new Future<T>(_sharedState.get());
+        return new Future<T>(_sharedStateReadOnly);
     }
 
     // `setValue()` or `setException()` can only be called once on a
@@ -38,6 +40,7 @@ public class Promise<T> {
         SharedState.Continuation<T> handler = null;
         synchronized(sharedState) {
             sharedState.value = val;
+            sharedState.ready = true;
             if (sharedState.handler != null) {
                 handler = sharedState.handler;
             } else {
@@ -47,6 +50,11 @@ public class Promise<T> {
         if (handler != null) {
             handler.handleResult(sharedState);
         }
+    }
+
+    // for Void futures
+    public void setValue() {
+        setValue(null);
     }
 
     public void setException(Throwable ex) {

@@ -106,6 +106,7 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       case MSet => "Ljava/util/HashSet;"
       case MMap => "Ljava/util/HashMap;"
       case MArray => s"[${javaTypeSignature(tm.args.head)}"
+      case MVoid => "Ljava/lang/Void;"
     }
     case e: MExtern => e.jni.typeSignature
     case MParam(_) => "Ljava/lang/Object;"
@@ -164,6 +165,7 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       case d: MDef => throw new AssertionError("unreachable")
       case e: MExtern => throw new AssertionError("unreachable")
       case p: MParam => throw new AssertionError("not applicable")
+      case MVoid => "Void"
     })
   }
 

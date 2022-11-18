@@ -1,7 +1,7 @@
 import {TestCase, allTests, assertEq, assertTrue} from "./testutils"
 import * as test from "../../generated-src/ts/test";
 
-function sleep(ms: number) {
+function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -43,6 +43,10 @@ class AsyncTest extends TestCase {
         const r = parseInt(s);
         assertEq(r, 36);
     }
+
+  async testVoidRountTrip() {
+    await this.m.testsuite.TestHelpers.voidAsyncMethod(sleep(10));
+  }
 
     async testFutureRoundtripWithException() {
         var s = null;

@@ -20,6 +20,8 @@
 #include "Marshal.hpp"
 #include "../cpp/Future.hpp"
 
+#include <iostream>
+
 namespace djinni {
 
 struct PromiseJniInfo {
@@ -52,6 +54,26 @@ struct ThrowableJniInfo {
 
 using NativeFutureHandlerFunc = void (*)(JNIEnv* jniEnv, jlong nativePromise, jobject jres, jthrowable jex);
 
+template<typename T>
+struct SetResult {
+    static void setCppResult(JNIEnv* jniEnv, Promise<typename T::CppType>& promise, jobject jres) {
+        promise.setValue(T::Boxed::toCpp(jniEnv, static_cast<typename T::Boxed::JniType>(jres)));
+    }
+    static void setJavaResult(JNIEnv* jniEnv, const PromiseJniInfo& promiseJniInfo, jobject promise, Future<typename T::CppType>& cppFuture) {
+        jniEnv->CallVoidMethod(promise, promiseJniInfo.method_set_value, T::Boxed::fromCpp(jniEnv, cppFuture.get()).get());
+    }
+};
+
+template<>
+struct SetResult<Void> {
+    static void setCppResult(JNIEnv* jniEnv, Promise<void>& promise, jobject jres) {
+        promise.setValue();
+    }
+    static void setJavaResult(JNIEnv* jniEnv, const PromiseJniInfo& promiseJniInfo, jobject promise, Future<void>& cppFuture) {
+        jniEnv->CallVoidMethod(promise, promiseJniInfo.method_set_value, nullptr);
+    }
+};
+
 template <class RESULT>
 class FutureAdaptor
 {
@@ -83,7 +105,8 @@ public:
                 reinterpret_cast<NativePromiseType*>(nativePromise)
             };
             if (jex == nullptr) {
-                promise->setValue(RESULT::Boxed::toCpp(jniEnv, static_cast<typename RESULT::Boxed::JniType>(jres)));
+                // promise->setValue(RESULT::Boxed::toCpp(jniEnv, static_cast<typename RESULT::Boxed::JniType>(jres)));
+                SetResult<RESULT>::setCppResult(jniEnv, *promise, static_cast<typename RESULT::Boxed::JniType>(jres));
             } else {
                 const auto& throwableJniInfo = JniClass<ThrowableJniInfo>::get();
                 LocalRef<jstring> jmsg(jniEnv, static_cast<jstring>(jniEnv->CallObjectMethod(jex,
@@ -118,8 +141,9 @@ public:
         c.then([promise, &promiseJniInfo] (Future<CppResType> cppFuture) {
             JNIEnv* jniEnv = jniGetThreadEnv();
             try {
-                auto res = cppFuture.get();
-                jniEnv->CallVoidMethod(promise->get(), promiseJniInfo.method_set_value, RESULT::Boxed::fromCpp(jniEnv, res).get());
+                // auto res = cppFuture.get();
+                // jniEnv->CallVoidMethod(promise->get(), promiseJniInfo.method_set_value, RESULT::Boxed::fromCpp(jniEnv, res).get());
+                SetResult<RESULT>::setJavaResult(jniEnv, promiseJniInfo, promise->get(), cppFuture);
             } catch (const std::exception& e) {
                 // create a java exception object
                 const auto& exceptionJniInfo = JniClass<RuntimeExceptionJniInfo>::get();
@@ -133,4 +157,5 @@ public:
         return future;
     }
 };
+
 } // namespace djinni

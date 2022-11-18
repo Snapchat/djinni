@@ -96,6 +96,8 @@ public:
 
     static ::djinni::Future<int32_t> async_early_throw();
 
+    static ::djinni::Future<void> void_async_method(::djinni::Future<void> f);
+
     static ::djinni::Future<std::string> check_async_interface(const /*not-null*/ std::shared_ptr<AsyncInterface> & i);
 
     static ::djinni::Future<std::string> check_async_composition(const /*not-null*/ std::shared_ptr<AsyncInterface> & i);
