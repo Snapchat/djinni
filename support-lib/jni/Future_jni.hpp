@@ -20,8 +20,6 @@
 #include "Marshal.hpp"
 #include "../cpp/Future.hpp"
 
-#include <iostream>
-
 namespace djinni {
 
 struct PromiseJniInfo {
@@ -105,7 +103,6 @@ public:
                 reinterpret_cast<NativePromiseType*>(nativePromise)
             };
             if (jex == nullptr) {
-                // promise->setValue(RESULT::Boxed::toCpp(jniEnv, static_cast<typename RESULT::Boxed::JniType>(jres)));
                 SetResult<RESULT>::setCppResult(jniEnv, *promise, static_cast<typename RESULT::Boxed::JniType>(jres));
             } else {
                 const auto& throwableJniInfo = JniClass<ThrowableJniInfo>::get();

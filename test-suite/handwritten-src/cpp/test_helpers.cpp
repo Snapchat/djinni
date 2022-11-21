@@ -257,7 +257,11 @@ djinni::Future<std::string> TestHelpers::check_async_composition(const std::shar
 }
 
 ::djinni::Future<void> TestHelpers::void_async_method(djinni::Future<void> f) {
+#ifdef DJINNI_FUTURE_HAS_COROUTINE_SUPPORT
+    co_return co_await f;
+#else
     return f;
+#endif
 }
 
 std::vector<std::experimental::optional<std::string>> TestHelpers::get_optional_list() {
