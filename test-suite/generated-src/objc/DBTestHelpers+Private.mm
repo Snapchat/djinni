@@ -231,6 +231,13 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
++ (nonnull DJFuture<NSNull *> *)voidAsyncMethod:(nonnull DJFuture<NSNull *> *)f {
+    try {
+        auto objcpp_result_ = ::testsuite::TestHelpers::void_async_method(::djinni::FutureAdaptor<::djinni::Void>::toCpp(f));
+        return ::djinni::FutureAdaptor<::djinni::Void>::fromCpp(std::move(objcpp_result_));
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
 + (nonnull DJFuture<NSString *> *)checkAsyncInterface:(nullable id<DBAsyncInterface>)i {
     try {
         auto objcpp_result_ = ::testsuite::TestHelpers::check_async_interface(::djinni_generated::AsyncInterface::toCpp(i));

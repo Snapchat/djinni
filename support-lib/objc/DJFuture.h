@@ -41,5 +41,7 @@
 // `setValue` or `setException` can only be called once on a promise. After
 // which the internal state becomes invalid.
 - (void)setValue:(nullable DJValue)val;
+// for NSNull* (void)
+- (void)setValue;
 - (void)setException:(nonnull NSException *)exception;
 @end

@@ -51,6 +51,7 @@ struct NativeTestHelpers : ::djinni::JsInterface<::testsuite::TestHelpers, Nativ
     static em::val get_async_result();
     static em::val future_roundtrip(const em::val& w_f);
     static em::val async_early_throw();
+    static em::val void_async_method(const em::val& w_f);
     static em::val check_async_interface(const em::val& w_i);
     static em::val check_async_composition(const em::val& w_i);
     static em::val get_optional_list();

@@ -185,6 +185,7 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
               case None => (p.body.cpp.ns + "::" + p.name, true)
             }
             case p: MParam => throw new AssertionError("Parameter should not happen at Obj-C top level")
+            case MVoid => ("NSNull", true)
           }
           base
       }

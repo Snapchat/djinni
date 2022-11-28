@@ -64,6 +64,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       case d: MDef => throw new AssertionError("unreachable")
       case e: MExtern => throw new AssertionError("unreachable")
       case p: MParam => throw new AssertionError("not applicable")
+      case MVoid => "Void"
     })
   }
   private def helperTemplates(tm: MExpr): String = {

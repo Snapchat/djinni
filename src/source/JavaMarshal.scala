@@ -133,6 +133,7 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
             case e: MExtern => throw new AssertionError("unreachable")
             case e: MProtobuf => throw new AssertionError("unreachable")
             case p: MParam => idJava.typeParam(p.name)
+            case MVoid => "Void"
           }
           base + args(tm)
       }

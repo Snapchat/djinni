@@ -67,4 +67,47 @@ public:
     }
 };
 
+template <>
+class FutureAdaptor<Void>
+{
+public:
+    using CppType = Future<void>;
+    using ObjcType = DJFuture*;
+
+    using Boxed = FutureAdaptor;
+
+    static CppType toCpp(ObjcType o)
+    {
+        using NativePromiseType = Promise<void>;
+
+        __block auto p = std::make_unique<NativePromiseType>();
+        auto f = p->getFuture();
+        [o then: ^id(DJFuture* res) {
+                @try {
+                    p->setValue();
+                } @catch (NSException* e) {
+                    p->setException(std::runtime_error(String::toCpp(e.reason)));
+                }
+                return nil;
+            }];
+        return f;
+    }
+
+    static ObjcType fromCpp(CppType c)
+    {
+        DJPromise<NSNull*>* promise = [[DJPromise alloc] init];
+        DJFuture<NSNull*>* future = [promise getFuture];
+
+        c.then([promise] (Future<void> res) {
+                try {
+                    [promise setValue:[NSNull null]];
+                } catch (const std::exception& e) {
+                    [promise setException: [NSException exceptionWithName:@"" reason: String::fromCpp(e.what()) userInfo:nil]];
+                }
+            });
+        
+        return future;
+    }
+};
+
 } // namespace djinni

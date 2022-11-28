@@ -188,7 +188,12 @@ private object IdlParser extends RegexParsers {
     case "" => false
   }
   def method: Parser[Interface.Method] = doc ~ staticLabel ~ constLabel ~ ident ~ parens(repsepend(field, ",")) ~ opt(ret) ~ supportLang ^^ {
-    case doc~staticLabel~constLabel~ ident~params~ret~ext => Interface.Method(ident, params, ret, doc, staticLabel, constLabel, ext)
+    case doc~staticLabel~constLabel~ ident~params~ret~ext => {
+      ret match {
+        case Some(r) if (r.expr.ident.name == "void") => Interface.Method(ident, params, None, doc, staticLabel, constLabel, ext)
+        case _ => Interface.Method(ident, params, ret, doc, staticLabel, constLabel, ext)
+      }
+    }
   }
   def ret: Parser[TypeRef] = ":" ~> typeRef
 

@@ -36,6 +36,14 @@ public class AsyncTest extends TestCase {
         assertEquals(f3.get(), "36");
     }
 
+    public void testVoidRoundtrip() throws Throwable {
+        final Promise<Void> p = new Promise();
+        p.setValue();
+        Future<Void> f = p.getFuture();
+        Future<Void> f1 = TestHelpers.voidAsyncMethod(f);
+        f1.get();
+    }
+
     public void testFutureRoundtripWithException() throws Throwable {
         final Promise<String> p = new Promise<String>();
         Future<String> f = p.getFuture();

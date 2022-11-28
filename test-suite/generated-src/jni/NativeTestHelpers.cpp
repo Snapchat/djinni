@@ -246,6 +246,14 @@ CJNIEXPORT ::djinni::FutureAdaptor<::djinni::I32>::JniType JNICALL Java_com_drop
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
+CJNIEXPORT ::djinni::FutureAdaptor<::djinni::Void>::JniType JNICALL Java_com_dropbox_djinni_test_TestHelpers_voidAsyncMethod(JNIEnv* jniEnv, jobject /*this*/, ::djinni::FutureAdaptor<::djinni::Void>::JniType j_f)
+{
+    try {
+        auto r = ::testsuite::TestHelpers::void_async_method(::djinni::FutureAdaptor<::djinni::Void>::toCpp(jniEnv, j_f));
+        return ::djinni::release(::djinni::FutureAdaptor<::djinni::Void>::fromCpp(jniEnv, std::move(r)));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
 CJNIEXPORT ::djinni::FutureAdaptor<::djinni::String>::JniType JNICALL Java_com_dropbox_djinni_test_TestHelpers_checkAsyncInterface(JNIEnv* jniEnv, jobject /*this*/, jobject j_i)
 {
     try {

@@ -123,6 +123,7 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
     case p: MProtobuf =>
       List(ImportRef(p.body.cpp.header))
     case p: MParam => List()
+    case MVoid => List()
   }
 
   def resolveExtCppHdr(path: String) = {
@@ -196,6 +197,7 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
       }
       case p: MParam => idCpp.typeParam(p.name)
       case p: MProtobuf => withNs(Some(p.body.cpp.ns), p.name)
+      case MVoid => "void"
     }
     def expr(tm: MExpr): String = {
       spec.cppNnType match {

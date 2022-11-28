@@ -764,4 +764,12 @@ namespace djinni
             return jniEnv->NewDoubleArray(size);
         }
     };
+
+    struct Void
+    {
+        using CppType = void;
+        using JniType = jobject;
+
+        using Boxed = Void;
+    };
 } // namespace djinni

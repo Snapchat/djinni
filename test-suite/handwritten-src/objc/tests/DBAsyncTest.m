@@ -81,4 +81,12 @@
     XCTAssertEqualObjects([s get], @"42");
 }
 
+- (void) testVoidRoundTrip {
+    DJPromise<NSNull *> *p = [[DJPromise alloc] init];
+    [p setValue];
+    DJFuture<NSNull *>* f = [p getFuture];
+    DJFuture<NSNull *>* f1 = [DBTestHelpers voidAsyncMethod:f];
+    [f1 get];
+}
+
 @end

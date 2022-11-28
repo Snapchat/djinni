@@ -385,6 +385,13 @@ struct Array<F64> : PrimitiveArray<F64> {
     }
 };
 
+class Void {
+public:
+    using CppType = void;
+    using JsType = em::val;
+    using Boxed = Void;
+};
+
 class CppResolveHandlerBase {
 public:
     virtual ~CppResolveHandlerBase() = default;
