@@ -17,7 +17,7 @@ struct NativeTextboxListener : ::djinni::JsInterface<::textsort::TextboxListener
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) {
-        djinni::checkForNull(c.get(), "NativeTextboxListener::fromCpp");
+        ::djinni::checkForNull(c.get(), "NativeTextboxListener::fromCpp");
         return fromCppOpt(c);
     }
 

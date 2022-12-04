@@ -27,7 +27,7 @@ em::val NativeTestHelpers::get_set_record() {
         return ::djinni_generated::NativeSetRecord::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeSetRecord>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeSetRecord>::handleNativeException(e);
     }
 }
 bool NativeTestHelpers::check_set_record(const em::val& w_rec) {
@@ -36,7 +36,7 @@ bool NativeTestHelpers::check_set_record(const em::val& w_rec) {
         return ::djinni::Bool::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::get_primitive_list() {
@@ -45,7 +45,7 @@ em::val NativeTestHelpers::get_primitive_list() {
         return ::djinni_generated::NativePrimitiveList::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativePrimitiveList>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativePrimitiveList>::handleNativeException(e);
     }
 }
 bool NativeTestHelpers::check_primitive_list(const em::val& w_pl) {
@@ -54,7 +54,7 @@ bool NativeTestHelpers::check_primitive_list(const em::val& w_pl) {
         return ::djinni::Bool::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::get_nested_collection() {
@@ -63,7 +63,7 @@ em::val NativeTestHelpers::get_nested_collection() {
         return ::djinni_generated::NativeNestedCollection::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeNestedCollection>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeNestedCollection>::handleNativeException(e);
     }
 }
 bool NativeTestHelpers::check_nested_collection(const em::val& w_nc) {
@@ -72,7 +72,7 @@ bool NativeTestHelpers::check_nested_collection(const em::val& w_nc) {
         return ::djinni::Bool::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::get_map() {
@@ -81,7 +81,7 @@ em::val NativeTestHelpers::get_map() {
         return ::djinni::Map<::djinni::String, ::djinni::I64>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Map<::djinni::String, ::djinni::I64>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Map<::djinni::String, ::djinni::I64>>::handleNativeException(e);
     }
 }
 bool NativeTestHelpers::check_map(const em::val& w_m) {
@@ -90,7 +90,7 @@ bool NativeTestHelpers::check_map(const em::val& w_m) {
         return ::djinni::Bool::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::get_empty_map() {
@@ -99,7 +99,7 @@ em::val NativeTestHelpers::get_empty_map() {
         return ::djinni::Map<::djinni::String, ::djinni::I64>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Map<::djinni::String, ::djinni::I64>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Map<::djinni::String, ::djinni::I64>>::handleNativeException(e);
     }
 }
 bool NativeTestHelpers::check_empty_map(const em::val& w_m) {
@@ -108,7 +108,7 @@ bool NativeTestHelpers::check_empty_map(const em::val& w_m) {
         return ::djinni::Bool::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::get_map_list_record() {
@@ -117,7 +117,7 @@ em::val NativeTestHelpers::get_map_list_record() {
         return ::djinni_generated::NativeMapListRecord::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeMapListRecord>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeMapListRecord>::handleNativeException(e);
     }
 }
 bool NativeTestHelpers::check_map_list_record(const em::val& w_m) {
@@ -126,7 +126,7 @@ bool NativeTestHelpers::check_map_list_record(const em::val& w_m) {
         return ::djinni::Bool::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
     }
 }
 void NativeTestHelpers::check_client_interface_ascii(const em::val& w_i) {
@@ -134,7 +134,7 @@ void NativeTestHelpers::check_client_interface_ascii(const em::val& w_i) {
         ::testsuite::TestHelpers::check_client_interface_ascii(::djinni_generated::NativeClientInterface::toCpp(w_i));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeTestHelpers::check_client_interface_nonascii(const em::val& w_i) {
@@ -142,7 +142,7 @@ void NativeTestHelpers::check_client_interface_nonascii(const em::val& w_i) {
         ::testsuite::TestHelpers::check_client_interface_nonascii(::djinni_generated::NativeClientInterface::toCpp(w_i));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeTestHelpers::check_client_interface_args(const em::val& w_i) {
@@ -150,7 +150,7 @@ void NativeTestHelpers::check_client_interface_args(const em::val& w_i) {
         ::testsuite::TestHelpers::check_client_interface_args(::djinni_generated::NativeClientInterface::toCpp(w_i));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeTestHelpers::check_enum_map(const em::val& w_m) {
@@ -158,7 +158,7 @@ void NativeTestHelpers::check_enum_map(const em::val& w_m) {
         ::testsuite::TestHelpers::check_enum_map(::djinni::Map<::djinni_generated::NativeColor, ::djinni::String>::toCpp(w_m));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 void NativeTestHelpers::check_enum(int32_t w_c) {
@@ -166,7 +166,7 @@ void NativeTestHelpers::check_enum(int32_t w_c) {
         ::testsuite::TestHelpers::check_enum(::djinni_generated::NativeColor::toCpp(w_c));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::token_id(const em::val& w_t) {
@@ -175,7 +175,7 @@ em::val NativeTestHelpers::token_id(const em::val& w_t) {
         return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeUserToken>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeUserToken>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeUserToken>>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::create_cpp_token() {
@@ -184,7 +184,7 @@ em::val NativeTestHelpers::create_cpp_token() {
         return ::djinni_generated::NativeUserToken::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeUserToken>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeUserToken>::handleNativeException(e);
     }
 }
 void NativeTestHelpers::check_cpp_token(const em::val& w_t) {
@@ -192,7 +192,7 @@ void NativeTestHelpers::check_cpp_token(const em::val& w_t) {
         ::testsuite::TestHelpers::check_cpp_token(::djinni_generated::NativeUserToken::toCpp(w_t));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 int64_t NativeTestHelpers::cpp_token_id(const em::val& w_t) {
@@ -201,7 +201,7 @@ int64_t NativeTestHelpers::cpp_token_id(const em::val& w_t) {
         return ::djinni::I64::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::I64>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::I64>::handleNativeException(e);
     }
 }
 void NativeTestHelpers::check_token_type(const em::val& w_t,const std::string& w_type) {
@@ -210,7 +210,7 @@ void NativeTestHelpers::check_token_type(const em::val& w_t,const std::string& w
                          ::djinni::String::toCpp(w_type));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::return_none() {
@@ -219,7 +219,7 @@ em::val NativeTestHelpers::return_none() {
         return ::djinni::Optional<std::experimental::optional, ::djinni::I32>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Optional<std::experimental::optional, ::djinni::I32>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Optional<std::experimental::optional, ::djinni::I32>>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::assorted_primitives_id(const em::val& w_i) {
@@ -228,7 +228,7 @@ em::val NativeTestHelpers::assorted_primitives_id(const em::val& w_i) {
         return ::djinni_generated::NativeAssortedPrimitives::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeAssortedPrimitives>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeAssortedPrimitives>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::id_binary(const em::val& w_b) {
@@ -237,7 +237,7 @@ em::val NativeTestHelpers::id_binary(const em::val& w_b) {
         return ::djinni::Binary::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Binary>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Binary>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::get_async_result() {
@@ -246,7 +246,7 @@ em::val NativeTestHelpers::get_async_result() {
         return ::djinni::FutureAdaptor<::djinni::I32>::fromCpp(std::move(r));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::I32>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::I32>>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::future_roundtrip(const em::val& w_f) {
@@ -255,7 +255,7 @@ em::val NativeTestHelpers::future_roundtrip(const em::val& w_f) {
         return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(r));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::String>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::String>>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::async_early_throw() {
@@ -264,7 +264,7 @@ em::val NativeTestHelpers::async_early_throw() {
         return ::djinni::FutureAdaptor<::djinni::I32>::fromCpp(std::move(r));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::I32>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::I32>>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::void_async_method(const em::val& w_f) {
@@ -273,7 +273,7 @@ em::val NativeTestHelpers::void_async_method(const em::val& w_f) {
         return ::djinni::FutureAdaptor<::djinni::Void>::fromCpp(std::move(r));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::Void>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::Void>>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::check_async_interface(const em::val& w_i) {
@@ -282,7 +282,7 @@ em::val NativeTestHelpers::check_async_interface(const em::val& w_i) {
         return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(r));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::String>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::String>>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::check_async_composition(const em::val& w_i) {
@@ -291,7 +291,7 @@ em::val NativeTestHelpers::check_async_composition(const em::val& w_i) {
         return ::djinni::FutureAdaptor<::djinni::String>::fromCpp(std::move(r));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::String>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::String>>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::get_optional_list() {
@@ -300,7 +300,7 @@ em::val NativeTestHelpers::get_optional_list() {
         return ::djinni::List<::djinni::Optional<std::experimental::optional, ::djinni::String>>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::List<::djinni::Optional<std::experimental::optional, ::djinni::String>>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::List<::djinni::Optional<std::experimental::optional, ::djinni::String>>>::handleNativeException(e);
     }
 }
 bool NativeTestHelpers::check_optional_list(const em::val& w_ol) {
@@ -309,7 +309,7 @@ bool NativeTestHelpers::check_optional_list(const em::val& w_ol) {
         return ::djinni::Bool::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::get_optional_set() {
@@ -318,7 +318,7 @@ em::val NativeTestHelpers::get_optional_set() {
         return ::djinni::Set<::djinni::Optional<std::experimental::optional, ::djinni::String>>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Set<::djinni::Optional<std::experimental::optional, ::djinni::String>>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Set<::djinni::Optional<std::experimental::optional, ::djinni::String>>>::handleNativeException(e);
     }
 }
 bool NativeTestHelpers::check_optional_set(const em::val& w_os) {
@@ -327,7 +327,7 @@ bool NativeTestHelpers::check_optional_set(const em::val& w_os) {
         return ::djinni::Bool::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::get_optional_map() {
@@ -336,7 +336,7 @@ em::val NativeTestHelpers::get_optional_map() {
         return ::djinni::Map<::djinni::Optional<std::experimental::optional, ::djinni::String>, ::djinni::Optional<std::experimental::optional, ::djinni::String>>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Map<::djinni::Optional<std::experimental::optional, ::djinni::String>, ::djinni::Optional<std::experimental::optional, ::djinni::String>>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Map<::djinni::Optional<std::experimental::optional, ::djinni::String>, ::djinni::Optional<std::experimental::optional, ::djinni::String>>>::handleNativeException(e);
     }
 }
 bool NativeTestHelpers::check_optional_map(const em::val& w_om) {
@@ -345,7 +345,7 @@ bool NativeTestHelpers::check_optional_map(const em::val& w_om) {
         return ::djinni::Bool::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
     }
 }
 

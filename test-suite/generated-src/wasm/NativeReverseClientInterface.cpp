@@ -20,7 +20,7 @@ std::string NativeReverseClientInterface::return_str(const CppType& self) {
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
     }
 }
 std::string NativeReverseClientInterface::meth_taking_interface(const CppType& self, const em::val& w_i) {
@@ -29,7 +29,7 @@ std::string NativeReverseClientInterface::meth_taking_interface(const CppType& s
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
     }
 }
 std::string NativeReverseClientInterface::meth_taking_optional_interface(const CppType& self, const em::val& w_i) {
@@ -38,7 +38,7 @@ std::string NativeReverseClientInterface::meth_taking_optional_interface(const C
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
     }
 }
 em::val NativeReverseClientInterface::create() {
@@ -47,7 +47,7 @@ em::val NativeReverseClientInterface::create() {
         return ::djinni_generated::NativeReverseClientInterface::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeReverseClientInterface>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeReverseClientInterface>::handleNativeException(e);
     }
 }
 

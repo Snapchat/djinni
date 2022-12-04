@@ -21,7 +21,7 @@ int32_t NativeCppException::throw_an_exception(const CppType& self) {
         return ::djinni::I32::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::I32>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::I32>::handleNativeException(e);
     }
 }
 int32_t NativeCppException::call_throwing_interface(const CppType& self, const em::val& w_cb) {
@@ -30,7 +30,7 @@ int32_t NativeCppException::call_throwing_interface(const CppType& self, const e
         return ::djinni::I32::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::I32>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::I32>::handleNativeException(e);
     }
 }
 std::string NativeCppException::call_throwing_and_catch(const CppType& self, const em::val& w_cb) {
@@ -39,7 +39,7 @@ std::string NativeCppException::call_throwing_and_catch(const CppType& self, con
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
     }
 }
 em::val NativeCppException::get() {
@@ -48,7 +48,7 @@ em::val NativeCppException::get() {
         return ::djinni_generated::NativeCppException::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeCppException>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeCppException>::handleNativeException(e);
     }
 }
 

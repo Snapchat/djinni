@@ -23,7 +23,7 @@ int32_t NativeEnumUsageInterface::e(const CppType& self, int32_t w_e) {
         return ::djinni_generated::NativeColor::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeColor>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeColor>::handleNativeException(e);
     }
 }
 em::val NativeEnumUsageInterface::o(const CppType& self, const em::val& w_o) {
@@ -32,7 +32,7 @@ em::val NativeEnumUsageInterface::o(const CppType& self, const em::val& w_o) {
         return ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeColor>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeColor>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeColor>>::handleNativeException(e);
     }
 }
 em::val NativeEnumUsageInterface::l(const CppType& self, const em::val& w_l) {
@@ -41,7 +41,7 @@ em::val NativeEnumUsageInterface::l(const CppType& self, const em::val& w_l) {
         return ::djinni::List<::djinni_generated::NativeColor>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::List<::djinni_generated::NativeColor>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::List<::djinni_generated::NativeColor>>::handleNativeException(e);
     }
 }
 em::val NativeEnumUsageInterface::s(const CppType& self, const em::val& w_s) {
@@ -50,7 +50,7 @@ em::val NativeEnumUsageInterface::s(const CppType& self, const em::val& w_s) {
         return ::djinni::Set<::djinni_generated::NativeColor>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Set<::djinni_generated::NativeColor>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Set<::djinni_generated::NativeColor>>::handleNativeException(e);
     }
 }
 em::val NativeEnumUsageInterface::m(const CppType& self, const em::val& w_m) {
@@ -59,7 +59,7 @@ em::val NativeEnumUsageInterface::m(const CppType& self, const em::val& w_m) {
         return ::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Map<::djinni_generated::NativeColor, ::djinni_generated::NativeColor>>::handleNativeException(e);
     }
 }
 
