@@ -297,7 +297,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         w.wl("static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }")
         w.w("static JsType fromCpp(const CppType& c)").braced {
           if (spec.cppNnType.isEmpty) {
-            w.wl(s"""djinni::checkForNull(c.get(), "$helper::fromCpp");""")
+            w.wl(s"""::djinni::checkForNull(c.get(), "$helper::fromCpp");""")
           }
           w.wl("return fromCppOpt(c);")
         }
@@ -377,7 +377,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
             }
             w.w("catch(const std::exception& e)").braced {
               val helper = if (!m.ret.isEmpty) helperClass(m.ret.get.resolved) else "void"
-              w.wl(s"return djinni::ExceptionHandlingTraits<${helper}>::handleNativeException(e);");
+              w.wl(s"return ::djinni::ExceptionHandlingTraits<${helper}>::handleNativeException(e);");
             }
           }
         }
