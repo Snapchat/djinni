@@ -117,12 +117,12 @@ public:
     // Examples:
     //   return Promise<int>::resolve(4);
     //   return Promise<std::string>::resolve(std::move(someStr));
-    static Future<T> resolve(const typename ValueHolder<T>::type& val) {
+    [[nodiscard]] static Future<T> resolve(const typename ValueHolder<T>::type& val) {
         PromiseBase<T> promise;
         promise.setValue(val);
         return promise.getFuture();
     }
-    static Future<T> resolve(typename ValueHolder<T>::type&& val) {
+    [[nodiscard]] static Future<T> resolve(typename ValueHolder<T>::type&& val) {
         PromiseBase<T> promise;
         promise.setValue(std::move(val));
         return promise.getFuture();
@@ -144,12 +144,12 @@ public:
     //   } catch (...) {
     //     return Promise<std::string>::reject(std::current_exception());
     //   }
-    static Future<T> reject(const std::exception& e) {
+    [[nodiscard]] static Future<T> reject(const std::exception& e) {
         PromiseBase<T> promise;
         promise.setException(e);
         return promise.getFuture();
     }
-    static Future<T> reject(std::exception_ptr ex) {
+    [[nodiscard]] static Future<T> reject(std::exception_ptr ex) {
         PromiseBase<T> promise;
         promise.setException(ex);
         return promise.getFuture();
