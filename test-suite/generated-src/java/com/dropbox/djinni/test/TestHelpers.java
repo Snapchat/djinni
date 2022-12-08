@@ -97,6 +97,13 @@ public abstract class TestHelpers {
     @Nonnull
     public static native com.snapchat.djinni.Future<Void> voidAsyncMethod(@Nonnull com.snapchat.djinni.Future<Void> f);
 
+    /**
+     * If the input is empty, returns back an empty future.
+     * If the input is non-empty, returns back the value plus one.
+     */
+    @Nonnull
+    public static native com.snapchat.djinni.Future<Integer> addOneIfPresent(@Nonnull com.snapchat.djinni.Future<Integer> f);
+
     @Nonnull
     public static native com.snapchat.djinni.Future<String> checkAsyncInterface(@CheckForNull AsyncInterface i);
 

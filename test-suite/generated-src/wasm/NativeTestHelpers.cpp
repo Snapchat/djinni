@@ -276,6 +276,15 @@ em::val NativeTestHelpers::void_async_method(const em::val& w_f) {
         return djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::Void>>::handleNativeException(e);
     }
 }
+em::val NativeTestHelpers::add_one_if_present(const em::val& w_f) {
+    try {
+        auto r = ::testsuite::TestHelpers::add_one_if_present(::djinni::FutureAdaptor<::djinni::Optional<std::experimental::optional, ::djinni::I32>>::toCpp(w_f));
+        return ::djinni::FutureAdaptor<::djinni::Optional<std::experimental::optional, ::djinni::I32>>::fromCpp(std::move(r));
+    }
+    catch(const std::exception& e) {
+        return djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::Optional<std::experimental::optional, ::djinni::I32>>>::handleNativeException(e);
+    }
+}
 em::val NativeTestHelpers::check_async_interface(const em::val& w_i) {
     try {
         auto r = ::testsuite::TestHelpers::check_async_interface(::djinni_generated::NativeAsyncInterface::toCpp(w_i));
@@ -382,6 +391,7 @@ EMSCRIPTEN_BINDINGS(testsuite_test_helpers) {
         .class_function("futureRoundtrip", NativeTestHelpers::future_roundtrip)
         .class_function("asyncEarlyThrow", NativeTestHelpers::async_early_throw)
         .class_function("voidAsyncMethod", NativeTestHelpers::void_async_method)
+        .class_function("addOneIfPresent", NativeTestHelpers::add_one_if_present)
         .class_function("checkAsyncInterface", NativeTestHelpers::check_async_interface)
         .class_function("checkAsyncComposition", NativeTestHelpers::check_async_composition)
         .class_function("getOptionalList", NativeTestHelpers::get_optional_list)

@@ -89,4 +89,22 @@
     [f1 get];
 }
 
+- (void) testOptionalFuture_unset {
+    DJPromise<NSNumber *> *p = [[DJPromise alloc] init];
+    [p setValue:nil];
+    DJFuture<NSNumber *>* f = [p getFuture];
+    DJFuture<NSNumber *>* f1 = [DBTestHelpers addOneIfPresent:f];
+    NSNumber * result = [f1 get];
+    XCTAssertNil(result);
+}
+
+- (void) testOptionalFuture_isSet {
+    DJPromise<NSNumber *> *p = [[DJPromise alloc] init];
+    [p setValue:@(10)];
+    DJFuture<NSNumber *>* f = [p getFuture];
+    DJFuture<NSNumber *>* f1 = [DBTestHelpers addOneIfPresent:f];
+    NSNumber * result = [f1 get];
+    XCTAssertEqual([result intValue], 11);
+}
+
 @end

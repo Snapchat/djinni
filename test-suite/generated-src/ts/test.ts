@@ -451,6 +451,11 @@ export interface TestHelpers_statics {
     futureRoundtrip(f: Promise<number>): Promise<string>;
     asyncEarlyThrow(): Promise<number>;
     voidAsyncMethod(f: Promise<void>): Promise<void>;
+    /**
+     * If the input is empty, returns back an empty future.
+     * If the input is non-empty, returns back the value plus one.
+     */
+    addOneIfPresent(f: Promise<number | undefined>): Promise<number | undefined>;
     checkAsyncInterface(i: AsyncInterface): Promise<string>;
     checkAsyncComposition(i: AsyncInterface): Promise<string>;
     getOptionalList(): Array<string | undefined>;

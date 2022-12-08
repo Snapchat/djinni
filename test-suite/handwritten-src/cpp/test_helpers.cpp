@@ -264,6 +264,18 @@ djinni::Future<std::string> TestHelpers::check_async_composition(const std::shar
 #endif
 }
 
+::djinni::Future<std::experimental::optional<int32_t>> TestHelpers::add_one_if_present(djinni::Future<std::experimental::optional<int32_t>> f) {
+#ifdef DJINNI_FUTURE_HAS_COROUTINE_SUPPORT
+    auto val = co_await f;
+    co_return val ? std::experimental::optional<int32_t>(*val + 1) : std::experimental::nullopt;
+#else
+    return f.then([](auto incoming) {
+        auto val = incoming.get();
+        return val ? std::experimental::optional<int32_t>(*val + 1) : std::experimental::nullopt;
+    });
+#endif
+}
+
 std::vector<std::experimental::optional<std::string>> TestHelpers::get_optional_list() {
     return {std::experimental::nullopt, std::string("hello")};
 }

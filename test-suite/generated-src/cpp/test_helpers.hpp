@@ -98,6 +98,12 @@ public:
 
     static ::djinni::Future<void> void_async_method(::djinni::Future<void> f);
 
+    /**
+     * If the input is empty, returns back an empty future.
+     * If the input is non-empty, returns back the value plus one.
+     */
+    static ::djinni::Future<std::experimental::optional<int32_t>> add_one_if_present(::djinni::Future<std::experimental::optional<int32_t>> f);
+
     static ::djinni::Future<std::string> check_async_interface(const /*not-null*/ std::shared_ptr<AsyncInterface> & i);
 
     static ::djinni::Future<std::string> check_async_composition(const /*not-null*/ std::shared_ptr<AsyncInterface> & i);
