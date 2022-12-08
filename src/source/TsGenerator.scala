@@ -72,7 +72,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
   }
 
   def toTsType(tm: MExpr, addNullability: Boolean = true): String = {
-    def args(tm: MExpr) = if (tm.args.isEmpty) "" else tm.args.map(f).mkString("<", ", ", ">")
+    def args(tm: MExpr) = if (tm.args.isEmpty) "" else tm.args.map(arg => toTsType(arg, addNullability)).mkString("<", ", ", ">")
     def f(tm: MExpr): String = {
       tm.base match {
         case MOptional =>

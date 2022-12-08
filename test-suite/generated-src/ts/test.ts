@@ -453,12 +453,12 @@ export interface TestHelpers_statics {
     voidAsyncMethod(f: Promise<void>): Promise<void>;
     checkAsyncInterface(i: AsyncInterface): Promise<string>;
     checkAsyncComposition(i: AsyncInterface): Promise<string>;
-    getOptionalList(): Array<string>;
-    checkOptionalList(ol: Array<string>): boolean;
-    getOptionalSet(): Set<string>;
-    checkOptionalSet(os: Set<string>): boolean;
-    getOptionalMap(): Map<string, string>;
-    checkOptionalMap(om: Map<string, string>): boolean;
+    getOptionalList(): Array<string | undefined>;
+    checkOptionalList(ol: Array<string | undefined>): boolean;
+    getOptionalSet(): Set<string | undefined>;
+    checkOptionalSet(os: Set<string | undefined>): boolean;
+    getOptionalMap(): Map<string | undefined, string | undefined>;
+    checkOptionalMap(om: Map<string | undefined, string | undefined>): boolean;
 }
 
 /**
