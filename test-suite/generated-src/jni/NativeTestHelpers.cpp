@@ -254,6 +254,14 @@ CJNIEXPORT ::djinni::FutureAdaptor<::djinni::Void>::JniType JNICALL Java_com_dro
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
+CJNIEXPORT ::djinni::FutureAdaptor<::djinni::Optional<std::experimental::optional, ::djinni::I32>>::JniType JNICALL Java_com_dropbox_djinni_test_TestHelpers_addOneIfPresent(JNIEnv* jniEnv, jobject /*this*/, ::djinni::FutureAdaptor<::djinni::Optional<std::experimental::optional, ::djinni::I32>>::JniType j_f)
+{
+    try {
+        auto r = ::testsuite::TestHelpers::add_one_if_present(::djinni::FutureAdaptor<::djinni::Optional<std::experimental::optional, ::djinni::I32>>::toCpp(jniEnv, j_f));
+        return ::djinni::release(::djinni::FutureAdaptor<::djinni::Optional<std::experimental::optional, ::djinni::I32>>::fromCpp(jniEnv, std::move(r)));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
 CJNIEXPORT ::djinni::FutureAdaptor<::djinni::String>::JniType JNICALL Java_com_dropbox_djinni_test_TestHelpers_checkAsyncInterface(JNIEnv* jniEnv, jobject /*this*/, jobject j_i)
 {
     try {

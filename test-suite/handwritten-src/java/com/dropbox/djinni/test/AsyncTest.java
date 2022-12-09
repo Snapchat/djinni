@@ -74,6 +74,20 @@ public class AsyncTest extends TestCase {
         assertEquals(s.get(), "42");
     }
 
+    public void testOptionalFutureUnsetValue() throws Throwable {
+        Promise<Integer> input = new Promise();
+        input.setValue(null);
+        Future<Integer> output = TestHelpers.addOneIfPresent(input.getFuture());
+        assertNull(output.get());
+    }
+
+    public void testOptionalFutureSetValue() throws Throwable {
+        Promise<Integer> input = new Promise();
+        input.setValue(10);
+        Future<Integer> output = TestHelpers.addOneIfPresent(input.getFuture());
+        assertEquals(output.get().intValue(), 11);
+    }
+
     public void testRx() throws Throwable {
         Future<Integer> f = TestHelpers.getAsyncResult();
         Single<Integer> s = Single.create(o -> f.then((i) -> {

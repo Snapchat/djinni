@@ -87,6 +87,12 @@
 
 + (nonnull DJFuture<NSNull *> *)voidAsyncMethod:(nonnull DJFuture<NSNull *> *)f;
 
+/**
+ * If the input is empty, returns back an empty future.
+ * If the input is non-empty, returns back the value plus one.
+ */
++ (nonnull DJFuture<NSNumber *> *)addOneIfPresent:(nonnull DJFuture<NSNumber *> *)f;
+
 + (nonnull DJFuture<NSString *> *)checkAsyncInterface:(nullable id<DBAsyncInterface>)i;
 
 + (nonnull DJFuture<NSString *> *)checkAsyncComposition:(nullable id<DBAsyncInterface>)i;
