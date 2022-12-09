@@ -85,7 +85,7 @@ public class AsyncTest extends TestCase {
         Promise<Integer> input = new Promise();
         input.setValue(10);
         Future<Integer> output = TestHelpers.addOneIfPresent(input.getFuture());
-        assertEquals(output.get(), 11);
+        assertEquals(output.get().intValue(), 11);
     }
 
     public void testRx() throws Throwable {
