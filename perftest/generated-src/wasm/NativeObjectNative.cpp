@@ -17,7 +17,7 @@ void NativeObjectNative::baseline(const CppType& self) {
         self->baseline();
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<void>::handleNativeException(e);
     }
 }
 

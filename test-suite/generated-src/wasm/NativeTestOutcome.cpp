@@ -19,7 +19,7 @@ em::val NativeTestOutcome::getSuccessOutcome() {
         return ::djinni::Outcome<::djinni::String, ::djinni::I32>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Outcome<::djinni::String, ::djinni::I32>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Outcome<::djinni::String, ::djinni::I32>>::handleNativeException(e);
     }
 }
 em::val NativeTestOutcome::getErrorOutcome() {
@@ -28,7 +28,7 @@ em::val NativeTestOutcome::getErrorOutcome() {
         return ::djinni::Outcome<::djinni::String, ::djinni::I32>::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Outcome<::djinni::String, ::djinni::I32>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Outcome<::djinni::String, ::djinni::I32>>::handleNativeException(e);
     }
 }
 std::string NativeTestOutcome::putSuccessOutcome(const em::val& w_x) {
@@ -37,7 +37,7 @@ std::string NativeTestOutcome::putSuccessOutcome(const em::val& w_x) {
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
     }
 }
 int32_t NativeTestOutcome::putErrorOutcome(const em::val& w_x) {
@@ -46,7 +46,7 @@ int32_t NativeTestOutcome::putErrorOutcome(const em::val& w_x) {
         return ::djinni::I32::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::I32>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::I32>::handleNativeException(e);
     }
 }
 em::val NativeTestOutcome::getNestedSuccessOutcome() {
@@ -55,7 +55,7 @@ em::val NativeTestOutcome::getNestedSuccessOutcome() {
         return ::djinni_generated::NativeNestedOutcome::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeNestedOutcome>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeNestedOutcome>::handleNativeException(e);
     }
 }
 em::val NativeTestOutcome::getNestedErrorOutcome() {
@@ -64,7 +64,7 @@ em::val NativeTestOutcome::getNestedErrorOutcome() {
         return ::djinni_generated::NativeNestedOutcome::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeNestedOutcome>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeNestedOutcome>::handleNativeException(e);
     }
 }
 int32_t NativeTestOutcome::putNestedSuccessOutcome(const em::val& w_x) {
@@ -73,7 +73,7 @@ int32_t NativeTestOutcome::putNestedSuccessOutcome(const em::val& w_x) {
         return ::djinni::I32::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::I32>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::I32>::handleNativeException(e);
     }
 }
 std::string NativeTestOutcome::putNestedErrorOutcome(const em::val& w_x) {
@@ -82,7 +82,7 @@ std::string NativeTestOutcome::putNestedErrorOutcome(const em::val& w_x) {
         return ::djinni::String::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
     }
 }
 

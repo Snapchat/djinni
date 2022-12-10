@@ -17,7 +17,7 @@ struct NativeExternInterface1 : ::djinni::JsInterface<::ExternInterface1, Native
     static CppType toCpp(JsType j) { return _fromJs(j); }
     static JsType fromCppOpt(const CppOptType& c) { return {_toJs(c)}; }
     static JsType fromCpp(const CppType& c) {
-        djinni::checkForNull(c.get(), "NativeExternInterface1::fromCpp");
+        ::djinni::checkForNull(c.get(), "NativeExternInterface1::fromCpp");
         return fromCppOpt(c);
     }
 

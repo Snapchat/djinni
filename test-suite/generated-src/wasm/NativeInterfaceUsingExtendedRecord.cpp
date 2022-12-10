@@ -20,7 +20,7 @@ em::val NativeInterfaceUsingExtendedRecord::meth(const CppType& self, const em::
         return ::djinni_generated::NativeExtendedRecord::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeExtendedRecord>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeExtendedRecord>::handleNativeException(e);
     }
 }
 

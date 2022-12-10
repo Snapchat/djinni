@@ -18,7 +18,7 @@ em::val NativeReturnOne::get_instance() {
         return ::djinni_generated::NativeReturnOne::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeReturnOne>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeReturnOne>::handleNativeException(e);
     }
 }
 int8_t NativeReturnOne::return_one(const CppType& self) {
@@ -27,7 +27,7 @@ int8_t NativeReturnOne::return_one(const CppType& self) {
         return ::djinni::I8::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::I8>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::I8>::handleNativeException(e);
     }
 }
 

@@ -20,7 +20,7 @@ em::val NativeConflictUser::Conflict(const CppType& self) {
         return ::djinni_generated::NativeConflict::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni_generated::NativeConflict>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeConflict>::handleNativeException(e);
     }
 }
 bool NativeConflictUser::conflict_arg(const CppType& self, const em::val& w_cs) {
@@ -29,7 +29,7 @@ bool NativeConflictUser::conflict_arg(const CppType& self, const em::val& w_cs) 
         return ::djinni::Bool::fromCpp(r);
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::Bool>::handleNativeException(e);
     }
 }
 
