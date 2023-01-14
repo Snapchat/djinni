@@ -244,7 +244,7 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
         }
 
         // Constructor.
-        if(r.fields.nonEmpty) {
+        if(r.fields.nonEmpty && spec.cppStructConstructor) {
           w.wl
           if (r.fields.size == 1) {
             w.wl("//NOLINTNEXTLINE(google-explicit-constructor)")
