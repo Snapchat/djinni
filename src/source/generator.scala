@@ -169,6 +169,7 @@ package object generatorTools {
     val underUpper = (s: String) => s.split('_').map(firstUpper).mkString("_")
     val underCaps = (s: String) => s.toUpperCase
     val prefix = (prefix: String, suffix: IdentConverter) => (s: String) => prefix + suffix(s)
+    val suffix = (prefix: IdentConverter, suffix: String) => (s: String) => prefix(s) + suffix
 
     val javaDefault = JavaIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, underCaps, underCaps)
     val cppDefault = CppIdentStyle(camelUpper, camelUpper, camelUpper, underLower, underLower, underLower, underCaps, underCaps)
@@ -196,6 +197,14 @@ package object generatorTools {
           return Some(if (diff > 0) {
             val before = input.substring(0, diff)
             prefix(before, func)
+          } else {
+            func
+          })
+        } else if (input startsWith str) {
+          val diff = input.length - str.length
+          return Some(if (diff > 0) {
+            val after = input.substring(str.length, input.length)
+            suffix(func, after)
           } else {
             func
           })
