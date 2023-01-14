@@ -282,7 +282,7 @@ em::val NativeTestHelpers::add_one_if_present(const em::val& w_f) {
         return ::djinni::FutureAdaptor<::djinni::Optional<std::experimental::optional, ::djinni::I32>>::fromCpp(std::move(r));
     }
     catch(const std::exception& e) {
-        return djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::Optional<std::experimental::optional, ::djinni::I32>>>::handleNativeException(e);
+        return ::djinni::ExceptionHandlingTraits<::djinni::FutureAdaptor<::djinni::Optional<std::experimental::optional, ::djinni::I32>>>::handleNativeException(e);
     }
 }
 em::val NativeTestHelpers::check_async_interface(const em::val& w_i) {

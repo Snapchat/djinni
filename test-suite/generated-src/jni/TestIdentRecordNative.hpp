@@ -4,27 +4,27 @@
 #pragma once
 
 #include "djinni_support.hpp"
-#include "test_ident_record.hpp"
+#include "test_ident_record_native.hpp"
 
 namespace djinni_generated {
 
-class NativeTestIdentRecord final {
+class TestIdentRecordNative final {
 public:
     using CppType = ::testsuite::TestIdentRecord;
     using JniType = jobject;
 
-    using Boxed = NativeTestIdentRecord;
+    using Boxed = TestIdentRecordNative;
 
-    ~NativeTestIdentRecord();
+    ~TestIdentRecordNative();
 
     static CppType toCpp(JNIEnv* jniEnv, JniType j);
     static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c);
 
 private:
-    NativeTestIdentRecord();
-    friend ::djinni::JniClass<NativeTestIdentRecord>;
+    TestIdentRecordNative();
+    friend ::djinni::JniClass<TestIdentRecordNative>;
 
-    const ::djinni::GlobalRef<jclass> clazz { ::djinni::jniFindClass("com/dropbox/djinni/test/NativeTestIdentRecord") };
+    const ::djinni::GlobalRef<jclass> clazz { ::djinni::jniFindClass("com/dropbox/djinni/test/TestIdentRecordNative") };
     const jmethodID jconstructor { ::djinni::jniGetMethodID(clazz.get(), "<init>", "(ILjava/lang/String;)V") };
     const jfieldID field_mFirstValue { ::djinni::jniGetFieldID(clazz.get(), "mFirstValue", "I") };
     const jfieldID field_mSecondValue { ::djinni::jniGetFieldID(clazz.get(), "mSecondValue", "Ljava/lang/String;") };

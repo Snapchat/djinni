@@ -4,9 +4,9 @@
 #import "DBTestIdentRecord.h"
 
 
-NSString * __nonnull const DBTestIdentRecordNativeRecordConstValue = @"test";
+NSString * __nonnull const DBTestIdentRecordRecordConstValueNative = @"test";
 
-int32_t const DBTestIdentRecordNativeXXXWeirdCase = 1;
+int32_t const DBTestIdentRecordXXXWeirdCaseNative = 1;
 
 @implementation DBTestIdentRecord
 

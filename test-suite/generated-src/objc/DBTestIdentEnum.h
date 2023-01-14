@@ -5,7 +5,7 @@
 
 typedef NS_ENUM(NSInteger, DBTestIdentEnum)
 {
-    DBTestIdentEnumNativeSnakeEnum = 0,
+    DBTestIdentEnumSnakeEnumNative = 0,
     /** Should become CapsEnum in objective-c, but stay the same in Java/C++ */
-    DBTestIdentEnumNativeCapsEnum = 1,
+    DBTestIdentEnumCapsEnumNative = 1,
 };

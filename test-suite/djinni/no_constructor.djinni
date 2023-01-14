@@ -1,0 +1,10 @@
+no_constructor_record = record {
+    FirstValue: i32;
+
+    second_value: string;
+
+    const RECORD_CONST_VALUE: string = "test";
+
+    # Weirdness in casing should be preserved: this should become XXXWeirdCase in CamelCase
+    const XXXWeird_Case: i32 = 1;
+}

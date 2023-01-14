@@ -6,7 +6,7 @@ package com.dropbox.djinni.test;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public enum NativeTestIdentEnum {
+public enum TestIdentEnumNative {
     SNAKE_ENUM,
     /** Should become CapsEnum in objective-c, but stay the same in Java/C++ */
     CAPS_ENUM,

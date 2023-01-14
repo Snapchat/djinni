@@ -17,6 +17,6 @@
 
 @end
 
-extern NSString * __nonnull const DBTestIdentRecordNativeRecordConstValue;
+extern NSString * __nonnull const DBTestIdentRecordRecordConstValueNative;
 /** Weirdness in casing should be preserved: this should become XXXWeirdCase in CamelCase */
-extern int32_t const DBTestIdentRecordNativeXXXWeirdCase;
+extern int32_t const DBTestIdentRecordXXXWeirdCaseNative;

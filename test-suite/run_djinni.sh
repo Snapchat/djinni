@@ -173,20 +173,20 @@ fi
     --java-nullable-annotation "javax.annotation.CheckForNull" \
     --java-nonnull-annotation "javax.annotation.Nonnull" \
     --java-use-final-for-record false \
-    --ident-java-type NativeFooBar! \
+    --ident-java-type FooBar!Native \
     --ident-java-field mFooBar! \
     \
     --cpp-out "$temp_out_relative/cpp" \
     --cpp-namespace testsuite \
-    --ident-cpp-file foo_bar! \
+    --ident-cpp-file foo_bar!_native \
     --ident-cpp-enum-type foo_bar! \
     --cpp-optional-template "std::experimental::optional" \
     --cpp-optional-header "\"../../handwritten-src/cpp/optional.hpp\"" \
     --cpp-extended-record-include-prefix "../../handwritten-src/cpp/" \
     \
     --jni-out "$temp_out_relative/jni" \
-    --ident-jni-file NativeFooBar! \
-    --ident-jni-class NativeFooBar! \
+    --ident-jni-file FooBar!Native \
+    --ident-jni-class FooBar!Native \
     --jni-function-prologue-file "../../handwritten-src/cpp/jni_prologue.hpp" \
     \
     --objc-out "$temp_out_relative/objc" \
@@ -194,8 +194,8 @@ fi
     --objc-type-prefix DB \
     --objcpp-function-prologue-file "../../handwritten-src/cpp/objcpp-prologue.hpp" \
     --ident-objc-type FooBar! \
-    --ident-objc-enum NativeFooBar! \
-    --ident-objc-const NativeFooBar! \
+    --ident-objc-enum FooBar!Native \
+    --ident-objc-const FooBar!Native \
     \
     --idl "$ident_explicit_in_relative" && \
 "$base_dir/../src/run-assume-built" \

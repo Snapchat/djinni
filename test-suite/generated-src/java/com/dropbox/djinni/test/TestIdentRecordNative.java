@@ -6,7 +6,7 @@ package com.dropbox.djinni.test;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-public class NativeTestIdentRecord {
+public class TestIdentRecordNative {
 
     @Nonnull
     public static final String RECORD_CONST_VALUE = "test";
@@ -19,7 +19,7 @@ public class NativeTestIdentRecord {
 
     /*package*/ final String mSecondValue;
 
-    public NativeTestIdentRecord(
+    public TestIdentRecordNative(
             int FirstValue,
             @Nonnull String secondValue) {
         this.mFirstValue = FirstValue;
@@ -37,7 +37,7 @@ public class NativeTestIdentRecord {
 
     @Override
     public String toString() {
-        return "NativeTestIdentRecord{" +
+        return "TestIdentRecordNative{" +
                 "mFirstValue=" + mFirstValue +
                 "," + "mSecondValue=" + mSecondValue +
         "}";
