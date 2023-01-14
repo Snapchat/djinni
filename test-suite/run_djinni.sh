@@ -27,6 +27,7 @@ in_relative="djinni/all.djinni"
 wchar_in_relative="djinni/wchar_test.djinni"
 prologue_in_relative="djinni/function_prologue.djinni"
 ident_explicit_in_relative="djinni/ident_explicit.djinni"
+no_constructor_in_relative="djinni/no_constructor.djinni"
 interface_and_abstract_class_in_relative="djinni/interface_and_abstract_class.djinni"
 temp_out_relative="djinni-output-temp"
 
@@ -229,7 +230,39 @@ fi
     --yaml-prefix "test_" \
     \
     --idl "$interface_and_abstract_class_in_relative" \
-    --idl-include-path "djinni/vendor" \
+    --idl-include-path "djinni/vendor" &&  \
+"$base_dir/../src/run-assume-built" \
+    --java-out "$temp_out_relative/java" \
+    --java-package $java_package \
+    --java-nullable-annotation "javax.annotation.CheckForNull" \
+    --java-nonnull-annotation "javax.annotation.Nonnull" \
+    --java-use-final-for-record false \
+    --ident-java-type FooBarNative \
+    --ident-java-field mFooBar \
+    \
+    --cpp-out "$temp_out_relative/cpp" \
+    --cpp-namespace testsuite \
+    --cpp-struct-constructor false \
+    --ident-cpp-file foo_bar_native \
+    --ident-cpp-enum-type foo_bar \
+    --cpp-optional-template "std::experimental::optional" \
+    --cpp-optional-header "\"../../handwritten-src/cpp/optional.hpp\"" \
+    --cpp-extended-record-include-prefix "../../handwritten-src/cpp/" \
+    \
+    --jni-out "$temp_out_relative/jni" \
+    --ident-jni-file FooBarNative \
+    --ident-jni-class FooBarNative \
+    --jni-function-prologue-file "../../handwritten-src/cpp/jni_prologue.hpp" \
+    \
+    --objc-out "$temp_out_relative/objc" \
+    --objcpp-out "$temp_out_relative/objc" \
+    --objc-type-prefix DB \
+    --objcpp-function-prologue-file "../../handwritten-src/cpp/objcpp-prologue.hpp" \
+    --ident-objc-type FooBar \
+    --ident-objc-enum FooBarNative \
+    --ident-objc-const FooBarNative \
+    \
+    --idl "$no_constructor_in_relative" \
 )
 
 # Make sure we can parse back our own generated YAML file
