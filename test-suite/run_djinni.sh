@@ -35,6 +35,7 @@ cpp_out="$base_dir/generated-src/cpp"
 jni_out="$base_dir/generated-src/jni"
 objc_out="$base_dir/generated-src/objc"
 java_out="$base_dir/generated-src/java/com/dropbox/djinni/test"
+kotlin_out="$base_dir/generated-src/kotlin/com/dropbox/djinni/test"
 wasm_out="$base_dir/generated-src/wasm"
 ts_out="$base_dir/generated-src/ts"
 yaml_out="$base_dir/generated-src/yaml"
@@ -52,7 +53,7 @@ elif [ $# -eq 1 ]; then
         echo "Unexpected arguemnt: \"$command\"." 1>&2
         exit 1
     fi
-    for dir in "$temp_out" "$cpp_out" "$jni_out" "$java_out"; do
+    for dir in "$temp_out" "$cpp_out" "$jni_out" "$java_out", "$kotlin_out"; do
         if [ -e "$dir" ]; then
             echo "Deleting \"$dir\"..."
             rm -r "$dir"
@@ -76,6 +77,8 @@ fi
     --java-nonnull-annotation "javax.annotation.Nonnull" \
     --java-use-final-for-record false \
     --ident-java-field mFooBar \
+    \
+    --kotlin-out "$temp_out_relative/kotlin" \
     \
     --cpp-out "$temp_out_relative/cpp" \
     --cpp-namespace testsuite \
@@ -111,6 +114,8 @@ fi
     --java-use-final-for-record false \
     --java-implement-android-os-parcelable true \
     --ident-java-field mFooBar \
+    \
+    --kotlin-out "$temp_out_relative/kotlin" \
     \
     --cpp-out "$temp_out_relative/cpp" \
     --cpp-namespace testsuite \
@@ -150,6 +155,8 @@ fi
     --java-use-final-for-record false \
     --ident-java-field mFooBar \
     \
+    --kotlin-out "$temp_out_relative/kotlin" \
+    \
     --cpp-out "$temp_out_relative/cpp" \
     --cpp-namespace testsuite \
     --ident-cpp-enum-type foo_bar \
@@ -176,6 +183,8 @@ fi
     --java-use-final-for-record false \
     --ident-java-type FooBar!Native \
     --ident-java-field mFooBar! \
+    \
+    --kotlin-out "$temp_out_relative/kotlin" \
     \
     --cpp-out "$temp_out_relative/cpp" \
     --cpp-namespace testsuite \
@@ -209,6 +218,8 @@ fi
     --java-gen-interface true \
     --ident-java-field mFooBar \
     \
+    --kotlin-out "$temp_out_relative/kotlin" \
+    \
     --cpp-out "$temp_out_relative/cpp" \
     --cpp-namespace testsuite \
     --ident-cpp-enum-type foo_bar \
@@ -239,6 +250,8 @@ fi
     --java-use-final-for-record false \
     --ident-java-type FooBarNative \
     --ident-java-field mFooBar \
+    \
+    --kotlin-out "$temp_out_relative/kotlin" \
     \
     --cpp-out "$temp_out_relative/cpp" \
     --cpp-namespace testsuite \
@@ -272,6 +285,8 @@ cp "$base_dir/djinni/yaml-test.djinni" "$temp_out/yaml"
     --java-out "$temp_out_relative/java" \
     --java-package $java_package \
     --ident-java-field mFooBar \
+    \
+    --kotlin-out "$temp_out_relative/kotlin" \
     \
     --cpp-out "$temp_out_relative/cpp" \
     --ident-cpp-enum-type foo_bar \
@@ -308,6 +323,7 @@ mirror() {
 echo "Copying generated code to final directories..."
 mirror "cpp" "$temp_out/cpp" "$cpp_out"
 mirror "java" "$temp_out/java" "$java_out"
+mirror "kotlin" "$temp_out/kotlin" "$kotlin_out"
 mirror "jni" "$temp_out/jni" "$jni_out"
 mirror "objc" "$temp_out/objc" "$objc_out"
 mirror "wasm" "$temp_out/wasm" "$wasm_out"
