@@ -42,6 +42,7 @@ package object generatorTools {
                    javaImplementAndroidOsParcelable: Boolean,
                    javaUseFinalForRecord: Boolean,
                    javaGenInterface: Boolean,
+                   kotlinOutFolder: Option[File],
                    cppOutFolder: Option[File],
                    cppHeaderOutFolder: Option[File],
                    cppIncludePrefix: String,
@@ -226,6 +227,13 @@ package object generatorTools {
       }
     }
 
+    def getKotlinCodeGenerationString(javaAccessModifier: JavaAccessModifier.Value): String = {
+      javaAccessModifier match {
+        case Public => ""
+        case Package => "internal "
+      }
+    }
+
   }
   implicit val javaAccessModifierReads: scopt.Read[JavaAccessModifier.Value] = scopt.Read.reads(JavaAccessModifier withName _)
 
@@ -269,6 +277,12 @@ package object generatorTools {
           createFolder("Java", spec.javaOutFolder.get)
         }
         new JavaGenerator(spec).generate(idl)
+      }
+      if (spec.kotlinOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("Kotlin", spec.kotlinOutFolder.get)
+        }
+        new KotlinGenerator(spec).generate(idl)
       }
       if (spec.jniOutFolder.isDefined) {
         if (!spec.skipGeneration) {

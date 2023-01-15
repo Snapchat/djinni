@@ -32,7 +32,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
   val javaNullableAnnotation = spec.javaNullableAnnotation.map(pkg => '@' + pkg.split("\\.").last)
   val javaNonnullAnnotation = spec.javaNonnullAnnotation.map(pkg => '@' + pkg.split("\\.").last)
   val javaClassAccessModifierString = JavaAccessModifier.getCodeGenerationString(spec.javaClassAccessModifier)
-  val marshal = new JavaMarshal(spec)
+  val marshal = new JavaMarshal(spec, false)
 
   class JavaRefs() {
     var java = mutable.TreeSet[String]()

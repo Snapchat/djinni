@@ -44,7 +44,7 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
     val interfaceNullity = if (spec.cppNnType.nonEmpty) nonnull else nullable
     tm.base match {
       case MOptional => nullable
-      case MPrimitive(_,_,_,_,_,_,_,_) => None
+      case MPrimitive(_,_,_,_,_,_,_,_,_) => None
       case d: MDef => d.defType match {
         case DEnum => None
         case DInterface => interfaceNullity
@@ -216,7 +216,7 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
     * strings, and optional strings. Anything else needs to be a class method.
     */
   def canBeConstVariable(c:Const): Boolean = c.ty.resolved.base match {
-    case MPrimitive(_,_,_,_,_,_,_,_) => true
+    case MPrimitive(_,_,_,_,_,_,_,_,_) => true
     case MString => true
     case MOptional =>
       assert(c.ty.resolved.args.size == 1)

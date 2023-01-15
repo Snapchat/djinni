@@ -32,7 +32,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   val cppMarshal = new CppMarshal(spec)
   val objcMarshal = new ObjcMarshal(spec)
   val objcppMarshal = new ObjcppMarshal(spec)
-  val javaMarshal = new JavaMarshal(spec)
+  val javaMarshal = new JavaMarshal(spec, false)
   val jniMarshal = new JNIMarshal(spec)
   val wasmMarshal = new WasmGenerator(spec)
   val tsMarshal = new TsGenerator(spec)

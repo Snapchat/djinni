@@ -93,7 +93,7 @@ case object DEnum extends DefType
 case object DInterface extends DefType
 case object DRecord extends DefType
 
-case class MPrimitive(_idlName: String, jName: String, jniName: String, cName: String, jBoxed: String, jSig: String, objcName: String, objcBoxed: String) extends MOpaque { val numParams = 0; val idlName = _idlName }
+case class MPrimitive(_idlName: String, jName: String, jniName: String, cName: String, jBoxed: String, jSig: String, objcName: String, objcBoxed: String, kName: String) extends MOpaque { val numParams = 0; val idlName = _idlName }
 case object MString extends MOpaque { val numParams = 0; val idlName = "string" }
 case object MDate extends MOpaque { val numParams = 0; val idlName = "date" }
 case object MBinary extends MOpaque { val numParams = 0; val idlName = "binary" }
@@ -105,13 +105,13 @@ case object MArray extends MOpaque { val numParams = 1; val idlName = "array"}
 case object MVoid extends MOpaque { val numParams = 0; val idlName = "void"}
 
 val defaults: Map[String,MOpaque] = immutable.HashMap(
-  ("i8",   MPrimitive("i8",   "byte",    "jbyte",    "int8_t",  "Byte",    "B", "int8_t",  "NSNumber")),
-  ("i16",  MPrimitive("i16",  "short",   "jshort",   "int16_t", "Short",   "S", "int16_t", "NSNumber")),
-  ("i32",  MPrimitive("i32",  "int",     "jint",     "int32_t", "Integer", "I", "int32_t", "NSNumber")),
-  ("i64",  MPrimitive("i64",  "long",    "jlong",    "int64_t", "Long",    "J", "int64_t", "NSNumber")),
-  ("f32",  MPrimitive("f32",  "float",   "jfloat",   "float",   "Float",   "F", "float",   "NSNumber")),
-  ("f64",  MPrimitive("f64",  "double",  "jdouble",  "double",  "Double",  "D", "double",  "NSNumber")),
-  ("bool", MPrimitive("bool", "boolean", "jboolean", "bool",    "Boolean", "Z", "BOOL",    "NSNumber")),
+  ("i8",   MPrimitive("i8",   "byte",    "jbyte",    "int8_t",  "Byte",    "B", "int8_t",  "NSNumber", "Byte")),
+  ("i16",  MPrimitive("i16",  "short",   "jshort",   "int16_t", "Short",   "S", "int16_t", "NSNumber", "Short")),
+  ("i32",  MPrimitive("i32",  "int",     "jint",     "int32_t", "Integer", "I", "int32_t", "NSNumber", "Int")),
+  ("i64",  MPrimitive("i64",  "long",    "jlong",    "int64_t", "Long",    "J", "int64_t", "NSNumber", "Long")),
+  ("f32",  MPrimitive("f32",  "float",   "jfloat",   "float",   "Float",   "F", "float",   "NSNumber", "Float")),
+  ("f64",  MPrimitive("f64",  "double",  "jdouble",  "double",  "Double",  "D", "double",  "NSNumber", "Double")),
+  ("bool", MPrimitive("bool", "boolean", "jboolean", "bool",    "Boolean", "Z", "BOOL",    "NSNumber", "Boolean")),
   ("string", MString),
   ("binary", MBinary),
   ("optional", MOptional),

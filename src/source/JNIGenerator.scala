@@ -29,7 +29,7 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
 
   val jniMarshal = new JNIMarshal(spec)
   val cppMarshal = new CppMarshal(spec)
-  val javaMarshal = new JavaMarshal(spec)
+  val javaMarshal = new JavaMarshal(spec, false)
   val jniBaseLibClassIdentStyle = IdentStyle.prefix("H", IdentStyle.camelUpper)
   val jniBaseLibFileIdentStyle = jniBaseLibClassIdentStyle
 

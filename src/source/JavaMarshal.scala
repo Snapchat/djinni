@@ -22,10 +22,11 @@ import djinni.ast._
 import djinni.generatorTools._
 import djinni.meta._
 
-class JavaMarshal(spec: Spec) extends Marshal(spec) {
+class JavaMarshal(spec: Spec, kotlin: Boolean) extends Marshal(spec) {
 
   val javaNullableAnnotation = spec.javaNullableAnnotation.map(pkg => '@' + pkg.split("\\.").last)
   val javaNonnullAnnotation = spec.javaNonnullAnnotation.map(pkg => '@' + pkg.split("\\.").last)
+  val voidReturnType = if (kotlin) "" else "void"
 
   override def typename(tm: MExpr): String = toJavaType(tm, None)
   def typename(name: String, ty: TypeDef): String = idJava.ty(name)
@@ -36,8 +37,8 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
   override def paramType(tm: MExpr): String = toJavaValueType(tm, None)
   override def fqParamType(tm: MExpr): String = toJavaValueType(tm, spec.javaPackage)
 
-  override def returnType(ret: Option[TypeRef]): String = ret.fold("void")(ty => toJavaValueType(ty.resolved, None))
-  override def fqReturnType(ret: Option[TypeRef]): String = ret.fold("void")(ty => toJavaValueType(ty.resolved, spec.javaPackage))
+  override def returnType(ret: Option[TypeRef]): String = ret.fold(voidReturnType)(ty => toJavaValueType(ty.resolved, None))
+  override def fqReturnType(ret: Option[TypeRef]): String = ret.fold(voidReturnType)(ty => toJavaValueType(ty.resolved, spec.javaPackage))
 
   override def fieldType(tm: MExpr): String = toJavaValueType(tm, None)
   override def fqFieldType(tm: MExpr): String = toJavaValueType(tm, spec.javaPackage)
@@ -73,7 +74,7 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
         }
       case e: MExtern => e.defType match {
         case DInterface => interfaceNullityAnnotation
-        case DRecord => if(e.java.reference) javaNonnullAnnotation else None
+        case DRecord => if (e.java.reference) javaNonnullAnnotation else None
         case DEnum => javaNonnullAnnotation
       }
       case _ => javaNonnullAnnotation
@@ -99,7 +100,7 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
 
   private def toJavaValueType(tm: MExpr, packageName: Option[String]): String = {
     val name = toJavaType(tm, packageName)
-    if(isEnumFlags(tm)) s"EnumSet<$name>" else name
+    if (isEnumFlags(tm)) s"EnumSet<$name>" else name
   }
 
   private def toJavaType(tm: MExpr, packageName: Option[String]): String = {
@@ -111,19 +112,21 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
           assert(tm.args.size == 1)
           val arg = tm.args.head
           arg.base match {
-            case p: MPrimitive => p.jBoxed
+            case p: MPrimitive => if (kotlin) p.kName + "?" else p.jBoxed
             case MOptional => throw new AssertionError("nested optional?")
-            case m => f(arg, true)
+            case m => f(arg, true) + (if (kotlin) "?" else "")
           }
         case MArray => toJavaType(tm.args.head, packageName) + "[]"
-        case e: MExtern => (if(needRef) e.java.boxed else e.java.typename) + (if(e.java.generic) args(tm) else "")
+        case e: MExtern if (kotlin) => (e.java.boxed) + (if (e.java.generic) args(tm) else "")
+        case e: MExtern => (if (needRef) e.java.boxed else e.java.typename) + (if (e.java.generic) args(tm) else "")
         case p: MProtobuf => p.name
         case o =>
           val base = o match {
+            case p: MPrimitive if kotlin => p.kName
             case p: MPrimitive => if (needRef) p.jBoxed else p.jName
             case MString => "String"
             case MDate => "Date"
-            case MBinary => "byte[]"
+            case MBinary => if (kotlin) "ByteArray" else "byte[]"
             case MOptional => throw new AssertionError("optional should have been special cased")
             case MList => "ArrayList"
             case MSet => "HashSet"
