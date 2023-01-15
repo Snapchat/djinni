@@ -53,12 +53,12 @@ fi
 
 [ ! -e "$temp_out" ] || rm -r "$temp_out"
 "$base_dir/../src/run-assume-built" \
-    --java-out "$temp_out/java" \
+    --kotlin-out "$temp_out/java" \
     --java-package $java_package \
     --java-class-access-modifier "package" \
     --java-nullable-annotation "javax.annotation.CheckForNull" \
     --java-nonnull-annotation "javax.annotation.Nonnull" \
-    --ident-java-field mFooBar \
+    --ident-java-field fooBar \
     \
     --cpp-out "$temp_out/cpp" \
     --cpp-namespace textsort \

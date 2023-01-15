@@ -1,6 +1,7 @@
 load("@build_bazel_rules_apple//apple:ios.bzl", "ios_application")
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
+load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kt_jvm_library")
 
 cc_library(
     name = "textsort-common",
@@ -24,9 +25,9 @@ cc_library(
 
 # ------------------------------------------------------------------
 
-java_library(
+kt_jvm_library(
     name = "textsort-java",
-    srcs = glob(["generated-src/java/**/*.java"]),
+    srcs = glob(["generated-src/java/**/*.kt"]),
     deps = [
         "//support-lib:djinni-support-java",
         "@maven_djinni//:com_google_code_findbugs_jsr305",

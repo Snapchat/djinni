@@ -3,12 +3,8 @@
 
 package com.dropbox.textsort;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
-/*package*/ enum SortOrder {
+internal enum class SortOrder {
     ASCENDING,
     DESCENDING,
     RANDOM,
-    ;
 }

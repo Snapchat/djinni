@@ -11,7 +11,18 @@ djinni_setup_deps()
 
 # android_sdk_repository fails to find build_tools if we don't explicitly set a version.
 android_sdk_repository(name = "androidsdk", build_tools_version = "32.0.0")
-android_ndk_repository(name = "androidndk", api_level = 21)
+RULES_ANDROID_NDK_COMMIT= "81ec8b79dc50ee97e336a25724fdbb28e33b8d41"
+RULES_ANDROID_NDK_SHA = "b29409496439cdcdb50a8e161c4953ca78a548e16d3ee729a1b5cd719ffdacbf"
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+http_archive(
+    name = "rules_android_ndk",
+    url = "https://github.com/bazelbuild/rules_android_ndk/archive/%s.zip" % RULES_ANDROID_NDK_COMMIT,
+    sha256 = RULES_ANDROID_NDK_SHA,
+    strip_prefix = "rules_android_ndk-%s" % RULES_ANDROID_NDK_COMMIT,
+)
+load("@rules_android_ndk//:rules.bzl", "android_ndk_repository")
+android_ndk_repository(name = "androidndk")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
