@@ -3,7 +3,7 @@ name: Build and Test
 on:
   push:
     branches:
-      - master
+      - main
   pull_request: {}
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
           path: ~/.cache/bazel
           key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.ref }}
           restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-master
+            ${{ runner.os }}-${{ env.cache-name }}-main
 
       - name: Build
         run: bazel build //src:djinni
