@@ -75,6 +75,7 @@ object Main {
     var objcHeaderExt: String = "h"
     var objcIdentStyle = IdentStyle.objcDefault
     var objcTypePrefix: String = ""
+    var objcTypeSuffix: String = ""
     var objcIncludePrefix: String = ""
     var objcExtendedRecordIncludePrefix: String = ""
     var objcSwiftBridgingHeaderName: Option[String] = None
@@ -202,6 +203,8 @@ object Main {
       opt[String]("objc-h-ext").valueName("<ext>").foreach(objcHeaderExt = _)
         .text("The filename extension for Objective-C[++] header files (default: \"h\")")
       opt[String]("objc-type-prefix").valueName("<pre>").foreach(objcTypePrefix = _)
+        .text("The filename extension for Objective-C[++] header files (default: \"h\")")
+      opt[String]("objc-type-suffix").valueName("<pre>").foreach(objcTypeSuffix = _)
         .text("The prefix for Objective-C data types (usually two or three letters)")
       opt[String]("objc-include-prefix").valueName("<prefix>").foreach(objcIncludePrefix = _)
         .text("The prefix for #import of header files from Objective-C files.")
@@ -312,6 +315,10 @@ object Main {
     // Add ObjC prefix to identstyle
     objcIdentStyle = objcIdentStyle.copy(ty = IdentStyle.prefix(objcTypePrefix,objcIdentStyle.ty))
     objcFileIdentStyle = IdentStyle.prefix(objcTypePrefix, objcFileIdentStyle)
+
+    // Add ObjC suffix to identstyle
+    objcIdentStyle = objcIdentStyle.copy(ty = IdentStyle.suffix(objcIdentStyle.ty, objcTypeSuffix))
+    objcFileIdentStyle = IdentStyle.suffix(objcFileIdentStyle, objcTypeSuffix)
 
     if (cppTypeEnumIdentStyle != null) {
       cppIdentStyle = cppIdentStyle.copy(enumType = cppTypeEnumIdentStyle)
