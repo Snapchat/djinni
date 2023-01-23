@@ -95,6 +95,7 @@ fi
     --objc-out "$temp_out_relative/objc" \
     --objcpp-out "$temp_out_relative/objc" \
     --objc-type-prefix DB \
+    --objc-type-suffix ViewModel \
     \
     --wasm-out "$temp_out_relative/wasm" \
     --wasm-namespace "testsuite" \
@@ -132,6 +133,7 @@ fi
     --objc-out "$temp_out_relative/objc" \
     --objcpp-out "$temp_out_relative/objc" \
     --objc-type-prefix DB \
+    --objc-type-suffix ViewModel \
     \
     --wasm-out "$temp_out_relative/wasm" \
     --wasm-namespace "testsuite" \
@@ -172,6 +174,7 @@ fi
     --objc-out "$temp_out_relative/objc" \
     --objcpp-out "$temp_out_relative/objc" \
     --objc-type-prefix DB \
+    --objc-type-suffix ViewModel \
     --objcpp-function-prologue-file "../../handwritten-src/cpp/objcpp-prologue.hpp" \
     \
     --idl "$prologue_in_relative" && \
@@ -202,6 +205,7 @@ fi
     --objc-out "$temp_out_relative/objc" \
     --objcpp-out "$temp_out_relative/objc" \
     --objc-type-prefix DB \
+    --objc-type-suffix ViewModel \
     --objcpp-function-prologue-file "../../handwritten-src/cpp/objcpp-prologue.hpp" \
     --ident-objc-type FooBar! \
     --ident-objc-enum FooBar!Native \
@@ -235,6 +239,7 @@ fi
     --objc-out "$temp_out_relative/objc" \
     --objcpp-out "$temp_out_relative/objc" \
     --objc-type-prefix DB \
+    --objc-type-suffix ViewModel \
     \
     --yaml-out "$temp_out_relative/yaml" \
     --yaml-out-file "yaml-interface-test.yaml" \
@@ -270,6 +275,7 @@ fi
     --objc-out "$temp_out_relative/objc" \
     --objcpp-out "$temp_out_relative/objc" \
     --objc-type-prefix DB \
+    --objc-type-suffix ViewModel \
     --objcpp-function-prologue-file "../../handwritten-src/cpp/objcpp-prologue.hpp" \
     --ident-objc-type FooBar \
     --ident-objc-enum FooBarNative \
@@ -301,6 +307,7 @@ cp "$base_dir/djinni/yaml-test.djinni" "$temp_out/yaml"
     --objc-out "$temp_out_relative/objc" \
     --objcpp-out "$temp_out_relative/objc" \
     --objc-type-prefix DB \
+    --objc-type-suffix ViewModel \
     \
     --wasm-out "$temp_out_relative/wasm" \
     --wasm-namespace "testsuite" \
