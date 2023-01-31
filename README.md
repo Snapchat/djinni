@@ -267,10 +267,10 @@ value known to the compiler at compile time, then there is no runtime
 overhead. You may also call it with a dynamic value, in that case it's a fast
 array indexing operation.
 
-## Experimantal WASM support
+## WASM support
 
 Djinni can generate code that bridges C++ (that compiles to Web Assembly) and
-Javascript/TypeScript in web browsers. This feature is currently experimental.
+Javascript/TypeScript in web browsers.
 
 For WASM, Djinni generates:
 - C++ code, which should be compiled into the WASM bindary
@@ -305,10 +305,10 @@ The command to run Wasm/TypeScript unit tests is `bazel run
 //test-suite:server-ts`. You will need the `tsc` compiler and the `browserify`
 tool to run these tests.
 
-## Experimental async interface support
+## Async interface support
 
-With the new yaml type `future<>` we can now write Djinni interfaces that
-return results asynchronously more easily.
+With the new yaml type `future<>` we can now write Djinni interfaces that return
+results asynchronously more easily.
 
 Instead of writing this:
 
