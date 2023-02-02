@@ -34,20 +34,34 @@ public:
 
     using NativePromiseType = Promise<CppResType>;
 
-    static void resolveNativePromise(int context, em::val res, em::val err) {
+    static void resolveNativePromise(int context, em::val res) {
         auto* pNativePromise = reinterpret_cast<NativePromiseType*>(context);
-        if (err.isNull() || err.isUndefined()) {
-            if constexpr (std::is_void_v<CppResType>) {
-                pNativePromise->setValue();
-            } else {
-                pNativePromise->setValue(RESULT::Boxed::toCpp(res));
-            }
+
+        if constexpr (std::is_void_v<CppResType>) {
+            pNativePromise->setValue();
         } else {
-            pNativePromise->setException(JsException(err));
+            pNativePromise->setValue(RESULT::Boxed::toCpp(res));
         }
+
         delete pNativePromise;
     }
-    
+
+    static void rejectNativePromise(int context, em::val err) {
+        auto* pNativePromise = reinterpret_cast<NativePromiseType*>(context);
+        static auto errorGlobal = em::val::global("Error");
+
+        // instanceof will be false if the error object is null or undefined.
+        if (err.instanceof(errorGlobal)) {
+            pNativePromise->setException(JsException(err));
+        } else {
+            // We could try to stringify the unknown type here, but rejecting a promise with a non-error
+            // type should not be a common use case.
+            pNativePromise->setException(std::runtime_error("JS promise rejected with non-error type"));
+        }
+
+        delete pNativePromise;
+    }
+
     static CppType toCpp(JsType o)
     {
         auto p = new NativePromiseType();
@@ -55,7 +69,7 @@ public:
         auto makeNativePromiseResolver = em::val::module_property("makeNativePromiseResolver");
         auto makeNativePromiseRejecter = em::val::module_property("makeNativePromiseRejecter");
         auto next = o.call<em::val>("then", makeNativePromiseResolver(reinterpret_cast<int>(&resolveNativePromise), reinterpret_cast<int>(p)));
-        next.call<void>("catch", makeNativePromiseRejecter(reinterpret_cast<int>(&resolveNativePromise), reinterpret_cast<int>(p)));
+        next.call<void>("catch", makeNativePromiseRejecter(reinterpret_cast<int>(&rejectNativePromise), reinterpret_cast<int>(p)));
         return f;
     }
 

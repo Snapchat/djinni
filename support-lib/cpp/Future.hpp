@@ -172,8 +172,10 @@ protected:
             sharedState->value = std::move(val);
         });
     }
-    template <typename E>
-    void setException(const E& ex) {
+
+    // Lock down to std::exception as a base class, as otherwise make_exception_ptr will happily take other
+    // pointers, and we don't want to encourage rejecting a promise with something other than an exception object.
+    void setException(const std::exception& ex) {
         setException(std::make_exception_ptr(ex));
     }
     void setException(std::exception_ptr ex) {
