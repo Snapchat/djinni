@@ -172,7 +172,6 @@ protected:
             sharedState->value = std::move(val);
         });
     }
-
     template <typename E>
     void setException(const E& ex) {
         setException(std::make_exception_ptr(ex));
