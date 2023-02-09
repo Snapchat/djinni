@@ -151,12 +151,12 @@ EM_JS(void, djinni_init_wasm, (), {
 
         Module.makeNativePromiseResolver = function(func, pNativePromise) {
             return function(res) {
-                Module.resolveNativePromise(func, pNativePromise, res, null);
+                Module.resolveNativePromise(func, pNativePromise, res);
             };
         };
         Module.makeNativePromiseRejecter = function(func, pNativePromise) {
             return function(err) {
-                Module.resolveNativePromise(func, pNativePromise, null, err);
+                Module.rejectNativePromise(func, pNativePromise, err);
             };
         };
 
@@ -216,6 +216,7 @@ EMSCRIPTEN_BINDINGS(djinni_wasm) {
     em::function("allocateWasmBuffer", &allocateWasmBuffer);
     em::function("initCppResolveHandler", &CppResolveHandlerBase::initInstance);
     em::function("resolveNativePromise", &CppResolveHandlerBase::resolveNativePromise);
+    em::function("rejectNativePromise", &CppResolveHandlerBase::rejectNativePromise);
 }
 
 }

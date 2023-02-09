@@ -456,6 +456,8 @@ export interface TestHelpers_statics {
      * If the input is non-empty, returns back the value plus one.
      */
     addOneIfPresent(f: Promise<number | undefined>): Promise<number | undefined>;
+    /** try-catches the future f, and accesses the error message, and returns as a string. */
+    returnExceptionString(f: Promise<number>): Promise<string>;
     checkAsyncInterface(i: AsyncInterface): Promise<string>;
     checkAsyncComposition(i: AsyncInterface): Promise<string>;
     getOptionalList(): Array<string | undefined>;

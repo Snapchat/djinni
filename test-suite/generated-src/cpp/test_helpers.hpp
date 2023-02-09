@@ -104,6 +104,9 @@ public:
      */
     static ::djinni::Future<std::experimental::optional<int32_t>> add_one_if_present(::djinni::Future<std::experimental::optional<int32_t>> f);
 
+    /** try-catches the future f, and accesses the error message, and returns as a string. */
+    static ::djinni::Future<std::string> return_exception_string(::djinni::Future<int32_t> f);
+
     static ::djinni::Future<std::string> check_async_interface(const /*not-null*/ std::shared_ptr<AsyncInterface> & i);
 
     static ::djinni::Future<std::string> check_async_composition(const /*not-null*/ std::shared_ptr<AsyncInterface> & i);

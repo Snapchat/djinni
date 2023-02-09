@@ -93,6 +93,9 @@
  */
 + (nonnull DJFuture<NSNumber *> *)addOneIfPresent:(nonnull DJFuture<NSNumber *> *)f;
 
+/** try-catches the future f, and accesses the error message, and returns as a string. */
++ (nonnull DJFuture<NSString *> *)returnExceptionString:(nonnull DJFuture<NSNumber *> *)f;
+
 + (nonnull DJFuture<NSString *> *)checkAsyncInterface:(nullable id<DBAsyncInterface>)i;
 
 + (nonnull DJFuture<NSString *> *)checkAsyncComposition:(nullable id<DBAsyncInterface>)i;
