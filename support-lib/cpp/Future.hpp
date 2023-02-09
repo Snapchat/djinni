@@ -174,6 +174,9 @@ protected:
     }
     template <typename E>
     void setException(const E& ex) {
+        // Let's try to prevent throwing non-exception types.
+        static_assert(std::is_convertible_v<E, std::exception>, "setException() called with type that is not convertible to std::exception");
+
         setException(std::make_exception_ptr(ex));
     }
     void setException(std::exception_ptr ex) {
