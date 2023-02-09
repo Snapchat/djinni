@@ -104,6 +104,10 @@ public abstract class TestHelpers {
     @Nonnull
     public static native com.snapchat.djinni.Future<Integer> addOneIfPresent(@Nonnull com.snapchat.djinni.Future<Integer> f);
 
+    /** try-catches the future f, and accesses the error message, and returns as a string. */
+    @Nonnull
+    public static native com.snapchat.djinni.Future<String> returnExceptionString(@Nonnull com.snapchat.djinni.Future<Integer> f);
+
     @Nonnull
     public static native com.snapchat.djinni.Future<String> checkAsyncInterface(@CheckForNull AsyncInterface i);
 

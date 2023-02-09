@@ -276,6 +276,26 @@ djinni::Future<std::string> TestHelpers::check_async_composition(const std::shar
 #endif
 }
 
+::djinni::Future<std::string> TestHelpers::return_exception_string(::djinni::Future<int32_t> f) {
+#ifdef DJINNI_FUTURE_HAS_COROUTINE_SUPPORT
+    try {
+        co_await f;
+        co_return std::string("failed");
+    } catch (const std::exception& e) {
+        co_return std::string(e.what());
+    }
+#else
+    return f.then([](auto incoming) {
+        try {
+            incoming.get();
+            return std::string("failed");
+        } catch (const std::exception& e) {
+            return std::string(e.what());
+        }
+    });
+#endif
+}
+
 std::vector<std::experimental::optional<std::string>> TestHelpers::get_optional_list() {
     return {std::experimental::nullopt, std::string("hello")};
 }

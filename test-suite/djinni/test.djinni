@@ -55,6 +55,8 @@ test_helpers = interface +c {
     # If the input is empty, returns back an empty future.
     # If the input is non-empty, returns back the value plus one.
     static add_one_if_present(f: future<optional<i32>>): future<optional<i32>>;
+    # try-catches the future f, and accesses the error message, and returns as a string.
+    static return_exception_string(f: future<i32>): future<string>;
 
     static check_async_interface(i: async_interface): future<string>;
     static check_async_composition(i: async_interface): future<string>;

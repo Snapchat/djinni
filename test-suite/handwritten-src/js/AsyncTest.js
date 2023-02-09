@@ -38,6 +38,18 @@ class AsyncTest {
         assertEq(r, 36);
     }
 
+    async testVoidRoundTrip() {
+        await this.m.testsuite.TestHelpers.voidAsyncMethod(sleep(10));
+    }
+
+    async testOptionalFutureUnsetValue() {
+        assertUndefined(await this.m.testsuite.TestHelpers.addOneIfPresent(Promise.resolve(undefined)));
+    }
+
+    async testOptionalFutureSetValue() {
+        assertEq(await this.m.testsuite.TestHelpers.addOneIfPresent(Promise.resolve(10)), 11);
+    }
+
     async testFutureRoundtripWithException() {
         var s = null;
         try {
@@ -69,7 +81,22 @@ class AsyncTest {
         } catch (e) {
             s = e.message;
         }
-        assertEq(s, "error");
+        assertEq(s, "C++: error");
+    }
+
+    async testReturnExceptionString_valid() {
+        const result = await this.module.testsuite.TestHelpers.returnExceptionString(Promise.reject(new Error("hello")));
+        assertTrue(result.startsWith("Error: hello"));
+    }
+
+    async testReturnExceptionString_null() {
+        const result = await this.module.testsuite.TestHelpers.returnExceptionString(Promise.reject(null));
+        assertEq(result, "JS promise rejected with non-error type");
+    }
+
+    async testReturnExceptionString_undefined() {
+        const result = await this.module.testsuite.TestHelpers.returnExceptionString(Promise.reject(undefined));
+        assertEq(result, "JS promise rejected with non-error type");
     }
 }
 
