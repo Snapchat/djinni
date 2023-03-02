@@ -510,7 +510,6 @@ For more informations, take a look at https://github.com/leetal/ios-cmake.
 ## Community Links
 
 * Join the discussion with other developers at the [Mobile C++ Slack Community](https://mobilecpp.herokuapp.com/)
-* There are a set of [tutorials](http://mobilecpptutorials.com/) for building a cross-platform app using Djinni.
 * [mx3](https://github.com/libmx3/mx3) is an example project demonstrating use of Djinni and other tools.
 * [Slides](https://bit.ly/djinnitalk) and [video](https://bit.ly/djinnivideo) from the CppCon 2014 talk where we introduced Djinni.
 * [Slides](https://bit.ly/djinnitalk2) and [video](https://bit.ly/djinnivideo2) from the CppCon 2015 about Djinni implementation techniques, and the addition of Python.
