@@ -564,6 +564,11 @@ namespace djinni
         }
     };
 
+    struct ByteBufferJniInfo {
+        const GlobalRef<jclass> clazz{ jniFindClass("java/nio/ByteBuffer") };
+        const jmethodID method_allocate{ jniGetStaticMethodID(clazz.get(), "allocate", "(I)Ljava/nio/ByteBuffer;") };
+    };
+
     // 
     template<typename CPP_PROTO, typename JAVA_PROTO, typename JAVA_SERIALIZER = GpbMessageLiteSerializer>
     class Protobuf {
@@ -607,12 +612,22 @@ namespace djinni
         {
             // Serialize to C++ vector
             std::vector<uint8_t> cppBuf(c.ByteSizeLong());
-            [[maybe_unused]]
-            bool success = c.SerializeToArray(cppBuf.data(), static_cast<int>(cppBuf.size()));
-            assert(success);
+            LocalRef<jobject> javaBuf;
 
-            // Wrap C++ vector as java.nio.ByteBuffer (no ownership)
-            auto javaBuf = LocalRef<jobject>(jniEnv, jniEnv->NewDirectByteBuffer(cppBuf.data(), cppBuf.size()));
+            if (cppBuf.size() > 0) {
+                [[maybe_unused]]
+                bool success = c.SerializeToArray(cppBuf.data(), static_cast<int>(cppBuf.size()));
+                assert(success);
+
+                // Wrap C++ vector as java.nio.ByteBuffer (no ownership)
+                javaBuf = LocalRef<jobject>(jniEnv, jniEnv->NewDirectByteBuffer(cppBuf.data(), cppBuf.size()));
+            } else {
+                // Can't have a zero-length DirectByteBuffer so use an empty Java array-backed ByteBuffer
+                const auto& byteBuffer = JniClass<ByteBufferJniInfo>::get();
+                javaBuf = LocalRef<jobject>(jniEnv, jniEnv->CallStaticObjectMethod(byteBuffer.clazz.get(), byteBuffer.method_allocate, 0));
+                jniExceptionCheck(jniEnv);
+            }
+
             // Then deserialize from ByteBuffer
             const auto& msgcls = JniClass<JAVA_SERIALIZER>::get();
             auto ret = msgcls.deserializeJavaProto(jniEnv, javaBuf.get(), JAVA_PROTO::name());

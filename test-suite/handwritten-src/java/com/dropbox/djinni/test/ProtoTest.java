@@ -25,6 +25,11 @@ public class ProtoTest extends TestCase {
         assertEquals(proto.getPeopleList().get(1).getName(), "jerry");
     }
 
+    public void testZeroSizeNativeToJava() {
+        AddressBook proto = ProtoTests.stringsToProto(new ArrayList<String>());
+        assertEquals(proto.getSerializedSize(), 0);
+    }
+
     public void testEmbeddedProto() {
         Person p = Person.newBuilder().setName("tom").setId(1).build();
         RecordWithEmbeddedProto rec = new RecordWithEmbeddedProto(p);
