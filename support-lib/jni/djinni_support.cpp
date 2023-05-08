@@ -121,6 +121,7 @@ void jniInit(JavaVM * jvm) {
     jclass classClass = env->GetObjectClass(ourClass);
     jmethodID getClassLoaderMethod = env->GetMethodID(classClass, "getClassLoader", "()Ljava/lang/ClassLoader;");
     jobject tmp = env->CallObjectMethod(ourClass, getClassLoaderMethod);
+    jniExceptionCheck(env);
     g_ourClassLoader = (jobject)env->NewGlobalRef(tmp);
 
     jclass classLoaderClass = env->FindClass("java/lang/ClassLoader");

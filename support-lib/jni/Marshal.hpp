@@ -712,7 +712,7 @@ namespace djinni
         {
             auto j = T::makePrimitiveArray(jniEnv, static_cast<jint>(c.size()));
             if (c.size() > 0) {
-                auto deleter = [jniEnv, j] (void* c) {if (c) {jniEnv->ReleasePrimitiveArrayCritical(j, c, JNI_ABORT);}};
+                auto deleter = [jniEnv, j] (void* c) {if (c) {jniEnv->ReleasePrimitiveArrayCritical(j, c, 0);}};
                 std::unique_ptr<EJniType, decltype(deleter)> ptr(
                     reinterpret_cast<EJniType*>(jniEnv->GetPrimitiveArrayCritical(j, nullptr)),
                     deleter);

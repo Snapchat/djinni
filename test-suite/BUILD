@@ -132,7 +132,7 @@ java_test(
         "@maven_djinni//:io_reactivex_rxjava2_rxjava",
         "@com_google_protobuf//java/core:core",
     ],
-    jvm_flags = ["-Ddjinni.native_libs_dirs=./test-suite/libdjinni-tests-jni.so"],
+    jvm_flags = ["-Ddjinni.native_libs_dirs=./test-suite/libdjinni-tests-jni.so", "-Xcheck:jni"],
 )
 
 macos_unit_test(

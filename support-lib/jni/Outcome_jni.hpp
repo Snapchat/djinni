@@ -53,6 +53,7 @@ public:
             return RESULT::Boxed::toCpp(jniEnv, reinterpret_cast<typename RESULT::Boxed::JniType>(r.get()));
         } else {
             auto e = LocalRef<jobject>(jniEnv, jniEnv->CallObjectMethod(j, outcomeJniInfo.method_error_or_null));
+            jniExceptionCheck(jniEnv);
             // if result is not present then error must be present, we can skip the present check
             return make_unexpected(ERROR::Boxed::toCpp(jniEnv, reinterpret_cast<typename ERROR::Boxed::JniType>(e.get())));
         }
