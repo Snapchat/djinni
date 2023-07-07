@@ -31,12 +31,13 @@ def djinni_deps():
         strip_prefix = "protobuf-{}".format(protobuf_version),
         sha256 = "512e5a674bf31f8b7928a64d8adf73ee67b8fe88339ad29adaa3b84dbaa570d8",
     )
+    rules_proto_version = "5.3.0-21.7"
     maybe(
         name = "rules_proto",
         repo_rule = http_archive,
         sha256 = "dc3fb206a2cb3441b485eb1e423165b231235a1ea9b031b4433cf7bc1fa460dd",
-        strip_prefix = "rules_proto-5.3.0-21.7",
-        url = "https://github.com/bazelbuild/rules_proto/archive/refs/tags/5.3.0-21.7.tar.gz"
+        strip_prefix = "rules_proto-{}".format(rules_proto_version),
+        url = "https://github.com/bazelbuild/rules_proto/archive/refs/tags/{}.tar.gz".format(rules_proto_version)
     )
     rules_jvm_external_tag = "3.0"
     maybe(
