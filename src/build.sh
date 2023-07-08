@@ -15,5 +15,5 @@ done
 base_dir=$(cd "$(dirname "$loc")" && pwd)
 
 pushd "$base_dir"
-${BAZEL_EXECUTABLE:-bazelisk} build //src:djinni --host_conlyopt=-std=c90
+${BAZEL_EXECUTABLE:-bazel} build //src:djinni --host_conlyopt=-std=c90
 popd

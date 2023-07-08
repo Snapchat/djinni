@@ -24,13 +24,13 @@ jobs:
             ${{ runner.os }}-${{ env.cache-name }}-master
 
       - name: Build
-        run: bazelisk build //src:djinni_deploy.jar
+        run: bazel build //src:djinni_deploy.jar
 
       - name: Generator
-        run: bazelisk build //generator:generator
+        run: bazel build //generator:generator
 
       - name: Test generator
-        run: bazelisk run //generator:generator -- --help
+        run: bazel run //generator:generator -- --help
 
       - name: Creating bat
         run: cp bazel-bin/generator/djinni bazel-bin/generator/djinni.bat
