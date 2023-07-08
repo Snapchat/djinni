@@ -25,14 +25,14 @@ jobs:
             ${{ runner.os }}-${{ env.cache-name }}-main
 
       - name: Build
-        run: bazel build //src:djinni
+        run: bazelisk build //src:djinni
 
       - name: Generate examples / check clean output
         run: ./ci/generate.sh
 
       - name: Test
-        run: bazel test --test_output=all //test-suite:djinni-java-tests  //test-suite:djinni-objc-tests
+        run: bazelisk test --test_output=all //test-suite:djinni-java-tests  //test-suite:djinni-objc-tests
 
       - name: External Test
         working-directory: external-test
-        run: bazel run @djinni//src:djinni -- --help
+        run: bazelisk run @djinni//src:djinni -- --help
