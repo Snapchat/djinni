@@ -2,9 +2,13 @@ load("@bazel_skylib//:workspace.bzl", "bazel_skylib_workspace")
 load("@io_bazel_rules_scala//scala:toolchains.bzl", "scala_register_toolchains")
 load("@io_bazel_rules_scala//scala:scala.bzl", "scala_repositories")
 load("@rules_jvm_external//:defs.bzl", "maven_install")
+load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
 
 def djinni_setup_deps():
     bazel_skylib_workspace()
+
+    rules_proto_dependencies()
+    rules_proto_toolchains()
 
     scala_register_toolchains()
     scala_repositories()

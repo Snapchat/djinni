@@ -1,4 +1,5 @@
 #include "DataRefTest.hpp"
+#include <algorithm>
 
 namespace testsuite {
 
