@@ -9,9 +9,10 @@ djinni_setup_deps()
 
 # --- Everything below is only used for examples and tests
 
-# android_sdk_repository fails to find build_tools if we don't explicitly set a version.
-android_sdk_repository(name = "androidsdk")
-android_ndk_repository(name = "androidndk", api_level = 21)
+load("//bzl:android_configure.bzl", "android_configure")
+android_configure(name = "local_config_android")
+load("@local_config_android//:android_configure.bzl", "android_workspace")
+android_workspace()
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
