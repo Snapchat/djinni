@@ -100,6 +100,7 @@ package object generatorTools {
                    jsIdentStyle: JsIdentStyle,
                    tsOutFolder: Option[File],
                    tsModule: String,
+                   allowInterfacesInRecords: Boolean,
                    outFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],
