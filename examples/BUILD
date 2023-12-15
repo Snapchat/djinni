@@ -53,7 +53,7 @@ android_library(
     srcs = glob(["handwritten-src/java/com/dropbox/textsort/*.java"]),
     custom_package = "com.dropbox.textsort",
     manifest = "android/app/src/main/AndroidManifest.xml",
-    resource_files = glob(["android/app/src/main/res/**"]),
+    resource_files = glob(["android/app/src/main/res/**"], exclude=["android/app/src/main/res/.DS_Store"]),
     deps = [":textsort-java",],
 )
 
