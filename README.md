@@ -26,7 +26,7 @@ to build and run Objective-C and Java tests.
 
 ### Building and running the mobile example apps
 
-You need to install the Android SDK 30.0.3 and the NDK 21.4.7075529. You need both `ANDROID_SDK_HOME` and `ANDROID_NDK_HOME` env variables set.
+You need to install the Android SDK 30.0.2 and the NDK 21.4.7075529. You need both `ANDROID_SDK_HOME` and `ANDROID_NDK_HOME` env variables set.
 The Android example app can be build with bazel: `bazel build //examples:android-app`, 
 and then install to a device with `adb install bazel-bin/examples/android-app.apk`
 
