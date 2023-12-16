@@ -66,6 +66,7 @@ verify the build and binary from the command line.
  - Local flags with `@flag` directive
  - DataView for copy free data passing
  - DateRef for copy free data passing with ownership
+ - Allows for not null interfaces references in records
  - Generating string names for C++ enums
  - Bug fixes
 
