@@ -221,10 +221,15 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
       writeCppTypeParams(w, params)
       w.w("struct " + actualSelf + cppFinal).bracedSemi {
         generateHppConstants(w, r.consts)
+
+        // Determine if optional parameters are required in the constructor
+        val requireOptionals = spec.cppConstructorRequireOptionals || r.derivingTypes.contains(DerivingType.Req)
+
         // Field definitions.
         for (f <- r.fields) {
           writeDoc(w, f.doc)
-          w.wl(marshal.fieldType(f.ty) + " " + idCpp.field(f.ident) + ";")
+          var optString = if (!requireOptionals && isOptional(f.ty.resolved)) " = std::nullopt" else ""
+          w.wl(marshal.fieldType(f.ty) + " " + idCpp.field(f.ident) + optString + ";")
         }
 
         if (r.derivingTypes.contains(DerivingType.Eq)) {
@@ -243,18 +248,28 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
           w.wl(s"friend bool operator>=(const $actualSelf& lhs, const $actualSelf& rhs);")
         }
 
-        // Constructor.
-        if(r.fields.nonEmpty) {
-          w.wl
-          if (r.fields.size == 1) {
-            w.wl("//NOLINTNEXTLINE(google-explicit-constructor)")
+        // Constructor generator
+        def writeConstructor(fields: Seq[Field])  {
+          if(fields.nonEmpty) {
+            w.wl
+            if (fields.size == 1) {
+              w.wl("//NOLINTNEXTLINE(google-explicit-constructor)")
+            }
+            writeAlignedCall(w, actualSelf + "(", fields, ")", f => marshal.fieldType(f.ty) + " " + idCpp.local(f.ident) + "_")
+            w.wl
+            val init = (f: Field) => idCpp.field(f.ident) + "(std::move(" + idCpp.local(f.ident) + "_))"
+            w.wl(": " + init(fields.head))
+            fields.tail.map(f => ", " + init(f)).foreach(w.wl)
+            w.wl("{}")
           }
-          writeAlignedCall(w, actualSelf + "(", r.fields, ")", f => marshal.fieldType(f.ty) + " " + idCpp.local(f.ident) + "_")
-          w.wl
-          val init = (f: Field) => idCpp.field(f.ident) + "(std::move(" + idCpp.local(f.ident) + "_))"
-          w.wl(": " + init(r.fields.head))
-          r.fields.tail.map(f => ", " + init(f)).foreach(w.wl)
-          w.wl("{}")
+        }
+
+        // First write constructor requiring optionals
+        writeConstructor(r.fields)
+
+        // Next write optional omitting constructor if necessary
+        if (!requireOptionals && r.reqFields.size != r.fields.size) {
+          writeConstructor(r.reqFields)
         }
 
         if (r.ext.cpp) {

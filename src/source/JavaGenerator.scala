@@ -274,28 +274,45 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
         w.wl
         generateJavaConstants(w, r.consts)
         // Field definitions.
+        var reqOptionals = spec.javaConstructorRequireOptionals || r.derivingTypes.contains(DerivingType.Req)
+
         for (f <- r.fields) {
+          var fieldFinal = if (reqOptionals || !isOptional(f.ty.resolved)) "final" else "/*optional*/"
           w.wl
-          w.wl(s"/*package*/ final ${marshal.fieldType(f.ty)} ${idJava.field(f.ident)};")
+          w.wl(s"/*package*/ ${fieldFinal} ${marshal.fieldType(f.ty)} ${idJava.field(f.ident)};")
         }
 
-        // Constructor.
-        w.wl
-        w.wl(s"public $self(").nestedN(2) {
-          val skipFirst = SkipFirst()
-          for (f <- r.fields) {
-            skipFirst { w.wl(",") }
-            marshal.nullityAnnotation(f.ty).map(annotation => w.w(annotation + " "))
-            w.w(marshal.paramType(f.ty) + " " + idJava.local(f.ident))
+        def writeConstructor(reqFields: Seq[Field], optFields: Seq[Field] = List.empty) {
+          w.wl
+          w.wl(s"public $self(").nestedN(2) {
+            val skipFirst = SkipFirst()
+            for (f <- reqFields) {
+              skipFirst { w.wl(",") }
+              marshal.nullityAnnotation(f.ty).map(annotation => w.w(annotation + " "))
+              w.w(marshal.paramType(f.ty) + " " + idJava.local(f.ident))
+            }
+            w.wl(") {")
           }
-          w.wl(") {")
-        }
-        w.nested {
-          for (f <- r.fields) {
-            w.wl(s"this.${idJava.field(f.ident)} = ${idJava.local(f.ident)};")
+          w.nested {
+            for (f <- reqFields) {
+              w.wl(s"this.${idJava.field(f.ident)} = ${idJava.local(f.ident)};")
+            }
+
+            // Explicitly initialize all optional fields to null
+            for (f <- optFields) {
+              w.wl(s"this.${idJava.field(f.ident)} = null;")
+            }
           }
+          w.wl("}")
         }
-        w.wl("}")
+
+        // Constructor, requiring all parameters
+        writeConstructor(r.fields)
+
+        // Constructor, not requiring optionals
+        if (!reqOptionals && r.fields.size != r.reqFields.size) {
+          writeConstructor(r.reqFields, r.fields.intersect(r.reqFields))
+        }
 
         // Accessors
         for (f <- r.fields) {
@@ -304,6 +321,14 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
           marshal.nullityAnnotation(f.ty).foreach(w.wl)
           w.w("public " + marshal.returnType(Some(f.ty)) + " " + idJava.method("get_" + f.ident.name) + "()").braced {
             w.wl("return " + idJava.field(f.ident) + ";")
+          }
+
+          // If the field is optional for the constructor, we need to write a setter
+          if (!reqOptionals && isOptional(f.ty.resolved)) {
+            w.wl
+            w.w("public void " + idJava.method("set_" + f.ident.name) + "(" + marshal.paramType(f.ty) + " " + idJava.local(f.ident) + ")").braced {
+              w.wl(s"this.${idJava.field(f.ident)} = ${idJava.local(f.ident)};")
+            }
           }
         }
 

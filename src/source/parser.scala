@@ -139,6 +139,7 @@ private object IdlParser extends RegexParsers {
       case "ord" => Record.DerivingType.Ord
       case "parcelable" => Record.DerivingType.AndroidParcelable
       case "nscopying" => Record.DerivingType.NSCopying
+      case "req" => Record.DerivingType.Req
       case _ => return err( s"""Unrecognized deriving type "${ident.name}"""")
     }).toSet
   }

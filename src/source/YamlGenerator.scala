@@ -124,6 +124,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
           case Record.DerivingType.Ord => "ord"
           case Record.DerivingType.AndroidParcelable => "parcelable"
           case Record.DerivingType.NSCopying => "nscopying"
+          case Record.DerivingType.Req => "req"
         }.mkString(" deriving(", ", ", ")")
       }
     }
