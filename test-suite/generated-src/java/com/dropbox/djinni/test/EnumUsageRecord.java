@@ -14,7 +14,7 @@ public class EnumUsageRecord implements android.os.Parcelable {
 
     /*package*/ final Color mE;
 
-    /*package*/ final Color mO;
+    /*package*/ /*optional*/ Color mO;
 
     /*package*/ final ArrayList<Color> mL;
 
@@ -35,6 +35,18 @@ public class EnumUsageRecord implements android.os.Parcelable {
         this.mM = m;
     }
 
+    public EnumUsageRecord(
+            @Nonnull Color e,
+            @Nonnull ArrayList<Color> l,
+            @Nonnull HashSet<Color> s,
+            @Nonnull HashMap<Color, Color> m) {
+        this(e,
+             null,
+             l,
+             s,
+             m);
+    }
+
     @Nonnull
     public Color getE() {
         return mE;
@@ -43,6 +55,10 @@ public class EnumUsageRecord implements android.os.Parcelable {
     @CheckForNull
     public Color getO() {
         return mO;
+    }
+
+    public void setO(Color o) {
+        this.mO = o;
     }
 
     @Nonnull

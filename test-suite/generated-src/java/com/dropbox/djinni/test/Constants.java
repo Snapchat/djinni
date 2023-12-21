@@ -75,8 +75,7 @@ public class Constants {
     public static final boolean DUMMY = false;
 
 
-    public Constants(
-            ) {
+    public Constants() {
     }
 
     @Override

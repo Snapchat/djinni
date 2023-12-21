@@ -228,8 +228,7 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
         // Field definitions.
         for (f <- r.fields) {
           writeDoc(w, f.doc)
-          var optString = if (!requireOptionals && isOptional(f.ty.resolved)) " = std::nullopt" else ""
-          w.wl(marshal.fieldType(f.ty) + " " + idCpp.field(f.ident) + optString + ";")
+          w.wl(marshal.fieldType(f.ty) + " " + idCpp.field(f.ident) + ";")
         }
 
         if (r.derivingTypes.contains(DerivingType.Eq)) {
@@ -250,21 +249,38 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
 
         // Constructor generator
         def writeConstructor(fields: Seq[Field])  {
-          if(fields.nonEmpty) {
+          // Only skip if there are no fields at all. If only optional
+          // fields exist, we should still create the trivial constructor
+          if(r.fields.nonEmpty) {
             w.wl
             if (fields.size == 1) {
               w.wl("//NOLINTNEXTLINE(google-explicit-constructor)")
             }
             writeAlignedCall(w, actualSelf + "(", fields, ")", f => marshal.fieldType(f.ty) + " " + idCpp.local(f.ident) + "_")
             w.wl
-            val init = (f: Field) => idCpp.field(f.ident) + "(std::move(" + idCpp.local(f.ident) + "_))"
-            w.wl(": " + init(fields.head))
-            fields.tail.map(f => ", " + init(f)).foreach(w.wl)
+            if (r.fields.size != fields.size) {
+              writeAlignedCall(w, ": " + actualSelf + "(", r.fields, ")", f => {
+                var param = idCpp.local(f.ident) + "_"
+                if (isOptional(f.ty.resolved))
+                  if (isInterface(f.ty.resolved.args.head)) 
+                    param = s"nullptr" 
+                  else 
+                    param = s"${spec.cppNulloptValue}"
+
+                param
+              })
+              w.wl
+            } else if (fields.nonEmpty) {
+              // required constructor
+              val init = (f: Field) => idCpp.field(f.ident) + "(std::move(" + idCpp.local(f.ident) + "_))"
+              w.wl(": " + init(r.fields.head))
+              r.fields.tail.map(f => ", " + init(f)).foreach(w.wl)
+            }
             w.wl("{}")
           }
         }
 
-        // First write constructor requiring optionals
+        // First write constructor requiring optionals, required for marshaling
         writeConstructor(r.fields)
 
         // Next write optional omitting constructor if necessary

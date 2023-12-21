@@ -13,11 +13,15 @@
 + (nonnull instancetype)clientReturnedRecordWithRecordId:(int64_t)recordId
                                                  content:(nonnull NSString *)content
                                                     misc:(nullable NSString *)misc;
+- (nonnull instancetype)initWithRecordId:(int64_t)recordId
+                                 content:(nonnull NSString *)content;
++ (nonnull instancetype)clientReturnedRecordWithRecordId:(int64_t)recordId
+                                                 content:(nonnull NSString *)content;
 
 @property (nonatomic, readonly) int64_t recordId;
 
 @property (nonatomic, readonly, nonnull) NSString * content;
 
-@property (nonatomic, readonly, nullable) NSString * misc;
+@property (nonatomic, nullable) NSString * misc;
 
 @end

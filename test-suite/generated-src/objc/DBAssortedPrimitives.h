@@ -34,6 +34,20 @@
                                      oSixtyfour:(nullable NSNumber *)oSixtyfour
                                     oFthirtytwo:(nullable NSNumber *)oFthirtytwo
                                     oFsixtyfour:(nullable NSNumber *)oFsixtyfour;
+- (nonnull instancetype)initWithB:(BOOL)b
+                            eight:(int8_t)eight
+                          sixteen:(int16_t)sixteen
+                        thirtytwo:(int32_t)thirtytwo
+                        sixtyfour:(int64_t)sixtyfour
+                       fthirtytwo:(float)fthirtytwo
+                       fsixtyfour:(double)fsixtyfour;
++ (nonnull instancetype)assortedPrimitivesWithB:(BOOL)b
+                                          eight:(int8_t)eight
+                                        sixteen:(int16_t)sixteen
+                                      thirtytwo:(int32_t)thirtytwo
+                                      sixtyfour:(int64_t)sixtyfour
+                                     fthirtytwo:(float)fthirtytwo
+                                     fsixtyfour:(double)fsixtyfour;
 
 @property (nonatomic, readonly) BOOL b;
 
@@ -49,18 +63,18 @@
 
 @property (nonatomic, readonly) double fsixtyfour;
 
-@property (nonatomic, readonly, nullable) NSNumber * oB;
+@property (nonatomic, nullable) NSNumber * oB;
 
-@property (nonatomic, readonly, nullable) NSNumber * oEight;
+@property (nonatomic, nullable) NSNumber * oEight;
 
-@property (nonatomic, readonly, nullable) NSNumber * oSixteen;
+@property (nonatomic, nullable) NSNumber * oSixteen;
 
-@property (nonatomic, readonly, nullable) NSNumber * oThirtytwo;
+@property (nonatomic, nullable) NSNumber * oThirtytwo;
 
-@property (nonatomic, readonly, nullable) NSNumber * oSixtyfour;
+@property (nonatomic, nullable) NSNumber * oSixtyfour;
 
-@property (nonatomic, readonly, nullable) NSNumber * oFthirtytwo;
+@property (nonatomic, nullable) NSNumber * oFthirtytwo;
 
-@property (nonatomic, readonly, nullable) NSNumber * oFsixtyfour;
+@property (nonatomic, nullable) NSNumber * oFsixtyfour;
 
 @end

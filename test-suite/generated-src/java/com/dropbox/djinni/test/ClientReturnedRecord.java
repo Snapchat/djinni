@@ -14,7 +14,7 @@ public class ClientReturnedRecord {
 
     /*package*/ final String mContent;
 
-    /*package*/ final String mMisc;
+    /*package*/ /*optional*/ String mMisc;
 
     public ClientReturnedRecord(
             long recordId,
@@ -23,6 +23,14 @@ public class ClientReturnedRecord {
         this.mRecordId = recordId;
         this.mContent = content;
         this.mMisc = misc;
+    }
+
+    public ClientReturnedRecord(
+            long recordId,
+            @Nonnull String content) {
+        this(recordId,
+             content,
+             null);
     }
 
     public long getRecordId() {
@@ -37,6 +45,10 @@ public class ClientReturnedRecord {
     @CheckForNull
     public String getMisc() {
         return mMisc;
+    }
+
+    public void setMisc(String misc) {
+        this.mMisc = misc;
     }
 
     @Override

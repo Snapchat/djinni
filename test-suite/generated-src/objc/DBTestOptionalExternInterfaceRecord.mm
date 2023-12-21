@@ -14,9 +14,14 @@
     return self;
 }
 
-+ (nonnull instancetype)testOptionalExternInterfaceRecordWithSampleInterface:(nullable DBSampleInterface *)sampleInterface
+- (nonnull instancetype)init
 {
-    return [[self alloc] initWithSampleInterface:sampleInterface];
+    self = [self initWithSampleInterface:nil];
+    return self;
+}
++ (nonnull instancetype)testOptionalExternInterfaceRecord
+{
+    return [[self alloc] init];
 }
 
 #ifndef DJINNI_DISABLE_DESCRIPTION_METHODS

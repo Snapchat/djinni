@@ -199,6 +199,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
     }
 
     val requireOptionals = spec.objcConstructorRequireOptionals || r.derivingTypes.contains(DerivingType.Req)
+    val shouldWriteFullConvenienceConstructor = !spec.objcOmitFullConvenienceConstructor || requireOptionals || r.fields.size == r.reqFields.size
 
     val firstInitializerArg = if(r.fields.isEmpty) "" else IdentStyle.camelUpper("with_" + r.fields.head.ident.name)
 
@@ -219,7 +220,8 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
         val decl = s"$sign (nonnull instancetype)$prefix$firstArg"
         writeAlignedObjcCall(w, decl, fields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
 
-        if (prefix == "init") {
+        // Only define the designated initializer for the main constructor
+        if (prefix == "init" && fields.size == r.fields.size) {
           w.wl(" NS_DESIGNATED_INITIALIZER;")
         } else {
           w.wl(";")
@@ -235,7 +237,11 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
 
       // First write the required initializer
       writeInitializer("-", "init", firstInitializerArg, r.fields)
-      if (!r.ext.objc && !spec.objcDisableClassCtor) writeInitializer("+", IdentStyle.camelLower(objcName), firstInitializerArg, r.fields)
+
+      // Next write the full convencience constructor if it is required
+      if (shouldWriteFullConvenienceConstructor) {
+        if (!r.ext.objc && !spec.objcDisableClassCtor) writeInitializer("+", IdentStyle.camelLower(objcName), firstInitializerArg, r.fields)
+      }
 
       // Next write an optional-omitting constructor if applicable
       if (!requireOptionals && r.fields.size != r.reqFields.size) {
@@ -305,25 +311,50 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
         w.wl
       }
 
+      def writeOptionalConstructor(reqFields: Seq[Field], fields: Seq[Field]) {
+        var init = s"- (nonnull instancetype)init$firstReqInitializerArg"
+        writeAlignedObjcCall(w, init, reqFields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
+        w.wl
+        w.braced {
+          val decl = s"self = [self init$firstInitializerArg"
+          writeAlignedObjcCall(w, decl, fields, "", f => {
+            (idObjc.field(f.ident), if (isOptional(f.ty.resolved)) "nil" else s"${idObjc.local(f.ident)}")
+          })
+          w.wl("];")
+          w.wl("return self;")
+        }
+      }
+
       // Constructor from all fields (not copying) (requiring all)
       writeConstructor(firstInitializerArg, r.fields)
 
       // Write constructor with optionals if necessary
       if (!requireOptionals && r.reqFields.size != r.fields.size) {
-        writeConstructor(firstReqInitializerArg, r.reqFields, r.fields.intersect(r.reqFields))
+        writeOptionalConstructor(r.reqFields, r.fields)
       }
 
       // Convenience initializer
+      // TODO: Need to add to this?
       if(!r.ext.objc && !spec.objcDisableClassCtor) {
-        val decl = s"+ (nonnull instancetype)${IdentStyle.camelLower(objcName)}$firstInitializerArg"
-        writeAlignedObjcCall(w, decl, r.fields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
-        w.wl
-        w.braced {
-          val call = s"return [[self alloc] init$firstInitializerArg"
-          writeAlignedObjcCall(w, call, r.fields, "", f => (idObjc.field(f.ident), s"${idObjc.local(f.ident)}"))
-          w.wl("];")
+        def writeConvenienceInitializer(firstInitArg: String, reqFields: Seq[Field]) = {
+          val decl = s"+ (nonnull instancetype)${IdentStyle.camelLower(objcName)}$firstInitArg"
+          writeAlignedObjcCall(w, decl, reqFields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
+          w.wl
+          w.braced {
+            val call = s"return [[self alloc] init$firstInitArg"
+            writeAlignedObjcCall(w, call, reqFields, "", f => (idObjc.field(f.ident), s"${idObjc.local(f.ident)}"))
+            w.wl("];")
+          }
+          w.wl
         }
-        w.wl
+
+        if (shouldWriteFullConvenienceConstructor) {
+          writeConvenienceInitializer(firstInitializerArg, r.fields)
+        }
+
+        if (!requireOptionals && r.reqFields.size != r.fields.size) {
+          writeConvenienceInitializer(firstReqInitializerArg, r.reqFields)
+        }
       }
 
       if (r.consts.nonEmpty) generateObjcConstants(w, r.consts, noBaseSelf, ObjcConstantType.ConstMethod)

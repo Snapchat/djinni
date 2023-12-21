@@ -13,8 +13,7 @@ public class ConstantWithEnum {
     public static final ConstantEnum CONST_ENUM = ConstantEnum.SOME_VALUE;
 
 
-    public ConstantWithEnum(
-            ) {
+    public ConstantWithEnum() {
     }
 
     @Override

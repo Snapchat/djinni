@@ -40,6 +40,30 @@
     return self;
 }
 
+- (nonnull instancetype)initWithB:(BOOL)b
+                            eight:(int8_t)eight
+                          sixteen:(int16_t)sixteen
+                        thirtytwo:(int32_t)thirtytwo
+                        sixtyfour:(int64_t)sixtyfour
+                       fthirtytwo:(float)fthirtytwo
+                       fsixtyfour:(double)fsixtyfour
+{
+    self = [self initWithB:b
+                     eight:eight
+                   sixteen:sixteen
+                 thirtytwo:thirtytwo
+                 sixtyfour:sixtyfour
+                fthirtytwo:fthirtytwo
+                fsixtyfour:fsixtyfour
+                        oB:nil
+                    oEight:nil
+                  oSixteen:nil
+                oThirtytwo:nil
+                oSixtyfour:nil
+               oFthirtytwo:nil
+               oFsixtyfour:nil];
+    return self;
+}
 + (nonnull instancetype)assortedPrimitivesWithB:(BOOL)b
                                           eight:(int8_t)eight
                                         sixteen:(int16_t)sixteen
@@ -69,6 +93,23 @@
                         oSixtyfour:oSixtyfour
                        oFthirtytwo:oFthirtytwo
                        oFsixtyfour:oFsixtyfour];
+}
+
++ (nonnull instancetype)assortedPrimitivesWithB:(BOOL)b
+                                          eight:(int8_t)eight
+                                        sixteen:(int16_t)sixteen
+                                      thirtytwo:(int32_t)thirtytwo
+                                      sixtyfour:(int64_t)sixtyfour
+                                     fthirtytwo:(float)fthirtytwo
+                                     fsixtyfour:(double)fsixtyfour
+{
+    return [[self alloc] initWithB:b
+                             eight:eight
+                           sixteen:sixteen
+                         thirtytwo:thirtytwo
+                         sixtyfour:sixtyfour
+                        fthirtytwo:fthirtytwo
+                        fsixtyfour:fsixtyfour];
 }
 
 - (BOOL)isEqual:(id)other

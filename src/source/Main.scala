@@ -35,6 +35,7 @@ object Main {
     var cppBaseLibIncludePrefix: String = ""
     var cppOptionalTemplate: String = "std::optional"
     var cppOptionalHeader: String = "<optional>"
+    var cppNulloptValue: String = "std::nullopt"
     var cppEnumHashWorkaround : Boolean = true
     var cppNnHeader: Option[String] = None
     var cppNnType: Option[String] = None
@@ -89,6 +90,7 @@ object Main {
     var objcFileIdentStyleOptional: Option[IdentConverter] = None
     var objcStrictProtocol: Boolean = true
     var objcConstructorRequireOptionals: Boolean = false
+    var objcOmitFullConvenienceConstructor: Boolean = false
     var objcppNamespace: String = "djinni_generated"
     var objcBaseLibIncludePrefix: String = ""
     var wasmOutFolder: Option[File] = None
@@ -167,6 +169,8 @@ object Main {
         .text("The template to use for optional values (default: \"std::optional\")")
       opt[String]("cpp-optional-header").valueName("<header>").foreach(x => cppOptionalHeader = x)
         .text("The header to use for optional values (default: \"<optional>\")")
+      opt[String]("cpp-nullopt-value").valueName("<value>").foreach(x => cppNulloptValue = x)
+        .text("The value to use for nullopt defaults of optional values (default: \"std::nullopt\")")
       opt[Boolean]("cpp-enum-hash-workaround").valueName("<true/false>").foreach(x => cppEnumHashWorkaround = x)
         .text("Work around LWG-2148 by generating std::hash specializations for C++ enums (default: true)")
       opt[String]("cpp-nn-header").valueName("<header>").foreach(x => cppNnHeader = Some(x))
@@ -220,6 +224,9 @@ object Main {
         .valueName("<true/false>").foreach(x => objcConstructorRequireOptionals = x)
         .text("Require optional parameters to be passed in the constructor for ObjC code (default: false)")
       note("")
+      opt[Boolean]("objc-omit-full-convenience-constructor")
+        .valueName("<omit-full-constructor>").foreach(x => objcOmitFullConvenienceConstructor = x)
+        .text("Skips generation of the convenience constructor requiring all record parameters, if possible (default: false)")
       opt[File]("objcpp-out").valueName("<out-folder>").foreach(x => objcppOutFolder = Some(x))
         .text("The output folder for private Objective-C++ files (Generator disabled if unspecified).")
       opt[String]("objcpp-ext").valueName("<ext>").foreach(objcppExt = _)
@@ -398,6 +405,7 @@ object Main {
       cppBaseLibIncludePrefix,
       cppOptionalTemplate,
       cppOptionalHeader,
+      cppNulloptValue,
       cppEnumHashWorkaround,
       cppNnHeader,
       cppNnType,
@@ -438,6 +446,7 @@ object Main {
       objcClosedEnums,
       objcStrictProtocol,
       objcConstructorRequireOptionals,
+      objcOmitFullConvenienceConstructor,
       wasmOutFolder,
       wasmIncludePrefix,
       wasmIncludeCppPrefix,
