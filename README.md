@@ -67,6 +67,7 @@ verify the build and binary from the command line.
  - DataView for copy free data passing
  - DateRef for copy free data passing with ownership
  - Generating string names for C++ enums
+ - Omit optional parameters from record constructors
  - Bug fixes
 
 ## Using new features
@@ -340,6 +341,35 @@ builtin `Promise` type (and therefore supports the `await` syntax).
 The C++ `Future` type has optional support for coroutines. If coroutines are
 availble (eg. compiling with C++20 or C++17 with -fcoroutines-ts), then you can
 use `co_await` on future objects.
+
+## Omitting Optionals from Record Constructors
+- By default, optionals will be omitted from the constructor in Djinni
+- The Djinni code generator will generate two constructors for a record with optionals: one with all values and one with optionals omitted. This will minimize code disruption
+- Optional behavior will be able to be switched via a usage flag for each platform. 
+- A new [deriving method](https://github.com/dropbox/djinni#derived-methods) specifier will be implemented so that individual records can still require all parameters
+
+### Compiler Flags
+The following compiler flags will require optionals in constructors for C++/ObjC/Java:
+```
+--cpp-constructor-require-optionals
+--java-constructor-require-optionals
+--objc-constructor-require-optionals
+```
+
+### Deriving Record
+Any record can be made to have all parameters be required by specifying it as a `req` deriving record:
+```
+MyClass = record {
+  required: string;
+  optional: optional<string>;
+} deriving(req)
+```
+
+### Omitting Convenience Constructors
+Extra convenience constructors which require all parameters can be removed from optional ObjC records with a new compiler flag:
+```
+--objc-omit-full-convenience-constructor
+```
 
 ## FAQ
 
