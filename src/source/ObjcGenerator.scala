@@ -327,7 +327,6 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       }
 
       // Convenience initializer
-      // TODO: Need to add to this?
       if(!r.ext.objc && !spec.objcDisableClassCtor) {
         def writeConvenienceInitializer(firstInitArg: String, reqFields: Seq[Field]) = {
           val decl = s"+ (nonnull instancetype)${IdentStyle.camelLower(objcName)}$firstInitArg"
