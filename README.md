@@ -348,14 +348,6 @@ use `co_await` on future objects.
 - Optional behavior will be able to be switched via a usage flag for each platform. 
 - A new [deriving method](https://github.com/dropbox/djinni#derived-methods) specifier will be implemented so that individual records can still require all parameters
 
-### Compiler Flags
-The following compiler flags will require optionals in constructors for C++/ObjC/Java:
-```
---cpp-constructor-require-optionals
---java-constructor-require-optionals
---objc-constructor-require-optionals
-```
-
 ### Deriving Record
 Any record can be made to have all parameters be required by specifying it as a `req` deriving record:
 ```
@@ -370,6 +362,17 @@ Extra convenience constructors which require all parameters can be removed from 
 ```
 --objc-omit-full-convenience-constructor
 ```
+
+## Reverting to Legacy Record Behavior
+Djinni records are now mutable and do not require optionals in reocrd constructors by default. In order to reverse this behavior and make Java and ObjC records immutable with full constructors only, the following generation flags can be used:
+
+```
+--cpp-legacy-records
+--java-legacy-records
+--objc-legacy-records
+```
+
+Note that for C++, the legacy flag will only remove the optional-omitting constructor. Records were already mutable within C++.
 
 ## FAQ
 

@@ -12,9 +12,9 @@
 + (nonnull instancetype)recordWithNestedDerivingsWithKey:(int32_t)key
                                                      rec:(nonnull DBRecordWithDerivings *)rec;
 
-@property (nonatomic, readonly) int32_t key;
+@property (nonatomic) int32_t key;
 
-@property (nonatomic, readonly, nonnull) DBRecordWithDerivings * rec;
+@property (nonatomic, nonnull) DBRecordWithDerivings * rec;
 
 - (NSComparisonResult)compare:(nonnull DBRecordWithNestedDerivings *)other;
 

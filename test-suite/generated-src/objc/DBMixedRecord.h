@@ -24,10 +24,10 @@
 
 @property (nonatomic, nullable) DBOptionalInterface * interfaceVal;
 
-@property (nonatomic, readonly) int32_t reqInt;
+@property (nonatomic) int32_t reqInt;
 
 @property (nonatomic, nullable) DBBaseRecord * optRecord;
 
-@property (nonatomic, readonly, nonnull) DBBaseRecord * reqRecord;
+@property (nonatomic, nonnull) DBBaseRecord * reqRecord;
 
 @end

@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 public class MapDateRecord {
 
 
-    /*package*/ final HashMap<String, java.util.Date> mDatesById;
+    /*package*/ HashMap<String, java.util.Date> mDatesById;
 
     public MapDateRecord(
             @Nonnull HashMap<String, java.util.Date> datesById) {
@@ -20,6 +20,10 @@ public class MapDateRecord {
     @Nonnull
     public HashMap<String, java.util.Date> getDatesById() {
         return mDatesById;
+    }
+
+    public void setDatesById(HashMap<String, java.util.Date> datesById) {
+        this.mDatesById = datesById;
     }
 
     @Override

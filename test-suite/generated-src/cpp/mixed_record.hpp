@@ -33,9 +33,9 @@ struct MixedRecord final {
     MixedRecord(int32_t reqInt_,
                 BaseRecord reqRecord_)
     : MixedRecord(nullptr,
-                  reqInt_,
+                  std::move(reqInt_),
                   std::experimental::nullopt,
-                  reqRecord_)
+                  std::move(reqRecord_))
     {}
 };
 

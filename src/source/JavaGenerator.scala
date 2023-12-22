@@ -274,12 +274,12 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
         w.wl
         generateJavaConstants(w, r.consts)
         // Field definitions.
-        val requireOptionals = spec.javaConstructorRequireOptionals || r.derivingTypes.contains(DerivingType.Req)
+        val requireOptionals = spec.javaLegacyRecords || r.derivingTypes.contains(DerivingType.Req)
 
         for (f <- r.fields) {
-          var fieldFinal = if (requireOptionals || !isOptional(f.ty.resolved)) "final" else "/*optional*/"
+          var fieldFinal = if (spec.javaLegacyRecords) "final " else if (requireOptionals || !isOptional(f.ty.resolved)) "" else "/*optional*/ "
           w.wl
-          w.wl(s"/*package*/ ${fieldFinal} ${marshal.fieldType(f.ty)} ${idJava.field(f.ident)};")
+          w.wl(s"/*package*/ ${fieldFinal}${marshal.fieldType(f.ty)} ${idJava.field(f.ident)};")
         }
 
         def writeConstructor(reqFields: Seq[Field]) {
@@ -327,8 +327,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
             w.wl("return " + idJava.field(f.ident) + ";")
           }
 
-          // If the field is optional for the constructor, we need to write a setter
-          if (!requireOptionals && isOptional(f.ty.resolved)) {
+          if (!spec.javaLegacyRecords) {
             w.wl
             w.w("public void " + idJava.method("set_" + f.ident.name) + "(" + marshal.paramType(f.ty) + " " + idJava.local(f.ident) + ")").braced {
               w.wl(s"this.${idJava.field(f.ident)} = ${idJava.local(f.ident)};")

@@ -10,9 +10,9 @@ import javax.annotation.Nonnull;
 public class ConstantRecord {
 
 
-    /*package*/ final int mSomeInteger;
+    /*package*/ int mSomeInteger;
 
-    /*package*/ final String mSomeString;
+    /*package*/ String mSomeString;
 
     public ConstantRecord(
             int someInteger,
@@ -25,9 +25,17 @@ public class ConstantRecord {
         return mSomeInteger;
     }
 
+    public void setSomeInteger(int someInteger) {
+        this.mSomeInteger = someInteger;
+    }
+
     @Nonnull
     public String getSomeString() {
         return mSomeString;
+    }
+
+    public void setSomeString(String someString) {
+        this.mSomeString = someString;
     }
 
     @Override

@@ -16,12 +16,12 @@
                                           reqInt:(int32_t)reqInt
                                        optDouble:(nullable NSNumber *)optDouble;
 
-@property (nonatomic, readonly, nullable) NSNumber * optInt;
+@property (nonatomic, nullable) NSNumber * optInt;
 
-@property (nonatomic, readonly, nullable) NSNumber * optFloat;
+@property (nonatomic, nullable) NSNumber * optFloat;
 
-@property (nonatomic, readonly) int32_t reqInt;
+@property (nonatomic) int32_t reqInt;
 
-@property (nonatomic, readonly, nullable) NSNumber * optDouble;
+@property (nonatomic, nullable) NSNumber * optDouble;
 
 @end

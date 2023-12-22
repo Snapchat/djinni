@@ -14,7 +14,7 @@ public class RecordUsingExtendedRecord {
             false /* mFoo */ ) /* mEr */ );
 
 
-    /*package*/ final ExtendedRecord mEr;
+    /*package*/ ExtendedRecord mEr;
 
     public RecordUsingExtendedRecord(
             @Nonnull ExtendedRecord er) {
@@ -24,6 +24,10 @@ public class RecordUsingExtendedRecord {
     @Nonnull
     public ExtendedRecord getEr() {
         return mEr;
+    }
+
+    public void setEr(ExtendedRecord er) {
+        this.mEr = er;
     }
 
     @Override

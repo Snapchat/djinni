@@ -10,6 +10,6 @@
 - (nonnull instancetype)initWithVal:(int32_t)val NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)baseRecordWithVal:(int32_t)val;
 
-@property (nonatomic, readonly) int32_t val;
+@property (nonatomic) int32_t val;
 
 @end

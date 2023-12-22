@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 public class RecordWithEmbeddedCppProto {
 
 
-    /*package*/ final PersistingState mState;
+    /*package*/ PersistingState mState;
 
     public RecordWithEmbeddedCppProto(
             @Nonnull PersistingState state) {
@@ -20,6 +20,10 @@ public class RecordWithEmbeddedCppProto {
     @Nonnull
     public PersistingState getState() {
         return mState;
+    }
+
+    public void setState(PersistingState state) {
+        this.mState = state;
     }
 
     @Override

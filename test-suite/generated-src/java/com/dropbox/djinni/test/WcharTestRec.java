@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 public class WcharTestRec {
 
 
-    /*package*/ final String mS;
+    /*package*/ String mS;
 
     public WcharTestRec(
             @Nonnull String s) {
@@ -19,6 +19,10 @@ public class WcharTestRec {
     @Nonnull
     public String getS() {
         return mS;
+    }
+
+    public void setS(String s) {
+        this.mS = s;
     }
 
     @Override

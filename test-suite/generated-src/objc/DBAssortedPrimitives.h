@@ -49,19 +49,19 @@
                                      fthirtytwo:(float)fthirtytwo
                                      fsixtyfour:(double)fsixtyfour;
 
-@property (nonatomic, readonly) BOOL b;
+@property (nonatomic) BOOL b;
 
-@property (nonatomic, readonly) int8_t eight;
+@property (nonatomic) int8_t eight;
 
-@property (nonatomic, readonly) int16_t sixteen;
+@property (nonatomic) int16_t sixteen;
 
-@property (nonatomic, readonly) int32_t thirtytwo;
+@property (nonatomic) int32_t thirtytwo;
 
-@property (nonatomic, readonly) int64_t sixtyfour;
+@property (nonatomic) int64_t sixtyfour;
 
-@property (nonatomic, readonly) float fthirtytwo;
+@property (nonatomic) float fthirtytwo;
 
-@property (nonatomic, readonly) double fsixtyfour;
+@property (nonatomic) double fsixtyfour;
 
 @property (nonatomic, nullable) NSNumber * oB;
 

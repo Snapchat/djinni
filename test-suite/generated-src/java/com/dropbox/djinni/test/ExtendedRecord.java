@@ -14,7 +14,7 @@ public class ExtendedRecord {
         true /* mFoo */ );
 
 
-    /*package*/ final boolean mFoo;
+    /*package*/ boolean mFoo;
 
     public ExtendedRecord(
             boolean foo) {
@@ -23,6 +23,10 @@ public class ExtendedRecord {
 
     public boolean getFoo() {
         return mFoo;
+    }
+
+    public void setFoo(boolean foo) {
+        this.mFoo = foo;
     }
 
     @Override

@@ -18,10 +18,10 @@
 + (nonnull instancetype)clientReturnedRecordWithRecordId:(int64_t)recordId
                                                  content:(nonnull NSString *)content;
 
-@property (nonatomic, readonly) int64_t recordId;
+@property (nonatomic) int64_t recordId;
 
-@property (nonatomic, readonly, nonnull) NSString * content;
+@property (nonatomic, copy, nonnull) NSString * content;
 
-@property (nonatomic, nullable) NSString * misc;
+@property (nonatomic, copy, nullable) NSString * misc;
 
 @end

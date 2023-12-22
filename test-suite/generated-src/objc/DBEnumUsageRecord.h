@@ -26,14 +26,14 @@
                                            s:(nonnull NSSet<NSNumber *> *)s
                                            m:(nonnull NSDictionary<NSNumber *, NSNumber *> *)m;
 
-@property (nonatomic, readonly) DBColor e;
+@property (nonatomic) DBColor e;
 
 @property (nonatomic, nullable) NSNumber * o;
 
-@property (nonatomic, readonly, nonnull) NSArray<NSNumber *> * l;
+@property (nonatomic, copy, nonnull) NSArray<NSNumber *> * l;
 
-@property (nonatomic, readonly, nonnull) NSSet<NSNumber *> * s;
+@property (nonatomic, copy, nonnull) NSSet<NSNumber *> * s;
 
-@property (nonatomic, readonly, nonnull) NSDictionary<NSNumber *, NSNumber *> * m;
+@property (nonatomic, copy, nonnull) NSDictionary<NSNumber *, NSNumber *> * m;
 
 @end

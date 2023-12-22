@@ -223,7 +223,7 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
         generateHppConstants(w, r.consts)
 
         // Determine if optional parameters are required in the constructor
-        val requireOptionals = spec.cppConstructorRequireOptionals || r.derivingTypes.contains(DerivingType.Req)
+        val requireOptionals = spec.cppLegacyRecords || r.derivingTypes.contains(DerivingType.Req)
 
         // Field definitions.
         for (f <- r.fields) {
@@ -260,7 +260,7 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
             w.wl
             if (r.fields.size != fields.size) {
               writeAlignedCall(w, ": " + actualSelf + "(", r.fields, ")", f => {
-                var param = idCpp.local(f.ident) + "_"
+                var param = "std::move(" + idCpp.local(f.ident) + "_)"
                 if (isOptional(f.ty.resolved))
                   if (isInterface(f.ty.resolved.args.head)) 
                     param = s"nullptr" 

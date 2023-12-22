@@ -10,13 +10,13 @@ import javax.annotation.Nonnull;
 public class OverrideRecord {
 
 
-    /*package*/ final Integer mOptInt;
+    /*package*/ Integer mOptInt;
 
-    /*package*/ final Float mOptFloat;
+    /*package*/ Float mOptFloat;
 
-    /*package*/ final int mReqInt;
+    /*package*/ int mReqInt;
 
-    /*package*/ final Double mOptDouble;
+    /*package*/ Double mOptDouble;
 
     public OverrideRecord(
             @CheckForNull Integer optInt,
@@ -34,18 +34,34 @@ public class OverrideRecord {
         return mOptInt;
     }
 
+    public void setOptInt(Integer optInt) {
+        this.mOptInt = optInt;
+    }
+
     @CheckForNull
     public Float getOptFloat() {
         return mOptFloat;
+    }
+
+    public void setOptFloat(Float optFloat) {
+        this.mOptFloat = optFloat;
     }
 
     public int getReqInt() {
         return mReqInt;
     }
 
+    public void setReqInt(int reqInt) {
+        this.mReqInt = reqInt;
+    }
+
     @CheckForNull
     public Double getOptDouble() {
         return mOptDouble;
+    }
+
+    public void setOptDouble(Double optDouble) {
+        this.mOptDouble = optDouble;
     }
 
     @Override

@@ -9,6 +9,6 @@
 - (nonnull instancetype)initWithList:(nonnull NSArray<NSNumber *> *)list NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)primitiveListWithList:(nonnull NSArray<NSNumber *> *)list;
 
-@property (nonatomic, readonly, nonnull) NSArray<NSNumber *> * list;
+@property (nonatomic, copy, nonnull) NSArray<NSNumber *> * list;
 
 @end

@@ -15,9 +15,9 @@ public class NativeTestIdentRecord {
     public static final int XXXWEIRD_CASE = 1;
 
 
-    /*package*/ final int mFirstValue;
+    /*package*/ int mFirstValue;
 
-    /*package*/ final String mSecondValue;
+    /*package*/ String mSecondValue;
 
     public NativeTestIdentRecord(
             int FirstValue,
@@ -30,9 +30,17 @@ public class NativeTestIdentRecord {
         return mFirstValue;
     }
 
+    public void setFirstValue(int FirstValue) {
+        this.mFirstValue = FirstValue;
+    }
+
     @Nonnull
     public String getSecondValue() {
         return mSecondValue;
+    }
+
+    public void setSecondValue(String secondValue) {
+        this.mSecondValue = secondValue;
     }
 
     @Override

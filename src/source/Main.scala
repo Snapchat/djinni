@@ -41,7 +41,7 @@ object Main {
     var cppNnType: Option[String] = None
     var cppNnCheckExpression: Option[String] = None
     var cppUseWideStrings: Boolean = false
-    var cppConstructorRequireOptionals: Boolean = false
+    var cppLegacyRecords: Boolean = false
     var javaOutFolder: Option[File] = None
     var javaPackage: Option[String] = None
     var javaClassAccessModifier: JavaAccessModifier.Value = JavaAccessModifier.Public
@@ -51,7 +51,7 @@ object Main {
     var javaNonnullAnnotation: Option[String] = None
     var javaImplementAndroidOsParcelable : Boolean = false
     var javaUseFinalForRecord: Boolean = true
-    var javaConstructorRequireOptionals: Boolean = false
+    var javaLegacyRecords: Boolean = false
     var javaGenInterface: Boolean = false
     var jniOutFolder: Option[File] = None
     var jniHeaderOutFolderOptional: Option[File] = None
@@ -89,7 +89,7 @@ object Main {
     var objcppDisableExceptionTranslation: Boolean = false
     var objcFileIdentStyleOptional: Option[IdentConverter] = None
     var objcStrictProtocol: Boolean = true
-    var objcConstructorRequireOptionals: Boolean = false
+    var objcLegacyRecords: Boolean = false
     var objcOmitFullConvenienceConstructor: Boolean = false
     var objcppNamespace: String = "djinni_generated"
     var objcBaseLibIncludePrefix: String = ""
@@ -146,8 +146,8 @@ object Main {
         .text("all generated java classes will implement the interface android.os.Parcelable")
       opt[Boolean]("java-use-final-for-record").valueName("<use-final-for-record>").foreach(x => javaUseFinalForRecord = x)
         .text("Whether generated Java classes for records should be marked 'final' (default: true). ")
-      opt[Boolean]("java-constructor-require-optionals").valueName("<constructor-require-optionals>").foreach(x => javaConstructorRequireOptionals = x)
-        .text("Require optional parameters to be passed in the constructor for Java code (default: false)")
+      opt[Boolean]("java-legacy-records").valueName("<legacy-records>").foreach(x => javaLegacyRecords = x)
+        .text("Use legacy record behavior for Java code (default: false)")
       opt[Boolean]("java-gen-interface").valueName("<true/false>").foreach(x => javaGenInterface = x)
         .text("Generate Java interface instead of abstract class.")
       note("")
@@ -181,8 +181,8 @@ object Main {
         .text("The expression to use for building non-nullable pointers")
       opt[Boolean]( "cpp-use-wide-strings").valueName("<true/false>").foreach(x => cppUseWideStrings = x)
         .text("Use wide strings in C++ code (default: false)")
-      opt[Boolean]( "cpp-constructor-require-optionals").valueName("<true/false>").foreach(x => cppConstructorRequireOptionals = x)
-        .text("Require optional parameters to be passed in the constructor for C++ code (default: false)")
+      opt[Boolean]( "cpp-legacy-records").valueName("<true/false>").foreach(x => cppLegacyRecords = x)
+        .text("Use legacy record behavior for C++ code (default: false)")
       note("")
       opt[File]("jni-out").valueName("<out-folder>").foreach(x => jniOutFolder = Some(x))
         .text("The folder for the JNI C++ output files (Generator disabled if unspecified).")
@@ -220,9 +220,9 @@ object Main {
       opt[Boolean]("objc-strict-protocols")
         .valueName("<true/false>").foreach(x => objcStrictProtocol = x)
         .text("All generated @protocol will implement <NSObject> (default: true). ")
-      opt[Boolean]("objc-constructor-require-optionals")
-        .valueName("<true/false>").foreach(x => objcConstructorRequireOptionals = x)
-        .text("Require optional parameters to be passed in the constructor for ObjC code (default: false)")
+      opt[Boolean]("objc-legacy-records")
+        .valueName("<true/false>").foreach(x => objcLegacyRecords = x)
+        .text("Use legacy record behavior for ObjC code (default: false)")
       note("")
       opt[Boolean]("objc-omit-full-convenience-constructor")
         .valueName("<omit-full-constructor>").foreach(x => objcOmitFullConvenienceConstructor = x)
@@ -394,7 +394,7 @@ object Main {
       javaImplementAndroidOsParcelable,
       javaUseFinalForRecord,
       javaGenInterface,
-      javaConstructorRequireOptionals,
+      javaLegacyRecords,
       cppOutFolder,
       cppHeaderOutFolder,
       cppIncludePrefix,
@@ -411,7 +411,7 @@ object Main {
       cppNnType,
       cppNnCheckExpression,
       cppUseWideStrings,
-      cppConstructorRequireOptionals,
+      cppLegacyRecords,
       jniOutFolder,
       jniHeaderOutFolder,
       jniIncludePrefix,
@@ -445,7 +445,7 @@ object Main {
       objcDisableClassCtor,
       objcClosedEnums,
       objcStrictProtocol,
-      objcConstructorRequireOptionals,
+      objcLegacyRecords,
       objcOmitFullConvenienceConstructor,
       wasmOutFolder,
       wasmIncludePrefix,

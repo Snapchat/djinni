@@ -12,15 +12,15 @@ import javax.annotation.Nonnull;
 public class EnumUsageRecord implements android.os.Parcelable {
 
 
-    /*package*/ final Color mE;
+    /*package*/ Color mE;
 
     /*package*/ /*optional*/ Color mO;
 
-    /*package*/ final ArrayList<Color> mL;
+    /*package*/ ArrayList<Color> mL;
 
-    /*package*/ final HashSet<Color> mS;
+    /*package*/ HashSet<Color> mS;
 
-    /*package*/ final HashMap<Color, Color> mM;
+    /*package*/ HashMap<Color, Color> mM;
 
     public EnumUsageRecord(
             @Nonnull Color e,
@@ -52,6 +52,10 @@ public class EnumUsageRecord implements android.os.Parcelable {
         return mE;
     }
 
+    public void setE(Color e) {
+        this.mE = e;
+    }
+
     @CheckForNull
     public Color getO() {
         return mO;
@@ -66,14 +70,26 @@ public class EnumUsageRecord implements android.os.Parcelable {
         return mL;
     }
 
+    public void setL(ArrayList<Color> l) {
+        this.mL = l;
+    }
+
     @Nonnull
     public HashSet<Color> getS() {
         return mS;
     }
 
+    public void setS(HashSet<Color> s) {
+        this.mS = s;
+    }
+
     @Nonnull
     public HashMap<Color, Color> getM() {
         return mM;
+    }
+
+    public void setM(HashMap<Color, Color> m) {
+        this.mM = m;
     }
 
     @Override

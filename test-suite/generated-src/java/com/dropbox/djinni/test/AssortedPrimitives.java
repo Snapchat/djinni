@@ -9,19 +9,19 @@ import javax.annotation.Nonnull;
 public class AssortedPrimitives implements android.os.Parcelable {
 
 
-    /*package*/ final boolean mB;
+    /*package*/ boolean mB;
 
-    /*package*/ final byte mEight;
+    /*package*/ byte mEight;
 
-    /*package*/ final short mSixteen;
+    /*package*/ short mSixteen;
 
-    /*package*/ final int mThirtytwo;
+    /*package*/ int mThirtytwo;
 
-    /*package*/ final long mSixtyfour;
+    /*package*/ long mSixtyfour;
 
-    /*package*/ final float mFthirtytwo;
+    /*package*/ float mFthirtytwo;
 
-    /*package*/ final double mFsixtyfour;
+    /*package*/ double mFsixtyfour;
 
     /*package*/ /*optional*/ Boolean mOB;
 
@@ -96,28 +96,56 @@ public class AssortedPrimitives implements android.os.Parcelable {
         return mB;
     }
 
+    public void setB(boolean b) {
+        this.mB = b;
+    }
+
     public byte getEight() {
         return mEight;
+    }
+
+    public void setEight(byte eight) {
+        this.mEight = eight;
     }
 
     public short getSixteen() {
         return mSixteen;
     }
 
+    public void setSixteen(short sixteen) {
+        this.mSixteen = sixteen;
+    }
+
     public int getThirtytwo() {
         return mThirtytwo;
+    }
+
+    public void setThirtytwo(int thirtytwo) {
+        this.mThirtytwo = thirtytwo;
     }
 
     public long getSixtyfour() {
         return mSixtyfour;
     }
 
+    public void setSixtyfour(long sixtyfour) {
+        this.mSixtyfour = sixtyfour;
+    }
+
     public float getFthirtytwo() {
         return mFthirtytwo;
     }
 
+    public void setFthirtytwo(float fthirtytwo) {
+        this.mFthirtytwo = fthirtytwo;
+    }
+
     public double getFsixtyfour() {
         return mFsixtyfour;
+    }
+
+    public void setFsixtyfour(double fsixtyfour) {
+        this.mFsixtyfour = fsixtyfour;
     }
 
     @CheckForNull

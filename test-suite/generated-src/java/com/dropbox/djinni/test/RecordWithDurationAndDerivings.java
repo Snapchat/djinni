@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 public class RecordWithDurationAndDerivings implements Comparable<RecordWithDurationAndDerivings> {
 
 
-    /*package*/ final java.time.Duration mDt;
+    /*package*/ java.time.Duration mDt;
 
     public RecordWithDurationAndDerivings(
             @Nonnull java.time.Duration dt) {
@@ -19,6 +19,10 @@ public class RecordWithDurationAndDerivings implements Comparable<RecordWithDura
     @Nonnull
     public java.time.Duration getDt() {
         return mDt;
+    }
+
+    public void setDt(java.time.Duration dt) {
+        this.mDt = dt;
     }
 
     @Override

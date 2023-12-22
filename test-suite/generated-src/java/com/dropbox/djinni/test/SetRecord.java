@@ -10,9 +10,9 @@ import javax.annotation.Nonnull;
 public class SetRecord {
 
 
-    /*package*/ final HashSet<String> mSet;
+    /*package*/ HashSet<String> mSet;
 
-    /*package*/ final HashSet<Integer> mIset;
+    /*package*/ HashSet<Integer> mIset;
 
     public SetRecord(
             @Nonnull HashSet<String> set,
@@ -26,9 +26,17 @@ public class SetRecord {
         return mSet;
     }
 
+    public void setSet(HashSet<String> set) {
+        this.mSet = set;
+    }
+
     @Nonnull
     public HashSet<Integer> getIset() {
         return mIset;
+    }
+
+    public void setIset(HashSet<Integer> iset) {
+        this.mIset = iset;
     }
 
     @Override

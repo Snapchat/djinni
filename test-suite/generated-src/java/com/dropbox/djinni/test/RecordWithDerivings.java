@@ -10,21 +10,21 @@ import javax.annotation.Nonnull;
 public class RecordWithDerivings implements Comparable<RecordWithDerivings> {
 
 
-    /*package*/ final byte mEight;
+    /*package*/ byte mEight;
 
-    /*package*/ final short mSixteen;
+    /*package*/ short mSixteen;
 
-    /*package*/ final int mThirtytwo;
+    /*package*/ int mThirtytwo;
 
-    /*package*/ final long mSixtyfour;
+    /*package*/ long mSixtyfour;
 
-    /*package*/ final float mFthirtytwo;
+    /*package*/ float mFthirtytwo;
 
-    /*package*/ final double mFsixtyfour;
+    /*package*/ double mFsixtyfour;
 
-    /*package*/ final Date mD;
+    /*package*/ Date mD;
 
-    /*package*/ final String mS;
+    /*package*/ String mS;
 
     public RecordWithDerivings(
             byte eight,
@@ -49,24 +49,48 @@ public class RecordWithDerivings implements Comparable<RecordWithDerivings> {
         return mEight;
     }
 
+    public void setEight(byte eight) {
+        this.mEight = eight;
+    }
+
     public short getSixteen() {
         return mSixteen;
+    }
+
+    public void setSixteen(short sixteen) {
+        this.mSixteen = sixteen;
     }
 
     public int getThirtytwo() {
         return mThirtytwo;
     }
 
+    public void setThirtytwo(int thirtytwo) {
+        this.mThirtytwo = thirtytwo;
+    }
+
     public long getSixtyfour() {
         return mSixtyfour;
+    }
+
+    public void setSixtyfour(long sixtyfour) {
+        this.mSixtyfour = sixtyfour;
     }
 
     public float getFthirtytwo() {
         return mFthirtytwo;
     }
 
+    public void setFthirtytwo(float fthirtytwo) {
+        this.mFthirtytwo = fthirtytwo;
+    }
+
     public double getFsixtyfour() {
         return mFsixtyfour;
+    }
+
+    public void setFsixtyfour(double fsixtyfour) {
+        this.mFsixtyfour = fsixtyfour;
     }
 
     @Nonnull
@@ -74,9 +98,17 @@ public class RecordWithDerivings implements Comparable<RecordWithDerivings> {
         return mD;
     }
 
+    public void setD(Date d) {
+        this.mD = d;
+    }
+
     @Nonnull
     public String getS() {
         return mS;
+    }
+
+    public void setS(String s) {
+        this.mS = s;
     }
 
     @Override

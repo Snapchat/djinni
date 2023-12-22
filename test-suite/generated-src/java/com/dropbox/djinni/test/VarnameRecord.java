@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 public class VarnameRecord {
 
 
-    /*package*/ final byte mField;
+    /*package*/ byte mField;
 
     public VarnameRecord(
             byte Field) {
@@ -23,6 +23,10 @@ public class VarnameRecord {
 
     public byte getField() {
         return mField;
+    }
+
+    public void setField(byte Field) {
+        this.mField = Field;
     }
 
     @Override

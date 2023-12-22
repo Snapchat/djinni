@@ -26,8 +26,8 @@ struct ClientReturnedRecord final {
 
     ClientReturnedRecord(int64_t record_id_,
                          std::string content_)
-    : ClientReturnedRecord(record_id_,
-                           content_,
+    : ClientReturnedRecord(std::move(record_id_),
+                           std::move(content_),
                            std::experimental::nullopt)
     {}
 };

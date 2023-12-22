@@ -198,7 +198,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       case _ => false
     }
 
-    val requireOptionals = spec.objcConstructorRequireOptionals || r.derivingTypes.contains(DerivingType.Req)
+    val requireOptionals = spec.objcLegacyRecords || r.derivingTypes.contains(DerivingType.Req)
     val shouldWriteFullConvenienceConstructor = !spec.objcOmitFullConvenienceConstructor || requireOptionals || r.fields.size == r.reqFields.size
 
     val firstInitializerArg = if(r.fields.isEmpty) "" else IdentStyle.camelUpper("with_" + r.fields.head.ident.name)
@@ -259,7 +259,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
         w.wl
         writeDoc(w, f.doc)
         val nullability = marshal.nullability(f.ty.resolved).fold("")(", " + _)
-        val readOnly = if (requireOptionals || !isOptional(f.ty.resolved)) ", readonly" else ""
+        val readOnly = if (spec.objcLegacyRecords) ", readonly" else if (checkMutable(f.ty.resolved)) ", copy" else ""
         w.wl(s"@property (nonatomic${readOnly}${nullability}) ${marshal.fqFieldType(f.ty)} ${idObjc.field(f.ident)};")
       }
       if (r.derivingTypes.contains(DerivingType.Ord)) {

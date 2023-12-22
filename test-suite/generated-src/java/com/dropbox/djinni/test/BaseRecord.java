@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 public class BaseRecord {
 
 
-    /*package*/ final int mVal;
+    /*package*/ int mVal;
 
     public BaseRecord(
             int val) {
@@ -19,6 +19,10 @@ public class BaseRecord {
 
     public int getVal() {
         return mVal;
+    }
+
+    public void setVal(int val) {
+        this.mVal = val;
     }
 
     @Override

@@ -12,11 +12,11 @@ public class MixedRecord {
 
     /*package*/ /*optional*/ OptionalInterface mInterfaceVal;
 
-    /*package*/ final int mReqInt;
+    /*package*/ int mReqInt;
 
     /*package*/ /*optional*/ BaseRecord mOptRecord;
 
-    /*package*/ final BaseRecord mReqRecord;
+    /*package*/ BaseRecord mReqRecord;
 
     public MixedRecord(
             @CheckForNull OptionalInterface interfaceVal,
@@ -51,6 +51,10 @@ public class MixedRecord {
         return mReqInt;
     }
 
+    public void setReqInt(int reqInt) {
+        this.mReqInt = reqInt;
+    }
+
     @CheckForNull
     public BaseRecord getOptRecord() {
         return mOptRecord;
@@ -63,6 +67,10 @@ public class MixedRecord {
     @Nonnull
     public BaseRecord getReqRecord() {
         return mReqRecord;
+    }
+
+    public void setReqRecord(BaseRecord reqRecord) {
+        this.mReqRecord = reqRecord;
     }
 
     @Override

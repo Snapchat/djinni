@@ -35,11 +35,11 @@ struct EnumUsageRecord final {
                     std::vector<color> l_,
                     std::unordered_set<color> s_,
                     std::unordered_map<color, color> m_)
-    : EnumUsageRecord(e_,
+    : EnumUsageRecord(std::move(e_),
                       std::experimental::nullopt,
-                      l_,
-                      s_,
-                      m_)
+                      std::move(l_),
+                      std::move(s_),
+                      std::move(m_))
     {}
 };
 
