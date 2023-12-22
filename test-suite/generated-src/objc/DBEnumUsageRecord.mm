@@ -34,6 +34,7 @@
                          m:m];
     return self;
 }
+
 + (nonnull instancetype)enumUsageRecordWithE:(DBColor)e
                                            o:(nullable NSNumber *)o
                                            l:(nonnull NSArray<NSNumber *> *)l

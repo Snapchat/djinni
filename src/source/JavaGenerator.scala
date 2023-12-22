@@ -274,10 +274,8 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
         w.wl
         generateJavaConstants(w, r.consts)
         // Field definitions.
-        val requireOptionals = spec.javaLegacyRecords || r.derivingTypes.contains(DerivingType.Req)
-
         for (f <- r.fields) {
-          var fieldFinal = if (spec.javaLegacyRecords) "final " else if (requireOptionals || !isOptional(f.ty.resolved)) "" else "/*optional*/ "
+          var fieldFinal = if (spec.javaLegacyRecords) "final " else if (r.derivingTypes.contains(DerivingType.Req) || !isOptional(f.ty.resolved)) "" else "/*optional*/ "
           w.wl
           w.wl(s"/*package*/ ${fieldFinal}${marshal.fieldType(f.ty)} ${idJava.field(f.ident)};")
         }
@@ -297,8 +295,8 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
               w.wl(") {")
             }
           w.nested {
+            // Optional constructor or full constructor
             if (reqFields.size != r.fields.size) {
-              // Optional constructor
               writeAlignedCall(w, "this(", r.fields, ");", f=> if (isOptional(f.ty.resolved)) "null" else idJava.local(f.ident))
               w.wl
             } else {
@@ -313,8 +311,8 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
         // Constructor, requiring all parameters, used for marshaling
         writeConstructor(r.fields)
 
-        // Constructor, not requiring optionals
-        if (!requireOptionals && r.fields.size != r.reqFields.size) {
+        // Constructor, not requiring optionals, generated if necessary
+        if (!spec.javaLegacyRecords && !r.derivingTypes.contains(DerivingType.Req) && r.fields.size != r.reqFields.size) {
           writeConstructor(r.reqFields)
         }
 

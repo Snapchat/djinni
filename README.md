@@ -68,6 +68,7 @@ verify the build and binary from the command line.
  - DateRef for copy free data passing with ownership
  - Generating string names for C++ enums
  - Omit optional parameters from record constructors
+ - Records are default mutable across all platforms
  - Bug fixes
 
 ## Using new features

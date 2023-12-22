@@ -29,6 +29,7 @@
                             reqRecord:reqRecord];
     return self;
 }
+
 + (nonnull instancetype)mixedRecordWithInterfaceVal:(nullable DBOptionalInterface *)interfaceVal
                                              reqInt:(int32_t)reqInt
                                           optRecord:(nullable DBBaseRecord *)optRecord

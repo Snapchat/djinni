@@ -25,6 +25,7 @@
                       optRecord:nil];
     return self;
 }
+
 + (nonnull instancetype)optionalRecordWithOptInt:(nullable NSNumber *)optInt
                                     optInterface:(nullable DBOptionalInterface *)optInterface
                                        optRecord:(nullable DBBaseRecord *)optRecord

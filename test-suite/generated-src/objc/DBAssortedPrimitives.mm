@@ -64,6 +64,7 @@
                oFsixtyfour:nil];
     return self;
 }
+
 + (nonnull instancetype)assortedPrimitivesWithB:(BOOL)b
                                           eight:(int8_t)eight
                                         sixteen:(int16_t)sixteen

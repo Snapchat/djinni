@@ -19,6 +19,7 @@
     self = [self initWithSampleInterface:nil];
     return self;
 }
+
 + (nonnull instancetype)testOptionalExternInterfaceRecord
 {
     return [[self alloc] init];

@@ -222,9 +222,6 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
       w.w("struct " + actualSelf + cppFinal).bracedSemi {
         generateHppConstants(w, r.consts)
 
-        // Determine if optional parameters are required in the constructor
-        val requireOptionals = spec.cppLegacyRecords || r.derivingTypes.contains(DerivingType.Req)
-
         // Field definitions.
         for (f <- r.fields) {
           writeDoc(w, f.doc)
@@ -248,17 +245,20 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
         }
 
         // Constructor generator
-        def writeConstructor(fields: Seq[Field])  {
+        def writeConstructor(reqFields: Seq[Field])  {
           // Only skip if there are no fields at all. If only optional
           // fields exist, we should still create the trivial constructor
           if(r.fields.nonEmpty) {
             w.wl
-            if (fields.size == 1) {
+            if (reqFields.size == 1) {
               w.wl("//NOLINTNEXTLINE(google-explicit-constructor)")
             }
-            writeAlignedCall(w, actualSelf + "(", fields, ")", f => marshal.fieldType(f.ty) + " " + idCpp.local(f.ident) + "_")
+            writeAlignedCall(w, actualSelf + "(", reqFields, ")", f => marshal.fieldType(f.ty) + " " + idCpp.local(f.ident) + "_")
             w.wl
-            if (r.fields.size != fields.size) {
+
+            // Determimne if we are writing a constructor omitting optionals or one requiring
+            // all parameters
+            if (r.fields.size != reqFields.size) {
               writeAlignedCall(w, ": " + actualSelf + "(", r.fields, ")", f => {
                 var param = "std::move(" + idCpp.local(f.ident) + "_)"
                 if (isOptional(f.ty.resolved))
@@ -270,7 +270,7 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
                 param
               })
               w.wl
-            } else if (fields.nonEmpty) {
+            } else {
               // required constructor
               val init = (f: Field) => idCpp.field(f.ident) + "(std::move(" + idCpp.local(f.ident) + "_))"
               w.wl(": " + init(r.fields.head))
@@ -284,7 +284,7 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
         writeConstructor(r.fields)
 
         // Next write optional omitting constructor if necessary
-        if (!requireOptionals && r.reqFields.size != r.fields.size) {
+        if (!spec.cppLegacyRecords && !r.derivingTypes.contains(DerivingType.Req) && r.reqFields.size != r.fields.size) {
           writeConstructor(r.reqFields)
         }
 

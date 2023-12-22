@@ -26,6 +26,7 @@
                              misc:nil];
     return self;
 }
+
 + (nonnull instancetype)clientReturnedRecordWithRecordId:(int64_t)recordId
                                                  content:(nonnull NSString *)content
                                                     misc:(nullable NSString *)misc

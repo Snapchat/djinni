@@ -259,6 +259,9 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
         w.wl
         writeDoc(w, f.doc)
         val nullability = marshal.nullability(f.ty.resolved).fold("")(", " + _)
+
+        // If using legacy constructors, add the readonly property. Otherwise determine if the
+        // copy property is necessary
         val readOnly = if (spec.objcLegacyRecords) ", readonly" else if (checkMutable(f.ty.resolved)) ", copy" else ""
         w.wl(s"@property (nonatomic${readOnly}${nullability}) ${marshal.fqFieldType(f.ty)} ${idObjc.field(f.ident)};")
       }
@@ -288,22 +291,26 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       w.wl(s"@implementation $self")
       w.wl
 
-      def writeConstructor(firstInitArg: String, reqFields: Seq[Field], optFields: Seq[Field] = List.empty) {
+      def writeConstructor(firstInitArg: String, reqFields: Seq[Field]) {
         var init = s"- (nonnull instancetype)init$firstInitArg"
         writeAlignedObjcCall(w, init, reqFields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
         w.wl
         w.braced {
-          w.w("if (self = [super init])").braced {
-            for (f <- reqFields) {
-              if (checkMutable(f.ty.resolved))
-                w.wl(s"_${idObjc.field(f.ident)} = [${idObjc.local(f.ident)} copy];")
-              else
-                w.wl(s"_${idObjc.field(f.ident)} = ${idObjc.local(f.ident)};")
-            }
-
-            // Set optional constructor fields to nil
-            for (f <- optFields) {
-              w.wl(s"_${idObjc.field(f.ident)} = nil;")
+          // Optional constructor or full constructor
+          if (reqFields.size != r.fields.size) {
+            val decl = s"self = [self init$firstInitializerArg"
+            writeAlignedObjcCall(w, decl, r.fields, "", f => {
+              (idObjc.field(f.ident), if (isOptional(f.ty.resolved)) "nil" else s"${idObjc.local(f.ident)}")
+            })
+            w.wl("];")
+          } else {
+            w.w("if (self = [super init])").braced {
+              for (f <- reqFields) {
+                if (checkMutable(f.ty.resolved))
+                  w.wl(s"_${idObjc.field(f.ident)} = [${idObjc.local(f.ident)} copy];")
+                else
+                  w.wl(s"_${idObjc.field(f.ident)} = ${idObjc.local(f.ident)};")
+              }
             }
           }
           w.wl("return self;")
@@ -311,26 +318,12 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
         w.wl
       }
 
-      def writeOptionalConstructor(reqFields: Seq[Field], fields: Seq[Field]) {
-        var init = s"- (nonnull instancetype)init$firstReqInitializerArg"
-        writeAlignedObjcCall(w, init, reqFields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
-        w.wl
-        w.braced {
-          val decl = s"self = [self init$firstInitializerArg"
-          writeAlignedObjcCall(w, decl, fields, "", f => {
-            (idObjc.field(f.ident), if (isOptional(f.ty.resolved)) "nil" else s"${idObjc.local(f.ident)}")
-          })
-          w.wl("];")
-          w.wl("return self;")
-        }
-      }
-
       // Constructor from all fields (not copying) (requiring all)
       writeConstructor(firstInitializerArg, r.fields)
 
       // Write constructor with optionals if necessary
       if (!requireOptionals && r.reqFields.size != r.fields.size) {
-        writeOptionalConstructor(r.reqFields, r.fields)
+        writeConstructor(firstReqInitializerArg, r.reqFields)
       }
 
       // Convenience initializer
