@@ -57,6 +57,29 @@ struct AssortedPrimitives final {
     , o_fthirtytwo(std::move(o_fthirtytwo_))
     , o_fsixtyfour(std::move(o_fsixtyfour_))
     {}
+
+    AssortedPrimitives(bool b_,
+                       int8_t eight_,
+                       int16_t sixteen_,
+                       int32_t thirtytwo_,
+                       int64_t sixtyfour_,
+                       float fthirtytwo_,
+                       double fsixtyfour_)
+    : AssortedPrimitives(std::move(b_),
+                         std::move(eight_),
+                         std::move(sixteen_),
+                         std::move(thirtytwo_),
+                         std::move(sixtyfour_),
+                         std::move(fthirtytwo_),
+                         std::move(fsixtyfour_),
+                         std::experimental::nullopt,
+                         std::experimental::nullopt,
+                         std::experimental::nullopt,
+                         std::experimental::nullopt,
+                         std::experimental::nullopt,
+                         std::experimental::nullopt,
+                         std::experimental::nullopt)
+    {}
 };
 
 } // namespace testsuite

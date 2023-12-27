@@ -221,6 +221,7 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
       writeCppTypeParams(w, params)
       w.w("struct " + actualSelf + cppFinal).bracedSemi {
         generateHppConstants(w, r.consts)
+
         // Field definitions.
         for (f <- r.fields) {
           writeDoc(w, f.doc)
@@ -243,18 +244,48 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
           w.wl(s"friend bool operator>=(const $actualSelf& lhs, const $actualSelf& rhs);")
         }
 
-        // Constructor.
-        if(r.fields.nonEmpty) {
-          w.wl
-          if (r.fields.size == 1) {
-            w.wl("//NOLINTNEXTLINE(google-explicit-constructor)")
+        // Constructor generator
+        def writeConstructor(reqFields: Seq[Field])  {
+          // Only skip if there are no fields at all. If only optional
+          // fields exist, we should still create the trivial constructor
+          if(r.fields.nonEmpty) {
+            w.wl
+            if (reqFields.size == 1) {
+              w.wl("//NOLINTNEXTLINE(google-explicit-constructor)")
+            }
+            writeAlignedCall(w, actualSelf + "(", reqFields, ")", f => marshal.fieldType(f.ty) + " " + idCpp.local(f.ident) + "_")
+            w.wl
+
+            // Determimne if we are writing a constructor omitting optionals or one requiring
+            // all parameters
+            if (r.fields.size != reqFields.size) {
+              writeAlignedCall(w, ": " + actualSelf + "(", r.fields, ")", f => {
+                var param = "std::move(" + idCpp.local(f.ident) + "_)"
+                if (isOptional(f.ty.resolved))
+                  if (isInterface(f.ty.resolved.args.head)) 
+                    param = s"nullptr" 
+                  else 
+                    param = s"${spec.cppNulloptValue}"
+
+                param
+              })
+              w.wl
+            } else {
+              // required constructor
+              val init = (f: Field) => idCpp.field(f.ident) + "(std::move(" + idCpp.local(f.ident) + "_))"
+              w.wl(": " + init(r.fields.head))
+              r.fields.tail.map(f => ", " + init(f)).foreach(w.wl)
+            }
+            w.wl("{}")
           }
-          writeAlignedCall(w, actualSelf + "(", r.fields, ")", f => marshal.fieldType(f.ty) + " " + idCpp.local(f.ident) + "_")
-          w.wl
-          val init = (f: Field) => idCpp.field(f.ident) + "(std::move(" + idCpp.local(f.ident) + "_))"
-          w.wl(": " + init(r.fields.head))
-          r.fields.tail.map(f => ", " + init(f)).foreach(w.wl)
-          w.wl("{}")
+        }
+
+        // First write constructor requiring optionals, required for marshaling
+        writeConstructor(r.fields)
+
+        // Next write optional omitting constructor if necessary
+        if (!spec.cppLegacyRecords && !r.derivingTypes.contains(DerivingType.Req) && r.reqFields.size != r.fields.size) {
+          writeConstructor(r.reqFields)
         }
 
         if (r.ext.cpp) {

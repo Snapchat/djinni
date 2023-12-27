@@ -198,7 +198,13 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
       case _ => false
     }
 
+    val requireOptionals = spec.objcLegacyRecords || r.derivingTypes.contains(DerivingType.Req)
+    val shouldWriteFullConvenienceConstructor = !spec.objcOmitFullConvenienceConstructor || requireOptionals || r.fields.size == r.reqFields.size
+
     val firstInitializerArg = if(r.fields.isEmpty) "" else IdentStyle.camelUpper("with_" + r.fields.head.ident.name)
+
+    // Find the first required arg for the optional-omitting initializer
+    val firstReqInitializerArg = if(r.reqFields.isEmpty) "" else IdentStyle.camelUpper("with_" + r.fields.find(f => !isOptional(f.ty.resolved)).get.ident.name)
 
     // Generate the header file for record
     writeObjcFile(marshal.headerName(objcName), origin, refs.header, w => {
@@ -210,26 +216,38 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
         w.wl(s"@interface $self : NSObject")
       }
 
-      def writeInitializer(sign: String, prefix: String) {
-        val decl = s"$sign (nonnull instancetype)$prefix$firstInitializerArg"
-        writeAlignedObjcCall(w, decl, r.fields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
+      def writeInitializer(sign: String, prefix: String, firstArg: String, fields: Seq[Field]) {
+        val decl = s"$sign (nonnull instancetype)$prefix$firstArg"
+        writeAlignedObjcCall(w, decl, fields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
 
-        if (prefix == "init") {
+        // Only define the designated initializer for the main constructor
+        if (prefix == "init" && fields.size == r.fields.size) {
           w.wl(" NS_DESIGNATED_INITIALIZER;")
         } else {
           w.wl(";")
         }
       }
 
-      if (r.fields.nonEmpty) {
+      if (r.reqFields.size > 0 || (requireOptionals && r.fields.nonEmpty)) {
           // NSObject init / new are marked unavailable. Only allow designated initializer
           // as records may have non-optional / nonnull fields.
           w.wl("- (nonnull instancetype)init NS_UNAVAILABLE;")
           w.wl("+ (nonnull instancetype)new NS_UNAVAILABLE;")
       }
 
-      writeInitializer("-", "init")
-      if (!r.ext.objc && !spec.objcDisableClassCtor) writeInitializer("+", IdentStyle.camelLower(objcName))
+      // First write the required initializer
+      writeInitializer("-", "init", firstInitializerArg, r.fields)
+
+      // Next write the full convencience constructor if it is required
+      if (shouldWriteFullConvenienceConstructor) {
+        if (!r.ext.objc && !spec.objcDisableClassCtor) writeInitializer("+", IdentStyle.camelLower(objcName), firstInitializerArg, r.fields)
+      }
+
+      // Next write an optional-omitting constructor if applicable
+      if (!requireOptionals && r.fields.size != r.reqFields.size) {
+        writeInitializer("-", "init", firstReqInitializerArg, r.reqFields)
+        if (!r.ext.objc && !spec.objcDisableClassCtor) writeInitializer("+", IdentStyle.camelLower(objcName), firstReqInitializerArg, r.reqFields)
+      }
 
       for (c <- r.consts if !marshal.canBeConstVariable(c)) {
         w.wl
@@ -241,7 +259,11 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
         w.wl
         writeDoc(w, f.doc)
         val nullability = marshal.nullability(f.ty.resolved).fold("")(", " + _)
-        w.wl(s"@property (nonatomic, readonly${nullability}) ${marshal.fqFieldType(f.ty)} ${idObjc.field(f.ident)};")
+
+        // If using legacy constructors, add the readonly property. Otherwise determine if the
+        // copy property is necessary
+        val readOnly = if (spec.objcLegacyRecords) ", readonly" else if (checkMutable(f.ty.resolved)) ", copy" else ""
+        w.wl(s"@property (nonatomic${readOnly}${nullability}) ${marshal.fqFieldType(f.ty)} ${idObjc.field(f.ident)};")
       }
       if (r.derivingTypes.contains(DerivingType.Ord)) {
         w.wl
@@ -264,38 +286,67 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
     // Generate the implementation file for record
     writeObjcFile(bodyName(objcName), origin, refs.body, w => {
       if (r.consts.nonEmpty) generateObjcConstants(w, r.consts, noBaseSelf, ObjcConstantType.ConstVariable)
-
+      
       w.wl
       w.wl(s"@implementation $self")
       w.wl
-      // Constructor from all fields (not copying)
-      val init = s"- (nonnull instancetype)init$firstInitializerArg"
-      writeAlignedObjcCall(w, init, r.fields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
-      w.wl
-      w.braced {
-        w.w("if (self = [super init])").braced {
-          for (f <- r.fields) {
-            if (checkMutable(f.ty.resolved))
-              w.wl(s"_${idObjc.field(f.ident)} = [${idObjc.local(f.ident)} copy];")
-            else
-              w.wl(s"_${idObjc.field(f.ident)} = ${idObjc.local(f.ident)};")
+
+      def writeConstructor(firstInitArg: String, reqFields: Seq[Field]) {
+        var init = s"- (nonnull instancetype)init$firstInitArg"
+        writeAlignedObjcCall(w, init, reqFields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
+        w.wl
+        w.braced {
+          // Optional constructor or full constructor
+          if (reqFields.size != r.fields.size) {
+            val decl = s"self = [self init$firstInitializerArg"
+            writeAlignedObjcCall(w, decl, r.fields, "", f => {
+              (idObjc.field(f.ident), if (isOptional(f.ty.resolved)) "nil" else s"${idObjc.local(f.ident)}")
+            })
+            w.wl("];")
+          } else {
+            w.w("if (self = [super init])").braced {
+              for (f <- reqFields) {
+                if (checkMutable(f.ty.resolved))
+                  w.wl(s"_${idObjc.field(f.ident)} = [${idObjc.local(f.ident)} copy];")
+                else
+                  w.wl(s"_${idObjc.field(f.ident)} = ${idObjc.local(f.ident)};")
+              }
+            }
           }
+          w.wl("return self;")
         }
-        w.wl("return self;")
+        w.wl
       }
-      w.wl
+
+      // Constructor from all fields (not copying) (requiring all)
+      writeConstructor(firstInitializerArg, r.fields)
+
+      // Write constructor with optionals if necessary
+      if (!requireOptionals && r.reqFields.size != r.fields.size) {
+        writeConstructor(firstReqInitializerArg, r.reqFields)
+      }
 
       // Convenience initializer
       if(!r.ext.objc && !spec.objcDisableClassCtor) {
-        val decl = s"+ (nonnull instancetype)${IdentStyle.camelLower(objcName)}$firstInitializerArg"
-        writeAlignedObjcCall(w, decl, r.fields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
-        w.wl
-        w.braced {
-          val call = s"return [[self alloc] init$firstInitializerArg"
-          writeAlignedObjcCall(w, call, r.fields, "", f => (idObjc.field(f.ident), s"${idObjc.local(f.ident)}"))
-          w.wl("];")
+        def writeConvenienceInitializer(firstInitArg: String, reqFields: Seq[Field]) = {
+          val decl = s"+ (nonnull instancetype)${IdentStyle.camelLower(objcName)}$firstInitArg"
+          writeAlignedObjcCall(w, decl, reqFields, "", f => (idObjc.field(f.ident), s"(${marshal.paramType(f.ty)})${idObjc.local(f.ident)}"))
+          w.wl
+          w.braced {
+            val call = s"return [[self alloc] init$firstInitArg"
+            writeAlignedObjcCall(w, call, reqFields, "", f => (idObjc.field(f.ident), s"${idObjc.local(f.ident)}"))
+            w.wl("];")
+          }
+          w.wl
         }
-        w.wl
+
+        if (shouldWriteFullConvenienceConstructor) {
+          writeConvenienceInitializer(firstInitializerArg, r.fields)
+        }
+
+        if (!requireOptionals && r.reqFields.size != r.fields.size) {
+          writeConvenienceInitializer(firstReqInitializerArg, r.reqFields)
+        }
       }
 
       if (r.consts.nonEmpty) generateObjcConstants(w, r.consts, noBaseSelf, ObjcConstantType.ConstMethod)

@@ -10,6 +10,6 @@
 - (nonnull instancetype)initWithAccess:(DBAccessFlags)access NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)recordWithFlagsWithAccess:(DBAccessFlags)access;
 
-@property (nonatomic, readonly) DBAccessFlags access;
+@property (nonatomic) DBAccessFlags access;
 
 @end

@@ -19,16 +19,16 @@
                                         i5:(int64_t)i5
                                         i6:(int64_t)i6;
 
-@property (nonatomic, readonly) int64_t i1;
+@property (nonatomic) int64_t i1;
 
-@property (nonatomic, readonly) int64_t i2;
+@property (nonatomic) int64_t i2;
 
-@property (nonatomic, readonly) int64_t i3;
+@property (nonatomic) int64_t i3;
 
-@property (nonatomic, readonly) int64_t i4;
+@property (nonatomic) int64_t i4;
 
-@property (nonatomic, readonly) int64_t i5;
+@property (nonatomic) int64_t i5;
 
-@property (nonatomic, readonly) int64_t i6;
+@property (nonatomic) int64_t i6;
 
 @end

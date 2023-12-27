@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 public class PrimitiveList {
 
 
-    /*package*/ final ArrayList<Long> mList;
+    /*package*/ ArrayList<Long> mList;
 
     public PrimitiveList(
             @Nonnull ArrayList<Long> list) {
@@ -20,6 +20,10 @@ public class PrimitiveList {
     @Nonnull
     public ArrayList<Long> getList() {
         return mList;
+    }
+
+    public void setList(@Nonnull ArrayList<Long> list) {
+        this.mList = list;
     }
 
     @Override

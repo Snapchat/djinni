@@ -10,11 +10,11 @@ import javax.annotation.Nonnull;
 public class ClientReturnedRecord {
 
 
-    /*package*/ final long mRecordId;
+    /*package*/ long mRecordId;
 
-    /*package*/ final String mContent;
+    /*package*/ String mContent;
 
-    /*package*/ final String mMisc;
+    /*package*/ /*optional*/ String mMisc;
 
     public ClientReturnedRecord(
             long recordId,
@@ -25,8 +25,20 @@ public class ClientReturnedRecord {
         this.mMisc = misc;
     }
 
+    public ClientReturnedRecord(
+            long recordId,
+            @Nonnull String content) {
+        this(recordId,
+             content,
+             null);
+    }
+
     public long getRecordId() {
         return mRecordId;
+    }
+
+    public void setRecordId(long recordId) {
+        this.mRecordId = recordId;
     }
 
     @Nonnull
@@ -34,9 +46,17 @@ public class ClientReturnedRecord {
         return mContent;
     }
 
+    public void setContent(@Nonnull String content) {
+        this.mContent = content;
+    }
+
     @CheckForNull
     public String getMisc() {
         return mMisc;
+    }
+
+    public void setMisc(String misc) {
+        this.mMisc = misc;
     }
 
     @Override

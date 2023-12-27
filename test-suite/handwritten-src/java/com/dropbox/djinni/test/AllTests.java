@@ -31,6 +31,7 @@ public class AllTests extends TestSuite {
         mySuite.addTestSuite(DataTest.class);
         mySuite.addTestSuite(AsyncTest.class);
         mySuite.addTestSuite(InterfaceAndAbstractClass.class);
+        mySuite.addTestSuite(OptionalsTest.class);
         return mySuite;
     }
 

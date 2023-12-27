@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 public class NestedCollection implements android.os.Parcelable {
 
 
-    /*package*/ final ArrayList<HashSet<String>> mSetList;
+    /*package*/ ArrayList<HashSet<String>> mSetList;
 
     public NestedCollection(
             @Nonnull ArrayList<HashSet<String>> setList) {
@@ -21,6 +21,10 @@ public class NestedCollection implements android.os.Parcelable {
     @Nonnull
     public ArrayList<HashSet<String>> getSetList() {
         return mSetList;
+    }
+
+    public void setSetList(@Nonnull ArrayList<HashSet<String>> setList) {
+        this.mSetList = setList;
     }
 
     @Override

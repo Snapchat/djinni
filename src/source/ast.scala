@@ -21,6 +21,7 @@ package djinni.ast
 import java.io.File
 import djinni.ast.Record.DerivingType.DerivingType
 import djinni.meta.MExpr
+import djinni.meta.isOptional
 import djinni.syntax.Loc
 
 case class IdlFile(imports: Seq[FileRef], typeDecls: Seq[TypeDecl], flags: Seq[String])
@@ -75,11 +76,16 @@ object Enum {
   case class Option(ident: Ident, doc: Doc, specialFlag: scala.Option[SpecialFlag])
 }
 
-case class Record(ext: Ext, fields: Seq[Field], consts: Seq[Const], derivingTypes: Set[DerivingType]) extends TypeDef
+case class Record(ext: Ext, fields: Seq[Field], consts: Seq[Const], derivingTypes: Set[DerivingType]) extends TypeDef {
+  // Returns only non-optional fields contained in the record
+  def reqFields = {
+    fields.filterNot(f => isOptional(f.ty.resolved))
+  }
+}
 object Record {
   object DerivingType extends Enumeration {
     type DerivingType = Value
-    val Eq, Ord, AndroidParcelable, NSCopying = Value
+    val Eq, Ord, AndroidParcelable, NSCopying, Req = Value
   }
 }
 

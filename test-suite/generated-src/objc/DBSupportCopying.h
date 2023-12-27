@@ -9,6 +9,6 @@
 - (nonnull instancetype)initWithX:(int32_t)x NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)supportCopyingWithX:(int32_t)x;
 
-@property (nonatomic, readonly) int32_t x;
+@property (nonatomic) int32_t x;
 
 @end

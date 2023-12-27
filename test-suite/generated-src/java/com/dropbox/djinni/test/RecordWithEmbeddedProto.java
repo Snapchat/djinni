@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 public class RecordWithEmbeddedProto {
 
 
-    /*package*/ final Person mPerson;
+    /*package*/ Person mPerson;
 
     public RecordWithEmbeddedProto(
             @Nonnull Person person) {
@@ -20,6 +20,10 @@ public class RecordWithEmbeddedProto {
     @Nonnull
     public Person getPerson() {
         return mPerson;
+    }
+
+    public void setPerson(@Nonnull Person person) {
+        this.mPerson = person;
     }
 
     @Override

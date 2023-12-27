@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 public class MapListRecord {
 
 
-    /*package*/ final ArrayList<HashMap<String, Long>> mMapList;
+    /*package*/ ArrayList<HashMap<String, Long>> mMapList;
 
     public MapListRecord(
             @Nonnull ArrayList<HashMap<String, Long>> mapList) {
@@ -21,6 +21,10 @@ public class MapListRecord {
     @Nonnull
     public ArrayList<HashMap<String, Long>> getMapList() {
         return mMapList;
+    }
+
+    public void setMapList(@Nonnull ArrayList<HashMap<String, Long>> mapList) {
+        this.mMapList = mapList;
     }
 
     @Override

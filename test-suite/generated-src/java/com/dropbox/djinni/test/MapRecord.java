@@ -10,9 +10,9 @@ import javax.annotation.Nonnull;
 public class MapRecord {
 
 
-    /*package*/ final HashMap<String, Long> mMap;
+    /*package*/ HashMap<String, Long> mMap;
 
-    /*package*/ final HashMap<Integer, Integer> mImap;
+    /*package*/ HashMap<Integer, Integer> mImap;
 
     public MapRecord(
             @Nonnull HashMap<String, Long> map,
@@ -26,9 +26,17 @@ public class MapRecord {
         return mMap;
     }
 
+    public void setMap(@Nonnull HashMap<String, Long> map) {
+        this.mMap = map;
+    }
+
     @Nonnull
     public HashMap<Integer, Integer> getImap() {
         return mImap;
+    }
+
+    public void setImap(@Nonnull HashMap<Integer, Integer> imap) {
+        this.mImap = imap;
     }
 
     @Override

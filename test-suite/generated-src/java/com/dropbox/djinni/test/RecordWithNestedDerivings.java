@@ -9,9 +9,9 @@ import javax.annotation.Nonnull;
 public class RecordWithNestedDerivings implements Comparable<RecordWithNestedDerivings> {
 
 
-    /*package*/ final int mKey;
+    /*package*/ int mKey;
 
-    /*package*/ final RecordWithDerivings mRec;
+    /*package*/ RecordWithDerivings mRec;
 
     public RecordWithNestedDerivings(
             int key,
@@ -24,9 +24,17 @@ public class RecordWithNestedDerivings implements Comparable<RecordWithNestedDer
         return mKey;
     }
 
+    public void setKey(int key) {
+        this.mKey = key;
+    }
+
     @Nonnull
     public RecordWithDerivings getRec() {
         return mRec;
+    }
+
+    public void setRec(@Nonnull RecordWithDerivings rec) {
+        this.mRec = rec;
     }
 
     @Override

@@ -9,6 +9,6 @@
 - (nonnull instancetype)initWithMapList:(nonnull NSArray<NSDictionary<NSString *, NSNumber *> *> *)mapList NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)mapListRecordWithMapList:(nonnull NSArray<NSDictionary<NSString *, NSNumber *> *> *)mapList;
 
-@property (nonatomic, readonly, nonnull) NSArray<NSDictionary<NSString *, NSNumber *> *> * mapList;
+@property (nonatomic, copy, nonnull) NSArray<NSDictionary<NSString *, NSNumber *> *> * mapList;
 
 @end

@@ -14,6 +14,6 @@
 - (nonnull instancetype)initWithField:(int8_t)Field NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)VarnameRecordWithField:(int8_t)Field;
 
-@property (nonatomic, readonly) int8_t Field;
+@property (nonatomic) int8_t Field;
 
 @end

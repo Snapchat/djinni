@@ -34,33 +34,47 @@
                                      oSixtyfour:(nullable NSNumber *)oSixtyfour
                                     oFthirtytwo:(nullable NSNumber *)oFthirtytwo
                                     oFsixtyfour:(nullable NSNumber *)oFsixtyfour;
+- (nonnull instancetype)initWithB:(BOOL)b
+                            eight:(int8_t)eight
+                          sixteen:(int16_t)sixteen
+                        thirtytwo:(int32_t)thirtytwo
+                        sixtyfour:(int64_t)sixtyfour
+                       fthirtytwo:(float)fthirtytwo
+                       fsixtyfour:(double)fsixtyfour;
++ (nonnull instancetype)assortedPrimitivesWithB:(BOOL)b
+                                          eight:(int8_t)eight
+                                        sixteen:(int16_t)sixteen
+                                      thirtytwo:(int32_t)thirtytwo
+                                      sixtyfour:(int64_t)sixtyfour
+                                     fthirtytwo:(float)fthirtytwo
+                                     fsixtyfour:(double)fsixtyfour;
 
-@property (nonatomic, readonly) BOOL b;
+@property (nonatomic) BOOL b;
 
-@property (nonatomic, readonly) int8_t eight;
+@property (nonatomic) int8_t eight;
 
-@property (nonatomic, readonly) int16_t sixteen;
+@property (nonatomic) int16_t sixteen;
 
-@property (nonatomic, readonly) int32_t thirtytwo;
+@property (nonatomic) int32_t thirtytwo;
 
-@property (nonatomic, readonly) int64_t sixtyfour;
+@property (nonatomic) int64_t sixtyfour;
 
-@property (nonatomic, readonly) float fthirtytwo;
+@property (nonatomic) float fthirtytwo;
 
-@property (nonatomic, readonly) double fsixtyfour;
+@property (nonatomic) double fsixtyfour;
 
-@property (nonatomic, readonly, nullable) NSNumber * oB;
+@property (nonatomic, nullable) NSNumber * oB;
 
-@property (nonatomic, readonly, nullable) NSNumber * oEight;
+@property (nonatomic, nullable) NSNumber * oEight;
 
-@property (nonatomic, readonly, nullable) NSNumber * oSixteen;
+@property (nonatomic, nullable) NSNumber * oSixteen;
 
-@property (nonatomic, readonly, nullable) NSNumber * oThirtytwo;
+@property (nonatomic, nullable) NSNumber * oThirtytwo;
 
-@property (nonatomic, readonly, nullable) NSNumber * oSixtyfour;
+@property (nonatomic, nullable) NSNumber * oSixtyfour;
 
-@property (nonatomic, readonly, nullable) NSNumber * oFthirtytwo;
+@property (nonatomic, nullable) NSNumber * oFthirtytwo;
 
-@property (nonatomic, readonly, nullable) NSNumber * oFsixtyfour;
+@property (nonatomic, nullable) NSNumber * oFsixtyfour;
 
 @end
