@@ -21,7 +21,7 @@ public class NestedOutcome {
         return mO;
     }
 
-    public void setO(com.snapchat.djinni.Outcome<Integer, String> o) {
+    public void setO(@Nonnull com.snapchat.djinni.Outcome<Integer, String> o) {
         this.mO = o;
     }
 

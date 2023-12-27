@@ -22,7 +22,7 @@ public class RecordWithFlags {
         return mAccess;
     }
 
-    public void setAccess(EnumSet<AccessFlags> access) {
+    public void setAccess(@Nonnull EnumSet<AccessFlags> access) {
         this.mAccess = access;
     }
 

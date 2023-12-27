@@ -21,7 +21,7 @@ public class WcharTestRec {
         return mS;
     }
 
-    public void setS(String s) {
+    public void setS(@Nonnull String s) {
         this.mS = s;
     }
 

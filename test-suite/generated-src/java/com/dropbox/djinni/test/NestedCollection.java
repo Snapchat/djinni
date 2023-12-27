@@ -23,7 +23,7 @@ public class NestedCollection implements android.os.Parcelable {
         return mSetList;
     }
 
-    public void setSetList(ArrayList<HashSet<String>> setList) {
+    public void setSetList(@Nonnull ArrayList<HashSet<String>> setList) {
         this.mSetList = setList;
     }
 

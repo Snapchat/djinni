@@ -22,7 +22,7 @@ public class RecordWithEmbeddedCppProto {
         return mState;
     }
 
-    public void setState(PersistingState state) {
+    public void setState(@Nonnull PersistingState state) {
         this.mState = state;
     }
 

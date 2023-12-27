@@ -34,7 +34,7 @@ public class ConstantRecord {
         return mSomeString;
     }
 
-    public void setSomeString(String someString) {
+    public void setSomeString(@Nonnull String someString) {
         this.mSomeString = someString;
     }
 

@@ -46,7 +46,7 @@ public class ClientReturnedRecord {
         return mContent;
     }
 
-    public void setContent(String content) {
+    public void setContent(@Nonnull String content) {
         this.mContent = content;
     }
 

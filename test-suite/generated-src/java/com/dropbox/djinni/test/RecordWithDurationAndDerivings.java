@@ -21,7 +21,7 @@ public class RecordWithDurationAndDerivings implements Comparable<RecordWithDura
         return mDt;
     }
 
-    public void setDt(java.time.Duration dt) {
+    public void setDt(@Nonnull java.time.Duration dt) {
         this.mDt = dt;
     }
 

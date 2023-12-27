@@ -327,7 +327,10 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
 
           if (!spec.javaLegacyRecords) {
             w.wl
-            w.w("public void " + idJava.method("set_" + f.ident.name) + "(" + marshal.paramType(f.ty) + " " + idJava.local(f.ident) + ")").braced {
+            // Check for null for setters used on required parameters
+            var nullability = if (isOptional(f.ty.resolved)) "" else marshal.nullityAnnotation(f.ty).map(_ + "").getOrElse("")
+            nullability = if (nullability.isEmpty) "" else nullability + " "
+            w.w("public void " + idJava.method("set_" + f.ident.name) + "(" + nullability + marshal.paramType(f.ty) + " " + idJava.local(f.ident) + ")").braced {
               w.wl(s"this.${idJava.field(f.ident)} = ${idJava.local(f.ident)};")
             }
           }

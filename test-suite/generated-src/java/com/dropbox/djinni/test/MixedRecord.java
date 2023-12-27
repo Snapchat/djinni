@@ -69,7 +69,7 @@ public class MixedRecord {
         return mReqRecord;
     }
 
-    public void setReqRecord(BaseRecord reqRecord) {
+    public void setReqRecord(@Nonnull BaseRecord reqRecord) {
         this.mReqRecord = reqRecord;
     }
 

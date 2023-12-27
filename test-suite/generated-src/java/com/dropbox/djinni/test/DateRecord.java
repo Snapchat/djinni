@@ -21,7 +21,7 @@ public class DateRecord implements Comparable<DateRecord>, android.os.Parcelable
         return mCreatedAt;
     }
 
-    public void setCreatedAt(java.util.Date createdAt) {
+    public void setCreatedAt(@Nonnull java.util.Date createdAt) {
         this.mCreatedAt = createdAt;
     }
 

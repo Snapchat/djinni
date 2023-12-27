@@ -22,7 +22,7 @@ public class RecordWithEmbeddedProto {
         return mPerson;
     }
 
-    public void setPerson(Person person) {
+    public void setPerson(@Nonnull Person person) {
         this.mPerson = person;
     }
 

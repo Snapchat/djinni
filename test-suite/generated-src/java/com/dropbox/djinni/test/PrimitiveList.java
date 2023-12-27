@@ -22,7 +22,7 @@ public class PrimitiveList {
         return mList;
     }
 
-    public void setList(ArrayList<Long> list) {
+    public void setList(@Nonnull ArrayList<Long> list) {
         this.mList = list;
     }
 

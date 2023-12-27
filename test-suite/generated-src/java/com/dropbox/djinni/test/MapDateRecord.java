@@ -22,7 +22,7 @@ public class MapDateRecord {
         return mDatesById;
     }
 
-    public void setDatesById(HashMap<String, java.util.Date> datesById) {
+    public void setDatesById(@Nonnull HashMap<String, java.util.Date> datesById) {
         this.mDatesById = datesById;
     }
 

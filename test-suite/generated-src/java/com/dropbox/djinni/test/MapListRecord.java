@@ -23,7 +23,7 @@ public class MapListRecord {
         return mMapList;
     }
 
-    public void setMapList(ArrayList<HashMap<String, Long>> mapList) {
+    public void setMapList(@Nonnull ArrayList<HashMap<String, Long>> mapList) {
         this.mMapList = mapList;
     }
 

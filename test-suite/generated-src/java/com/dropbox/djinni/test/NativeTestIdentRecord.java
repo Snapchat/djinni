@@ -39,7 +39,7 @@ public class NativeTestIdentRecord {
         return mSecondValue;
     }
 
-    public void setSecondValue(String secondValue) {
+    public void setSecondValue(@Nonnull String secondValue) {
         this.mSecondValue = secondValue;
     }
 

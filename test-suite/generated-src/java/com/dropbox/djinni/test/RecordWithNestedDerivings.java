@@ -33,7 +33,7 @@ public class RecordWithNestedDerivings implements Comparable<RecordWithNestedDer
         return mRec;
     }
 
-    public void setRec(RecordWithDerivings rec) {
+    public void setRec(@Nonnull RecordWithDerivings rec) {
         this.mRec = rec;
     }
 

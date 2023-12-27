@@ -26,7 +26,7 @@ public class SetRecord {
         return mSet;
     }
 
-    public void setSet(HashSet<String> set) {
+    public void setSet(@Nonnull HashSet<String> set) {
         this.mSet = set;
     }
 
@@ -35,7 +35,7 @@ public class SetRecord {
         return mIset;
     }
 
-    public void setIset(HashSet<Integer> iset) {
+    public void setIset(@Nonnull HashSet<Integer> iset) {
         this.mIset = iset;
     }
 

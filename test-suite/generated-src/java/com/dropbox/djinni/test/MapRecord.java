@@ -26,7 +26,7 @@ public class MapRecord {
         return mMap;
     }
 
-    public void setMap(HashMap<String, Long> map) {
+    public void setMap(@Nonnull HashMap<String, Long> map) {
         this.mMap = map;
     }
 
@@ -35,7 +35,7 @@ public class MapRecord {
         return mImap;
     }
 
-    public void setImap(HashMap<Integer, Integer> imap) {
+    public void setImap(@Nonnull HashMap<Integer, Integer> imap) {
         this.mImap = imap;
     }
 

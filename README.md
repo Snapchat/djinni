@@ -343,7 +343,7 @@ The C++ `Future` type has optional support for coroutines. If coroutines are
 availble (eg. compiling with C++20 or C++17 with -fcoroutines-ts), then you can
 use `co_await` on future objects.
 
-## Omitting Optionals from Record Constructors
+## Requiring Optional Parameters in Individual Records
 - By default, optionals will be omitted from the constructor in Djinni
 - The Djinni code generator will generate two constructors for a record with optionals: one with all values and one with optionals omitted. This will minimize code disruption
 - Optional behavior will be able to be switched via a usage flag for each platform. 

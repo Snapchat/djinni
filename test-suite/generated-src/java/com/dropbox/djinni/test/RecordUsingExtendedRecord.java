@@ -26,7 +26,7 @@ public class RecordUsingExtendedRecord {
         return mEr;
     }
 
-    public void setEr(ExtendedRecord er) {
+    public void setEr(@Nonnull ExtendedRecord er) {
         this.mEr = er;
     }
 

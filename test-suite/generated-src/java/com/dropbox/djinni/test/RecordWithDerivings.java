@@ -98,7 +98,7 @@ public class RecordWithDerivings implements Comparable<RecordWithDerivings> {
         return mD;
     }
 
-    public void setD(Date d) {
+    public void setD(@Nonnull Date d) {
         this.mD = d;
     }
 
@@ -107,7 +107,7 @@ public class RecordWithDerivings implements Comparable<RecordWithDerivings> {
         return mS;
     }
 
-    public void setS(String s) {
+    public void setS(@Nonnull String s) {
         this.mS = s;
     }
 
