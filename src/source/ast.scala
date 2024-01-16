@@ -51,6 +51,7 @@ case class InternTypeDecl(override val ident: Ident, override val params: Seq[Ty
 case class ExternTypeDecl(override val ident: Ident, override val params: Seq[TypeParam], override val body: TypeDef, properties: Map[String, Any], override val origin: String) extends TypeDecl
 case class ProtobufTypeDecl(override val ident: Ident, override val params: Seq[TypeParam], override val body: TypeDef, override val origin: String) extends TypeDecl
 
+// FIXME: composer?
 case class Ext(java: Boolean, cpp: Boolean, objc: Boolean, js: Boolean) {
   def any(): Boolean = {
     java || cpp || objc || js

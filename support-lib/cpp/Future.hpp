@@ -25,7 +25,7 @@
 #include <cassert>
 
 #ifdef __cpp_coroutines
-#if __has_include(<coroutine>)
+#if (__cplusplus == 202002L) && __has_include(<coroutine>)
     #include <coroutine>
     namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::coroutine_handle<Promise>;

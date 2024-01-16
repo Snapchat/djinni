@@ -105,6 +105,10 @@ package object generatorTools {
                    jsIdentStyle: JsIdentStyle,
                    tsOutFolder: Option[File],
                    tsModule: String,
+                   composerOutFolder: Option[File],
+                   composerIncludePrefix: String,
+                   composerIncludeCppPrefix: String,
+                   composerBaseLibIncludePrefix: String,
                    outFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],
@@ -294,6 +298,12 @@ package object generatorTools {
           createFolder("WASM", spec.wasmOutFolder.get)
         }
         new WasmGenerator(spec).generate(idl)
+      }
+      if (spec.composerOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("Composer", spec.composerOutFolder.get)
+        }
+        new ComposerGenerator(spec).generate(idl)
       }
       if (spec.tsOutFolder.isDefined) {
         if (!spec.skipGeneration) {
