@@ -111,7 +111,12 @@ private object IdlParser extends RegexParsers {
           foundObjc = true
         }
         case "w" => {
-          if (foundJavascript) return err("Found multiple \"w\" modifiers.")
+          if (foundJavascript) return err("Found multiple \"js\" modifiers.")
+          foundJavascript = true
+        }
+        // +js is an alias for +w for both wasm and composer
+        case "js" => {
+          if (foundJavascript) return err("Found multiple \"js\" modifiers.")
           foundJavascript = true
         }
         case _ => return err("Invalid modifier \"" + part.name + "\"")
