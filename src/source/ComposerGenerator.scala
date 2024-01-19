@@ -124,10 +124,22 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
   }
 
   private def stubRetSchema(m: Interface.Method): String = {
-    return if (m.ret.isEmpty) "ValueSchema::voidType()" else s"${helperClass(m.ret.get.resolved)}::schema()"
+    return if (m.ret.isEmpty) "ValueSchema::voidType()" else s"${schemaOrReference(m.ret.get)}"
   }
 
   private def stubParamName(name: String): String = s"c_${idCpp.local(name)}"
+
+  private def schemaTypeNameForInterface(ident: Ident): String = s"_djinni_interface_${ident.name}"
+  private def schemaTypeNameForStaticInterface(ident: Ident): String = s"_djinni_interface_${ident.name}_statics"
+  private def schemaTypeNameForRecord(ident: Ident): String = s"_djinni_record_${ident.name}"
+
+  private def schemaOrReference(ty: TypeRef): String = {
+    val m = ty.resolved
+    if (isInterface(m))
+      return s"${helperClass(m)}::schemaRef()"
+    else
+      return s"${helperClass(m)}::schema()"
+  }
 
   override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
     val refs = new ComposerRefs(ident.name)
@@ -184,9 +196,9 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
       }
       w.w(s"const ValueSchema& $helper::schema()").braced {
         //FIXME: _djinnin_record_namespace?
-        w.wl(s"""static auto schema = ValueSchema::cls(STRING_LITERAL("_djinni_record_${ident.name}"), false,""").bracedEnd(");") {
+        w.wl(s"""static auto schema = ValueSchema::cls(STRING_LITERAL("${schemaTypeNameForRecord(ident)}"), false,""").bracedEnd(");") {
           for (f <- r.fields) {
-            w.wl(s"""ClassPropertySchema(STRING_LITERAL("${idJs.field(f.ident)}"), ${helperClass(f.ty.resolved)}::schema()),""")
+            w.wl(s"""ClassPropertySchema(STRING_LITERAL("${idJs.field(f.ident)}"), ${schemaOrReference(f.ty)}),""")
           }
         }
         w.wl("return schema;")
@@ -209,6 +221,8 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     val helper = helperClass(ident)
     writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.w(s"struct $helper : ::djinni::JsInterface<$cls, $helper>").bracedSemi {
+        w.wl("static void registerSchema();")
+        w.wl("static const Composer::ValueSchema& schemaRef();")
         w.wl("static const Composer::ValueSchema& schema();")
 
         // cpp marshal helper
@@ -234,7 +248,6 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         //static methods
         val staticMethods = i.methods.filter(m => m.static)
         if (!staticMethods.isEmpty) {
-          w.wl("static const Composer::ValueSchema& staticSchema();")
           w.wl("static void djinniInitStaticMethods(Composer::Ref<Composer::ValueMap> m);")
         }
 
@@ -249,6 +262,8 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     writeCppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle, spec.composerIncludePrefix)(ident.name, origin, refs.cpp, (w => {
       w.wl("using namespace Composer;")
       w.wl("using namespace std::placeholders;")
+      w.wl
+      w.wl(s"""static STRING_CONST(schemaName, "${schemaTypeNameForInterface(ident)}");""")
       w.wl
       if (i.ext.cpp) {
         // method trampolines
@@ -287,16 +302,46 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         }
       }
       //value schema
-      w.w(s"const ValueSchema& $helper::schema()").braced {
-        w.wl(s"""static auto schema = ValueSchema::cls(STRING_LITERAL("_djinni_interface_${ident.name}"), true,""").bracedEnd(");") {
+      w.w(s"static const ValueSchema& unresolvedSchema()").braced {
+        w.wl(s"static auto schema = ValueSchema::cls(schemaName(), true,").bracedEnd(");") {
           for (m <- i.methods.filter(m => !m.static)) {
             w.w(s"""ClassPropertySchema(STRING_LITERAL("${idJs.method(m.ident)}"), ValueSchema::function(${stubRetSchema(m)},""").bracedEnd(")),") {
               for (p <- m.params) {
-                w.wl(s"${helperClass(p.ty.resolved)}::schema(),")
+                w.wl(s"${schemaOrReference(p.ty)},")
               }
             }
           }
         }
+        w.wl("return schema;")
+      }
+      w.w(s"void $helper::registerSchema()").braced {
+        w.wl("static std::once_flag flag;")
+        w.w("std::call_once(flag, []").bracedEnd(");") {
+          w.wl("auto registry = ValueSchemaRegistry::sharedInstance();")
+          //register this interface
+          w.wl("registry->registerSchema(unresolvedSchema());")
+          //register dependent interfaces (params and return that are interfaces but not this one)
+          var dependentTypes = new mutable.ListBuffer[String]()
+          for (m <- i.methods) {
+            for (p <- m.params.filter(p => isInterface(p.ty.resolved))) {
+              dependentTypes += helperClass(p.ty.resolved)
+            }
+            if (!m.ret.isEmpty && isInterface(m.ret.get.resolved)) {
+              dependentTypes += helperClass(m.ret.get.resolved)
+            }
+          }
+          for (t <- dependentTypes.distinct.filter(t => t != withNs(Some(helperNamespace), helperClass(ident)))) {
+            w.wl(s"${t}::registerSchema();")
+          }
+        }
+      }
+      // type reference
+      w.w(s"const ValueSchema& $helper::schemaRef()").braced {
+        w.wl("static auto ref = ValueSchema::typeReference(ValueSchemaTypeReference::named(schemaName()));")
+        w.wl("return ref;")
+      }
+      w.w(s"const ValueSchema& $helper::schema()").braced {
+        w.wl("static auto schema = djinni::resolveSchema(unresolvedSchema(), [] { registerSchema(); });")
         w.wl("return schema;")
       }
       // js proxy
@@ -327,22 +372,19 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
       // static methods
       val staticMethods = i.methods.filter(m => m.static)
       if (!staticMethods.isEmpty) {
-        // static methods schema
-        w.w(s"const ValueSchema& ${helper}::staticSchema()").braced {
-          w.wl(s"""static auto schema = ValueSchema::cls(STRING_LITERAL("_djinni_interface_${ident.name}_statics"), false,""").bracedEnd(");") {
+        // object for static methods
+        w.wl(s"void ${helper}::djinniInitStaticMethods(Ref<ValueMap> m)").braced {
+          w.wl(s"""auto unresolvedStaticSchema = ValueSchema::cls(STRING_LITERAL("${schemaTypeNameForStaticInterface(ident)}"), false,""").bracedEnd(");") {
             for (m <- i.methods.filter(m => m.static)) {
               w.w(s"""ClassPropertySchema(STRING_LITERAL("${idJs.method(m.ident)}"), ValueSchema::function(${stubRetSchema(m)},""").bracedEnd(")),") {
                 for (p <- m.params) {
-                  w.wl(s"${helperClass(p.ty.resolved)}::schema(),")
+                  w.wl(s"${schemaOrReference(p.ty)},")
                 }
               }
             }
           }
-          w.wl("return schema;")
-        }
-        // object for static methods
-        w.wl(s"void ${helper}::djinniInitStaticMethods(Ref<ValueMap> m)").braced {
-          w.w(s"""(*m)[STRING_LITERAL("${idJs.ty(ident)}")] = Value(ValueTypedObject::make(staticSchema().getClassRef(),""").bracedEnd("));") {
+          w.wl("auto staticSchema = djinni::resolveSchema(unresolvedStaticSchema, [] { registerSchema(); });")
+          w.w(s"""(*m)[STRING_LITERAL("${idJs.ty(ident)}")] = Value(ValueTypedObject::make(staticSchema.getClassRef(),""").bracedEnd("));") {
             for (m <- i.methods.filter(m => m.static)) {
               w.wl(s"""djinni::tsFunc(shim::${idCpp.method(m.ident)}),""")
             }
