@@ -104,9 +104,10 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         assert(tm.args.size == 2)
         f
       case MProtobuf(name, _, ProtobufMessage(cpp,_,_,Some(ts))) =>
-        "not implemented"
+        s"""<${withNs(Some(cpp.ns), name)}>"""
       case MArray =>
-        "not implemented"
+        assert(tm.args.size == 1)
+        s"""<${helperClass(tm.args.head)}>"""
       case _ => f
     }
   }
@@ -221,7 +222,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     val helper = helperClass(ident)
     writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.w(s"struct $helper : ::djinni::JsInterface<$cls, $helper>").bracedSemi {
-        w.wl("static void registerSchema();")
+        w.wl("static void registerSchema(bool resolve);")
         w.wl("static const Composer::ValueSchema& schemaRef();")
         w.wl("static const Composer::ValueSchema& schema();")
 
@@ -269,7 +270,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         // method trampolines
         w.wl("namespace shim {")
         for (m <- i.methods.filter(m => !m.static || m.lang.js)) {
-          val selfRef = if (m.static) "" else if (m.params.isEmpty) s"const ${helper}::CppType& self" else s"const ${helper}::CppType& self, "
+          val selfRef = if (m.static) "" else s"const ${helper}::CppType& self, "
           w.w(s"static Value ${idCpp.method(m.ident)}(${selfRef}const ValueFunctionCallContext& callContext)").braced {
             var idx = 0;
             for (p <- m.params) {
@@ -314,26 +315,22 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         }
         w.wl("return schema;")
       }
-      w.w(s"void $helper::registerSchema()").braced {
-        w.wl("static std::once_flag flag;")
-        w.w("std::call_once(flag, []").bracedEnd(");") {
-          w.wl("auto registry = ValueSchemaRegistry::sharedInstance();")
-          //register this interface
-          w.wl("registry->registerSchema(unresolvedSchema());")
-          //register dependent interfaces (params and return that are interfaces but not this one)
-          var dependentTypes = new mutable.ListBuffer[String]()
-          for (m <- i.methods) {
-            for (p <- m.params.filter(p => isInterface(p.ty.resolved))) {
-              dependentTypes += helperClass(p.ty.resolved)
-            }
-            if (!m.ret.isEmpty && isInterface(m.ret.get.resolved)) {
-              dependentTypes += helperClass(m.ret.get.resolved)
-            }
+      w.w(s"void $helper::registerSchema(bool resolve)").braced {
+        //register dependent interfaces (params and return that are interfaces but not this one)
+        var dependentTypes = new mutable.ListBuffer[String]()
+        for (m <- i.methods) {
+          for (p <- m.params.filter(p => isInterface(p.ty.resolved))) {
+            dependentTypes += helperClass(p.ty.resolved)
           }
-          for (t <- dependentTypes.distinct.filter(t => t != withNs(Some(helperNamespace), helperClass(ident)))) {
-            w.wl(s"${t}::registerSchema();")
-          }
+          if (!m.ret.isEmpty && isInterface(m.ret.get.resolved)) {
+            dependentTypes += helperClass(m.ret.get.resolved)
+            }
         }
+        for (t <- dependentTypes.distinct.filter(t => t != withNs(Some(helperNamespace), helperClass(ident)))) {
+          w.wl(s"${t}::registerSchema(resolve);")
+        }
+        w.wl("static std::once_flag flag[2];")
+        w.wl("std::call_once(flag[resolve ? 1 : 0], [resolve] { djinni::registerSchemaImpl(unresolvedSchema(), resolve); });")
       }
       // type reference
       w.w(s"const ValueSchema& $helper::schemaRef()").braced {
@@ -341,7 +338,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         w.wl("return ref;")
       }
       w.w(s"const ValueSchema& $helper::schema()").braced {
-        w.wl("static auto schema = djinni::resolveSchema(unresolvedSchema(), [] { registerSchema(); });")
+        w.wl(s"static auto schema = djinni::getResolvedSchema<$helper>(schemaName());")
         w.wl("return schema;")
       }
       // js proxy
@@ -357,7 +354,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
             if (!m.ret.isEmpty) {
               w.w("auto ret = ")
             }
-            w.w(s"getMethod(${idx})(").bracedEnd(");") {
+            w.w(s"callJsMethod(${idx},").bracedEnd(");") {
               for (p <- m.params) { 
                 w.wl(s"${helperClass(p.ty.resolved)}::fromCpp(${cppMarshal.maybeMove(idCpp.local(p.ident), p.ty)}),")
               }
@@ -370,12 +367,12 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         }
       }
       // static methods
-      val staticMethods = i.methods.filter(m => m.static)
+      val staticMethods = i.methods.filter(m => m.static && m.lang.js)
       if (!staticMethods.isEmpty) {
         // object for static methods
         w.wl(s"void ${helper}::djinniInitStaticMethods(Ref<ValueMap> m)").braced {
           w.wl(s"""auto unresolvedStaticSchema = ValueSchema::cls(STRING_LITERAL("${schemaTypeNameForStaticInterface(ident)}"), false,""").bracedEnd(");") {
-            for (m <- i.methods.filter(m => m.static)) {
+            for (m <- staticMethods) {
               w.w(s"""ClassPropertySchema(STRING_LITERAL("${idJs.method(m.ident)}"), ValueSchema::function(${stubRetSchema(m)},""").bracedEnd(")),") {
                 for (p <- m.params) {
                   w.wl(s"${schemaOrReference(p.ty)},")
@@ -383,7 +380,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
               }
             }
           }
-          w.wl("auto staticSchema = djinni::resolveSchema(unresolvedStaticSchema, [] { registerSchema(); });")
+          w.wl(s"auto staticSchema = djinni::resolveSchema(unresolvedStaticSchema, [] { registerSchema(false); registerSchema(true);} );")
           w.w(s"""(*m)[STRING_LITERAL("${idJs.ty(ident)}")] = Value(ValueTypedObject::make(staticSchema.getClassRef(),""").bracedEnd("));") {
             for (m <- i.methods.filter(m => m.static)) {
               w.wl(s"""djinni::tsFunc(shim::${idCpp.method(m.ident)}),""")

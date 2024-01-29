@@ -28,13 +28,20 @@ import java.util.regex.Pattern
 import java.util.regex.Matcher
 
 class TsGenerator(spec: Spec) extends Generator(spec) {
+
+  // FIXME: hack to choose composer flavor
+  // differences from wasm TS:
+  // * Use Long instead of BigInt
+  // * Proto messages in namespaces
+  private def composerMode = spec.composerOutFolder.isDefined && !spec.wasmOutFolder.isDefined
+
   private def tsRetType(m: Interface.Method): String = {
     return if (m.ret.isEmpty) "void" else toTsType(m.ret.get.resolved)
   }
 
   private def tsPrimitiveType(p: MPrimitive): String = p._idlName match {
     case "bool" => "boolean"
-    case "i64" => "bigint"
+    case "i64" => if (composerMode) "Long" else "bigint"
     case _ => "number"
   }
 
@@ -111,7 +118,9 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
   case class TsSymbolRef(sym: String, module: String)
   def references(m: Meta): Seq[TsSymbolRef] = m match {
     case e: MExtern => List(TsSymbolRef(idJs.ty(e.name), e.ts.module))
-    case MProtobuf(name, _, ProtobufMessage(_,_,_,Some(ts))) => List(TsSymbolRef(name, ts.module))
+    case MProtobuf(name, _, ProtobufMessage(_,_,_,Some(ts))) =>
+      if (composerMode) List(TsSymbolRef(s"${ts.ns}.$name as $name", ts.module))
+        else List(TsSymbolRef(name, ts.module))
     case _ => List()
   }
   class TsRefs() {
@@ -134,6 +143,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
   private def generateTsConstants(w: IndentWriter, ident: Ident, consts: Seq[Const]) = {
     def writeJsConst(w: IndentWriter, ty: TypeRef, v: Any): Unit = v match {
       case l: Long if (toTsType(removeOptional(ty.resolved)) == "bigint") => w.w(s"""BigInt("${l.toString}")""")
+      case l: Long if (toTsType(removeOptional(ty.resolved)) == "Long") => w.w(s"""Long.fromString("${l.toString}")""")
       case l: Long => w.w(l.toString)
       case d: Double => w.w(d.toString)
       case b: Boolean => w.w(if (b) "true" else "false")
