@@ -38,7 +38,7 @@ public:
         return _storage.data();
     }
 
-    PlatformObject platformObj() const override {
+    PlatformObject platformObj() const {
         return nullptr; // should not be called, as there's no translation
     }
 

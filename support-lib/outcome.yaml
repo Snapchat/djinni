@@ -36,3 +36,6 @@ ts:
   typename: 'Outcome'
   module: '@djinni_support/Outcome'
   generic: true
+composer:
+  translator: '::djinni::Outcome'
+  header: '"$Outcome_composer.hpp"'

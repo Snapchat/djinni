@@ -115,16 +115,20 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
     f(tm) + (if (addNullability) nullityAnnotation(tm) else "")
   }
 
-  case class TsSymbolRef(sym: String, module: String)
-  def references(m: Meta): Seq[TsSymbolRef] = m match {
+  abstract class TsSymbolRefBase {}
+  case class TsSymbolRef(sym: String, module: String) extends TsSymbolRefBase
+  case class ProtoSymbolRef(sym: String, module: String, ns: String) extends TsSymbolRefBase
+
+  def references(m: Meta): Seq[TsSymbolRefBase] = m match {
     case e: MExtern => List(TsSymbolRef(idJs.ty(e.name), e.ts.module))
     case MProtobuf(name, _, ProtobufMessage(_,_,_,Some(ts))) =>
-      if (composerMode) List(TsSymbolRef(s"${ts.ns}.$name as $name", ts.module))
+      if (composerMode) List(ProtoSymbolRef(name, ts.module, ts.ns))
         else List(TsSymbolRef(name, ts.module))
     case _ => List()
   }
   class TsRefs() {
     var imports = scala.collection.mutable.Map[String, TreeSet[String]]()
+    var protos = scala.collection.mutable.Map[String, TreeSet[(String, String)]]()
 
     def find(ty: TypeRef) { find(ty.resolved) }
     def find(tm: MExpr) {
@@ -135,6 +139,10 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
       case TsSymbolRef(sym, module) => {
         var syms = imports.getOrElseUpdate(module, TreeSet[String]())
         syms += (sym)
+      }
+      case ProtoSymbolRef(sym, module, ns) => {
+        var syms = protos.getOrElseUpdate(module, TreeSet[(String, String)]())
+        syms += ((sym, ns))
       }
       case _ =>
     }
@@ -260,6 +268,14 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
       for ((module, syms) <- refs.imports) {
         if (module != "") {
           w.wl(s"""import { ${syms.mkString(", ")} } from "$module"""")
+        }
+      }
+      for ((module, syms) <- refs.protos) {
+        if (module != "") {
+          w.wl(s"""import * as proto from "$module"""")
+          for (sym <- syms) {
+            w.wl(s"type ${sym._1} = proto.${sym._2}.${sym._1}")
+          }
         }
       }
 

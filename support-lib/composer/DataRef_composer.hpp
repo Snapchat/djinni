@@ -16,21 +16,20 @@
 
 #pragma once
 
-#include "djinni_wasm.hpp"
+#include "djinni_composer.hpp"
 #include "../cpp/DataRef.hpp"
 
-namespace djinni {
+namespace djinni::composer {
 
 struct NativeDataRef {
     using CppType = DataRef;
-    using JsType = em::val;
-
-    static CppType toCpp(const JsType& data) {
-        return DataRef(data);
-    }
-
-    static JsType fromCpp(const CppType& c);
-
+    using ComposerType = Composer::Value;
     using Boxed = NativeDataRef;
+
+    static CppType toCpp(const ComposerType& v);
+    static ComposerType fromCpp(const CppType& c);
+    
+    static const Composer::ValueSchema& schema();
 };
+
 } // namespace djinni

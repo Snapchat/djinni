@@ -36,7 +36,7 @@
   using PlatformObject = void*;
 #elif DATAREF_OBJC
   #include <CoreFoundation/CFData.h>
-  using PlatformObject = const void*;
+  using PlatformObject = CFDataRef;
 #elif DATAREF_WASM
   #include <emscripten/val.h>
   using PlatformObject = emscripten::val;
@@ -51,7 +51,6 @@ public:
     class Impl {
     public:
         virtual ~Impl() = default;
-        virtual PlatformObject platformObj() const = 0;
         
         virtual const uint8_t* buf() const = 0;
         virtual size_t len() const = 0;
@@ -62,6 +61,8 @@ public:
     DataRef(const DataRef&) = default;
     DataRef(DataRef&&) = default;
     
+    explicit DataRef(const std::shared_ptr<Impl>& impl): _impl(impl) {}
+
     // initialize with empty buffer
     explicit DataRef(size_t len);
     // initialize with data
@@ -96,13 +97,8 @@ public:
     uint8_t* mutableBuf() const {
         return _impl ? _impl->mutableBuf() : nullptr;
     }
-    PlatformObject platformObj() const {
-#if DATAREF_WASM
-        return _impl ? _impl->platformObj() : emscripten::val::undefined();
-#else
-        return _impl ? _impl->platformObj() : nullptr;
-#endif
-    }
+
+    std::shared_ptr<Impl> impl() const { return _impl; } 
 
 private:
     std::shared_ptr<Impl> _impl;

@@ -127,6 +127,9 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
   private def stubRetSchema(m: Interface.Method): String = {
     return if (m.ret.isEmpty) "ValueSchema::voidType()" else s"${schemaOrReference(m.ret.get)}"
   }
+  private def exceptionHandlingTraits(m: Interface.Method): String = {
+    return if (m.ret.isEmpty) "void" else helperClass(m.ret.get.resolved)
+  }
 
   private def stubParamName(name: String): String = s"c_${idCpp.local(name)}"
 
@@ -296,7 +299,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         w.w(s"Ref<ValueTypedProxyObject> $helper::toComposer(const CppOptType& c)").braced{
           w.w("auto o = ValueTypedObject::make(schema().getClassRef(),").bracedEnd(");") {
             for (m <- i.methods.filter(m => !m.static)) {
-              w.wl(s"""djinni::tsFunc(std::bind(shim::${idCpp.method(m.ident)}, c, _1)),""")
+              w.wl(s"""djinni::tsFunc<${exceptionHandlingTraits(m)}>(std::bind(shim::${idCpp.method(m.ident)}, c, _1)),""")
             }
           }
           w.wl("return makeShared<djinni::DjinniCppProxyObject<CppType::element_type>>(o, c);")
@@ -383,7 +386,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
           w.wl(s"auto staticSchema = djinni::resolveSchema(unresolvedStaticSchema, [] { registerSchema(false); registerSchema(true);} );")
           w.w(s"""(*m)[STRING_LITERAL("${idJs.ty(ident)}")] = Value(ValueTypedObject::make(staticSchema.getClassRef(),""").bracedEnd("));") {
             for (m <- i.methods.filter(m => m.static)) {
-              w.wl(s"""djinni::tsFunc(shim::${idCpp.method(m.ident)}),""")
+              w.wl(s"""djinni::tsFunc<${exceptionHandlingTraits(m)}>(shim::${idCpp.method(m.ident)}),""")
             }
           }
         }
