@@ -30,6 +30,13 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
 
   val cppMarshal = new CppMarshal(spec)
 
+  def jsClassNameAsCppType(jsClass: String): String = {
+    val nameParts = jsClass.split("""\.""")
+    val ns = nameParts.dropRight(1).mkString(".")
+    val cls = nameParts.takeRight(1).last
+    return Seq(ns, cls).map( e=> s"""djinni::CTS{"$e"}""").mkString(", ")
+  }
+
   class ComposerRefs(name: String, cppPrefixOverride: Option[String]=None) {
     var hpp = mutable.TreeSet[String]()
     var cpp = mutable.TreeSet[String]()
@@ -104,7 +111,9 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         assert(tm.args.size == 2)
         f
       case MProtobuf(name, _, ProtobufMessage(cpp,_,_,Some(ts))) =>
-        s"""<${withNs(Some(cpp.ns), name)}>"""
+        assert(tm.args.size == 0)
+        val tsname = if (ts.ns.isEmpty) name else ts.ns + "." + name
+        s"""<${withNs(Some(cpp.ns), name)}, ${jsClassNameAsCppType(tsname)}>"""
       case MArray =>
         assert(tm.args.size == 1)
         s"""<${helperClass(tm.args.head)}>"""
