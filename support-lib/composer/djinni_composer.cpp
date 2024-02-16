@@ -73,15 +73,17 @@ const ValueSchema& Binary::schema() {
 }
 
 Date::CppType Date::toCpp(const Date::ComposerType& v) {
-    return {};
+    auto millisecondsSinceEpoch = std::chrono::milliseconds(static_cast<int64_t>(v.toDouble()));
+    return CppType(std::chrono::duration_cast<std::chrono::system_clock::duration>(millisecondsSinceEpoch));
 }
 
 Date::ComposerType Date::fromCpp(const Date::CppType& c) {
-    return {};
+    auto millisecondsSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(c.time_since_epoch());
+    return Composer::Value(static_cast<double>(millisecondsSinceEpoch.count()));
 }
 
 const ValueSchema& Date::schema() {
-    static auto schema = ValueSchema::untyped();
+    static auto schema = ValueSchema::date();
     return schema;
 }
 

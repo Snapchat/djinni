@@ -40,18 +40,20 @@ public:
     // take over a std::vector's buffer without copying it
     explicit DataRefComposer(std::vector<uint8_t>&& vec) {
         auto container = Composer::makeShared<ComposerDataObject>();
-        auto bytes = vec.data();
-        auto len = vec.size();
         container->_data = std::move(vec);
+        const auto& containedVec = std::get<std::vector<uint8_t>>(container->_data);
+        auto bytes = containedVec.data();
+        auto len = containedVec.size();
         _array = Composer::makeShared<Composer::ValueTypedArray>(Composer::kDefaultTypedArrayType,
                                                        Composer::BytesView(container, bytes, len));
     }
     // take over a std::string's buffer without copying it
     explicit DataRefComposer(std::string&& str) {
         auto container = Composer::makeShared<ComposerDataObject>();
-        auto bytes = reinterpret_cast<uint8_t*>(str.data());
-        auto len = str.size();
         container->_data = std::move(str);
+        const std::string& containedStr = std::get<std::string>(container->_data);
+        auto bytes = reinterpret_cast<const uint8_t*>(containedStr.data());
+        auto len = containedStr.size();
         _array = Composer::makeShared<Composer::ValueTypedArray>(Composer::kDefaultTypedArrayType,
                                                                  Composer::BytesView(container, bytes, len));
     }

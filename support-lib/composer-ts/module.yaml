@@ -1,0 +1,5 @@
+output_target: release
+dependencies:
+  - composer_core
+  - coreutils
+  - foundation

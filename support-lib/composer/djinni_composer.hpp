@@ -343,7 +343,11 @@ public:
     }
 };
 
-template<typename CppProto>
+template<size_t N>
+struct CTS { char data[N]; };
+template<size_t N> CTS(const char(&)[N]) -> CTS<N>;
+
+template<typename CppProto, CTS ... JsClassName>
 class Protobuf {
 public:
     using CppType = CppProto;
@@ -352,15 +356,26 @@ public:
 
     static CppType toCpp(ComposerType v)
     {
-        return {};
+        auto array = v.getTypedArrayRef();
+        auto buffer = array->getBuffer();
+        CppProto ret;
+        ret.ParseFromArray(buffer.data(), static_cast<int>(buffer.size()));
+        return ret;
     }
         
     static ComposerType fromCpp(const CppType& c)
     {
-        return {};
+        std::vector<uint8_t> cbuf(c.ByteSizeLong());
+        c.SerializeToArray(cbuf.data(), static_cast<int>(cbuf.size()));
+        auto bytes = Composer::makeShared<Composer::Bytes>();
+        bytes->assignVec(std::move(cbuf));
+        auto array = Composer::makeShared<Composer::ValueTypedArray>(Composer::kDefaultTypedArrayType, bytes);
+        return Composer::Value(array);
     }
+
     static const Composer::ValueSchema& schema() {
-        static auto schema = Composer::ValueSchema::untyped();
+        constexpr std::array<const std::string_view, sizeof...(JsClassName)> jsClassName = {JsClassName.data...};
+        static auto schema = Composer::ValueSchema::proto(jsClassName.begin(), jsClassName.end());
         return schema;
     }
 };
