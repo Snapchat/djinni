@@ -23,8 +23,6 @@ def _android_autoconf_impl(repository_ctx):
     native.android_sdk_repository(
         name="androidsdk",
         path="{}",
-        api_level=30,
-        build_tools_version="30.0.2",
     )
 """.format(sdk_home)
 
