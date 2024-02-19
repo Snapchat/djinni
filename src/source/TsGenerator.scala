@@ -120,7 +120,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
   case class ProtoSymbolRef(sym: String, module: String, ns: String) extends TsSymbolRefBase
 
   def references(m: Meta): Seq[TsSymbolRefBase] = m match {
-    case e: MExtern => List(TsSymbolRef(idJs.ty(e.name), e.ts.module))
+    case e: MExtern => List(TsSymbolRef(idJs.ty(e.name), fixDjinniSupportModulePath(e.ts.module)))
     case MProtobuf(name, _, ProtobufMessage(_,_,_,Some(ts))) =>
       if (composerMode) List(ProtoSymbolRef(name, ts.module, ts.ns))
         else List(TsSymbolRef(name, ts.module))
@@ -147,6 +147,10 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
       case _ =>
     }
   }
+
+  private def fixDjinniSupportModulePath(module: String) =
+    if (composerMode) module.replaceAll("^@djinni_support/", "djinni_support/src/")
+    else module
 
   private def generateTsConstants(w: IndentWriter, ident: Ident, consts: Seq[Const]) = {
     def writeJsConst(w: IndentWriter, ty: TypeRef, v: Any): Unit = v match {
