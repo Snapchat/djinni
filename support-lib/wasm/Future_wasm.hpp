@@ -96,6 +96,7 @@ public:
         void doResolve() {
             try {
                 if constexpr (std::is_void_v<typename RESULT::CppType>) {
+                    _future->get();
                     _resolveFunc(em::val::undefined());
                 } else {
                     _resolveFunc(RESULT::Boxed::fromCpp(_future->get()));
