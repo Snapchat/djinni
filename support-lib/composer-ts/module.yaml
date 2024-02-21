@@ -3,3 +3,4 @@ dependencies:
   - composer_core
   - coreutils
   - foundation
+  - composer_protobuf

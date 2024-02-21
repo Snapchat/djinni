@@ -16,6 +16,7 @@
 
 #include "../cpp/DataRef.hpp"
 #include "DataRef_composer.hpp"
+#include <variant>
 
 namespace djinni::composer {
 
