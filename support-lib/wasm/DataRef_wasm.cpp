@@ -14,7 +14,6 @@
   * limitations under the License.
   */
 
-#include "../cpp/DataRef.hpp"
 #include "DataRef_wasm.hpp"
 
 #if DATAREF_WASM

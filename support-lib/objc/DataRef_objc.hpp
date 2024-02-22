@@ -17,7 +17,7 @@
 #pragma once
 
 #include "DJIMarshal+Private.h"
-#include "../cpp/DataRef.hpp"
+#include "DataRef.hpp"
 
 namespace djinni {
 struct NativeDataRef {

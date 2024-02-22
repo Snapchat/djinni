@@ -17,7 +17,7 @@
 #pragma once
 
 #include "djinni_composer.hpp"
-#include "../cpp/DataView.hpp"
+#include "DataView.hpp"
 
 namespace djinni::composer {
 

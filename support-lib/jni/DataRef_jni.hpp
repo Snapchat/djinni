@@ -17,7 +17,7 @@
 #pragma once
 
 #include "djinni_support.hpp"
-#include "../cpp/DataRef.hpp"
+#include "DataRef.hpp"
 
 namespace djinni {
 struct NativeDataRef {

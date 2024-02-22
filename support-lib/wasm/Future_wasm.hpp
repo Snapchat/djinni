@@ -17,7 +17,7 @@
 #pragma once
 
 #include "djinni_wasm.hpp"
-#include "../cpp/Future.hpp"
+#include "Future.hpp"
 
 namespace djinni {
 
