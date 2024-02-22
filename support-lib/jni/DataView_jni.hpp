@@ -17,7 +17,7 @@
 #pragma once
 
 #include "djinni_support.hpp"
-#include "DataView.hpp"
+#include "../cpp/DataView.hpp"
 
 namespace djinni {
 

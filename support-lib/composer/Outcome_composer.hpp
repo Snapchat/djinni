@@ -17,7 +17,7 @@
 #pragma once
 
 #include "djinni_composer.hpp"
-#include "expected.hpp"
+#include "../cpp/expected.hpp"
 
 namespace djinni {
 

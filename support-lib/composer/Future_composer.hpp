@@ -17,7 +17,7 @@
 #pragma once
 
 #include "djinni_composer.hpp"
-#include "Future.hpp"
+#include "../cpp/Future.hpp"
 #include "composer_core/cpp/Utils/ResolvablePromise.hpp"
 
 namespace djinni {

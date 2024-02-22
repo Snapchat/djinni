@@ -14,6 +14,7 @@
   * limitations under the License.
   */
 
+#include "../cpp/DataRef.hpp"
 #include "DataRef_objc.hpp"
 
 #if DATAREF_OBJC

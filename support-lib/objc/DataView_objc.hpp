@@ -17,7 +17,7 @@
 #pragma once
 
 #include "DJIMarshal+Private.h"
-#include "DataView.hpp"
+#include "../cpp/DataView.hpp"
 
 namespace djinni {
 

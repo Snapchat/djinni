@@ -18,7 +18,7 @@
 
 #include "djinni_support.hpp"
 #include "Marshal.hpp"
-#include "Future.hpp"
+#include "../cpp/Future.hpp"
 
 namespace djinni {
 

@@ -17,7 +17,7 @@
 #pragma once
 
 #include "DJIMarshal+Private.h"
-#include "expected.hpp"
+#include "../cpp/expected.hpp"
 #import "DJOutcome.h"
 
 namespace djinni {
