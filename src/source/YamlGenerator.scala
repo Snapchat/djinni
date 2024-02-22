@@ -35,6 +35,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   val javaMarshal = new JavaMarshal(spec)
   val jniMarshal = new JNIMarshal(spec)
   val wasmMarshal = new WasmGenerator(spec)
+  val composerMarshal = new ComposerGenerator(spec)
   val tsMarshal = new TsGenerator(spec)
 
   case class QuotedString(str: String) // For anything that migt require escaping
@@ -72,6 +73,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     w.wl("java:").nested { write(w, java(td)) }
     w.wl("jni:").nested { write(w, jni(td)) }
     w.wl("wasm:").nested { write(w, wasm(td)) }
+    w.wl("composer:").nested { write(w, composer(td)) }
     w.wl("ts:").nested {write(w, ts(td)) }
   }
 
@@ -190,6 +192,11 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     "typename" -> wasmMarshal.wasmType(mexpr(td))
   )
 
+  private def composer(td: TypeDecl) = Map[String, Any](
+    "translator" -> QuotedString(composerMarshal.helperName(mexpr(td))),
+    "header" -> QuotedString(composerMarshal.include(td.ident))
+  )
+
   private def ts(td: TypeDecl) = Map[String, Any](
     "typename" -> tsMarshal.toTsType(mexpr(td), /*addNullability*/ false),
     "module" -> QuotedString("./" + spec.tsModule)
@@ -276,6 +283,9 @@ object YamlGenerator {
       getOptionalField(td, "wasm", "typename"),
       getOptionalField(td, "wasm", "translator"),
       getOptionalField(td, "wasm", "header")),
+    MExtern.Composer(
+      getOptionalField(td, "composer", "translator"),
+      getOptionalField(td, "composer", "header")),
     MExtern.Ts(
       getOptionalField(td, "ts", "typename"),
       getOptionalField(td, "ts", "module"),

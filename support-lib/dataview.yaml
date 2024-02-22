@@ -33,3 +33,6 @@ wasm:
 ts:
   typename: 'Uint8Array'
   module: ''
+composer:
+  translator: '::djinni::composer::NativeDataView'
+  header: '"$DataView_composer.hpp"'

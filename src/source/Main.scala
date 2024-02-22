@@ -103,6 +103,10 @@ object Main {
     var jsIdentStyle = IdentStyle.jsDefault
     var tsOutFolder: Option[File] = None
     var tsModule: String = "module"
+    var composerOutFolder: Option[File] = None
+    var composerIncludePrefix: String = ""
+    var composerIncludeCppPrefix: String = ""
+    var composerBaseLibIncludePrefix: String = ""
     var inFileListPath: Option[File] = None
     var outFileListPath: Option[File] = None
     var skipGeneration: Boolean = false
@@ -268,6 +272,15 @@ object Main {
         .text("The output for the TypeScript interface files (Generator disabled if unspecified).")
       opt[String]("ts-module").valueName("<name>").foreach(tsModule = _)
         .text("TypeScript declaration module name (default: \"module\").")
+      note("")
+      opt[File]("composer-out").valueName("<out-folder>").foreach(x => composerOutFolder = Some(x))
+        .text("The output for the Composer bridge C++ files (Generator disabled if unspecified).")
+      opt[String]("composer-include-prefix").valueName("<prefix>").foreach(composerIncludePrefix = _)
+        .text("The prefix for #includes of Composer header files from Composer C++ files.")
+      opt[String]("composer-include-cpp-prefix").valueName("<prefix>").foreach(composerIncludeCppPrefix = _)
+        .text("The prefix for #includes of the main header files from Composer C++ files.")
+      opt[String]("composer-base-lib-include-prefix").valueName("...").foreach(x => composerBaseLibIncludePrefix = x)
+        .text("The Composer base library's include path, relative to the Composer C++ classes.")
       note("")
       opt[File]("yaml-out").valueName("<out-folder>").foreach(x => yamlOutFolder = Some(x))
         .text("The output folder for YAML files (Generator disabled if unspecified).")
@@ -457,6 +470,10 @@ object Main {
       jsIdentStyle,
       tsOutFolder,
       tsModule,
+      composerOutFolder,
+      composerIncludePrefix,
+      composerIncludeCppPrefix,
+      composerBaseLibIncludePrefix,
       outFileListWriter,
       skipGeneration,
       yamlOutFolder,

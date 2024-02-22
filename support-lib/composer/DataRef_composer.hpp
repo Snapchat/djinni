@@ -1,5 +1,5 @@
 /**
-  * Copyright 2021 Snap, Inc.
+  * Copyright 2024 Snap, Inc.
   *
   * Licensed under the Apache License, Version 2.0 (the "License");
   * you may not use this file except in compliance with the License.
@@ -16,24 +16,20 @@
 
 #pragma once
 
-#include "DJIMarshal+Private.h"
+#include "djinni_composer.hpp"
 #include "DataRef.hpp"
 
-namespace djinni {
+namespace djinni::composer {
+
 struct NativeDataRef {
     using CppType = DataRef;
-    using ObjcType = NSData*;
-
-    static CppType toCpp(ObjcType data) {
-        if ([data isKindOfClass:[NSMutableData class]]) {
-            return DataRef((__bridge CFMutableDataRef)data);
-        } else {
-            return DataRef((__bridge CFDataRef)data);
-        }
-    }
-
-    static ObjcType fromCpp(const CppType& c);
-
+    using ComposerType = Composer::Value;
     using Boxed = NativeDataRef;
+
+    static CppType toCpp(const ComposerType& v);
+    static ComposerType fromCpp(const CppType& c);
+    
+    static const Composer::ValueSchema& schema();
 };
+
 } // namespace djinni

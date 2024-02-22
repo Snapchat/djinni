@@ -17,7 +17,7 @@
 #pragma once
 
 #include "djinni_wasm.hpp"
-#include "../cpp/expected.hpp"
+#include "expected.hpp"
 
 namespace djinni {
 

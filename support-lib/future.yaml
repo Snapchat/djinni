@@ -36,3 +36,6 @@ ts:
   typename: 'Promise'
   module: ''
   generic: true
+composer:
+  translator: '::djinni::FutureAdaptor'
+  header: '"$Future_composer.hpp"'

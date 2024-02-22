@@ -18,7 +18,7 @@
 
 #include "djinni_support.hpp"
 #include "Marshal.hpp"
-#include "../cpp/expected.hpp"
+#include "expected.hpp"
 
 namespace djinni {
 

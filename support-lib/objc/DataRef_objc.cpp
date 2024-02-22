@@ -14,7 +14,7 @@
   * limitations under the License.
   */
 
-#include "../cpp/DataRef.hpp"
+#include "DataRef_objc.hpp"
 
 #if DATAREF_OBJC
 
@@ -83,7 +83,7 @@ public:
         return _mutableData ? CFDataGetMutableBytePtr(_mutableData) : nullptr;
     }
 
-    PlatformObject platformObj() const override {
+    PlatformObject platformObj() const {
         return _data;
     }
 
@@ -143,6 +143,14 @@ DataRef::DataRef(CFMutableDataRef platformObj) {
 
 DataRef::DataRef(CFDataRef platformObj) {
     _impl = std::make_shared<DataRefObjc>(platformObj);
+}
+
+NSData* NativeDataRef::fromCpp(const DataRef& c) {
+    auto impl = std::dynamic_pointer_cast<DataRefObjc>(c.impl());
+    if (!impl) {
+        throw std::invalid_argument("DataRef impl is not compatible with ObjC");
+    }
+    return (__bridge NSData*)impl->platformObj();
 }
 
 } // namespace djinni
