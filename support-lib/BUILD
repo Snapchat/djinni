@@ -43,6 +43,7 @@ objc_library(
     hdrs = glob(["objc/*.h", "objc/*.hpp"]),
     copts = [
         "-ObjC++",
+        "-std=c++17",
     ],
     includes = ["objc"],
     defines = ["DATAREF_OBJC=1"],
