@@ -584,7 +584,7 @@ private:
         }
     }
 
-    // enable this only when the derived class has `schema` defined
+    // enable this only when the derived class has `toComposer` defined
     // (interface +c)
     template<typename, typename>
     struct GetOrCreateCppProxy {
