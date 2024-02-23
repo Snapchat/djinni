@@ -383,15 +383,17 @@ public:
             this->_promise.setValue(std::forward<V>(value));
         }
     };
-    template <>
-    struct PromiseType<void>: PromiseTypeBase {
-        void return_void() {
-            this->_promise.setValue();
-        }
-    };
     using promise_type = PromiseType<T>;
 #endif
 };
+
+#if defined(DJINNI_FUTURE_HAS_COROUTINE_SUPPORT)
+template<> template<> struct Future<void>::PromiseType<void>:PromiseTypeBase {
+    void return_void() {
+        this->_promise.setValue();
+    }
+};
+#endif
 
 template <typename T>
 Future<T> detail::PromiseBase<T>::getFuture() {
