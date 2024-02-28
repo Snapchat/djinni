@@ -100,6 +100,10 @@ object Main {
     var wasmOmitConstants: Boolean = false
     var wasmNamespace: Option[String] = None
     var wasmOmitNsAlias: Boolean = false
+    var composerNamespace: String = "djinni_generated"
+    var composerClassIdentStyleOptional: Option[IdentConverter] = None
+    var composerFileIdentStyleOptional: Option[IdentConverter] = None
+    var composerTsOutFolder: Option[File] = None
     var jsIdentStyle = IdentStyle.jsDefault
     var tsOutFolder: Option[File] = None
     var tsModule: String = "module"
@@ -281,6 +285,10 @@ object Main {
         .text("The prefix for #includes of the main header files from Composer C++ files.")
       opt[String]("composer-base-lib-include-prefix").valueName("...").foreach(x => composerBaseLibIncludePrefix = x)
         .text("The Composer base library's include path, relative to the Composer C++ classes.")
+      opt[String]("composer-namespace").valueName("...").foreach(x => composerNamespace = x)
+        .text("The namespace name to use for generated Composer C++ classes.")
+      opt[File]("composer-ts-out").valueName("<out-folder>").foreach(x => composerTsOutFolder = Some(x))
+        .text("The output for the Composer TypeScript interface files (Generator disabled if unspecified).")
       note("")
       opt[File]("yaml-out").valueName("<out-folder>").foreach(x => yamlOutFolder = Some(x))
         .text("The output folder for YAML files (Generator disabled if unspecified).")
@@ -318,6 +326,8 @@ object Main {
       identStyle("ident-objc-local",      c => { objcIdentStyle = objcIdentStyle.copy(local = c) })
       identStyle("ident-objc-const",      c => { objcIdentStyle = objcIdentStyle.copy(const = c) })
       identStyle("ident-objc-file",       c => { objcFileIdentStyleOptional = Some(c) })
+      identStyle("ident-composer-class", c => { composerClassIdentStyleOptional = Some(c)})
+      identStyle("ident-composer-file",  c => { composerFileIdentStyleOptional = Some(c)})
     }
 
     if (!argParser.parse(args)) {
@@ -335,6 +345,9 @@ object Main {
     // Add ObjC prefix to identstyle
     objcIdentStyle = objcIdentStyle.copy(ty = IdentStyle.prefix(objcTypePrefix,objcIdentStyle.ty))
     objcFileIdentStyle = IdentStyle.prefix(objcTypePrefix, objcFileIdentStyle)
+
+    val composerClassIdentStyle = composerClassIdentStyleOptional.getOrElse(cppIdentStyle.ty)
+    val composerFileIdentStyle = composerFileIdentStyleOptional.getOrElse(cppFileIdentStyle)
 
     if (cppTypeEnumIdentStyle != null) {
       cppIdentStyle = cppIdentStyle.copy(enumType = cppTypeEnumIdentStyle)
@@ -474,6 +487,10 @@ object Main {
       composerIncludePrefix,
       composerIncludeCppPrefix,
       composerBaseLibIncludePrefix,
+      composerNamespace,
+      composerClassIdentStyle,
+      composerFileIdentStyle,
+      composerTsOutFolder,
       outFileListWriter,
       skipGeneration,
       yamlOutFolder,

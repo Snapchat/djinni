@@ -36,7 +36,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   val jniMarshal = new JNIMarshal(spec)
   val wasmMarshal = new WasmGenerator(spec)
   val composerMarshal = new ComposerGenerator(spec)
-  val tsMarshal = new TsGenerator(spec)
+  val tsMarshal = new TsGenerator(spec, false)
 
   case class QuotedString(str: String) // For anything that migt require escaping
 

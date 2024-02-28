@@ -61,13 +61,13 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
   }
 
   private def composerFilenameStyle(name: String): String = {
-    return spec.jniFileIdentStyle(name)
+    return spec.composerFileIdentStyle(name)
   }
   private def helperNamespace(): String = {
-    return spec.jniNamespace;
+    return spec.composerNamespace;
   }
 
-  private def helperClass(name: String) = spec.jniClassIdentStyle(name)
+  private def helperClass(name: String) = spec.composerClassIdentStyle(name)
   private def helperClass(tm: MExpr): String = helperName(tm) + helperTemplates(tm)
   def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => withNs(Some(helperNamespace()), helperClass(d.name))

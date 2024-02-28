@@ -109,6 +109,10 @@ package object generatorTools {
                    composerIncludePrefix: String,
                    composerIncludeCppPrefix: String,
                    composerBaseLibIncludePrefix: String,
+                   composerNamespace: String,
+                   composerClassIdentStyle: IdentConverter,
+                   composerFileIdentStyle: IdentConverter,
+                   composerTsOutFolder: Option[File],
                    outFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],
@@ -309,7 +313,13 @@ package object generatorTools {
         if (!spec.skipGeneration) {
           createFolder("TypeScript", spec.tsOutFolder.get)
         }
-        new TsGenerator(spec).generate(idl)
+        new TsGenerator(spec, false).generate(idl)
+      }
+      if (spec.composerTsOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("Composer TypeScript", spec.composerTsOutFolder.get)
+        }
+        new TsGenerator(spec, true).generate(idl)
       }
       if (spec.yamlOutFolder.isDefined) {
         if (!spec.skipGeneration) {
