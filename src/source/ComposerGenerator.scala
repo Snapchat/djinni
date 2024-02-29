@@ -394,7 +394,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
           }
           w.wl(s"auto staticSchema = djinni::resolveSchema(unresolvedStaticSchema, [] { registerSchema(false); registerSchema(true);} );")
           w.w(s"""(*m)[STRING_LITERAL("${idJs.ty(ident)}")] = Value(ValueTypedObject::make(staticSchema.getClassRef(),""").bracedEnd("));") {
-            for (m <- i.methods.filter(m => m.static)) {
+            for (m <- staticMethods) {
               w.wl(s"""djinni::tsFunc<${exceptionHandlingTraits(m)}>(shim::${idCpp.method(m.ident)}),""")
             }
           }
