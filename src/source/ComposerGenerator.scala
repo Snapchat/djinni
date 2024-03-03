@@ -40,6 +40,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
   class ComposerRefs(name: String, cppPrefixOverride: Option[String]=None) {
     var hpp = mutable.TreeSet[String]()
     var cpp = mutable.TreeSet[String]()
+    var interfaces = mutable.TreeSet[String]()
 
     val cppPrefix = cppPrefixOverride.getOrElse(spec.composerIncludeCppPrefix)
     hpp.add("#include " + q(cppPrefix + spec.cppFileIdentStyle(name) + "." + spec.cppHeaderExt))
@@ -54,9 +55,14 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
       tm.args.foreach(find)
       find(tm.base)
     }
-    def find(m: Meta) = for(r <- references(m, name)) r match {
-      case ImportRef(arg) => cpp.add("#include " + arg)
-      case _ =>
+    def find(m: Meta) = {
+      for(r <- references(m, name)) r match {
+        case ImportRef(arg) => cpp.add("#include " + arg)
+        case _ =>
+      }
+      for(i <- dependentInterfaces(m)) {
+        interfaces.add(helperClass(i))
+      }
     }
   }
 
@@ -131,6 +137,12 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
 
   def resolveExtComposerHdr(path: String) = {
     path.replaceAll("\\$", spec.composerBaseLibIncludePrefix);
+  }
+
+  def dependentInterfaces(m: Meta): Seq[MExpr] = m match {
+    case d: MDef => if (d.defType == DInterface) List(MExpr(d, List())) else List()
+    case e: MExtern => if (e.defType == DInterface) List(MExpr(e, List())) else List()
+    case _ => List()
   }
 
   private def stubRetSchema(m: Interface.Method): String = {
@@ -329,16 +341,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
       }
       w.w(s"void $helper::registerSchema(bool resolve)").braced {
         //register dependent interfaces (params and return that are interfaces but not this one)
-        var dependentTypes = new mutable.ListBuffer[String]()
-        for (m <- i.methods) {
-          for (p <- m.params.filter(p => isInterface(p.ty.resolved))) {
-            dependentTypes += helperClass(p.ty.resolved)
-          }
-          if (!m.ret.isEmpty && isInterface(m.ret.get.resolved)) {
-            dependentTypes += helperClass(m.ret.get.resolved)
-            }
-        }
-        for (t <- dependentTypes.distinct.filter(t => t != withNs(Some(helperNamespace), helperClass(ident)))) {
+        for (t <- refs.interfaces.filter(t => t != withNs(Some(helperNamespace), helperClass(ident)))) {
           w.wl(s"${t}::registerSchema(resolve);")
         }
         w.wl("static std::once_flag flag[2];")
