@@ -324,7 +324,7 @@ class TsGenerator(spec: Spec, composerMode: Boolean) extends Generator(spec) {
           w.wl(s"${nsParts.head}: ns_${nsParts.head};")
         }
       } else {
-        w.w(s"export interface ${idJs.ty(spec.tsModule)}_statics").braced {
+        w.w(s"export interface ${idJs.ty(spec.tsModule)}_module").braced {
           for (i <- interfacesWithStatics.toList) {
             w.wl(withWasmNamespace(i) + ": " + i + "_statics;")
           }
