@@ -303,7 +303,14 @@ class TsGenerator(spec: Spec, composerMode: Boolean) extends Generator(spec) {
       }
       // add static factories
       w.wl
-      if (!composerMode && !spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
+      if (composerMode) {
+        w.w(s"export interface ${idJs.ty(spec.tsModule)}_module").braced {
+          for (i <- interfacesWithStatics.toList) {
+            w.wl(withWasmNamespace(i) + ": " + i + "_statics;")
+          }
+        }
+      }
+      else if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
         val nsParts = spec.wasmNamespace.get.split("\\.")
 
         for (i <- 0 until nsParts.length - 1) {
@@ -322,12 +329,6 @@ class TsGenerator(spec: Spec, composerMode: Boolean) extends Generator(spec) {
           }
           w.wl
           w.wl(s"${nsParts.head}: ns_${nsParts.head};")
-        }
-      } else {
-        w.w(s"export interface ${idJs.ty(spec.tsModule)}_module").braced {
-          for (i <- interfacesWithStatics.toList) {
-            w.wl(withWasmNamespace(i) + ": " + i + "_statics;")
-          }
         }
       }
     })
