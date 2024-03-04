@@ -240,12 +240,10 @@ class TsGenerator(spec: Spec, composerMode: Boolean) extends Generator(spec) {
     }
   }
   private def withWasmNamespace(name: String, sep: String = "_") =
-    if (!composerMode) {
-      spec.wasmNamespace match {
-        case Some(p) => p.replaceAll(Pattern.quote("."), Matcher.quoteReplacement(sep)) + sep + name
-        case None => name
-      }
-    } else name
+    spec.wasmNamespace match {
+      case Some(p) => p.replaceAll(Pattern.quote("."), Matcher.quoteReplacement(sep)) + sep + name
+      case None => name
+    }
 
   //--------------------------------------------------------------------------
   override def generate(idl: Seq[TypeDecl]) {
@@ -306,11 +304,10 @@ class TsGenerator(spec: Spec, composerMode: Boolean) extends Generator(spec) {
       if (composerMode) {
         w.w(s"export interface ${idJs.ty(spec.tsModule)}_module").braced {
           for (i <- interfacesWithStatics.toList) {
-            w.wl(withWasmNamespace(i) + ": " + i + "_statics;")
+            w.wl(i + ": " + i + "_statics;")
           }
         }
-      }
-      else if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
+      } else if (!spec.wasmOmitNsAlias && !spec.wasmNamespace.isEmpty) {
         val nsParts = spec.wasmNamespace.get.split("\\.")
 
         for (i <- 0 until nsParts.length - 1) {
@@ -329,6 +326,12 @@ class TsGenerator(spec: Spec, composerMode: Boolean) extends Generator(spec) {
           }
           w.wl
           w.wl(s"${nsParts.head}: ns_${nsParts.head};")
+        }
+      } else {
+        w.w(s"export interface ${idJs.ty(spec.tsModule)}_statics").braced {
+          for (i <- interfacesWithStatics.toList) {
+            w.wl(withWasmNamespace(i) + ": " + i + "_statics;")
+          }
         }
       }
     })
