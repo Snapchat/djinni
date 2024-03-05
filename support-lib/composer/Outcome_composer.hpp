@@ -19,7 +19,7 @@
 #include "djinni_composer.hpp"
 #include "../cpp/expected.hpp"
 
-namespace djinni {
+namespace djinni::composer {
 
 template <class RESULT, class ERROR>
 class Outcome

@@ -20,7 +20,7 @@
 #include "../cpp/Future.hpp"
 #include "composer_core/cpp/Utils/ResolvablePromise.hpp"
 
-namespace djinni {
+namespace djinni::composer {
 
 template <class RESULT>
 class FutureAdaptor

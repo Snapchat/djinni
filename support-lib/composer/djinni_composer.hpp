@@ -40,7 +40,7 @@
 #include <functional>
 #include <codecvt>
 
-namespace djinni {
+namespace djinni::composer {
 
 // -------- Helper functions and classes
 class JsException : public std::runtime_error {

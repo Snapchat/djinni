@@ -37,5 +37,5 @@ ts:
   module: '@djinni_support/Outcome'
   generic: true
 composer:
-  translator: '::djinni::Outcome'
+  translator: '::djinni::composer::Outcome'
   header: '"$Outcome_composer.hpp"'

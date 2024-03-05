@@ -37,5 +37,5 @@ ts:
   module: ''
   generic: true
 composer:
-  translator: '::djinni::FutureAdaptor'
+  translator: '::djinni::composer::FutureAdaptor'
   header: '"$Future_composer.hpp"'

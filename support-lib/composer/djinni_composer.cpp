@@ -18,7 +18,7 @@
 
 #include "composer_core/cpp/Utils/ValueTypedArray.hpp"
 
-namespace djinni {
+namespace djinni::composer {
 
 using namespace Composer;
 

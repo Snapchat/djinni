@@ -34,7 +34,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     val nameParts = jsClass.split("""\.""")
     val ns = nameParts.dropRight(1).mkString(".")
     val cls = nameParts.takeRight(1).last
-    return Seq(ns, cls).map( e=> s"""djinni::CTS{"$e"}""").mkString(", ")
+    return Seq(ns, cls).map( e=> s"""djinni::composer::CTS{"$e"}""").mkString(", ")
   }
 
   class ComposerRefs(name: String, cppPrefixOverride: Option[String]=None) {
@@ -78,7 +78,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
   def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => withNs(Some(helperNamespace()), helperClass(d.name))
     case e: MExtern => e.composer.translator
-    case o => withNs(Some("djinni"), o match {
+    case o => withNs(Some("djinni::composer"), o match {
       case p: MPrimitive => p.idlName match {
         case "i8" => "I8"
         case "i16" => "I16"
@@ -174,7 +174,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     // val fullyQualifiedName = withWasmNamespace(idJs.ty(ident))
     val fullyQualifiedName = idJs.ty(ident)
     writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
-      w.wl(s"using $helper = ::djinni::Enum<$cls>;")
+      w.wl(s"using $helper = ::djinni::composer::Enum<$cls>;")
     }), (w => {}))
   }
 
@@ -245,7 +245,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     val cls = withNs(Some(spec.cppNamespace), idCpp.ty(ident))
     val helper = helperClass(ident)
     writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
-      w.w(s"struct $helper : ::djinni::JsInterface<$cls, $helper>").bracedSemi {
+      w.w(s"struct $helper : ::djinni::composer::JsInterface<$cls, $helper>").bracedSemi {
         w.wl("static void registerSchema(bool resolve);")
         w.wl("static const Composer::ValueSchema& schemaRef();")
         w.wl("static const Composer::ValueSchema& schema();")
@@ -257,7 +257,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
 
         // js proxy
         if (i.ext.js) {
-          w.w(s"struct ComposerProxy: $cls, ::djinni::ComposerProxyBase").bracedSemi {
+          w.w(s"struct ComposerProxy: $cls, ::djinni::composer::ComposerProxyBase").bracedSemi {
             w.wl("ComposerProxy(Composer::Ref<Composer::ValueTypedProxyObject> js) : ComposerProxyBase(js) {}")
             for (m <- i.methods.filter(m => !m.static)) {
               w.w(s"${cppMarshal.fqReturnType(m.ret)} ${idCpp.method(m.ident)}(")
@@ -320,10 +320,10 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         w.w(s"Ref<ValueTypedProxyObject> $helper::toComposer(const CppOptType& c)").braced{
           w.w("auto o = ValueTypedObject::make(schema().getClassRef(),").bracedEnd(");") {
             for (m <- i.methods.filter(m => !m.static)) {
-              w.wl(s"""djinni::tsFunc<${exceptionHandlingTraits(m)}>(std::bind(shim::${idCpp.method(m.ident)}, c, _1)),""")
+              w.wl(s"""djinni::composer::tsFunc<${exceptionHandlingTraits(m)}>(std::bind(shim::${idCpp.method(m.ident)}, c, _1)),""")
             }
           }
-          w.wl("return makeShared<djinni::DjinniCppProxyObject<CppType::element_type>>(o, c);")
+          w.wl("return makeShared<djinni::composer::DjinniCppProxyObject<CppType::element_type>>(o, c);")
         }
       }
       //value schema
@@ -345,7 +345,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
           w.wl(s"${t}::registerSchema(resolve);")
         }
         w.wl("static std::once_flag flag[2];")
-        w.wl("std::call_once(flag[resolve ? 1 : 0], [resolve] { djinni::registerSchemaImpl(unresolvedSchema(), resolve); });")
+        w.wl("std::call_once(flag[resolve ? 1 : 0], [resolve] { djinni::composer::registerSchemaImpl(unresolvedSchema(), resolve); });")
       }
       // type reference
       w.w(s"const ValueSchema& $helper::schemaRef()").braced {
@@ -353,7 +353,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         w.wl("return ref;")
       }
       w.w(s"const ValueSchema& $helper::schema()").braced {
-        w.wl(s"static auto schema = djinni::getResolvedSchema<$helper>(schemaName());")
+        w.wl(s"static auto schema = djinni::composer::getResolvedSchema<$helper>(schemaName());")
         w.wl("return schema;")
       }
       // js proxy
@@ -395,10 +395,10 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
               }
             }
           }
-          w.wl(s"auto staticSchema = djinni::resolveSchema(unresolvedStaticSchema, [] { registerSchema(false); registerSchema(true);} );")
+          w.wl(s"auto staticSchema = djinni::composer::resolveSchema(unresolvedStaticSchema, [] { registerSchema(false); registerSchema(true);} );")
           w.w(s"""(*m)[STRING_LITERAL("${idJs.ty(ident)}")] = Value(ValueTypedObject::make(staticSchema.getClassRef(),""").bracedEnd("));") {
             for (m <- staticMethods) {
-              w.wl(s"""djinni::tsFunc<${exceptionHandlingTraits(m)}>(shim::${idCpp.method(m.ident)}),""")
+              w.wl(s"""djinni::composer::tsFunc<${exceptionHandlingTraits(m)}>(shim::${idCpp.method(m.ident)}),""")
             }
           }
         }
