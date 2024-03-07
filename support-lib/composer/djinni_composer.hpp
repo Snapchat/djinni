@@ -536,7 +536,7 @@ public:
         return {_toJs(c)};
     }
     static ComposerType fromCpp(const CppType& c) {
-        ::djinni::checkForNull(c.get(), typeid(Self).name());
+        ::djinni::composer::checkForNull(c.get(), typeid(Self).name());
         return fromCppOpt(c);
     }
 
