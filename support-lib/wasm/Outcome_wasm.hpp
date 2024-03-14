@@ -39,7 +39,7 @@ struct Outcome
         } else {
             em::val err = j["error"];
             assert(!err.isUndefined());
-            return make_unexpected(Error::Boxed::toCpp(err));
+            return unexpected {Error::Boxed::toCpp(err)};
         }
     }
     static JsType fromCpp(const CppType& c) {

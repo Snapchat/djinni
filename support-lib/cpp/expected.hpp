@@ -1,5 +1,20 @@
 #pragma once
 
+#include <version>
+
+#ifdef __cpp_lib_expected
+
+#include <expected>
+
+namespace djinni {
+
+using ::std::expected;
+using ::std::unexpected;
+
+}
+
+#else
+
 #include "tl_expected.hpp"
 
 namespace djinni {
@@ -7,9 +22,6 @@ namespace djinni {
 using ::tl::unexpected;
 using ::tl::expected;
 
-template <class E>
-unexpected<typename std::decay<E>::type> make_unexpected(E &&e) {
-    return tl::unexpected<typename std::decay<E>::type>(std::forward<E>(e));
 }
 
-}
+#endif
