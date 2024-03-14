@@ -23,12 +23,12 @@ typedef id (^HANDLER)(id _Nonnull);
 }
 -(instancetype)initWithResult:(id)result {
     if (self = [super init]) {
-        self->_accessor = ^(HANDLER resultHandler, HANDLER errorHandler) {return resultHandler(result);};}
+        self->_accessor = ^(HANDLER resultHandler, HANDLER) {return resultHandler(result);};}
     return self;
 }
 -(instancetype)initWithError:(id)error {
     if (self = [super init]) {
-        self->_accessor = ^(HANDLER resultHandler, HANDLER errorHandler) {return errorHandler(error);};}
+        self->_accessor = ^(HANDLER, HANDLER errorHandler) {return errorHandler(error);};}
     return self;
 }
 +(DJOutcome<id, id>*)fromResult:(id)result {
@@ -42,14 +42,14 @@ typedef id (^HANDLER)(id _Nonnull);
 }
 -(id)result {
     return _accessor(^(id result){ return result; }, 
-                     ^(id error) { return (id)nil; });
+                     ^(id) { return (id)nil; });
 }
 -(id)resultOr:(id)defaultResult {
     return _accessor(^(id result){ return result; },
-                     ^(id error) { return defaultResult; });
+                     ^(id) { return defaultResult; });
 }
 -(id)error {
-    return _accessor(^(id result){ return (id)nil; },
+    return _accessor(^(id){ return (id)nil; },
                      ^(id error) { return error; });
 }
 - (NSString *)description {
