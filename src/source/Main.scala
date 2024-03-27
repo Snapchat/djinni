@@ -101,6 +101,7 @@ object Main {
     var inFileListPath: Option[File] = None
     var outFileListPath: Option[File] = None
     var skipGeneration: Boolean = false
+    var allowInterfacesInRecords: Boolean = false
     var yamlOutFolder: Option[File] = None
     var yamlOutFile: Option[String] = None
     var yamlPrefix: String = ""
@@ -265,6 +266,8 @@ object Main {
         .text("Optional file in which to write the list of output files produced.")
       opt[Boolean]("skip-generation").valueName("<true/false>").foreach(x => skipGeneration = x)
         .text("Way of specifying if file generation should be skipped (default: false)")
+      opt[Boolean]("allow-interfaces-in-records").valueName("<true/false>").foreach(x => allowInterfacesInRecords = x)
+        .text("Allows for records to contain interfaces.")
 
       note("\nIdentifier styles (ex: \"FooBar\", \"fooBar\", \"foo_bar\", \"FOO_BAR\", \"m_fooBar\")\nUse an exclamation mark to apply stricty, even on ALL_CAPS identifiers (ex: \"FooBar!\")\n")
       identStyle("ident-java-enum",      c => { javaIdentStyle = javaIdentStyle.copy(enum = c) })
@@ -341,7 +344,7 @@ object Main {
 
     // Resolve names in IDL file, check types.
     System.out.println("Resolving...")
-    resolver.resolve(meta.defaults, idl) match {
+    resolver.resolve(meta.defaults, idl, allowInterfacesInRecords) match {
       case Some(err) =>
         System.err.println(err)
         System.exit(1); return
@@ -435,6 +438,7 @@ object Main {
       jsIdentStyle,
       tsOutFolder,
       tsModule,
+      allowInterfacesInRecords,
       outFileListWriter,
       skipGeneration,
       yamlOutFolder,
