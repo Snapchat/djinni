@@ -108,7 +108,7 @@ private:
         auto buf = reinterpret_cast<const uint8_t*>(p->data());
         auto len = p->size();
         context.info = p;
-        context.deallocate = [](void* ptr, void* info) {
+        context.deallocate = [](void*, void* info) {
             // delete the wrapped object
             auto* p = reinterpret_cast<DataObj*>(info);
             delete p;
