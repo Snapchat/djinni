@@ -9,7 +9,7 @@ djinni::expected<std::string, int> TestOutcome::getSuccessOutcome() {
 }
 
 djinni::expected<std::string, int> TestOutcome::getErrorOutcome() {
-    return djinni::make_unexpected(42);
+    return djinni::unexpected(42);
 }
 
 std::string TestOutcome::putSuccessOutcome(const djinni::expected<std::string, int>& x) {
@@ -26,7 +26,7 @@ NestedOutcome TestOutcome::getNestedSuccessOutcome() {
 
 NestedOutcome TestOutcome::getNestedErrorOutcome() {
     return {
-        djinni::make_unexpected(std::string("hello"))
+        djinni::unexpected(std::string("hello"))
     };
 }
 

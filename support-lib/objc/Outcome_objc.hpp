@@ -41,7 +41,7 @@ public:
             return RESULT::Boxed::toCpp(r);
         } else {
             ErrorObjcType e = [o error];
-            return make_unexpected(ERROR::Boxed::toCpp(e));
+            return unexpected {ERROR::Boxed::toCpp(e)};
         }
     }
 
