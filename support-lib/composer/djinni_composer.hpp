@@ -465,6 +465,12 @@ struct CppProxyCacheEntry {
     Composer::Weak<Composer::ValueTypedProxyObject> ref;
     int count;
 };
+class ComposerProxyBase;
+extern std::unordered_map<ComposerProxyId, std::weak_ptr<ComposerProxyBase>> jsProxyCache;
+extern std::unordered_map<void*, CppProxyCacheEntry> cppProxyCache;
+extern std::mutex jsProxyCacheMutex;
+extern std::mutex cppProxyCacheMutex;
+
 class ComposerProxyBase {
 protected:
     Composer::Ref<Composer::ValueTypedProxyObject> _js;
@@ -473,11 +479,17 @@ protected:
 public:
     ComposerProxyBase(Composer::Ref<Composer::ValueTypedProxyObject> js)
         : _js(js), _methods(_js->getTypedObject()->getPropertiesSize()) {}
-    virtual ~ComposerProxyBase() = default;
+    virtual ~ComposerProxyBase() {
+        std::lock_guard lk(jsProxyCacheMutex);
+        jsProxyCache.erase(_js->getId());
+    }
     Composer::Ref<Composer::ValueTypedProxyObject> getProxy() {
         return _js;
     }
     Composer::Value callJsMethod(size_t i, std::initializer_list<Composer::Value> parameters) {
+        if (_js->expired()) {
+            throw JsException(Composer::Error("proxy expired"));
+        }
         if (_methods[i] == nullptr) {
             _methods[i] = _js->getTypedObject()->getProperty(i).getFunctionRef();
         }
@@ -491,11 +503,6 @@ public:
         }
     }
 };
-
-extern std::unordered_map<ComposerProxyId, std::weak_ptr<ComposerProxyBase>> jsProxyCache;
-extern std::unordered_map<void*, CppProxyCacheEntry> cppProxyCache;
-extern std::mutex jsProxyCacheMutex;
-extern std::mutex cppProxyCacheMutex;
 
 template<typename T>
 class DjinniCppProxyObject : public Composer::ValueTypedProxyObject {
