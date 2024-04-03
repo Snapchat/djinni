@@ -33,7 +33,7 @@ void checkForNull(void* ptr, const char* context) {
     }
 }
 
-ValueSchema resolveSchema(const ValueSchema& unresolved, std::function<void()> registerSchemaFunc) {
+ValueSchema resolveSchema(const ValueSchema& unresolved, std::function<void()> registerSchemaFunc) noexcept {
     registerSchemaFunc();
     Composer::ValueSchemaTypeResolver resolver(Composer::ValueSchemaRegistry::sharedInstance().get());
     auto result = resolver.resolveTypeReferences(unresolved);
@@ -41,7 +41,7 @@ ValueSchema resolveSchema(const ValueSchema& unresolved, std::function<void()> r
     return result.moveValue();
 }
 
-void registerSchemaImpl(const ValueSchema& schema, bool resolve) {
+void registerSchemaImpl(const ValueSchema& schema, bool resolve) noexcept {
     auto registry = ValueSchemaRegistry::sharedInstance();
     if (!resolve) {
         registry->registerSchema(schema);
@@ -54,35 +54,35 @@ void registerSchemaImpl(const ValueSchema& schema, bool resolve) {
     }
 }
 
-Binary::CppType Binary::toCpp(const Binary::ComposerType& v) {
+Binary::CppType Binary::toCpp(const Binary::ComposerType& v) noexcept {
     auto a = v.getTypedArrayRef();
     auto buffer = a->getBuffer();
     return CppType(buffer.begin(), buffer.end());
 }
 
-Binary::ComposerType Binary::fromCpp(const Binary::CppType& c) {
+Binary::ComposerType Binary::fromCpp(const Binary::CppType& c) noexcept {
     auto bytes = makeShared<Bytes>();
     bytes->assignData(c.data(), c.size());
     auto va = makeShared<ValueTypedArray>(TypedArrayType::Uint8Array, bytes);
     return Value(va);
 }
 
-const ValueSchema& Binary::schema() {
+const ValueSchema& Binary::schema() noexcept {
     static auto schema = ValueSchema::valueTypedArray();
     return schema;
 }
 
-Date::CppType Date::toCpp(const Date::ComposerType& v) {
+Date::CppType Date::toCpp(const Date::ComposerType& v) noexcept {
     auto millisecondsSinceEpoch = std::chrono::milliseconds(static_cast<int64_t>(v.toDouble()));
     return CppType(std::chrono::duration_cast<std::chrono::system_clock::duration>(millisecondsSinceEpoch));
 }
 
-Date::ComposerType Date::fromCpp(const Date::CppType& c) {
+Date::ComposerType Date::fromCpp(const Date::CppType& c) noexcept {
     auto millisecondsSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(c.time_since_epoch());
     return Composer::Value(static_cast<double>(millisecondsSinceEpoch.count()));
 }
 
-const ValueSchema& Date::schema() {
+const ValueSchema& Date::schema() noexcept {
     static auto schema = ValueSchema::date();
     return schema;
 }

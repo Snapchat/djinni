@@ -195,7 +195,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         w.wl("static CppType toCpp(const ComposerType& v);")
         w.wl("static ComposerType fromCpp(const CppType& c);")
         w.wl
-        w.wl("static const Composer::ValueSchema& schema();")
+        w.wl("static const Composer::ValueSchema& schema() noexcept;")
       }
     }), (w => {}))
     writeCppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle, spec.composerIncludePrefix) (ident.name, origin, refs.cpp, (w => {
@@ -219,7 +219,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         }
         w.wl("return Value(o);")
       }
-      w.w(s"const ValueSchema& $helper::schema()").braced {
+      w.w(s"const ValueSchema& $helper::schema() noexcept").braced {
         //FIXME: _djinnin_record_namespace?
         w.wl(s"""static auto schema = ValueSchema::cls(STRING_LITERAL("${schemaTypeNameForRecord(ident)}"), false,""").bracedEnd(");") {
           for (f <- r.fields) {
@@ -246,9 +246,9 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     val helper = helperClass(ident)
     writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.w(s"struct $helper : ::djinni::composer::JsInterface<$cls, $helper>").bracedSemi {
-        w.wl("static void registerSchema(bool resolve);")
-        w.wl("static const Composer::ValueSchema& schemaRef();")
-        w.wl("static const Composer::ValueSchema& schema();")
+        w.wl("static void registerSchema(bool resolve) noexcept;")
+        w.wl("static const Composer::ValueSchema& schemaRef() noexcept;")
+        w.wl("static const Composer::ValueSchema& schema() noexcept;")
 
         // cpp marshal helper
         if (i.ext.cpp) {
@@ -273,7 +273,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         //static methods
         val staticMethods = i.methods.filter(m => m.static)
         if (!staticMethods.isEmpty) {
-          w.wl("static void djinniInitStaticMethods(Composer::Ref<Composer::ValueMap> m);")
+          w.wl("static void djinniInitStaticMethods(Composer::Ref<Composer::ValueMap> m) noexcept;")
         }
 
         //TODO ???
@@ -327,7 +327,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         }
       }
       //value schema
-      w.w(s"static const ValueSchema& unresolvedSchema()").braced {
+      w.w(s"static const ValueSchema& unresolvedSchema() noexcept").braced {
         w.wl(s"static auto schema = ValueSchema::cls(schemaName(), true,").bracedEnd(");") {
           for (m <- i.methods.filter(m => !m.static)) {
             w.w(s"""ClassPropertySchema(STRING_LITERAL("${idJs.method(m.ident)}"), ValueSchema::function(${stubRetSchema(m)},""").bracedEnd(")),") {
@@ -339,7 +339,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         }
         w.wl("return schema;")
       }
-      w.w(s"void $helper::registerSchema(bool resolve)").braced {
+      w.w(s"void $helper::registerSchema(bool resolve) noexcept").braced {
         //register dependent interfaces (params and return that are interfaces but not this one)
         for (t <- refs.interfaces.filter(t => t != withNs(Some(helperNamespace), helperClass(ident)))) {
           w.wl(s"${t}::registerSchema(resolve);")
@@ -348,11 +348,11 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         w.wl("if (std::exchange(flag[resolve ? 1 : 0], true) == false) { djinni::composer::registerSchemaImpl(unresolvedSchema(), resolve); }")
       }
       // type reference
-      w.w(s"const ValueSchema& $helper::schemaRef()").braced {
+      w.w(s"const ValueSchema& $helper::schemaRef() noexcept").braced {
         w.wl("static auto ref = ValueSchema::typeReference(ValueSchemaTypeReference::named(schemaName()));")
         w.wl("return ref;")
       }
-      w.w(s"const ValueSchema& $helper::schema()").braced {
+      w.w(s"const ValueSchema& $helper::schema() noexcept").braced {
         w.wl(s"static auto schema = djinni::composer::getResolvedSchema<$helper>(schemaName());")
         w.wl("return schema;")
       }
@@ -385,7 +385,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
       val staticMethods = i.methods.filter(m => m.static && m.lang.js)
       if (!staticMethods.isEmpty) {
         // object for static methods
-        w.wl(s"void ${helper}::djinniInitStaticMethods(Ref<ValueMap> m)").braced {
+        w.wl(s"void ${helper}::djinniInitStaticMethods(Ref<ValueMap> m) noexcept").braced {
           w.wl(s"""auto unresolvedStaticSchema = ValueSchema::cls(STRING_LITERAL("${schemaTypeNameForStaticInterface(ident)}"), false,""").bracedEnd(");") {
             for (m <- staticMethods) {
               w.w(s"""ClassPropertySchema(STRING_LITERAL("${idJs.method(m.ident)}"), ValueSchema::function(${stubRetSchema(m)},""").bracedEnd(")),") {
