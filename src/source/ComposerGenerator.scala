@@ -344,8 +344,8 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         for (t <- refs.interfaces.filter(t => t != withNs(Some(helperNamespace), helperClass(ident)))) {
           w.wl(s"${t}::registerSchema(resolve);")
         }
-        w.wl("static std::once_flag flag[2];")
-        w.wl("std::call_once(flag[resolve ? 1 : 0], [resolve] { djinni::composer::registerSchemaImpl(unresolvedSchema(), resolve); });")
+        w.wl("static bool flag[2] = {false, false};")
+        w.wl("if (std::exchange(flag[resolve ? 1 : 0], true) == false) { djinni::composer::registerSchemaImpl(unresolvedSchema(), resolve); }")
       }
       // type reference
       w.w(s"const ValueSchema& $helper::schemaRef()").braced {
