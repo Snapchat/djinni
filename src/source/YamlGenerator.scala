@@ -72,9 +72,15 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     w.wl("objcpp:").nested { write(w, objcpp(td)) }
     w.wl("java:").nested { write(w, java(td)) }
     w.wl("jni:").nested { write(w, jni(td)) }
-    w.wl("wasm:").nested { write(w, wasm(td)) }
-    w.wl("composer:").nested { write(w, composer(td)) }
-    w.wl("ts:").nested {write(w, ts(td)) }
+    if (spec.wasmOutFolder.isDefined) {
+      w.wl("wasm:").nested { write(w, wasm(td)) }
+    }
+    if (spec.composerOutFolder.isDefined) {
+      w.wl("composer:").nested { write(w, composer(td)) }
+    }
+    if (spec.wasmOutFolder.isDefined || spec.composerOutFolder.isDefined) {
+      w.wl("ts:").nested {write(w, ts(td)) }
+    }
   }
 
   private def write(w: IndentWriter, m: Map[String, Any]) {
@@ -307,7 +313,7 @@ object YamlGenerator {
       nested(td, key)(subKey).toString
     } catch {
       case e: java.util.NoSuchElementException => {
-        println(s"Warning: in ${td.origin}, missing field $key/$subKey")
+        // println(s"Warning: in ${td.origin}, missing field $key/$subKey")
         "[unspecified]"
       }
     }

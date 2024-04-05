@@ -78,14 +78,14 @@ public:
 
 template<typename U>
 struct ExceptionHandlingTraits<FutureAdaptor<U>> {
-    static Composer::Value handleNativeException(const std::exception& e, const Composer::ValueFunctionCallContext& callContext) {
+    static Composer::Value handleNativeException(const std::exception& e, const Composer::ValueFunctionCallContext& callContext) noexcept {
         // store C++ exception in JS Error and raise in JS runtime
         auto msg = STRING_FORMAT("C++: {}", e.what());
         auto composerPromise = Composer::makeShared<Composer::ResolvablePromise>();
         composerPromise->fulfill(Composer::Result<Composer::Value>(Composer::Error(std::move(msg))));
         return Composer::Value(composerPromise);
     }
-    static Composer::Value handleNativeException(const JsException& e, const Composer::ValueFunctionCallContext& callContext) {
+    static Composer::Value handleNativeException(const JsException& e, const Composer::ValueFunctionCallContext& callContext) noexcept {
         // JS error passthrough
         auto composerPromise = Composer::makeShared<Composer::ResolvablePromise>();
         composerPromise->fulfill(Composer::Result<Composer::Value>(e.cause()));

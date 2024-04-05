@@ -48,20 +48,20 @@ public:
     // Input must be an instanceof an Error Type
     JsException(Composer::Error e): std::runtime_error(e.toString()), _jsEx(std::move(e))
     {}
-    const Composer::Error& cause() const { return _jsEx; }
+    const Composer::Error& cause() const noexcept { return _jsEx; }
 private:
     Composer::Error _jsEx;
 };
 
 template<typename T>
 struct ExceptionHandlingTraits {
-    static Composer::Value handleNativeException(const std::exception& e, const Composer::ValueFunctionCallContext& callContext) {
+    static Composer::Value handleNativeException(const std::exception& e, const Composer::ValueFunctionCallContext& callContext) noexcept {
         // store C++ exception in JS Error and raise in JS runtime
         auto msg = STRING_FORMAT("C++: {}", e.what());
         callContext.getExceptionTracker().onError(Composer::Error(std::move(msg)));
         return Composer::Value::undefined();
     }
-    static Composer::Value handleNativeException(const JsException& e, const Composer::ValueFunctionCallContext& callContext) {
+    static Composer::Value handleNativeException(const JsException& e, const Composer::ValueFunctionCallContext& callContext) noexcept {
         // JS error passthrough
         callContext.getExceptionTracker().onError(e.cause());
         return Composer::Value::undefined();
@@ -69,8 +69,8 @@ struct ExceptionHandlingTraits {
 };
 
 template<typename T, typename F>
-Composer::Value tsFunc(F&& f) {
-    return Composer::Value(Composer::makeShared<Composer::ValueFunctionWithCallable>([f = std::forward<F>(f)] (const Composer::ValueFunctionCallContext& callContext) {
+Composer::Value tsFunc(F&& f) noexcept {
+    return Composer::Value(Composer::makeShared<Composer::ValueFunctionWithCallable>([f = std::forward<F>(f)] (const Composer::ValueFunctionCallContext& callContext) noexcept {
         try {
             return f(callContext);
         }
@@ -85,12 +85,12 @@ Composer::Value tsFunc(F&& f) {
 
 void checkForNull(void* ptr, const char* context);
 
-Composer::ValueSchema resolveSchema(const Composer::ValueSchema& unresolved, std::function<void()> registerSchemaFunc);
+Composer::ValueSchema resolveSchema(const Composer::ValueSchema& unresolved, std::function<void()> registerSchemaFunc) noexcept;
 
-void registerSchemaImpl(const Composer::ValueSchema& schema, bool resolve);
+void registerSchemaImpl(const Composer::ValueSchema& schema, bool resolve) noexcept;
 
 template<typename T>
-Composer::ValueSchema getResolvedSchema(const Composer::StringBox& typeName) {
+Composer::ValueSchema getResolvedSchema(const Composer::StringBox& typeName) noexcept {
     T::registerSchema(false);
     T::registerSchema(true);
     auto registry = Composer::ValueSchemaRegistry::sharedInstance();
@@ -104,7 +104,7 @@ template<class T>
 struct hasSchemaRef<T, std::void_t<decltype(T::schemaRef)>> : std::true_type { };
 
 template<typename T>
-const Composer::ValueSchema& schemaOrRef() {
+const Composer::ValueSchema& schemaOrRef() noexcept {
     if constexpr (hasSchemaRef<T>::value) {
         return T::schemaRef();
     } else {
@@ -121,13 +121,13 @@ public:
 
     using Boxed = Primitive;
 
-    static CppType toCpp(const ComposerType& v) {
+    static CppType toCpp(const ComposerType& v) noexcept {
         return static_cast<T>(v.to<U>());
     }
-    static ComposerType fromCpp(const CppType& c) {
+    static ComposerType fromCpp(const CppType& c) noexcept {
         return ComposerType(static_cast<U>(c));
     }
-    static const Composer::ValueSchema& schema() {
+    static const Composer::ValueSchema& schema() noexcept {
         static auto schema = Composer::ValueSchema::primitiveType<U>();
         return schema;
     }
@@ -173,7 +173,7 @@ public:
     static ComposerType fromCpp(const CppType& c) {
         return ComposerType(Utf8Converter{}.to_bytes(c));
     }
-    static const Composer::ValueSchema& schema() {
+    static const Composer::ValueSchema& schema() noexcept {
         static auto schema = Composer::ValueSchema::string();
         return schema;
     }
@@ -186,9 +186,9 @@ public:
     using ComposerType = Composer::Value;
     using Boxed = Binary;
 
-    static CppType toCpp(const ComposerType& j);
-    static ComposerType fromCpp(const CppType& c);
-    static const Composer::ValueSchema& schema();
+    static CppType toCpp(const ComposerType& j) noexcept;
+    static ComposerType fromCpp(const CppType& c) noexcept;
+    static const Composer::ValueSchema& schema() noexcept ;
 };
 
 class Date {
@@ -197,9 +197,9 @@ public:
     using ComposerType = Composer::Value;
     using Boxed = Date;
     
-    static CppType toCpp(const ComposerType& v);
-    static ComposerType fromCpp(const CppType& c);
-    static const Composer::ValueSchema& schema();
+    static CppType toCpp(const ComposerType& v) noexcept;
+    static ComposerType fromCpp(const CppType& c) noexcept;
+    static const Composer::ValueSchema& schema() noexcept;
 };
 
 template<template<class> class OptionalType, class T>
@@ -226,7 +226,7 @@ struct Optional {
     static ComposerType fromCpp(const typename C::CppOptType& cppOpt) {
         return T::Boxed::fromCppOpt(cppOpt);
     }
-    static const Composer::ValueSchema& schema() {
+    static const Composer::ValueSchema& schema() noexcept {
         static auto schema = schemaOrRef<T>().asOptional();
         return schema;
     }
@@ -242,7 +242,7 @@ public:
     using ComposerType = Composer::Value;
     using Boxed = List;
 
-    static const Composer::ValueSchema& schema() {
+    static const Composer::ValueSchema& schema() noexcept {
         static auto schema = Composer::ValueSchema::array(schemaOrRef<T>());
         return schema;
     }
@@ -291,7 +291,7 @@ public:
         }
         return Composer::Value(es6set);
     }
-    static const Composer::ValueSchema& schema() {
+    static const Composer::ValueSchema& schema() noexcept {
         static auto schema = Composer::ValueSchema::es6set(schemaOrRef<T>());
         return schema;
     }
@@ -326,7 +326,7 @@ public:
         }
         return Composer::Value(es6Map);
     }
-    static const Composer::ValueSchema& schema() {
+    static const Composer::ValueSchema& schema() noexcept {
         static auto schema = Composer::ValueSchema::es6map(schemaOrRef<Key>(), schemaOrRef<Value>());
         return schema;
     }
@@ -337,7 +337,7 @@ public:
     using CppType = void;
     using ComposerType = Composer::Value;
     using Boxed = Void;
-    static const Composer::ValueSchema& schema() {
+    static const Composer::ValueSchema& schema() noexcept {
         static auto schema = Composer::ValueSchema::untyped();
         return schema;
     }
@@ -373,7 +373,7 @@ public:
         return Composer::Value(array);
     }
 
-    static const Composer::ValueSchema& schema() {
+    static const Composer::ValueSchema& schema() noexcept {
         constexpr std::array<const std::string_view, sizeof...(JsClassName)> jsClassName = {JsClassName.data...};
         static auto schema = Composer::ValueSchema::proto(jsClassName.begin(), jsClassName.end());
         return schema;
@@ -393,7 +393,7 @@ struct Array {
         return List<T>::fromCpp(c);
     }
     
-    static const Composer::ValueSchema& schema() {
+    static const Composer::ValueSchema& schema() noexcept {
         return List<T>::schema();
     }
 };
@@ -405,7 +405,7 @@ struct PrimitiveArray {
     using Boxed = PrimitiveArray;
     using CppElemType = typename T::CppType;
 
-    static CppType toCpp(const ComposerType& v) {
+    static CppType toCpp(const ComposerType& v) noexcept {
         auto arr = v.getTypedArrayRef();
         const auto* bytes = arr->getBuffer().data();
         const auto byteSize = arr->getBuffer().size();
@@ -413,32 +413,32 @@ struct PrimitiveArray {
         const auto typedSize = byteSize / sizeof(CppElemType);
         return CppType(typedData, typedData + typedSize);
     }
-    static ComposerType fromCpp(const CppType& c) {
+    static ComposerType fromCpp(const CppType& c) noexcept {
         auto bytes = Composer::makeShared<Composer::Bytes>();
         bytes->assignData(reinterpret_cast<const Composer::Byte*>(c.data()), c.size() * sizeof(CppElemType));
         auto arr = Composer::makeShared<Composer::ValueTypedArray>(U::getArrayType(), bytes);
         return Composer::Value(arr);
     }
-    static const Composer::ValueSchema& schema() {
+    static const Composer::ValueSchema& schema() noexcept {
         static auto schema = Composer::ValueSchema::valueTypedArray();
         return schema;
     }
 };
 template <>
 struct Array<I8> : PrimitiveArray<I8> {
-    static Composer::TypedArrayType getArrayType() {
+    static constexpr Composer::TypedArrayType getArrayType() noexcept {
         return Composer::TypedArrayType::Int8Array;
     }
 };
 template <>
 struct Array<I16> : PrimitiveArray<I16> {
-    static Composer::TypedArrayType getArrayType() {
+    static constexpr Composer::TypedArrayType getArrayType() noexcept {
         return Composer::TypedArrayType::Int16Array;
     }
 };
 template <>
 struct Array<I32> : PrimitiveArray<I32> {
-    static Composer::TypedArrayType getArrayType() {
+    static constexpr Composer::TypedArrayType getArrayType() noexcept {
         return Composer::TypedArrayType::Int32Array;
     }
 };
@@ -448,13 +448,13 @@ struct Array<I64> : PrimitiveArray<I64> {
 };
 template <>
 struct Array<F32> : PrimitiveArray<F32> {
-    static Composer::TypedArrayType getArrayType() {
+    static constexpr Composer::TypedArrayType getArrayType() noexcept {
         return Composer::TypedArrayType::Float32Array;
     }
 };
 template <>
 struct Array<F64> : PrimitiveArray<F64> {
-    static Composer::TypedArrayType getArrayType() {
+    static constexpr Composer::TypedArrayType getArrayType() noexcept {
         return Composer::TypedArrayType::Float64Array;
     }
 };
@@ -483,7 +483,7 @@ public:
         std::lock_guard lk(jsProxyCacheMutex);
         jsProxyCache.erase(_js->getId());
     }
-    Composer::Ref<Composer::ValueTypedProxyObject> getProxy() {
+    Composer::Ref<Composer::ValueTypedProxyObject> getProxy() noexcept {
         return _js;
     }
     Composer::Value callJsMethod(size_t i, std::initializer_list<Composer::Value> parameters) {
@@ -517,10 +517,10 @@ public:
             cppProxyCache.erase(_impl.get());
         }
     }
-    std::string_view getType() const final {
+    std::string_view getType() const noexcept final {
         return "Djinni C++ Proxy";
     }
-    std::shared_ptr<T> getImpl() const {
+    std::shared_ptr<T> getImpl() const noexcept {
         return _impl;
     }
 
@@ -550,14 +550,14 @@ public:
 private:
     template<typename, typename>
     struct GetOrCreateJsProxy {
-        std::shared_ptr<I> operator()(const Composer::Value& js) {
+        std::shared_ptr<I> operator()(const Composer::Value& js) noexcept {
             assert(false && "Attempting to pass JS object but interface lacks +p");
             return {};
         }
     };
     template<typename T>
     struct GetOrCreateJsProxy<T, std::void_t<typename T::ComposerProxy>> {
-        std::shared_ptr<I> operator()(const Composer::Value& js) {
+        std::shared_ptr<I> operator()(const Composer::Value& js) noexcept {
             auto proxy = js.getTypedProxyObjectRef();
             auto obj = proxy->getTypedObject();
             std::lock_guard lk(jsProxyCacheMutex);
@@ -595,14 +595,14 @@ private:
     // (interface +c)
     template<typename, typename>
     struct GetOrCreateCppProxy {
-        Composer::Value operator()(const std::shared_ptr<I>& c) {
+        Composer::Value operator()(const std::shared_ptr<I>& c) noexcept {
             assert(false && "Attempting to pass C++ object but interface lacks +c");
             return Composer::Value::undefined();
         }
     };
     template<typename T>
     struct GetOrCreateCppProxy<T, std::void_t<decltype(T::toComposer)>> {
-        Composer::Value operator()(const std::shared_ptr<I>& c) {
+        Composer::Value operator()(const std::shared_ptr<I>& c) noexcept {
             // look up in cpp proxy cache
             std::lock_guard lk(cppProxyCacheMutex);
             auto i = cppProxyCache.find(c.get());
