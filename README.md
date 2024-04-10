@@ -141,7 +141,8 @@ outcome<RESULT, ERROR>
 Where RESULT and ERROR can be any Djinni types (primitives or records).
 
 
-In C++, the `outcome<>` type maps to the template class `djinni::expected<>`.
+In C++, the `outcome<>` type maps to the template `djinni::expected<>`,
+which is an alias of `std::expected<>` if supported or a drop-in replacement otherwise.
 In Java, it maps to the generic class `com.snapchat.djinni.Outcome<>`. In ObjC,
 it maps to the generic class `DJOutcome<>`.
 
