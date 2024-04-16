@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary", "objc_library")
 load("@rules_java//java:defs.bzl", "java_test")
 load("@build_bazel_rules_apple//apple:macos.bzl", "macos_unit_test")
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library", "swift_test")
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
 
 cc_library(
@@ -190,4 +191,9 @@ sh_binary(
     srcs = ["handwritten-src/js/run.sh"],
     data = glob(["handwritten-src/js/*.html",
                  "handwritten-src/js/*.js"]) + [":wasm"]
+)
+
+swift_test(
+    name = "djinni-swift-tests",
+    srcs = ['handwritten-src/swift/AllTests.swift']
 )
