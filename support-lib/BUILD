@@ -91,7 +91,6 @@ swift_library(
         "-Xcc", "-std=c++17",
     ],
     deps = [
-        ":djinni-support-common",
         ":djinni-support-swiftxx",
     ],
     visibility = ["//visibility:public"],

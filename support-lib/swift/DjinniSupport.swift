@@ -1,4 +1,3 @@
-import support_lib_djinni_support_common
 import support_lib_djinni_support_swiftxx
 
 public protocol Marshaller {
