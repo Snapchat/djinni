@@ -1,11 +1,13 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "objc_library")
 load("@rules_java//java:defs.bzl", "java_library")
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 
 cc_library(
     name = "djinni-support-common",
     srcs = glob(["cpp/*.cpp"]),
     hdrs = glob(["*.hpp", "cpp/*.hpp"]),
     includes = ["cpp"],
+    tags = ["swift_module"],
     visibility = ["//visibility:public"],
 )
 
@@ -75,5 +77,44 @@ cc_library(
 sh_library(
     name = "djinni-support-ts",
     data = glob(["ts/*.ts"]),
+    visibility = ["//visibility:public"],
+)
+
+swift_library(
+    name = "djinni-support-swift",
+    module_name = "DjinniSupport",
+    srcs = glob([
+        "swift/*.swift",
+    ]),
+    copts = [
+        "-cxx-interoperability-mode=default",
+        "-Xcc", "-std=c++17",
+    ],
+    deps = [
+        ":djinni-support-common",
+        ":djinni-support-swiftxx",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "djinni-support-swiftxx",
+    srcs = glob([
+        "swiftxx/*.cpp",
+    ]),
+    hdrs = glob([
+        "swiftxx/*.hpp",
+    ]),
+    includes = [
+        "swiftxx",
+        ".",
+    ],
+    deps = [
+        ":djinni-support-common",
+    ],
+    copts = [
+        "-std=c++17",
+    ],
+    tags = ["swift_module"],
     visibility = ["//visibility:public"],
 )

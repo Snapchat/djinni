@@ -1,12 +1,19 @@
 import XCTest
-// @testable import swift
+@testable import TextSort;
+@testable import TextSortImp;
+
+class MyListener: TextboxListener {
+    func update(items: ItemList) {
+        print("*** update() called")
+        print(items)
+    }
+}
 
 final class AllTests: XCTestCase {
     func testExample() throws {
-        // XCTest Documentation
-        // https://developer.apple.com/documentation/xctest
-
-        // Defining Test Cases and Test Methods
-        // https://developer.apple.com/documentation/xctest/defining_test_cases_and_test_methods
+        let listener = MyListener()
+        let s = SortItems_statics.createWithListener(listener: listener)
+        let items = ItemList(items: ["bbb", "ccc", "aaa"])
+        s.sort(order: SortOrder.ASCENDING, items: items)
     }
 }

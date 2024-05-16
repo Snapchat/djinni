@@ -28,6 +28,7 @@ cc_library(
         "//support-lib:djinni-support-common",
         "@com_google_protobuf//:protobuf"
     ],
+    tags = ["swift_module"],
     linkstatic = True,
     alwayslink = 1,
 )
@@ -195,5 +196,11 @@ sh_binary(
 
 swift_test(
     name = "djinni-swift-tests",
-    srcs = ['handwritten-src/swift/AllTests.swift']
+    srcs = ['handwritten-src/swift/AllTests.swift'],
+    deps = ['//examples:textsort-swiftimp'],
+    copts = [
+        "-cxx-interoperability-mode=default",
+        "-Xcc",
+        "-std=c++17"
+    ],
 )

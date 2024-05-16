@@ -20,24 +20,21 @@ build_bazel_rules_apple_version = "1.1.3"
 http_archive(
     name = "build_bazel_rules_apple",
     sha256 = "f94e6dddf74739ef5cb30f000e13a2a613f6ebfa5e63588305a71fce8a8a9911",
-    url = "https://github.com/bazelbuild/rules_apple/releases/download/{0}/rules_apple.{0}.tar.gz"
-        .format(build_bazel_rules_apple_version),
+    url = "https://github.com/bazelbuild/rules_apple/releases/download/{0}/rules_apple.{0}.tar.gz" .format(build_bazel_rules_apple_version),
 )
 
 build_bazel_rules_swift_version = "1.14.0"
 http_archive(
     name = "build_bazel_rules_swift",
     sha256 = "9b0064197e3b6c123cf7cbd377ad5071ac020cbd208fcc23dbc9f3928baf4fa2",
-    url = "https://github.com/bazelbuild/rules_swift/releases/download/{0}/rules_swift.{0}.tar.gz"
-        .format(build_bazel_rules_swift_version),
+    url = "https://github.com/bazelbuild/rules_swift/releases/download/{0}/rules_swift.{0}.tar.gz" .format(build_bazel_rules_swift_version),
 )
 
 build_bazel_apple_support_version = "1.15.1"
 http_archive(
     name = "build_bazel_apple_support",
     sha256 = "c4bb2b7367c484382300aee75be598b92f847896fb31bbd22f3a2346adf66a80",
-    url = "https://github.com/bazelbuild/apple_support/releases/download/{0}/apple_support.{0}.tar.gz"
-        .format(build_bazel_apple_support_version),
+    url = "https://github.com/bazelbuild/apple_support/releases/download/{0}/apple_support.{0}.tar.gz" .format(build_bazel_apple_support_version),
 )
 
 rules_kotlin_version = "legacy-1.3.0"
