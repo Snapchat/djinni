@@ -15,8 +15,8 @@ struct NativeSortItems {
     }
 };
 
-djinni::AnyValue SortItems_createWithListener(const djinni::ParameterList& params);
-djinni::AnyValue SortItems_runSort(const djinni::ParameterList& params);
-djinni::AnyValue SortItems_sort(const djinni::ParameterList& params);
+djinni::AnyValue SortItems_createWithListener(const djinni::ParameterList* params);
+djinni::AnyValue SortItems_runSort(const djinni::ParameterList* params);
+djinni::AnyValue SortItems_sort(const djinni::ParameterList* params);
 
 }

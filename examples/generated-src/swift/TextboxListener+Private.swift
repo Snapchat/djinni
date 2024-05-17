@@ -12,7 +12,7 @@ class TextboxListenerProxy: TextboxListener {
         var params = djinni.ParameterList()
         params.addValue(inst)
         params.addValue(ItemListMarshaller.toCpp(items))
-        djinni_generated.TextboxListener_update(params)
+        djinni_generated.TextboxListener_update(&params)
     }
 }
 
@@ -27,7 +27,7 @@ func textboxListenerDispatcher(_  instance: UnsafeMutableRawPointer?,
     }
     guard let listener = Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as? TextboxListener else { return }
     if (idx == 0) {
-        let items = ItemListMarshaller.fromCpp(params.pointee.getValue(0))
+        let items = ItemListMarshaller.fromCpp(djinni.getMember(params, 0))
         listener.update(items: items)
     }
 }

@@ -13,7 +13,7 @@ class SortItemsProxy: SortItems {
         params.addValue(inst)
         params.addValue(SortOrderMarshaller.toCpp(order))
         params.addValue(ItemListMarshaller.toCpp(items))
-        djinni_generated.SortItems_sort(params)
+        djinni_generated.SortItems_sort(&params)
     }
 }
 
@@ -31,13 +31,13 @@ public class SortItems_statics {
     static func createWithListener(listener: TextboxListener)-> SortItems {
         var params = djinni.ParameterList()
         params.addValue(TextboxListenerMarshaller.toCpp(listener))
-        let ret = djinni_generated.SortItems_createWithListener(params)
+        let ret = djinni_generated.SortItems_createWithListener(&params)
         return SortItemsMarshaller.fromCpp(ret)
     }
     static func runSort(items: ItemList)-> ItemList {
         var params = djinni.ParameterList()
         params.addValue(ItemListMarshaller.toCpp(items))
-        let ret = djinni_generated.SortItems_runSort(params)
+        let ret = djinni_generated.SortItems_runSort(&params)
         return ItemListMarshaller.fromCpp(ret)
     }
 }

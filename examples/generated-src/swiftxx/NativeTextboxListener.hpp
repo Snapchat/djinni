@@ -19,6 +19,6 @@ struct NativeTextboxListener {
     }
 };
 
-djinni::AnyValue TextboxListener_update(const djinni::ParameterList& params);
+djinni::AnyValue TextboxListener_update(const djinni::ParameterList* params);
 
 }

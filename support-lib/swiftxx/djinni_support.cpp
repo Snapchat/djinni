@@ -27,6 +27,10 @@ AnyValue getMember(const AnyValue& v, size_t i) {
     return composite->getValue(i);
 }
 
+AnyValue getMember(const ParameterList* v, size_t i) {
+    return v->getValue(i);
+}
+
 void addMember(const AnyValue& c, const AnyValue& v) {
     auto composite = std::get<CompositeValuePtr>(c);
     composite->addValue(v);
@@ -53,9 +57,9 @@ ProtocolWrapper::~ProtocolWrapper() {
     _dispatcher(_instance, -1, nullptr, nullptr);
 }
 
-AnyValue ProtocolWrapper::callProtocol(int idx, const ParameterList& params) {
+AnyValue ProtocolWrapper::callProtocol(int idx, const ParameterList* params) {
     AnyValue ret = VoidValue();
-    _dispatcher(_instance, idx, &params, &ret);
+    _dispatcher(_instance, idx, params, &ret);
     return ret;
 }
 

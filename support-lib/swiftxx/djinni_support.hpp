@@ -55,6 +55,7 @@ AnyValue fromI32(I32Value v);
 
 size_t getSize(const AnyValue& v);
 AnyValue getMember(const AnyValue& v, size_t i);
+AnyValue getMember(const ParameterList* v, size_t i);
 void addMember(const AnyValue& c, const AnyValue& v);
 void setReturnValue(AnyValue* ret, const AnyValue& v);
 
@@ -64,7 +65,7 @@ class ProtocolWrapper {
     DispatchFunc _dispatcher;
 protected:
     ProtocolWrapper(void* instance, DispatchFunc dispatcher);
-    AnyValue callProtocol(int idx, const ParameterList& params);
+    AnyValue callProtocol(int idx, const ParameterList* params);
 public:
     virtual ~ProtocolWrapper();
 };
