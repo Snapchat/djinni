@@ -22,6 +22,7 @@ djinni::AnyValue SortItems_runSort(const djinni::ParameterList* params) {
     return NativeItemList::fromCpp(ret);
 }
 
+// +c instance method stub
 djinni::AnyValue SortItems_sort(const djinni::ParameterList* params) {
     // instance method:
     // retrieve the instance pointer from params[0]
