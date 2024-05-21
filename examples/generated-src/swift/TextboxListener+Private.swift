@@ -3,42 +3,30 @@ import TextSort
 import DjinniSupport
 import support_lib_djinni_support_swiftxx
 
-class TextboxListenerProxy: TextboxListener {
-    var inst: djinni.AnyValue
-    init(_ inst: djinni.AnyValue) {
-        self.inst = inst
-    }
-    func update(items: ItemList) {
-        var params = djinni.ParameterList()
-        params.addValue(inst)
-        params.addValue(ItemListMarshaller.toCpp(items))
-        djinni_generated.TextboxListener_update(&params)
-    }
-}
+// have to declare this type in each file because for some reason we can't export typealiases with C++ types from DjinniSupport.swift
+typealias MethodDispatcher = (Any, UnsafePointer<djinni.ParameterList>?, UnsafeMutablePointer<djinni.AnyValue>?) -> Void
 
-func textboxListenerDispatcher(_  instance: UnsafeMutableRawPointer?,
-                               idx: Int32,
-                               params: UnsafePointer<djinni.ParameterList>?,
-                               ret: UnsafeMutablePointer<djinni.AnyValue>?) -> Void {
-    guard let ptr = instance else { return }
-    if (idx < 0) {
-        let _ = Unmanaged<AnyObject>.fromOpaque(ptr).takeRetainedValue()
-        return
-    }
-    guard let listener = Unmanaged<AnyObject>.fromOpaque(ptr).takeUnretainedValue() as? TextboxListener else { return }
-    if (idx == 0) {
-        let items = ItemListMarshaller.fromCpp(djinni.getMember(params, 0))
-        listener.update(items: items)
-    }
-}
+let textboxListenerMethods: [MethodDispatcher] = [
+  // generate one entry for each interface method
+  { inst, params, ret in
+      // generate one line for each parameter 
+      let items = ItemListMarshaller.fromCpp(djinni.getMember(params, 0))
+      // call swift object through protocol
+      (inst as! TextboxListener).update(items: items)
+      // update ret if method has return value
+  },
+]
 
 enum TextboxListenerMarshaller: DjinniSupport.Marshaller {
     typealias SwiftType = TextboxListener
+    // generate unimplemented fromCpp() if interface lacks +c
     static func fromCpp(_ v: djinni.AnyValue) -> SwiftType {
-        return TextboxListenerProxy(v)
+        fatalError("n/a")
     }
-    static func toCpp(_ listener: TextboxListener) -> djinni.AnyValue {
-        let instance = Unmanaged.passRetained(listener as AnyObject).toOpaque()
-        return djinni_generated.TextboxListenerProtocolWrapper.make(instance, textboxListenerDispatcher)
+    // generate toCpp() with the dispatch func
+    static func toCpp(_ listener: SwiftType) -> djinni.AnyValue {
+        let ctx = ProtocolWrapperContext(inst: listener, vtbl: textboxListenerMethods)
+        let p = Unmanaged.passRetained(ctx).toOpaque()
+        return djinni_generated.TextboxListenerProtocolWrapper.make(p, DjinniSupport.dispatcherProtocalCall)
     }
 }

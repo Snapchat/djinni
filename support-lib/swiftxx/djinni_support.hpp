@@ -4,30 +4,26 @@
 #include <string>
 #include <memory>
 #include <chrono>
-#include <swift/bridging>
 
 namespace djinni {
-
+// -------- Intermediate data structure and functions to manipulate them from Swift
 struct VoidValue{};
-using BoolValue = bool;
-using I8Value = int8_t;
-using I16Value = int16_t;
+// I32 covers bool, i8, i16, i32, enum
 using I32Value = int32_t;
 using I64Value = int64_t;
-using FloatValue = float;
+// double covers float too
 using DoubleValue = double;
 using StringValue = std::string;
 using BinaryValue = std::vector<uint8_t>;
 using DateValue = std::chrono::system_clock::time_point;
-using EnumValue = int32_t;
 using InterfaceValue = std::shared_ptr<void>;
 
 struct CompositeValue;
 using CompositeValuePtr = std::shared_ptr<CompositeValue>;
 
 using AnyValue = std::variant<VoidValue,
-    BoolValue, I8Value, I16Value, I32Value, I64Value, FloatValue, DoubleValue,
-    StringValue, BinaryValue, DateValue, /*EnumValue is identical to I32*/
+    I32Value, I64Value, DoubleValue,
+    StringValue, BinaryValue, DateValue,
     InterfaceValue, CompositeValuePtr>;
 
 struct CompositeValue {
@@ -41,37 +37,54 @@ struct CompositeValue {
     size_t getSize() const { return _elems.size(); }
 };
 
-struct ListValue: CompositeValue {};
-struct SetValue: CompositeValue {};
-struct MapValue: CompositeValue {};
-struct OptionalValue: CompositeValue {};
-struct RecordValue: CompositeValue {};
 struct ParameterList: CompositeValue {};
 
-StringValue toString(const AnyValue& v);
-AnyValue fromString(const StringValue& s);
-I32Value toI32(const AnyValue& v);
-AnyValue fromI32(I32Value v);
-
-size_t getSize(const AnyValue& v);
-AnyValue getMember(const AnyValue& v, size_t i);
+size_t getSize(const AnyValue* v);
+AnyValue getMember(const AnyValue* v, size_t i);
+void addMember(const AnyValue* c, const AnyValue& v);
 AnyValue getMember(const ParameterList* v, size_t i);
-void addMember(const AnyValue& c, const AnyValue& v);
 void setReturnValue(AnyValue* ret, const AnyValue& v);
+AnyValue makeVoidValue();
+AnyValue makeCompositeValue();
 
-typedef void (*DispatchFunc)(void* instance, int idx /* -1 for cleanup*/, const ParameterList* params, AnyValue* ret);
+// -------- Swift protocol trampoline
+typedef void (*DispatchFunc)(void* ctx, int idx /* -1 for cleanup*/, const ParameterList* params, AnyValue* ret);
 class ProtocolWrapper {
-    void* _instance;
+    void* _ctx;
     DispatchFunc _dispatcher;
 protected:
-    ProtocolWrapper(void* instance, DispatchFunc dispatcher);
+    ProtocolWrapper(void* ctx, DispatchFunc dispatcher);
     AnyValue callProtocol(int idx, const ParameterList* params);
 public:
     virtual ~ProtocolWrapper();
 };
 
-AnyValue nilValue();
-AnyValue makeCompositeValue();
+// -------- Built-in marshallers (conversion between C++ types and intermediate types)
+template <typename T /*C++ type*/, typename U/*storage type*/>
+struct Integer {
+    using CppType = T;
+    static djinni::AnyValue fromCpp(T v) {
+        return {static_cast<U>(v)};
+    }
+    static T toCpp(const djinni::AnyValue& v) {
+        auto i = std::get<U>(v);
+        return static_cast<T>(i);
+    }
+};
+
+using I32 = Integer<int32_t, I32Value>;
+
+template <typename T>
+struct Enum {
+    using CppType = T;
+    static djinni::AnyValue fromCpp(T v) {
+        return {static_cast<int32_t>(v)};
+    }
+    static T toCpp(const djinni::AnyValue& v) {
+        auto i = std::get<djinni::I32Value>(v);
+        return static_cast<T>(i);
+    }
+};
 
 struct String {
     using CppType = std::string;
@@ -100,6 +113,18 @@ struct List {
             vec.push_back(T::toCpp(item));
         }
         return vec;
+    }
+};
+
+template <typename T>
+struct Interface {
+    using CppType = std::shared_ptr<T>;
+    static djinni::AnyValue fromCpp(const CppType& v) {
+        return {v};
+    }
+    static CppType toCpp(const djinni::AnyValue& v) {
+        auto p = std::get<djinni::InterfaceValue>(v);
+        return std::reinterpret_pointer_cast<T>(p);
     }
 };
 

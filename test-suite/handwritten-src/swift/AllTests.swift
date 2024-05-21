@@ -3,6 +3,9 @@ import XCTest
 @testable import TextSortImp;
 
 class MyListener: TextboxListener {
+    deinit {
+        print("*** deinit called")
+    }
     func update(items: ItemList) {
         print("*** update() called")
         print(items)

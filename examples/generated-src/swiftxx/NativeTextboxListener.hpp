@@ -12,12 +12,7 @@ public:
     void update(const textsort::ItemList& items) override;
 };
 
-struct NativeTextboxListener {
-    static std::shared_ptr<textsort::TextboxListener> toCpp(const djinni::AnyValue& v) {
-        auto p = std::get<djinni::InterfaceValue>(v);
-        return std::reinterpret_pointer_cast<textsort::TextboxListener>(p);
-    }
-};
+using NativeTextboxListener = djinni::Interface<textsort::TextboxListener>;
 
 djinni::AnyValue TextboxListener_update(const djinni::ParameterList* params);
 

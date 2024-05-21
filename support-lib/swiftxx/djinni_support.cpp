@@ -2,28 +2,13 @@
 
 namespace djinni {
 
-StringValue toString(const AnyValue& v) {
-    return std::get<StringValue>(v);
-}
-AnyValue fromString(const StringValue& s) {
-    return {s};
-}
-
-I32Value toI32(const AnyValue& v) {
-    return std::get<I32Value>(v);
-}
-
-AnyValue fromI32(I32Value v) {
-    return {v};
-}
-
-size_t getSize(const AnyValue& v) {
-    auto composite = std::get<CompositeValuePtr>(v);
+size_t getSize(const AnyValue* v) {
+    auto composite = std::get<CompositeValuePtr>(*v);
     return composite->getSize();
 }
 
-AnyValue getMember(const AnyValue& v, size_t i) {
-    auto composite = std::get<CompositeValuePtr>(v);
+AnyValue getMember(const AnyValue* v, size_t i) {
+    auto composite = std::get<CompositeValuePtr>(*v);
     return composite->getValue(i);
 }
 
@@ -31,8 +16,8 @@ AnyValue getMember(const ParameterList* v, size_t i) {
     return v->getValue(i);
 }
 
-void addMember(const AnyValue& c, const AnyValue& v) {
-    auto composite = std::get<CompositeValuePtr>(c);
+void addMember(const AnyValue* c, const AnyValue& v) {
+    auto composite = std::get<CompositeValuePtr>(*c);
     composite->addValue(v);
 }
 
@@ -40,7 +25,7 @@ void setReturnValue(AnyValue* ret, const AnyValue& v) {
     *ret = v;
 }
 
-AnyValue nilValue() {
+AnyValue makeVoidValue() {
     return VoidValue{};
 }
 
@@ -49,17 +34,17 @@ AnyValue makeCompositeValue() {
 }
 
 
-ProtocolWrapper::ProtocolWrapper(void* instance, DispatchFunc dispatcher):
-    _instance(instance), _dispatcher(dispatcher)
+ProtocolWrapper::ProtocolWrapper(void* ctx, DispatchFunc dispatcher):
+    _ctx(ctx), _dispatcher(dispatcher)
 {}
 
 ProtocolWrapper::~ProtocolWrapper() {
-    _dispatcher(_instance, -1, nullptr, nullptr);
+    _dispatcher(_ctx, -1, nullptr, nullptr);
 }
 
 AnyValue ProtocolWrapper::callProtocol(int idx, const ParameterList* params) {
     AnyValue ret = VoidValue();
-    _dispatcher(_instance, idx, params, &ret);
+    _dispatcher(_ctx, idx, params, &ret);
     return ret;
 }
 

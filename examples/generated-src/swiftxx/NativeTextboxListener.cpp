@@ -13,7 +13,7 @@ djinni::AnyValue TextboxListener_update(const djinni::ParameterList* params) {
     auto inst = NativeTextboxListener::toCpp(params->getValue(0));
     auto items = NativeItemList::toCpp(params->getValue(1));
     inst->update(items);
-    return djinni::nilValue();
+    return djinni::makeVoidValue();
 }
 
 djinni::AnyValue TextboxListenerProtocolWrapper::make(void* instance, djinni::DispatchFunc dispatcher) {
