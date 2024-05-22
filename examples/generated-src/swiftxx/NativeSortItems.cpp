@@ -5,7 +5,7 @@
 
 namespace djinni_generated {
 
-djinni::AnyValue SortItems_createWithListener(const djinni::ParameterList* params) {
+djinni::swift::AnyValue SortItems_createWithListener(const djinni::swift::ParameterList* params) {
     // static method:
     // generate a line for each parameter of the method
     auto listener = NativeTextboxListener::toCpp(params->getValue(0));
@@ -15,7 +15,7 @@ djinni::AnyValue SortItems_createWithListener(const djinni::ParameterList* param
     return NativeSortItems::fromCpp(ret);
 }
 
-djinni::AnyValue SortItems_runSort(const djinni::ParameterList* params) {
+djinni::swift::AnyValue SortItems_runSort(const djinni::swift::ParameterList* params) {
     // static method:
     auto items = NativeItemList::toCpp(params->getValue(0));
     auto ret = textsort::SortItems::run_sort(items);
@@ -23,7 +23,7 @@ djinni::AnyValue SortItems_runSort(const djinni::ParameterList* params) {
 }
 
 // +c instance method stub
-djinni::AnyValue SortItems_sort(const djinni::ParameterList* params) {
+djinni::swift::AnyValue SortItems_sort(const djinni::swift::ParameterList* params) {
     // instance method:
     // retrieve the instance pointer from params[0]
     auto inst = NativeSortItems::toCpp(params->getValue(0));
@@ -34,7 +34,7 @@ djinni::AnyValue SortItems_sort(const djinni::ParameterList* params) {
     inst->sort(order, items);
     // convert result to intermediate form
     // return nil for void methods
-    return djinni::makeVoidValue();
+    return djinni::swift::makeVoidValue();
 }
 
 }

@@ -4,19 +4,19 @@ import support_lib_djinni_support_swiftxx // C++ support library
 
 enum ItemListMarshaller: Marshaller {
     typealias SwiftType = ItemList
-    static func fromCpp(_ v: djinni.AnyValue) -> SwiftType {
+    static func fromCpp(_ v: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: v) { p in
             // generate one line for each member of the record
-            let items = DjinniSupport.ListMarshaller<DjinniSupport.StringMarshaller>.fromCpp(djinni.getMember(p, 0))
+            let items = DjinniSupport.ListMarshaller<DjinniSupport.StringMarshaller>.fromCpp(djinni.swift.getMember(p, 0))
             // generate a struct constructor call
             return ItemList(items: items)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.AnyValue {
+    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         // construct the record container
-        var v = djinni.makeCompositeValue()
+        var v = djinni.swift.makeCompositeValue()
         // generate one line for each member of the record
-        djinni.addMember(&v, ListMarshaller<DjinniSupport.StringMarshaller>.toCpp(s.items))
+        djinni.swift.addMember(&v, ListMarshaller<DjinniSupport.StringMarshaller>.toCpp(s.items))
         return v
     }
 }

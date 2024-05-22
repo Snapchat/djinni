@@ -1,6 +1,6 @@
 #include "djinni_support.hpp"
 
-namespace djinni {
+namespace djinni::swift {
 
 size_t getSize(const AnyValue* v) {
     auto composite = std::get<CompositeValuePtr>(*v);

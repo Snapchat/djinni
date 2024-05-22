@@ -5,7 +5,7 @@
 #include <memory>
 #include <chrono>
 
-namespace djinni {
+namespace djinni::swift {
 // -------- Intermediate data structure and functions to manipulate them from Swift
 struct VoidValue{};
 // I32 covers bool, i8, i16, i32, enum
@@ -63,10 +63,10 @@ public:
 template <typename T /*C++ type*/, typename U/*storage type*/>
 struct Integer {
     using CppType = T;
-    static djinni::AnyValue fromCpp(T v) {
+    static AnyValue fromCpp(T v) {
         return {static_cast<U>(v)};
     }
-    static T toCpp(const djinni::AnyValue& v) {
+    static T toCpp(const AnyValue& v) {
         auto i = std::get<U>(v);
         return static_cast<T>(i);
     }
@@ -77,11 +77,11 @@ using I32 = Integer<int32_t, I32Value>;
 template <typename T>
 struct Enum {
     using CppType = T;
-    static djinni::AnyValue fromCpp(T v) {
+    static AnyValue fromCpp(T v) {
         return {static_cast<int32_t>(v)};
     }
-    static T toCpp(const djinni::AnyValue& v) {
-        auto i = std::get<djinni::I32Value>(v);
+    static T toCpp(const AnyValue& v) {
+        auto i = std::get<I32Value>(v);
         return static_cast<T>(i);
     }
 };
@@ -108,7 +108,7 @@ struct List {
     }
     static CppType toCpp(const AnyValue& v) {
         CppType vec;
-        auto c = std::get<djinni::CompositeValuePtr>(v);
+        auto c = std::get<CompositeValuePtr>(v);
         for (const auto& item: c->_elems) {
             vec.push_back(T::toCpp(item));
         }
@@ -119,11 +119,11 @@ struct List {
 template <typename T>
 struct Interface {
     using CppType = std::shared_ptr<T>;
-    static djinni::AnyValue fromCpp(const CppType& v) {
+    static AnyValue fromCpp(const CppType& v) {
         return {v};
     }
-    static CppType toCpp(const djinni::AnyValue& v) {
-        auto p = std::get<djinni::InterfaceValue>(v);
+    static CppType toCpp(const AnyValue& v) {
+        auto p = std::get<InterfaceValue>(v);
         return std::reinterpret_pointer_cast<T>(p);
     }
 };

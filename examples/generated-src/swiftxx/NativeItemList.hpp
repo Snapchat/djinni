@@ -6,17 +6,17 @@
 namespace djinni_generated {
 
 struct NativeItemList {
-    static djinni::AnyValue fromCpp(const textsort::ItemList& v) {
+    static djinni::swift::AnyValue fromCpp(const textsort::ItemList& v) {
         // generate record container
-        auto ret = std::make_shared<djinni::CompositeValue>();
+        auto ret = std::make_shared<djinni::swift::CompositeValue>();
         // generate one line for each member of the record
-        ret->addValue(djinni::List<djinni::String>::fromCpp(v.items));
+        ret->addValue(djinni::swift::List<djinni::swift::String>::fromCpp(v.items));
         return {ret};
     }
-    static textsort::ItemList toCpp(const djinni::AnyValue& v) {
-        auto c = std::get<djinni::CompositeValuePtr>(v);
+    static textsort::ItemList toCpp(const djinni::swift::AnyValue& v) {
+        auto c = std::get<djinni::swift::CompositeValuePtr>(v);
         // generate an argument for each member of the record
-        return textsort::ItemList(djinni::List<djinni::String>::toCpp(c->getValue(0)));
+        return textsort::ItemList(djinni::swift::List<djinni::swift::String>::toCpp(c->getValue(0)));
     }
 };
 

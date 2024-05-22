@@ -6,11 +6,11 @@
 namespace djinni_generated {
 
 // Alias to generic interface marshaller 
-using NativeSortItems = djinni::Interface<textsort::SortItems>;
+using NativeSortItems = djinni::swift::Interface<textsort::SortItems>;
 
 // Generate forward declarations for each static and +c instance method
-djinni::AnyValue SortItems_createWithListener(const djinni::ParameterList* params);
-djinni::AnyValue SortItems_runSort(const djinni::ParameterList* params);
-djinni::AnyValue SortItems_sort(const djinni::ParameterList* params);
+djinni::swift::AnyValue SortItems_createWithListener(const djinni::swift::ParameterList* params);
+djinni::swift::AnyValue SortItems_runSort(const djinni::swift::ParameterList* params);
+djinni::swift::AnyValue SortItems_sort(const djinni::swift::ParameterList* params);
 
 }

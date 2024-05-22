@@ -6,6 +6,6 @@
 namespace djinni_generated {
 
 // Alias to generic enum marshaller
-using NativeSortOrder = djinni::Enum<textsort::sort_order>;
+using NativeSortOrder = djinni::swift::Enum<textsort::sort_order>;
 
 }
