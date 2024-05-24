@@ -16,13 +16,27 @@ AnyValue getMember(const ParameterList* v, size_t i) {
     return v->getValue(i);
 }
 
-void addMember(const AnyValue* c, const AnyValue& v) {
+void addMember(AnyValue* c, const AnyValue& v) {
     auto composite = std::get<CompositeValuePtr>(*c);
     composite->addValue(v);
 }
 
 void setReturnValue(AnyValue* ret, const AnyValue& v) {
     *ret = v;
+}
+
+WeakSwiftProxy weakify(const AnyValue& v) {
+    auto i = std::get<InterfaceValue>(v);
+    return i.sptr;
+}
+
+AnyValue strongify(const WeakSwiftProxy& v) {
+    return {v.lock()};
+}
+
+InterfaceInfo getInterfaceInfo(const AnyValue* v) {
+    auto i = std::get<InterfaceValue>(*v);
+    return {i.ptr.get(), i.sptr.get()};
 }
 
 AnyValue makeVoidValue() {
@@ -43,7 +57,7 @@ ProtocolWrapper::~ProtocolWrapper() {
 }
 
 AnyValue ProtocolWrapper::callProtocol(int idx, const ParameterList* params) {
-    AnyValue ret = VoidValue();
+    AnyValue ret = VoidValue(); // output parameter
     _dispatcher(_ctx, idx, params, &ret);
     return ret;
 }

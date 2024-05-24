@@ -6,9 +6,10 @@
 namespace djinni_generated {
 
 // generate proxy class for C++ callers
-class TextboxListenerProtocolWrapper: public textsort::TextboxListener, public djinni::swift::ProtocolWrapper {
+class TextboxListenerSwiftProxy: public textsort::TextboxListener,
+                                 public djinni::swift::ProtocolWrapper {
 public:
-    TextboxListenerProtocolWrapper(void* instance, djinni::swift::DispatchFunc dispatcher): djinni::swift::ProtocolWrapper(instance, dispatcher) {}
+    TextboxListenerSwiftProxy(void* instance, djinni::swift::DispatchFunc dispatcher): ProtocolWrapper(instance, dispatcher) {}
     // factory method for Swift caller
     static djinni::swift::AnyValue make(void* instance, djinni::swift::DispatchFunc dispatcher);
     // generate method stubs

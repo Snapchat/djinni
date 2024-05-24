@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include <chrono>
+#include <unordered_map>
 
 namespace djinni::swift {
 // -------- Intermediate data structure and functions to manipulate them from Swift
@@ -16,7 +17,14 @@ using DoubleValue = double;
 using StringValue = std::string;
 using BinaryValue = std::vector<uint8_t>;
 using DateValue = std::chrono::system_clock::time_point;
-using InterfaceValue = std::shared_ptr<void>;
+
+class ProtocolWrapper;
+struct InterfaceValue {
+    std::shared_ptr<void> ptr;
+    std::shared_ptr<ProtocolWrapper> sptr;
+    template<typename T>
+    InterfaceValue(const std::shared_ptr<T>& p) : ptr(p), sptr(std::dynamic_pointer_cast<ProtocolWrapper>(p)) {}
+};
 
 struct CompositeValue;
 using CompositeValuePtr = std::shared_ptr<CompositeValue>;
@@ -33,6 +41,9 @@ struct CompositeValue {
     void addValue(const AnyValue& v) {
         _elems.push_back(v);
     }
+    void addValue(AnyValue&& v) {
+        _elems.push_back(std::move(v));
+    }
     AnyValue getValue(size_t i) const { return _elems[i]; }
     size_t getSize() const { return _elems.size(); }
 };
@@ -41,22 +52,33 @@ struct ParameterList: CompositeValue {};
 
 size_t getSize(const AnyValue* v);
 AnyValue getMember(const AnyValue* v, size_t i);
-void addMember(const AnyValue* c, const AnyValue& v);
+void addMember(AnyValue* c, const AnyValue& v);
 AnyValue getMember(const ParameterList* v, size_t i);
 void setReturnValue(AnyValue* ret, const AnyValue& v);
 AnyValue makeVoidValue();
 AnyValue makeCompositeValue();
 
+struct InterfaceInfo {
+    void* cppPointer;
+    void* ctxPointer;
+};
+InterfaceInfo getInterfaceInfo(const AnyValue* v);
+
+using WeakSwiftProxy = std::weak_ptr<ProtocolWrapper>;
+WeakSwiftProxy weakify(const AnyValue& v);
+AnyValue strongify(const WeakSwiftProxy& v);
+
 // -------- Swift protocol trampoline
 typedef void (*DispatchFunc)(void* ctx, int idx /* -1 for cleanup*/, const ParameterList* params, AnyValue* ret);
 class ProtocolWrapper {
+protected:
     void* _ctx;
     DispatchFunc _dispatcher;
-protected:
     ProtocolWrapper(void* ctx, DispatchFunc dispatcher);
     AnyValue callProtocol(int idx, const ParameterList* params);
 public:
     virtual ~ProtocolWrapper();
+    void* ctx() const { return _ctx; }
 };
 
 // -------- Built-in marshallers (conversion between C++ types and intermediate types)
@@ -123,9 +145,23 @@ struct Interface {
         return {v};
     }
     static CppType toCpp(const AnyValue& v) {
-        auto p = std::get<InterfaceValue>(v);
-        return std::reinterpret_pointer_cast<T>(p);
+        auto i = std::get<InterfaceValue>(v);
+        return std::reinterpret_pointer_cast<T>(i.ptr);
     }
 };
+
+// // Keeps track of C++ objects in Swift
+// class CppProxyCache {
+//     static CppProxyCache& instance();
+//     std::unordered_map<uintptr_t/*shared_ptr.data*/, uintptr_t/*unretained swift anyobject pointer*/> _mapPtrToProxy;
+// public:
+// };
+
+// // Keeps track of Swift objects in C++
+// class SwiftProxyCache {
+//     static SwiftProxyCache& instance();
+//     std::unordered_map<uintptr_t/*shared_ptr.data*/, uintptr_t/*unretained swift anyobject pointer*/> _mapPtrToProxy;
+// public:
+// };
 
 }

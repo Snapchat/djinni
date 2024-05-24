@@ -4,12 +4,7 @@ import support_lib_djinni_support_swiftxx // C++ support library
 import examples_textsort_swiftxx          // C++ bridge code
 
 // generate Proxy class if interface is +c
-class SortItemsProxy: SortItems {
-    // generate fixed member and init
-    var inst: djinni.swift.AnyValue
-    init(_ inst: djinni.swift.AnyValue) {
-        self.inst = inst
-    }
+final class CppProxy: DjinniSupport.CppProxy, SortItems {
     // generate method stubs
     func sort(order: SortOrder, items: ItemList) {
         var params = djinni.swift.ParameterList()
@@ -28,11 +23,11 @@ enum SortItemsMarshaller: DjinniSupport.Marshaller {
     typealias SwiftType = SortItems
     // generate fromCpp() if interface is +c
     static func fromCpp(_ v: djinni.swift.AnyValue) -> SwiftType {
-        return SortItemsProxy(v)
+        return cppInterfaceToSwift(v, {c in CppProxy(c)})
     }
-    // generate unimplemented toCpp() if interface lacks +swift
+    // generate unimplemented factory call if interface lacks +swift
     static func toCpp(_ v: SwiftType) -> djinni.swift.AnyValue {
-        fatalError("n/a")
+        return swiftInterfaceToCpp(v, {_ in fatalError("n/a") })
     }
 }
 
