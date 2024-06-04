@@ -113,6 +113,14 @@ package object generatorTools {
                    composerClassIdentStyle: IdentConverter,
                    composerFileIdentStyle: IdentConverter,
                    composerTsOutFolder: Option[File],
+                   swiftOutFolder: Option[File],
+                   swiftIdentStyle: SwiftIdentStyle,
+                   swiftModule: String,
+                   swiftxxOutFolder: Option[File],
+                   swiftxxNamespace: String,
+                   swiftxxBaseLibModule: String,
+                   swiftxxClassIdentStyle: IdentConverter,
+                   swiftxxFileIdentStyle: IdentConverter,
                    outFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],
@@ -161,6 +169,9 @@ package object generatorTools {
   case class JsIdentStyle(ty: IdentConverter, typeParam: IdentConverter,
                           method: IdentConverter, field: IdentConverter, local: IdentConverter,
                           enum: IdentConverter, const: IdentConverter)
+  case class SwiftIdentStyle(ty: IdentConverter, typeParam: IdentConverter,
+                             method: IdentConverter, field: IdentConverter, local: IdentConverter,
+                             enum: IdentConverter, const: IdentConverter)
 
   object IdentStyle {
     private val camelUpperStrict = (s: String) => {
@@ -187,6 +198,7 @@ package object generatorTools {
     val cppDefault = CppIdentStyle(camelUpper, camelUpper, camelUpper, underLower, underLower, underLower, underCaps, underCaps)
     val objcDefault = ObjcIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, camelUpper, camelUpper)
     val jsDefault = JsIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, underCaps, underCaps)
+    val swiftDefault = SwiftIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, underCaps, underCaps)
 
     val styles = Map(
       "FooBar" -> camelUpper,
@@ -321,6 +333,18 @@ package object generatorTools {
         }
         new TsGenerator(spec, true).generate(idl)
       }
+      if (spec.swiftOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("Swift", spec.swiftOutFolder.get)
+        }
+        new SwiftGenerator(spec).generate(idl)
+      }
+      if (spec.swiftxxOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("Swift/C++ interop", spec.swiftxxOutFolder.get)
+        }
+        new SwiftxxGenerator(spec).generate(idl)
+      }
       if (spec.yamlOutFolder.isDefined) {
         if (!spec.skipGeneration) {
           createFolder("YAML", spec.yamlOutFolder.get)
@@ -381,6 +405,7 @@ abstract class Generator(spec: Spec)
   val idJava = spec.javaIdentStyle
   val idObjc = spec.objcIdentStyle
   val idJs = spec.jsIdentStyle
+  val idSwift = spec.swiftIdentStyle
 
   def wrapNamespace(w: IndentWriter, ns: String, f: IndentWriter => Unit) {
     ns match {
@@ -495,35 +520,35 @@ abstract class Generator(spec: Spec)
 
   def normalEnumOptions(e: Enum) = e.options.filter(_.specialFlag == None)
 
-  def writeEnumOptionNone(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=") {
+  def writeEnumOptionNone(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=", prefix: String = "", lineEnd: String = ",") {
     for (o <- e.options.find(_.specialFlag == Some(Enum.SpecialFlag.NoFlags))) {
       writeDoc(w, o.doc)
-      w.wl(ident(o.ident.name) + s" $delim 0,")
+      w.wl(prefix + ident(o.ident.name) + s" $delim 0$lineEnd")
     }
   }
 
-  def writeEnumOptions(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=") {
+  def writeEnumOptions(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=", prefix: String = "", lineEnd: String = ",") {
     var shift = 0
     for (o <- normalEnumOptions(e)) {
       writeDoc(w, o.doc)
-      w.wl(ident(o.ident.name) + (if(e.flags) s" $delim 1 << $shift" else s" $delim $shift") + ",")
+      w.wl(prefix + ident(o.ident.name) + (if(e.flags) s" $delim 1 << $shift" else s" $delim $shift") + lineEnd)
       shift += 1
     }
   }
 
-  def writeEnumOptionAll(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=") {
+  def writeEnumOptionAll(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=", prefix: String = "", lineEnd: String = ",") {
     for (
       o <- e.options.find(_.specialFlag.contains(Enum.SpecialFlag.AllFlags))
     ) {
       writeDoc(w, o.doc)
-      w.w(ident(o.ident.name) + s" $delim ")
+      w.w(prefix + ident(o.ident.name) + s" $delim ")
       w.w(
         normalEnumOptions(e)
           .zipWithIndex
           .map{case(o, i) => s"(1 << $i)"}
           .fold("0")((acc, o) => acc + " | " + o)
       )
-      w.wl(",")
+      w.wl(lineEnd)
     }
   }
 

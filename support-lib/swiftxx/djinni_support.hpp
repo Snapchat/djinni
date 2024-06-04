@@ -150,18 +150,4 @@ struct Interface {
     }
 };
 
-// // Keeps track of C++ objects in Swift
-// class CppProxyCache {
-//     static CppProxyCache& instance();
-//     std::unordered_map<uintptr_t/*shared_ptr.data*/, uintptr_t/*unretained swift anyobject pointer*/> _mapPtrToProxy;
-// public:
-// };
-
-// // Keeps track of Swift objects in C++
-// class SwiftProxyCache {
-//     static SwiftProxyCache& instance();
-//     std::unordered_map<uintptr_t/*shared_ptr.data*/, uintptr_t/*unretained swift anyobject pointer*/> _mapPtrToProxy;
-// public:
-// };
-
 }

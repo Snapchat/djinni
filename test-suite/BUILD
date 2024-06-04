@@ -28,7 +28,6 @@ cc_library(
         "//support-lib:djinni-support-common",
         "@com_google_protobuf//:protobuf"
     ],
-    tags = ["swift_module"],
     linkstatic = True,
     alwayslink = 1,
 )

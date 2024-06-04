@@ -86,18 +86,25 @@ private object IdlParser extends RegexParsers {
   }
 
   def ext(default: Ext) = (rep1("+" ~> ident) >> checkExts) | success(default)
-  def extRecord = ext(Ext(false, false, false, false))
-  def extInterface = ext(Ext(true, true, true, true))
-  def supportLang = ext(Ext(true, true, true, true))
+  def extRecord = ext(Ext(false, false, false, false, false))
+  def extInterface = ext(Ext(true, true, true, true, true))
+  def supportLang = ext(Ext(true, true, true, true, true))
 
   def checkExts(parts: List[Ident]): Parser[Ext] = {
     var foundCpp = false
     var foundJava = false
     var foundObjc = false
     var foundJavascript = false
+    var foundSwift = false
 
     for (part <- parts)
       part.name match {
+        case "nc" => {
+          foundJava = true
+          foundObjc = true
+          foundJavascript = true
+          foundSwift = true
+        }
         case "c" => {
           if (foundCpp) return err("Found multiple \"c\" modifiers.")
           foundCpp = true
@@ -119,9 +126,13 @@ private object IdlParser extends RegexParsers {
           if (foundJavascript) return err("Found multiple \"js\" modifiers.")
           foundJavascript = true
         }
+        case "sw" => {
+          if (foundSwift) return err("Found multiple \"sw\" modifiers.")
+          foundSwift = true
+        }
         case _ => return err("Invalid modifier \"" + part.name + "\"")
       }
-    success(Ext(foundJava, foundCpp, foundObjc, foundJavascript))
+    success(Ext(foundJava, foundCpp, foundObjc, foundJavascript, foundSwift))
   }
 
   def typeDef: Parser[TypeDef] = record | enum | flags | interface

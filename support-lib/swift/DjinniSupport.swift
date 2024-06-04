@@ -1,4 +1,4 @@
-import support_lib_djinni_support_swiftxx
+import DjinniSupportCxx
 
 public typealias Vtbl<T> = [(T, UnsafePointer<djinni.swift.ParameterList>?, UnsafeMutablePointer<djinni.swift.AnyValue>?) -> Void]
 
@@ -122,7 +122,7 @@ class SwiftProxyCache {
 // 2. object is a an existing swift proxy: unwrap the original swift object
 // 3. need to create a new proxy         : call newProxyFunc
 public func cppInterfaceToSwift<I>(_ c: djinni.swift.AnyValue,
-                                   _ newProxyFunc: (djinni.swift.AnyValue)->I) -> I {
+                                   _ newProxyFunc: ()->I) -> I {
     return withUnsafePointer(to: c) { p in
         let info = djinni.swift.getInterfaceInfo(p)
         // for 1. check the cpp proxy cache
@@ -135,7 +135,7 @@ public func cppInterfaceToSwift<I>(_ c: djinni.swift.AnyValue,
             return ctx.getInst() as! I
         }
         // 3.
-        let newProxy = newProxyFunc(c)
+        let newProxy = newProxyFunc()
         CppProxyCache.shared.mapPtrToProxy[info.cppPointer] = Unmanaged.passUnretained(newProxy as AnyObject).toOpaque()
         return newProxy
     }
@@ -145,7 +145,7 @@ public func cppInterfaceToSwift<I>(_ c: djinni.swift.AnyValue,
 // 2. object is a an existing swift proxy: return existing
 // 3. need to create a new proxy         : call newProxyFunc
 public func swiftInterfaceToCpp<I>(_ s: I,
-                                   _ newProxyFunc: (I)->djinni.swift.AnyValue) -> djinni.swift.AnyValue {
+                                   _ newProxyFunc: ()->djinni.swift.AnyValue) -> djinni.swift.AnyValue {
     // 1. try cast to CppProxy and unwrap
     if let cppproxy = s as? CppProxy {
         return cppproxy.inst
@@ -156,9 +156,14 @@ public func swiftInterfaceToCpp<I>(_ s: I,
         return djinni.swift.strongify(weakProxy)
     }
     // 3.
-    let newProxy = newProxyFunc(s)
+    let newProxy = newProxyFunc()
     SwiftProxyCache.shared.mapPtrToProxy[key] = djinni.swift.weakify(newProxy)
     return newProxy
+}
+
+public func ctxPtr<I> (_ s: I, _ vtbl: Vtbl<I>) -> UnsafeMutableRawPointer {
+    let ctx = ProtocolWrapperContext(inst: s, vtbl: vtbl)
+    return Unmanaged.passRetained(ctx).toOpaque()
 }
 
 public func destroyCppProxy(_ inst: djinni.swift.AnyValue) {

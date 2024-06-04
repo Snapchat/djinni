@@ -7,7 +7,6 @@ cc_library(
     srcs = glob(["cpp/*.cpp"]),
     hdrs = glob(["*.hpp", "cpp/*.hpp"]),
     includes = ["cpp"],
-    tags = ["swift_module"],
     visibility = ["//visibility:public"],
 )
 
@@ -114,6 +113,6 @@ cc_library(
     copts = [
         "-std=c++17",
     ],
-    tags = ["swift_module"],
+    tags = ["swift_module=DjinniSupportCxx"],
     visibility = ["//visibility:public"],
 )

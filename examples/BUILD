@@ -20,7 +20,6 @@ cc_library(
     deps = [
         "//support-lib:djinni-support-common",
     ],
-    tags = ["swift_module"],
     alwayslink = 1,
     visibility = ["//visibility:public"],
 )
@@ -164,6 +163,6 @@ cc_library(
     copts = [
         "-std=c++17",
     ],
-    tags = ["swift_module"],
+    tags = ["swift_module=TextSortCxx"],
     visibility = ["//visibility:public"],
 )

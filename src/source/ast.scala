@@ -52,9 +52,9 @@ case class ExternTypeDecl(override val ident: Ident, override val params: Seq[Ty
 case class ProtobufTypeDecl(override val ident: Ident, override val params: Seq[TypeParam], override val body: TypeDef, override val origin: String) extends TypeDecl
 
 // `Ext.js` is shared by both wasm and composer
-case class Ext(java: Boolean, cpp: Boolean, objc: Boolean, js: Boolean) {
+case class Ext(java: Boolean, cpp: Boolean, objc: Boolean, js: Boolean, swift: Boolean) {
   def any(): Boolean = {
-    java || cpp || objc || js
+    java || cpp || objc || js || swift
   }
 }
 
