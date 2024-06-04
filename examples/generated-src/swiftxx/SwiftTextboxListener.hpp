@@ -10,4 +10,11 @@ namespace djinni_generated {
 
 using SwiftTextboxListener = djinni::swift::Interface<::textsort::TextboxListener>;
 
+class TextboxListenerSwiftProxy: public ::textsort::TextboxListener, public djinni::swift::ProtocolWrapper {
+public:
+    TextboxListenerSwiftProxy(void* instance, djinni::swift::DispatchFunc dispatcher): ProtocolWrapper(instance, dispatcher) {}
+    static djinni::swift::AnyValue make(void* instance, djinni::swift::DispatchFunc dispatcher);
+    void update(const ::textsort::ItemList & items) override;
+};
+
 } // namespace djinni_generated
