@@ -39,6 +39,13 @@ class SwiftMarshal(spec: Spec) extends Marshal(spec) {
   override def toCpp(tm: MExpr, expr: String): String = s"${helperClass(tm)}.toCpp(${expr})"
   override def fromCpp(tm: MExpr, expr: String): String = s"${helperClass(tm)}.fromCpp(${expr})"
 
+  def references(m: Meta, exclude: String = ""): Seq[SymbolReference] = m match {
+    case p: MProtobuf => List()
+    case d: MDef => List()
+    case e: MExtern => List(ImportRef(e.swift.module))
+    case _ => List()
+  }
+
   private def toSwiftType(tm: MExpr, packageName: Option[String]): String = {
     def args(tm: MExpr) = if (tm.args.isEmpty) "" else tm.args.map(f(_)).mkString("<", ", ", ">")
     def f(tm: MExpr): String = {
@@ -50,8 +57,8 @@ class SwiftMarshal(spec: Spec) extends Marshal(spec) {
             case MOptional => throw new AssertionError("nested optional?")
             case m => s"Optional<${f(arg)}>"
           }
-        // case e: MExtern => e.swift.typename + (if (e.ts.generic) args(tm) else "")
-        case e: MExtern => throw new AssertionError("TODO")
+        case e: MExtern => e.swift.typename + (if (e.swift.generic) args(tm) else "")
+        // case e: MExtern => throw new AssertionError("TODO")
         case p: MProtobuf => p.name
         case o =>
           val base = o match {
@@ -82,16 +89,16 @@ class SwiftMarshal(spec: Spec) extends Marshal(spec) {
     case "i32" => "Int32"
     case "i16" => "Int16"
     case "i8" => "Int8"
-    case "float" => "Float"
-    case "double" => "Double"
-    case _ => throw new AssertionError("unknown primitive type")
+    case "f32" => "Float"
+    case "f64" => "Double"
+    case _ => throw new AssertionError("unknown primitive type: " + p._idlName)
   }
 
   def helperClass(name: String) = idSwift.ty(name) + "Marshaller" // TODO: make naming configurable
   private def helperClass(tm: MExpr): String = helperName(tm) + helperTemplates(tm)
   def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => helperClass(d.name)
-    case e: MExtern => e.jni.translator // TODO: swift translator
+    case e: MExtern => e.swift.translator
     case o => o match {
       case p: MPrimitive => p.idlName match {
         case "i8" => "I8Marshaller"

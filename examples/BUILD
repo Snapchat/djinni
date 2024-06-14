@@ -125,8 +125,8 @@ swift_library(
 )
 
 swift_library(
-    name = "textsort-swiftimp",
-    module_name = "TextSortImp",
+    name = "textsort-swift-bridge",
+    module_name = "TextSortBridge",
     srcs = glob([swift_private_files,]),
     copts = [
         "-cxx-interoperability-mode=default",

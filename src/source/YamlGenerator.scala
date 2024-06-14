@@ -37,6 +37,8 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   val wasmMarshal = new WasmGenerator(spec)
   val composerMarshal = new ComposerGenerator(spec)
   val tsMarshal = new TsGenerator(spec, false)
+  val swiftMarshal = new SwiftMarshal(spec)
+  val swiftxxMarshal = new SwiftxxMarshal(spec)
 
   case class QuotedString(str: String) // For anything that migt require escaping
 
@@ -80,6 +82,9 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     }
     if (spec.wasmOutFolder.isDefined || spec.composerOutFolder.isDefined) {
       w.wl("ts:").nested {write(w, ts(td)) }
+    }
+    if (spec.swiftOutFolder.isDefined) {
+      w.wl("swift:").nested {write(w, swift(td))}
     }
   }
 
@@ -209,6 +214,11 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     //, "generic" -> false
   )
 
+  private def swift(td: TypeDecl) = Map[String, Any](
+    "typename" -> QuotedString(swiftMarshal.fqTypename(td.ident, td.body)),
+    "module" -> QuotedString(spec.swiftModule)
+  )
+
   // TODO: there has to be a way to do all this without the MExpr/Meta conversions?
   private def mexpr(td: TypeDecl) = MExpr(meta(td), List())
 
@@ -295,7 +305,15 @@ object YamlGenerator {
     MExtern.Ts(
       getOptionalField(td, "ts", "typename"),
       getOptionalField(td, "ts", "module"),
-      getOptionalField(td, "ts", "generic", false))
+      getOptionalField(td, "ts", "generic", false)),
+    MExtern.Swift(
+      getOptionalField(td, "swift", "typename"),
+      getOptionalField(td, "swift", "module"),
+      getOptionalField(td, "swift", "translator"),
+      getOptionalField(td, "swift", "generic", false)),
+    MExtern.Swiftxx(
+      getOptionalField(td, "swiftxx", "translator"),
+      getOptionalField(td, "swiftxx", "header"))
   )
 
   private def nested(td: ExternTypeDecl, key: String) = {

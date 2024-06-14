@@ -39,3 +39,11 @@ ts:
 composer:
   translator: '::djinni::composer::FutureAdaptor'
   header: '"$Future_composer.hpp"'
+swift:
+  typename: 'DJFuture'
+  module: 'DjinniSupport'
+  translator: 'FutureMarshaller'
+  generic: true
+swiftxx:
+  translator: '::djinni::swift::FutureAdaptor'
+  header: '"$Future_swift.hpp"'

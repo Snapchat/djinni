@@ -157,7 +157,7 @@ class SwiftxxGenerator(spec: Spec) extends Generator(spec) {
               } else {
                 w.w("inst->")
               }
-              val args = m.params.map(p => s"_${idCpp.local(p.ident)}").mkString(", ")
+              val args = m.params.map(p => s"std::move(_${idCpp.local(p.ident)})").mkString(", ")
               w.wl(s"${idCpp.method(m.ident)}($args);")
               // return
               if (m.ret.isEmpty) {

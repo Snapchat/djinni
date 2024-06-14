@@ -126,7 +126,7 @@ public:
         return f;
     }
 
-    static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, CppType c)
+    static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c)
     {
         const auto& promiseJniInfo = JniClass<PromiseJniInfo>::get();
 

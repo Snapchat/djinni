@@ -36,3 +36,7 @@ ts:
 composer:
   translator: '::djinni::composer::NativeDataView'
   header: '"$DataView_composer.hpp"'
+swift:
+  typename: 'Data'
+  module: 'Foundation'
+  generic: false

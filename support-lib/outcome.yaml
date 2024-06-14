@@ -39,3 +39,6 @@ ts:
 composer:
   translator: '::djinni::composer::Outcome'
   header: '"$Outcome_composer.hpp"'
+swift:
+  typename: 'Result'
+  generic: true

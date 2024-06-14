@@ -41,26 +41,23 @@ class SwiftxxMarshal(spec: Spec) extends Marshal(spec) {
   override def fromCpp(tm: MExpr, expr: String): String = s"${helperClass(tm)}::fromCpp(${expr})"
 
   def references(m: Meta, exclude: String = ""): Seq[SymbolReference] = m match {
-    case p: MProtobuf => {
-      List()
-      // val headers = List()
-      // p.body.java.jniHeader match {
-      //   case Some(serialzerHeader) => ImportRef(serialzerHeader) :: headers
-      //   case _ => headers
-      // }
-    }
+    case p: MProtobuf => List()
     case d: MDef => List(ImportRef(include(d.name)))
-    case e: MExtern => List()
+    case e: MExtern => List(ImportRef(resolveExtSwiftxxHdr(e.swiftxx.header)))
     case _ => List()
   }
 
   def include(ident: String) = q(spec.swiftxxFileIdentStyle(ident) + "." + spec.cppHeaderExt)
 
+  def resolveExtSwiftxxHdr(path: String) = {
+    path.replaceAll("\\$", "");
+  }
+
   def helperClass(name: String) = spec.swiftxxClassIdentStyle(name)
   private def helperClass(tm: MExpr): String = helperName(tm) + helperTemplates(tm)
   def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => withNs(Some(spec.swiftxxNamespace), helperClass(d.name))
-    case e: MExtern => e.jni.translator // TODO: swift translator
+    case e: MExtern => e.swiftxx.translator
     case o => withNs(Some("djinni::swift"), o match {
       case p: MPrimitive => p.idlName match {
         case "i8" => "I8"
@@ -89,7 +86,11 @@ class SwiftxxMarshal(spec: Spec) extends Marshal(spec) {
   private def helperTemplates(tm: MExpr): String = {
     def f() = if(tm.args.isEmpty) "" else tm.args.map(helperClass).mkString("<", ", ", ">")
     tm.base match {
-      case MOptional | MList | MSet | MArray =>
+      case MOptional =>
+        assert(tm.args.size == 1)
+        val argHelperClass = helperClass(tm.args.head)
+        s"<${spec.cppOptionalTemplate}, $argHelperClass>"
+      case MList | MSet | MArray =>
         assert(tm.args.size == 1)
         f
       case _ => f

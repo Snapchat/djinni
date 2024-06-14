@@ -1,6 +1,6 @@
 import XCTest
 @testable import TextSort;
-@testable import TextSortImp;
+@testable import TextSortBridge;
 
 class MyListener: TextboxListener {
     deinit {

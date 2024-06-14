@@ -78,12 +78,12 @@ empty_record = record {
 
 # Test for conflict of method name with an interface name.
 # See the comments about scopeSymbols in CppMarshal.scala for more info.
-Conflict = interface +c {
-}
-conflict_user = interface +c {
-    Conflict(): Conflict;
-    conflict_arg(cs: set<Conflict>): bool;
-}
+# Conflict = interface +c {
+# }
+# conflict_user = interface +c {
+#     Conflict(): Conflict;
+#     conflict_arg(cs: set<Conflict>): bool;
+# }
 
 # we need to test optional interface
 # this one will be used

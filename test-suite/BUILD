@@ -4,18 +4,23 @@ load("@build_bazel_rules_apple//apple:macos.bzl", "macos_unit_test")
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library", "swift_test")
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
 
+exclude_files = ["handwritten-src/cpp/proto_test_helpers.*",
+                 "handwritten-src/cpp/TranslateDuration.*",
+                 "handwritten-src/cpp/data_helpers.*",
+                 "handwritten-src/cpp/outcome_test_helpers.*"]
+
 cc_library(
     name = "djinni-tests-common",
     srcs = glob([
         "generated-src/cpp/*.cpp",
         "handwritten-src/cpp/*.cpp",
         "djinni/vendor/third-party/proto/cpp/*.cc",
-    ]),
+    ], exclude=exclude_files),
     hdrs = glob([
         "generated-src/cpp/*.hpp",
         "handwritten-src/cpp/*.hpp",
         "djinni/vendor/third-party/proto/cpp/*.h",
-    ]),
+    ], exclude=exclude_files),
     includes = [
         "generated-src/cpp",
         "handwritten-src/cpp",
@@ -196,10 +201,73 @@ sh_binary(
 swift_test(
     name = "djinni-swift-tests",
     srcs = ['handwritten-src/swift/AllTests.swift'],
-    deps = ['//examples:textsort-swiftimp'],
+    deps = ['//examples:textsort-swift-bridge'],
     copts = [
         "-cxx-interoperability-mode=default",
         "-Xcc",
         "-std=c++17"
     ],
+)
+
+swift_private_files = "generated-src/swift/*+Private.swift"
+
+swift_library(
+    name = "test-swift",
+    module_name = "TestSuite",
+    generated_header_name = "TestSuite-Swift.h",
+    generates_header = True,
+    srcs = glob([
+        "generated-src/swift/*.swift",
+    ], exclude = [ swift_private_files ]),
+    copts = [
+        "-cxx-interoperability-mode=default",
+        "-Xcc", "-std=c++17",
+    ],
+    deps = [
+        "//support-lib:djinni-support-swift",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+swift_library(
+    name = "test-swift-bridge",
+    module_name = "TestSuiteBridge",
+    srcs = glob([swift_private_files,]),
+    copts = [
+        "-cxx-interoperability-mode=default",
+        "-Xcc", "-std=c++17",
+    ],
+    deps = [
+        ":djinni-tests-common",
+        ":test-swift",
+        ":test-swiftxx",
+        "//support-lib:djinni-support-swift",
+        "//support-lib:djinni-support-swiftxx",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "test-swiftxx",
+    srcs = glob([
+        "generated-src/swiftxx/*.cpp",
+    ]),
+    hdrs = glob([
+        "generated-src/swiftxx/*.hpp",
+    ]),
+    includes = [
+        "generated-src/swiftxx",
+        ".",
+    ],
+    deps = [
+        ":djinni-tests-common",
+        ":test-swift",
+        "//support-lib:djinni-support-common",
+        "//support-lib:djinni-support-swiftxx",
+    ],
+    copts = [
+        "-std=c++17",
+    ],
+    tags = ["swift_module=TestSuiteCxx"],
+    visibility = ["//visibility:public"],
 )

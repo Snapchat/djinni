@@ -2,6 +2,14 @@
 
 namespace djinni::swift {
 
+AnyValue makeRangeValue(void* bytes, size_t size) {
+    return RangeValue{bytes, size};
+}
+
+RangeValue getRange(const AnyValue& v) {
+    return std::get<RangeValue>(v);
+}
+
 size_t getSize(const AnyValue* v) {
     auto composite = std::get<CompositeValuePtr>(*v);
     return composite->getSize();
@@ -42,6 +50,11 @@ InterfaceInfo getInterfaceInfo(const AnyValue* v) {
 AnyValue makeVoidValue() {
     return VoidValue{};
 }
+
+bool isVoidValue(const AnyValue* c) {
+    return std::holds_alternative<VoidValue>(*c);
+}
+
 
 AnyValue makeCompositeValue() {
     return { std::make_shared<CompositeValue>() }; 

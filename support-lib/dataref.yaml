@@ -36,3 +36,7 @@ ts:
 composer:
   translator: '::djinni::composer::NativeDataRef'
   header: '"$DataRef_composer.hpp"'
+swift:
+  typename: 'Data'
+  module: 'Foundation'
+  generic: false
