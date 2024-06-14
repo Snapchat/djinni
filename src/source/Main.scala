@@ -29,6 +29,8 @@ object Main {
     var idlIncludePaths: List[String] = List("")
     var cppOutFolder: Option[File] = None
     var cppNamespace: String = ""
+    var cppStringConstexpr: Option[String] = None
+    var cppStringConstexprHeader: Option[String] = None
     var cppIncludePrefix: String = ""
     var cppExtendedRecordIncludePrefix: String = ""
     var cppFileIdentStyle: IdentConverter = IdentStyle.underLower
@@ -154,6 +156,10 @@ object Main {
         .text("The C++ base library's include path, relative to the C++ classes.")
       opt[String]("cpp-namespace").valueName("...").foreach(x => cppNamespace = x)
         .text("The namespace name to use for generated C++ classes.")
+      opt[String]("cpp-string-constexpr").valueName("<class>").foreach(x => cppStringConstexpr = Some(x))
+        .text("The type for string constants for generated C++ classes.")
+      opt[String]("cpp-string-constexpr-header").valueName("<header>>").foreach(x => cppStringConstexprHeader = Some(x))
+        .text("The header file to be included for string constants for generated C++ classes.")
       opt[String]("cpp-ext").valueName("<ext>").foreach(cppExt = _)
         .text("The filename extension for C++ files (default: \"cpp\").")
       opt[String]("hpp-ext").valueName("<ext>").foreach(cppHeaderExt = _)
@@ -382,6 +388,8 @@ object Main {
       cppIncludePrefix,
       cppExtendedRecordIncludePrefix,
       cppNamespace,
+      cppStringConstexpr,
+      cppStringConstexprHeader,
       cppIdentStyle,
       cppFileIdentStyle,
       cppBaseLibIncludePrefix,
