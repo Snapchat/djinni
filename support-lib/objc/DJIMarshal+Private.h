@@ -244,6 +244,9 @@ public:
     static ObjcType fromCpp(const OptionalType<typename T::CppType>& opt) {
         return opt ? T::Boxed::fromCpp(*opt) : nil;
     }
+    static ObjcType fromCpp(OptionalType<typename T::CppType>&& opt) {
+        return opt ? T::Boxed::fromCpp(std::move(*opt)) : nil;
+    }
 
     // fromCpp used for nullable shared_ptr
     template <typename C = T>
