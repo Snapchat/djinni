@@ -34,7 +34,7 @@ package object resolver {
 
 type Scope = immutable.Map[String,Meta]
 
-def resolve(metas: Scope, idl: Seq[TypeDecl]): Option[Error] = {
+def resolve(metas: Scope, idl: Seq[TypeDecl], allowInterfacesInRecords: Boolean): Option[Error] = {
 
   try {
     var topScope = metas
@@ -74,7 +74,7 @@ def resolve(metas: Scope, idl: Seq[TypeDecl]): Option[Error] = {
         scope = scope.updated(typeParam.ident.name, MParam(typeParam.ident.name))
       }
 
-      resolve(scope, typeDecl.body)
+      resolve(scope, typeDecl.body, allowInterfacesInRecords)
     }
 
     for (typeDecl <- idl) {
@@ -88,10 +88,10 @@ def resolve(metas: Scope, idl: Seq[TypeDecl]): Option[Error] = {
   None
 }
 
-private def resolve(scope: Scope, typeDef: TypeDef) {
+private def resolve(scope: Scope, typeDef: TypeDef, allowInterfacesInRecords: Boolean) {
   typeDef match {
     case e: Enum => resolveEnum(scope, e)
-    case r: Record => resolveRecord(scope, r)
+    case r: Record => resolveRecord(scope, r, allowInterfacesInRecords)
     case i: Interface => resolveInterface(scope, i)
     case p: ProtobufMessage=>
   }
@@ -214,7 +214,7 @@ private def constTypeCheck(ty: MExpr, value: Any, resolvedConsts: Seq[Const]) {
   }
 }
 
-private def resolveRecord(scope: Scope, r: Record) {
+private def resolveRecord(scope: Scope, r: Record, allowInterfacesInRecords: Boolean) {
   val dupeChecker = new DupeChecker("record field")
   for (f <- r.fields) {
     dupeChecker.check(f.ident)
@@ -243,7 +243,9 @@ private def resolveRecord(scope: Scope, r: Record) {
       }
       case df: MDef => df.defType match {
         case DInterface =>
-          throw new Error(f.ident.loc, "Interface reference cannot live in a record").toException
+          if (!allowInterfacesInRecords) {
+            throw new Error(f.ident.loc, "Interface reference cannot live in a record").toException
+          }
         case DRecord =>
           val record = df.body.asInstanceOf[Record]
           if (!r.derivingTypes.subsetOf(record.derivingTypes))
@@ -252,7 +254,9 @@ private def resolveRecord(scope: Scope, r: Record) {
       }
       case e: MExtern => e.defType match {
         case DInterface =>
-          throw new Error(f.ident.loc, "Interface reference cannot live in a record").toException
+          if (!allowInterfacesInRecords) {
+            throw new Error(f.ident.loc, "Interface reference cannot live in a record").toException
+          }
         case DRecord =>
           val record = e.body.asInstanceOf[Record]
           if (!r.derivingTypes.subsetOf(record.derivingTypes))

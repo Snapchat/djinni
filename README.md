@@ -66,6 +66,7 @@ verify the build and binary from the command line.
  - Local flags with `@flag` directive
  - DataView for copy free data passing
  - DateRef for copy free data passing with ownership
+ - Allows for not null interfaces references in records
  - Generating string names for C++ enums
  - Bug fixes
 
@@ -302,9 +303,9 @@ Notable differences when comparing to the Java/ObjC support:
   easily add extension methods (by add functions to prototype) without having to
   derive from a base class.
 
-The command to run Wasm/TypeScript unit tests is `bazel run
-//test-suite:server-ts`. You will need the `tsc` compiler and the `browserify`
-tool to run these tests.
+Use `bazel run //test-suite:server-ts` to run the Wasm/TypeScript unit tests.
+You will need `npm` and run `npm install` in the `test-suite` folder.
+You need as well the `tsc` compiler and the `browserify` tool to run these tests.
 
 ## Async interface support
 
