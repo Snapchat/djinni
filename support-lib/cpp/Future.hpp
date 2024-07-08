@@ -25,7 +25,7 @@
 #include <cassert>
 #include <exception>
 
-#ifdef __cpp_coroutines
+#if defined(__cpp_coroutines) || defined(__cpp_impl_coroutine)
 #if __has_include(<coroutine>)
     #include <coroutine>
     namespace djinni::detail {
