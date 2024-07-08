@@ -56,13 +56,13 @@ template <typename T>
 struct ValueHolder {
     using type = T;
     std::optional<T> value;
-    T getValueUnsafe() const {return *value;}
+    T&& getValueUnsafe() && {return std::move(*value);}
 };
 template <>
 struct ValueHolder<void> {
     using type = bool;
     std::optional<bool> value;
-    void getValueUnsafe() const {}
+    void getValueUnsafe() && {}
 };
 
 template<typename T>
@@ -295,7 +295,7 @@ public:
         sharedState->cv.wait(lk, [state = sharedState] {return state->isReady();});
 #endif
         if (!sharedState->exception) {
-            return sharedState->getValueUnsafe();
+            return std::move(*sharedState).getValueUnsafe();
         } else {
             std::rethrow_exception(sharedState->exception);
         }
