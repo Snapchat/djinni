@@ -43,6 +43,7 @@ swift:
   typename: 'DJFuture'
   module: 'DjinniSupport'
   translator: 'FutureMarshaller'
+  translator.module: 'DjinniSupport'
   generic: true
 swiftxx:
   translator: '::djinni::swift::FutureAdaptor'

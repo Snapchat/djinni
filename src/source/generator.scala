@@ -198,7 +198,7 @@ package object generatorTools {
     val cppDefault = CppIdentStyle(camelUpper, camelUpper, camelUpper, underLower, underLower, underLower, underCaps, underCaps)
     val objcDefault = ObjcIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, camelUpper, camelUpper)
     val jsDefault = JsIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, underCaps, underCaps)
-    val swiftDefault = SwiftIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, underCaps, underCaps)
+    val swiftDefault = SwiftIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, camelLower, camelLower)
 
     val styles = Map(
       "FooBar" -> camelUpper,
@@ -360,6 +360,7 @@ package object generatorTools {
 
   sealed abstract class SymbolReference
   case class ImportRef(arg: String) extends SymbolReference // Already contains <> or "" in C contexts
+  case class PrivateImportRef(arg: String) extends SymbolReference
   case class DeclRef(decl: String, namespace: Option[String]) extends SymbolReference
 }
 

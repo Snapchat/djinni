@@ -91,6 +91,7 @@ object MExtern {
     typename: String,
     module: String,
     translator: String,
+    translatorModule: String,
     generic: Boolean
   )
   case class Swiftxx(

@@ -24,25 +24,27 @@ class SwiftMarshal(spec: Spec) extends Marshal(spec) {
   override def typename(tm: MExpr): String = toSwiftType(tm, None)
   def typename(name: String, ty: TypeDef): String = idSwift.ty(name)
 
-  override def fqTypename(tm: MExpr): String = toSwiftType(tm, None)
-  def fqTypename(name: String, ty: TypeDef): String = idSwift.ty(name)
+  override def fqTypename(tm: MExpr): String = toSwiftType(tm, Some(spec.swiftModule))
+  def fqTypename(name: String, ty: TypeDef): String = withPackage(Some(spec.swiftModule), idSwift.ty(name))
 
   override def paramType(tm: MExpr): String = toSwiftType(tm, None)
-  override def fqParamType(tm: MExpr): String = toSwiftType(tm, None)
+  override def fqParamType(tm: MExpr): String = toSwiftType(tm, Some(spec.swiftModule))
 
   override def returnType(ret: Option[TypeRef]): String = ret.fold("Void")(ty => toSwiftType(ty.resolved, None))
-  override def fqReturnType(ret: Option[TypeRef]): String = ret.fold("Void")(ty => toSwiftType(ty.resolved, None))
+  override def fqReturnType(ret: Option[TypeRef]): String = ret.fold("Void")(ty => toSwiftType(ty.resolved, Some(spec.swiftModule)))
 
   override def fieldType(tm: MExpr): String = toSwiftType(tm, None)
-  override def fqFieldType(tm: MExpr): String = toSwiftType(tm, spec.javaPackage)
+  override def fqFieldType(tm: MExpr): String = toSwiftType(tm, Some(spec.swiftModule))
 
   override def toCpp(tm: MExpr, expr: String): String = s"${helperClass(tm)}.toCpp(${expr})"
   override def fromCpp(tm: MExpr, expr: String): String = s"${helperClass(tm)}.fromCpp(${expr})"
 
+  private def withPackage(packageName: Option[String], t: String) = packageName.fold(t)(_ + "." + t)
+
   def references(m: Meta, exclude: String = ""): Seq[SymbolReference] = m match {
-    case p: MProtobuf => List()
+    case MProtobuf(name, _, ProtobufMessage(_,_,_,_,Some(swift))) => List(ImportRef(swift.module), PrivateImportRef(swift.module))
     case d: MDef => List()
-    case e: MExtern => List(ImportRef(e.swift.module))
+    case e: MExtern => List(ImportRef(e.swift.module), PrivateImportRef(e.swift.translatorModule))
     case _ => List()
   }
 
@@ -58,8 +60,10 @@ class SwiftMarshal(spec: Spec) extends Marshal(spec) {
             case m => s"Optional<${f(arg)}>"
           }
         case e: MExtern => e.swift.typename + (if (e.swift.generic) args(tm) else "")
-        // case e: MExtern => throw new AssertionError("TODO")
-        case p: MProtobuf => p.name
+        case p: MProtobuf => p.body.swift match {
+          case Some(o) => o.prefix + p.name
+          case None => p.name
+        }
         case o =>
           val base = o match {
             case p: MPrimitive => swiftPrimitiveType(p)
@@ -71,7 +75,7 @@ class SwiftMarshal(spec: Spec) extends Marshal(spec) {
             case MArray => "Array"
             case MSet => "Set"
             case MMap => "Dictionary"
-            case d: MDef => idSwift.ty(d.name)
+            case d: MDef => withPackage(packageName, idSwift.ty(d.name))
             case e: MExtern => throw new AssertionError("unreachable")
             case e: MProtobuf => throw new AssertionError("unreachable")
             case p: MParam => idSwift.typeParam(p.name)
@@ -116,7 +120,10 @@ class SwiftMarshal(spec: Spec) extends Marshal(spec) {
       case MList => "ListMarshaller"
       case MSet => "SetMarshaller"
       case MMap => "MapMarshaller"
-      case MProtobuf(_,_,_) => "ProtobufMarshaller"
+      case p: MProtobuf => p.body.swift match {
+        case Some(o) => "ProtobufMarshaller<" + o.prefix + p.name + ">"
+        case None => s"[invalid protobuf: ${p.name}]"
+      }
       case MArray => "ArrayMarshaller"
       case d: MDef => throw new AssertionError("unreachable")
       case e: MExtern => throw new AssertionError("unreachable")

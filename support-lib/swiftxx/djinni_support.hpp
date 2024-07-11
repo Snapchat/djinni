@@ -4,6 +4,8 @@
 #include <string>
 #include <memory>
 #include <chrono>
+#include <locale>
+#include <codecvt>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -15,13 +17,31 @@ using I32Value = int32_t;
 using I64Value = int64_t;
 // double covers float too
 using DoubleValue = double;
-// using StringValue = std::string;
-// using BinaryValue = std::vector<uint8_t>;
+using StringValue = std::string;
+using BinaryValue = std::vector<uint8_t>;
 struct RangeValue {
     const void* bytes;
     size_t size;
 };
 using DateValue = std::chrono::system_clock::time_point;
+struct ErrorValue: public std::exception {
+    std::string msg;
+    std::exception_ptr cause;
+
+    ErrorValue(const std::string& msg)
+        :msg(msg), cause(nullptr) {}
+    ErrorValue(const std::string& msg, std::exception_ptr cause)
+        :msg(msg), cause(cause) {}
+    ErrorValue(const ErrorValue& other) = default;
+    ErrorValue(ErrorValue&& other) = default;
+
+    ErrorValue& operator=(const ErrorValue& other) = default;
+    ErrorValue& operator=(ErrorValue&& other) = default;
+    
+    const char* what() const noexcept override {
+        return msg.c_str();
+    }
+};
 
 class ProtocolWrapper;
 struct InterfaceValue {
@@ -39,10 +59,9 @@ struct OpaqueValue {
 };
 using OpaqueValuePtr = std::shared_ptr<OpaqueValue>;
 
-using AnyValue = std::variant<VoidValue,
-    I32Value, I64Value, DoubleValue,
-    RangeValue, DateValue,
-    InterfaceValue, OpaqueValuePtr, CompositeValuePtr>;
+using AnyValue = std::variant<VoidValue, I32Value, I64Value, DoubleValue,
+    StringValue, BinaryValue, DateValue, ErrorValue, OpaqueValuePtr, RangeValue,
+    InterfaceValue, CompositeValuePtr>;
 
 struct CompositeValue {
     virtual ~CompositeValue() = default;
@@ -60,16 +79,22 @@ struct CompositeValue {
 
 struct ParameterList: CompositeValue {};
 
-AnyValue makeRangeValue(void* bytes, size_t size);
-RangeValue getRange(const AnyValue& v);
+AnyValue makeStringValue(const char* bytes, size_t size);
+AnyValue makeBinaryValue(const void* bytes, size_t size);
+RangeValue getBinaryRange(const AnyValue& v);
+AnyValue makeRangeValue(const void* bytes, size_t size);
 size_t getSize(const AnyValue* v);
 AnyValue getMember(const AnyValue* v, size_t i);
 void addMember(AnyValue* c, const AnyValue& v);
 AnyValue getMember(const ParameterList* v, size_t i);
 void setReturnValue(AnyValue* ret, const AnyValue& v);
+void setErrorValue(AnyValue* ret, const ErrorValue& v);
+void setErrorMessage(AnyValue* ret, const std::string& s);
 AnyValue makeVoidValue();
 bool isVoidValue(const AnyValue* c);
 AnyValue makeCompositeValue();
+bool isError(const AnyValue* ret);
+ErrorValue getError(const AnyValue* ret);
 
 struct InterfaceInfo {
     void* cppPointer;
@@ -130,11 +155,22 @@ struct Enum {
 struct String {
     using CppType = std::string;
     static AnyValue fromCpp(const CppType& c) {
-        return RangeValue{c.data(), c.size()};
+        return c;
     }
     static CppType toCpp(const AnyValue& v) {
-        auto range = std::get<RangeValue>(v);
-        return {reinterpret_cast<const char*>(range.bytes), range.size};
+        return std::get<StringValue>(v);
+    }
+};
+
+struct WString {
+    using Utf8Converter = std::wstring_convert<std::codecvt_utf8<wchar_t>>;
+    using CppType = std::wstring;
+    static AnyValue fromCpp(const CppType& c) {
+        return Utf8Converter().to_bytes(c);
+    }
+    static CppType toCpp(const AnyValue& v) {
+        auto utf8str = std::get<StringValue>(v);
+        return Utf8Converter{}.from_bytes(utf8str);
     }
 };
 
@@ -221,7 +257,7 @@ struct Optional {
     }
     template<typename C = T>
     static AnyValue fromCpp(const typename C::CppOptType& cppOpt) {
-        return T::fromCppOpt(cppOpt);
+        return cppOpt ? T::fromCppOpt(cppOpt) : makeVoidValue();
     }
 };
 
@@ -244,12 +280,10 @@ public:
     using CppType = std::vector<uint8_t>;
 
     static AnyValue fromCpp(const CppType& c) {
-        return RangeValue{c.data(), c.size()};
+        return makeBinaryValue(c.data(), c.size());
     }
     static CppType toCpp(const AnyValue& v) {
-        auto range = std::get<RangeValue>(v);
-        const auto* ptr = reinterpret_cast<const uint8_t*>(range.bytes);
-        return {ptr, ptr + range.size};
+        return std::get<BinaryValue>(v);
     }
 };
 
@@ -271,6 +305,29 @@ struct Interface {
     }
     static AnyValue fromCppOpt(const CppOptType& c) {
         return {c};
+    }
+};
+
+template <typename CPP_PROTO>
+class Protobuf {
+public:
+    using CppType = CPP_PROTO;
+    static CppType toCpp(const AnyValue& s) {
+        auto bin = std::get<BinaryValue>(s);
+        CPP_PROTO cppProto;
+        bool success = cppProto.ParseFromArray(bin.data(), bin.size());
+        if (!success) {
+            throw ErrorValue(std::string("failed to parse protobuf type ") + cppProto.GetTypeName());
+        }
+        return cppProto;
+    }
+    static AnyValue fromCpp(const CppType& c) {
+        BinaryValue bin(c.ByteSizeLong());
+        bool success = c.SerializeToArray(bin.data(), static_cast<int>(bin.size()));
+        if (!success) {
+            return ErrorValue("failed to serialize protobuf type " + c.GetTypeName());
+        }
+        return {bin};
     }
 };
 

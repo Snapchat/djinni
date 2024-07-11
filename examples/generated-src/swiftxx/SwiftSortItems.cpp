@@ -8,22 +8,31 @@
 
 namespace djinni_generated {
 
-djinni::swift::AnyValue SortItems_sort(const djinni::swift::ParameterList* params) {
+djinni::swift::AnyValue SortItems_sort(const djinni::swift::ParameterList* params) try {
     auto inst = SwiftSortItems::toCpp(params->getValue(0));
     auto _order = ::djinni_generated::SwiftSortOrder::toCpp(params->getValue(1));
     auto _items = ::djinni_generated::SwiftItemList::toCpp(params->getValue(2));
-    inst->sort(_order, _items);
+    inst->sort(std::move(_order), std::move(_items));
     return djinni::swift::makeVoidValue();
 }
-djinni::swift::AnyValue SortItems_createWithListener(const djinni::swift::ParameterList* params) {
+catch (const std::exception& e) {
+    return {djinni::swift::ErrorValue{ e.what(), std::current_exception()}};
+}
+djinni::swift::AnyValue SortItems_createWithListener(const djinni::swift::ParameterList* params) try {
     auto _listener = ::djinni_generated::SwiftTextboxListener::toCpp(params->getValue(0));
-    auto ret = ::textsort::SortItems::create_with_listener(_listener);
+    auto ret = ::textsort::SortItems::create_with_listener(std::move(_listener));
     return ::djinni_generated::SwiftSortItems::fromCpp(ret);
 }
-djinni::swift::AnyValue SortItems_runSort(const djinni::swift::ParameterList* params) {
+catch (const std::exception& e) {
+    return {djinni::swift::ErrorValue{ e.what(), std::current_exception()}};
+}
+djinni::swift::AnyValue SortItems_runSort(const djinni::swift::ParameterList* params) try {
     auto _items = ::djinni_generated::SwiftItemList::toCpp(params->getValue(0));
-    auto ret = ::textsort::SortItems::run_sort(_items);
+    auto ret = ::textsort::SortItems::run_sort(std::move(_items));
     return ::djinni_generated::SwiftItemList::fromCpp(ret);
+}
+catch (const std::exception& e) {
+    return {djinni::swift::ErrorValue{ e.what(), std::current_exception()}};
 }
 
 } // namespace djinni_generated

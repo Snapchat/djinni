@@ -3,36 +3,43 @@
 
 import DjinniSupport
 import DjinniSupportCxx
+import Foundation
 import TextSort
 import TextSortCxx
 
-final class CppProxy: DjinniSupport.CppProxy, SortItems {
-    func sort(order: SortOrder, items: ItemList) -> Void {
+final class SortItemsCppProxy: DjinniSupport.CppProxy, SortItems {
+    init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
+    func sort(order: TextSort.SortOrder, items: TextSort.ItemList) throws -> Void {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(SortOrderMarshaller.toCpp(order))
         params.addValue(ItemListMarshaller.toCpp(items))
-        djinni_generated.SortItems_sort(&params)
+        var ret = djinni_generated.SortItems_sort(&params)
+        try handleCppErrors(&ret)
     }
 }
 enum SortItemsMarshaller: DjinniSupport.Marshaller {
     typealias SwiftType = SortItems
     static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
-        return cppInterfaceToSwift(c, { CppProxy(c) })
+        return cppInterfaceToSwift(c, { SortItemsCppProxy(c) as SwiftType })
     }
     static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }
 public class SortItems_statics {
-    static func createWithListener(listener: TextboxListener) -> SortItems {
+    static func createWithListener(listener: TextSort.TextboxListener) throws -> TextSort.SortItems {
         var params = djinni.swift.ParameterList()
         params.addValue(TextboxListenerMarshaller.toCpp(listener))
-        return SortItemsMarshaller.fromCpp(djinni_generated.SortItems_createWithListener(&params))
+        var ret = djinni_generated.SortItems_createWithListener(&params)
+        try handleCppErrors(&ret)
+        return SortItemsMarshaller.fromCpp(ret)
     }
-    static func runSort(items: ItemList) -> ItemList {
+    static func runSort(items: TextSort.ItemList) throws -> TextSort.ItemList {
         var params = djinni.swift.ParameterList()
         params.addValue(ItemListMarshaller.toCpp(items))
-        return ItemListMarshaller.fromCpp(djinni_generated.SortItems_runSort(&params))
+        var ret = djinni_generated.SortItems_runSort(&params)
+        try handleCppErrors(&ret)
+        return ItemListMarshaller.fromCpp(ret)
     }
 }

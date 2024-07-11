@@ -39,4 +39,8 @@ ts:
   module: ''
 swift:
   typename: 'Date'
-  module: ''
+  translator: 'DateMarshaller'
+  module: 'DjinniSupport'
+swiftxx:
+  translator: '::djinni::swift::Date'
+  header: '"djinni_support.hpp"'

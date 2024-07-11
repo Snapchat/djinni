@@ -37,6 +37,11 @@ composer:
   translator: '::djinni::composer::NativeDataRef'
   header: '"$DataRef_composer.hpp"'
 swift:
-  typename: 'Data'
+  typename: 'NSData'
   module: 'Foundation'
   generic: false
+  translator: 'DataRefMarshaller'
+  translator.module: 'DjinniSupport'
+swiftxx:
+  translator: '::djinni::swift::DataRefAdaptor'
+  header: '"Data_swift.hpp"'

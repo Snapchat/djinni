@@ -70,12 +70,15 @@ class SwiftxxMarshal(spec: Spec) extends Marshal(spec) {
       }
       case MOptional => "Optional"
       case MBinary => "Binary"
-      case MString => "String"
+      case MString => if (spec.cppUseWideStrings) "WString" else "String"
       case MDate => "Date"
       case MList => "List"
       case MSet => "Set"
       case MMap => "Map"
-      case MProtobuf(_,_,_) => "Protobuf"
+      case p: MProtobuf => p.body.swift match {
+        case Some(o) => "Protobuf" + "<" + withNs(Some(p.body.cpp.ns), p.name) + ">"
+        case None => s"[invalid protobuf: ${p.name}]"
+      }
       case MArray => "Array"
       case d: MDef => throw new AssertionError("unreachable")
       case e: MExtern => throw new AssertionError("unreachable")

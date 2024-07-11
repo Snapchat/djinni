@@ -97,10 +97,11 @@ object Interface {
 
 case class Field(ident: Ident, ty: TypeRef, doc: Doc)
 
-case class ProtobufMessage(cpp: ProtobufMessage.Cpp, java: ProtobufMessage.Java, objc: Option[ProtobufMessage.Objc], ts: Option[ProtobufMessage.Ts]) extends TypeDef
+case class ProtobufMessage(cpp: ProtobufMessage.Cpp, java: ProtobufMessage.Java, objc: Option[ProtobufMessage.Objc], ts: Option[ProtobufMessage.Ts], swift: Option[ProtobufMessage.Swift]) extends TypeDef
 object ProtobufMessage {
   case class Cpp(header: String, ns: String)
   case class Java(pkg: String, jniClass: Option[String], jniHeader: Option[String])
   case class Objc(header: String, prefix: String)
   case class Ts(module: String, ns: String)
+  case class Swift(module: String, prefix: String)
 }

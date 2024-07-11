@@ -125,6 +125,7 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
 
   class SwiftRefs(name: String) {
     var swiftImports = mutable.TreeSet[String]()
+    var privateImports = mutable.TreeSet[String]("DjinniSupport", "Foundation",spec.swiftxxBaseLibModule, spec.swiftModule, spec.swiftModule + "Cxx")
     swiftImports.add("Foundation")
     def find(ty: TypeRef) { find(ty.resolved) }
     def find(tm: MExpr) {
@@ -132,8 +133,45 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
       find(tm.base)
     }
     def find(m: Meta) = for(r <- marshal.references(m, name)) r match {
-      case ImportRef(arg) => swiftImports.add(arg)
+      // don't import empty module name (e.g. types defined in stdlib) or same module as the current one
+      case ImportRef(arg) => if (arg.nonEmpty && arg != spec.swiftModule) { swiftImports.add(arg) }
+      case PrivateImportRef(arg) => if (arg.nonEmpty && arg != spec.swiftModule) { privateImports.add(arg) }
       case _ =>
+    }
+  }
+
+  def generateSwiftConstants(w: IndentWriter, consts: Seq[Const]) = {
+
+    def writeSwiftConst(w: IndentWriter, ty: TypeRef, v: Any): Unit = v match {
+      case l: Long => w.w(l.toString)
+      case d: Double => w.w(d.toString)
+      case b: Boolean => w.w(if (b) "true" else "false")
+      case s: String => w.w(s)
+      case e: EnumValue =>  w.w(s"${marshal.typename(ty)}.${idSwift.enum(e)}")
+      case v: ConstRef => w.w(idSwift.const(v))
+      case z: Map[_, _] => { // Value is record
+        val recordMdef = ty.resolved.base.asInstanceOf[MDef]
+        val record = recordMdef.body.asInstanceOf[Record]
+        val vMap = z.asInstanceOf[Map[String, Any]]
+        w.wl(s"${marshal.typename(ty)}(")
+        w.increase()
+        // Use exact sequence
+        val skipFirst = SkipFirst()
+        for (f <- record.fields) {
+          skipFirst {w.wl(",")}
+          w.w(idSwift.field(f.ident) + ":")
+          writeSwiftConst(w, f.ty, vMap.apply(f.ident.name))
+        }
+        w.w(")")
+        w.decrease()
+      }
+    }
+
+    for (c <- consts) {
+      writeDoc(w, c.doc)
+      w.w(s"public static let ${idSwift.const(c.ident)}: ${marshal.fieldType(c.ty)} = ")
+      writeSwiftConst(w, c.ty, c.value)
+      w.wl
     }
   }
 
@@ -142,12 +180,14 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
     r.fields.foreach(f => refs.find(f.ty))
     writeSwiftFile(ident, origin, refs.swiftImports, w => {
       writeDoc(w, doc)
-      w.w(s"public struct ${marshal.typename(ident, r)}").braced {
+      val eqClause = if (r.derivingTypes.contains(DerivingType.Eq)) ": Equatable" else ""
+      w.w(s"public struct ${marshal.typename(ident, r)}${eqClause}").braced {
+        generateSwiftConstants(w, r.consts)
         for (f <- r.fields) {
           writeDoc(w, f.doc)
-          w.wl(s"public var ${idSwift.field(f.ident)}: ${marshal.fieldType(f.ty)}")
+          w.wl(s"public var ${idSwift.field(f.ident)}: ${marshal.fqFieldType(f.ty)}")
         }
-        val initParams = r.fields.map(f => s"${idSwift.field(f.ident)}: ${marshal.fieldType(f.ty)}").mkString(", ")
+        val initParams = r.fields.map(f => s"${idSwift.field(f.ident)}: ${marshal.fqFieldType(f.ty)}").mkString(", ")
         w.wl
         w.wl(s"public init(${initParams})").braced {
           for (f <- r.fields) {
@@ -156,10 +196,9 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
         }
       }
     })
-    writeSwiftPrivateFile(ident, origin, List[String]("DjinniSupport", "Foundation", spec.swiftxxBaseLibModule, spec.swiftModule), w => {
-      val t = marshal.typename(ident, r)
-      w.w(s"enum ${t}Marshaller: DjinniSupport.Marshaller").braced {
-        w.wl(s"typealias SwiftType = $t")
+    writeSwiftPrivateFile(ident, origin, refs.privateImports, w => {
+      w.w(s"enum ${marshal.typename(ident, r)}Marshaller: DjinniSupport.Marshaller").braced {
+        w.wl(s"typealias SwiftType = ${marshal.fqTypename(ident, r)}")
         w.w("static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType").braced {
           w.wl("return withUnsafePointer(to: c) { p in").nested {
             for ((f, i) <- r.fields.view.zipWithIndex) {
@@ -201,30 +240,30 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
         for (m <- i.methods.filter(!_.static)) {
           writeMethodDoc(w, m, idSwift.local)
           w.w(s"func ${swiftMethodName(m.ident)}(")
-          w.w(m.params.map(p => s"${idSwift.local(p.ident)}: ${marshal.paramType(p.ty)}").mkString(", "))
-          w.wl(s") -> ${marshal.returnType(m.ret)}")
+          w.w(m.params.map(p => s"${idSwift.local(p.ident)}: ${marshal.fqParamType(p.ty)}").mkString(", "))
+          w.wl(s") throws -> ${marshal.fqReturnType(m.ret)}")
         }
       }
     })
-    writeSwiftPrivateFile(ident, origin, List[String]("DjinniSupport", "Foundation",spec.swiftxxBaseLibModule, spec.swiftModule, spec.swiftModule + "Cxx"), w => {
+    writeSwiftPrivateFile(ident, origin, refs.privateImports, w => {
       writeDoc(w, doc)
       // Define CppProxy class if interface is implemented in C++
       if (i.ext.cpp) {
-        w.w(s"final class ${marshal.typename(ident, i)}CppProxy: DjinniSupport.CppProxy, ${marshal.typename(ident, i)}").braced {
+        w.w(s"final class ${marshal.typename(ident, i)}CppProxy: DjinniSupport.CppProxy, ${marshal.fqTypename(ident, i)}").braced {
+          w.wl("init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } ")
           for (m <- i.methods.filter(!_.static)) {
             w.w(s"func ${swiftMethodName(m.ident)}(")
-            w.w(m.params.map(p => s"${idSwift.local(p.ident)}: ${marshal.paramType(p.ty)}").mkString(", "))
-            w.w(s") -> ${marshal.returnType(m.ret)}").braced {
+            w.w(m.params.map(p => s"${idSwift.local(p.ident)}: ${marshal.fqParamType(p.ty)}").mkString(", "))
+            w.w(s") throws -> ${marshal.fqReturnType(m.ret)}").braced {
               w.wl("var params = djinni.swift.ParameterList()")
               w.wl("params.addValue(inst)")
               for (p <- m.params) {
                 w.wl(s"params.addValue(${marshal.toCpp(p.ty, idSwift.local(p.ident))})")
               }
-              val call = s"${spec.swiftxxNamespace}.${marshal.typename(ident, i)}_${idSwift.method(m.ident)}(&params)"
-              if (m.ret.isEmpty) {
-                w.wl(call)
-              } else {
-                w.wl(s"return ${marshal.fromCpp(m.ret.get, call)}")
+              w.wl(s"var ret = ${spec.swiftxxNamespace}.${marshal.typename(ident, i)}_${idSwift.method(m.ident)}(&params)")
+              w.wl("try handleCppErrors(&ret)")
+              if (!m.ret.isEmpty) {
+                w.wl(s"return ${marshal.fromCpp(m.ret.get, "ret")}")
               }
             }
           }
@@ -244,9 +283,9 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
               val args = m.params.map(p => s"${idSwift.local(p.ident)}: _${idSwift.local(p.ident)}").mkString(", ")
               val call = s"inst.${swiftMethodName(m.ident)}(${args})"
               if (m.ret.isEmpty) {
-                w.wl(call)
+                w.wl("try " + call)
               } else {
-                w.wl(s"djinni.swift.setReturnValue(ret, ${marshal.toCpp(m.ret.get, call)})")
+                w.wl(s"djinni.swift.setReturnValue(ret, try ${marshal.toCpp(m.ret.get, call)})")
               }
             }
             w.wl("},")
@@ -257,9 +296,9 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
       }
       // Define the marshaller
       w.w(s"enum ${marshal.typename(ident, i)}Marshaller: DjinniSupport.Marshaller").braced {
-        w.wl(s"typealias SwiftType = ${marshal.typename(ident, i)}")
+        w.wl(s"typealias SwiftType = ${marshal.fqTypename(ident, i)}")
         w.w("static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType").braced {
-          val newProxyBlock = if (i.ext.cpp) {s"{ ${marshal.typename(ident, i)}CppProxy(c) }"} else {"{ fatalError(\"n/a\") }"}
+          val newProxyBlock = if (i.ext.cpp) {s"{ ${marshal.typename(ident, i)}CppProxy(c) as SwiftType }"} else {"{ fatalError(\"n/a\") }"}
           w.wl(s"return cppInterfaceToSwift(c, ${newProxyBlock})")
         }
         w.w("static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue").braced {
@@ -268,22 +307,21 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
         }
       }
       // Define static method stubs
-      val staticMethods = i.methods.filter(_.static)
+      val staticMethods = i.methods.filter(m => m.static && m.lang.swift)
       if (!staticMethods.isEmpty) {
         w.w(s"public class ${marshal.typename(ident, i)}_statics").braced {
           for (m <- staticMethods) {
             w.w(s"static func ${swiftMethodName(m.ident)}(")
-            w.w(m.params.map(p => s"${idSwift.local(p.ident)}: ${marshal.paramType(p.ty)}").mkString(", "))
-            w.w(s") -> ${marshal.returnType(m.ret)}").braced {
+            w.w(m.params.map(p => s"${idSwift.local(p.ident)}: ${marshal.fqParamType(p.ty)}").mkString(", "))
+            w.w(s") throws -> ${marshal.fqReturnType(m.ret)}").braced {
               w.wl("var params = djinni.swift.ParameterList()")
               for (p <- m.params) {
                 w.wl(s"params.addValue(${marshal.toCpp(p.ty, idSwift.local(p.ident))})")
               }
-              val call = s"${spec.swiftxxNamespace}.${marshal.typename(ident, i)}_${idSwift.method(m.ident)}(&params)"
-              if (m.ret.isEmpty) {
-                w.wl(call)
-              } else {
-                w.wl(s"return ${marshal.fromCpp(m.ret.get, call)}")
+              w.wl(s"var ret = ${spec.swiftxxNamespace}.${marshal.typename(ident, i)}_${idSwift.method(m.ident)}(&params)")
+              w.wl("try handleCppErrors(&ret)")
+              if (!m.ret.isEmpty) {
+                w.wl(s"return ${marshal.fromCpp(m.ret.get, "ret")}")
               }
             }
           }

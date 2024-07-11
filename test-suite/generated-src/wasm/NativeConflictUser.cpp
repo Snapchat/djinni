@@ -25,7 +25,7 @@ em::val NativeConflictUser::Conflict(const CppType& self) {
 }
 bool NativeConflictUser::conflict_arg(const CppType& self, const em::val& w_cs) {
     try {
-        auto r = self->conflict_arg(::djinni::Set<::djinni_generated::NativeConflict>::toCpp(w_cs));
+        auto r = self->conflict_arg(::djinni::List<::djinni_generated::NativeConflict>::toCpp(w_cs));
         return ::djinni::Bool::fromCpp(r);
     }
     catch(const std::exception& e) {

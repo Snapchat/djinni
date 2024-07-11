@@ -3,13 +3,14 @@
 
 import DjinniSupport
 import DjinniSupportCxx
+import Foundation
 import TextSort
 import TextSortCxx
 
 let textboxListenerMethods: Vtbl<TextboxListener> = [
     { inst, params, ret in
         let _items = ItemListMarshaller.fromCpp(djinni.swift.getMember(params, 0))
-        inst.update(items: _items)
+        try inst.update(items: _items)
     },
 ]
 

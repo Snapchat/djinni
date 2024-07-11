@@ -81,7 +81,7 @@ class SwiftxxGenerator(spec: Spec) extends Generator(spec) {
         w.wl("auto ret = std::make_shared<djinni::swift::CompositeValue>();")
         for (f <- r.fields) {
           val member = s"c.${idCpp.field(f.ident)}"
-          w.wl(s"ret->addValue(${marshal.fromCpp(f.ty, member)});")
+          w.wl(s"ret->addValue(${marshal.fromCpp(f.ty, cppMarshal.maybeMove(member, f.ty))});")
         }
         w.wl("return {ret};")
       }
@@ -110,10 +110,8 @@ class SwiftxxGenerator(spec: Spec) extends Generator(spec) {
       w.wl(s"using ${spec.swiftxxClassIdentStyle(ident)} = djinni::swift::Interface<${cppMarshal.fqTypename(ident, i)}>;")
       if (i.ext.cpp) {
         w.wl
-        i.methods.foreach(m => {
-          if (m.static || m.lang.swift) {
-            w.wl(s"djinni::swift::AnyValue ${idSwift.ty(ident)}_${idSwift.method(m.ident)}(const djinni::swift::ParameterList* params);")
-          }
+        i.methods.filter(m => !m.static || (m.static && m.lang.swift)).foreach(m => {
+          w.wl(s"djinni::swift::AnyValue ${idSwift.ty(ident)}_${idSwift.method(m.ident)}(const djinni::swift::ParameterList* params);")
         })
       }
       if (i.ext.swift) {
@@ -135,37 +133,38 @@ class SwiftxxGenerator(spec: Spec) extends Generator(spec) {
     })
     writeSwiftCppFile(ident, origin, refs.swiftCpp, w => {
       if (i.ext.cpp) {
-        i.methods.foreach(m => {
-          if (m.static || m.lang.swift) {
-            w.w(s"djinni::swift::AnyValue ${idSwift.ty(ident)}_${idSwift.method(m.ident)}(const djinni::swift::ParameterList* params)").braced {
-              // get self
-              if (!m.static) {
-                w.wl(s"auto inst = ${marshal.helperClass(ident)}::toCpp(params->getValue(0));")
-              }
-              // get args
-              val iOffset = if (m.static) 0 else 1
-              for ((p, i) <- m.params.view.zipWithIndex) {
-                val pi = s"params->getValue(${i + iOffset})"
-                w.wl(s"auto _${idCpp.local(p.ident)} = ${marshal.toCpp(p.ty, pi)};")
-              }
-              // make the call
-              if (!m.ret.isEmpty) {
-                w.w("auto ret = ")
-              }
-              if (m.static) {
-                w.w(s"${cppMarshal.fqTypename(ident, i)}::")
-              } else {
-                w.w("inst->")
-              }
-              val args = m.params.map(p => s"std::move(_${idCpp.local(p.ident)})").mkString(", ")
-              w.wl(s"${idCpp.method(m.ident)}($args);")
-              // return
-              if (m.ret.isEmpty) {
-                w.wl("return djinni::swift::makeVoidValue();")
-              } else {
-                w.wl("return " + marshal.fromCpp(m.ret.get, "ret") + ";")
-              }
+        i.methods.filter(m => !m.static || (m.static && m.lang.swift)).foreach(m => {
+          w.w(s"djinni::swift::AnyValue ${idSwift.ty(ident)}_${idSwift.method(m.ident)}(const djinni::swift::ParameterList* params) try").braced {
+            // get self
+            if (!m.static) {
+              w.wl(s"auto inst = ${marshal.helperClass(ident)}::toCpp(params->getValue(0));")
             }
+            // get args
+            val iOffset = if (m.static) 0 else 1
+            for ((p, i) <- m.params.view.zipWithIndex) {
+              val pi = s"params->getValue(${i + iOffset})"
+              w.wl(s"auto _${idCpp.local(p.ident)} = ${marshal.toCpp(p.ty, pi)};")
+            }
+            // make the call
+            if (!m.ret.isEmpty) {
+              w.w("auto ret = ")
+            }
+            if (m.static) {
+              w.w(s"${cppMarshal.fqTypename(ident, i)}::")
+            } else {
+              w.w("inst->")
+            }
+            val args = m.params.map(p => s"std::move(_${idCpp.local(p.ident)})").mkString(", ")
+            w.wl(s"${idCpp.method(m.ident)}($args);")
+            // return
+            if (m.ret.isEmpty) {
+              w.wl("return djinni::swift::makeVoidValue();")
+            } else {
+              w.wl("return " + marshal.fromCpp(m.ret.get, cppMarshal.maybeMove("ret", m.ret.get)) + ";")
+            }
+          }
+          w.w("catch (const std::exception& e)").braced {
+            w.wl("return {djinni::swift::ErrorValue{ e.what(), std::current_exception()}};")
           }
         })
       }
@@ -180,7 +179,7 @@ class SwiftxxGenerator(spec: Spec) extends Generator(spec) {
           w.w(s"$ret $proxy::${idCpp.method(m.ident)}${params.mkString("(", ", ", ")")}$constFlag").braced {
             w.wl("djinni::swift::ParameterList params;")
             for (p <- m.params) {
-              w.wl(s"params.addValue(${marshal.fromCpp(p.ty, idCpp.local(p.ident))});")
+              w.wl(s"params.addValue(${marshal.fromCpp(p.ty, cppMarshal.maybeMove(idCpp.local(p.ident), p.ty))});")
             }
             val call = s"callProtocol($idx, &params)"
             if (m.ret.isEmpty) {

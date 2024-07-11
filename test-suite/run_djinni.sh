@@ -101,6 +101,12 @@ fi
     --ts-out "$temp_out_relative/ts" \
     --ts-module "test_wchar" \
     \
+    --swift-out "$temp_out_relative/swift" \
+    --swift-module "TestSuite" \
+    --swiftxx-out "$temp_out_relative/swiftxx" \
+    --ident-swiftxx-class NativeFooBar \
+    --ident-swiftxx-file NativeFooBar \
+    \
     --yaml-out "$temp_out_relative/yaml" \
     --yaml-out-file "yaml-test.yaml" \
     --yaml-prefix "test_" \
@@ -137,9 +143,9 @@ fi
     --ts-out "$temp_out_relative/ts" \
     --ts-module "test" \
     \
-    --swift-out "$temp_out/swift" \
+    --swift-out "$temp_out_relative/swift" \
     --swift-module "TestSuite" \
-    --swiftxx-out "$temp_out/swiftxx" \
+    --swiftxx-out "$temp_out_relative/swiftxx" \
     --ident-swiftxx-class NativeFooBar \
     --ident-swiftxx-file NativeFooBar \
     \
@@ -305,6 +311,12 @@ cp "$base_dir/djinni/yaml-test.djinni" "$temp_out/yaml"
     --wasm-namespace "testsuite" \
     --ts-out "$temp_out_relative/ts" \
     --ts-module "test_yaml" \
+    \
+    --swift-out "$temp_out_relative/swift" \
+    --swift-module "TestSuite" \
+    --swiftxx-out "$temp_out_relative/swiftxx" \
+    --ident-swiftxx-class NativeFooBar \
+    --ident-swiftxx-file NativeFooBar \
     \
     --idl "$temp_out_relative/yaml/yaml-test.djinni" \
 )

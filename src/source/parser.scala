@@ -382,6 +382,14 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
         Some(ProtobufMessage.Ts(p("module"), p("namespace")))
       }
       case None => None
+    },
+    // Swift is optional
+    Option(doc.get("swift")) match {
+      case Some(properties) => {
+        val p = properties.asInstanceOf[JMap[String, String]].toMap
+        Some(ProtobufMessage.Swift(p("module"), p("prefix")))
+      }
+      case None => None
     }
   )
   for(message <- doc.get("messages").asInstanceOf[java.util.List[String]]) {

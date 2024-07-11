@@ -4,7 +4,7 @@
 package com.dropbox.djinni.test;
 
 import com.snapchat.djinni.NativeObjectManager;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -13,7 +13,7 @@ public abstract class ConflictUser {
     @CheckForNull
     public abstract Conflict Conflict();
 
-    public abstract boolean conflictArg(@Nonnull HashSet<Conflict> cs);
+    public abstract boolean conflictArg(@Nonnull ArrayList<Conflict> cs);
 
     public static final class CppProxy extends ConflictUser
     {
@@ -37,11 +37,11 @@ public abstract class ConflictUser {
         private native Conflict native_Conflict(long _nativeRef);
 
         @Override
-        public boolean conflictArg(HashSet<Conflict> cs)
+        public boolean conflictArg(ArrayList<Conflict> cs)
         {
             assert !this.destroyed.get() : "trying to use a destroyed object";
             return native_conflictArg(this.nativeRef, cs);
         }
-        private native boolean native_conflictArg(long _nativeRef, HashSet<Conflict> cs);
+        private native boolean native_conflictArg(long _nativeRef, ArrayList<Conflict> cs);
     }
 }

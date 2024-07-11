@@ -4,23 +4,18 @@ load("@build_bazel_rules_apple//apple:macos.bzl", "macos_unit_test")
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library", "swift_test")
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
 
-exclude_files = ["handwritten-src/cpp/proto_test_helpers.*",
-                 "handwritten-src/cpp/TranslateDuration.*",
-                 "handwritten-src/cpp/data_helpers.*",
-                 "handwritten-src/cpp/outcome_test_helpers.*"]
-
 cc_library(
     name = "djinni-tests-common",
     srcs = glob([
         "generated-src/cpp/*.cpp",
         "handwritten-src/cpp/*.cpp",
         "djinni/vendor/third-party/proto/cpp/*.cc",
-    ], exclude=exclude_files),
+    ]),
     hdrs = glob([
         "generated-src/cpp/*.hpp",
         "handwritten-src/cpp/*.hpp",
         "djinni/vendor/third-party/proto/cpp/*.h",
-    ], exclude=exclude_files),
+    ]),
     includes = [
         "generated-src/cpp",
         "handwritten-src/cpp",
@@ -198,10 +193,13 @@ sh_binary(
                  "handwritten-src/js/*.js"]) + [":wasm"]
 )
 
+swift_helper_files = "handwritten-src/swift/*+Helper.swift"
+swift_error_files = "handwritten-src/swift/*+Error.swift"
+
 swift_test(
     name = "djinni-swift-tests",
-    srcs = ['handwritten-src/swift/AllTests.swift'],
-    deps = ['//examples:textsort-swift-bridge'],
+    srcs = glob(['handwritten-src/swift/*.swift'], exclude = [swift_helper_files, swift_error_files]),
+    deps = [':test-swift-bridge', '//examples:textsort-swift-bridge'],
     copts = [
         "-cxx-interoperability-mode=default",
         "-Xcc",
@@ -218,6 +216,7 @@ swift_library(
     generates_header = True,
     srcs = glob([
         "generated-src/swift/*.swift",
+        swift_error_files
     ], exclude = [ swift_private_files ]),
     copts = [
         "-cxx-interoperability-mode=default",
@@ -225,6 +224,7 @@ swift_library(
     ],
     deps = [
         "//support-lib:djinni-support-swift",
+        ":protobuf-test-swift"
     ],
     visibility = ["//visibility:public"],
 )
@@ -232,7 +232,7 @@ swift_library(
 swift_library(
     name = "test-swift-bridge",
     module_name = "TestSuiteBridge",
-    srcs = glob([swift_private_files,]),
+    srcs = glob([swift_private_files, swift_helper_files]),
     copts = [
         "-cxx-interoperability-mode=default",
         "-Xcc", "-std=c++17",
@@ -243,6 +243,16 @@ swift_library(
         ":test-swiftxx",
         "//support-lib:djinni-support-swift",
         "//support-lib:djinni-support-swiftxx",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+swift_library(
+    name = "protobuf-test-swift",
+    module_name = "ProtobufTest",
+    srcs = glob(["djinni/vendor/third-party/proto/swift/*.swift"]),
+    deps = [
+        "@apple_swift_protobuf//:swift-protobuf"
     ],
     visibility = ["//visibility:public"],
 )

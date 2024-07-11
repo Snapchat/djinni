@@ -91,6 +91,7 @@ swift_library(
     ],
     deps = [
         ":djinni-support-swiftxx",
+        "@apple_swift_protobuf//:swift-protobuf"
     ],
     visibility = ["//visibility:public"],
 )
