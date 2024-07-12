@@ -79,6 +79,7 @@ struct CompositeValue {
 
 struct ParameterList: CompositeValue {};
 
+// Swift callable functions
 AnyValue makeStringValue(const char* bytes, size_t size);
 AnyValue makeBinaryValue(const void* bytes, size_t size);
 RangeValue getBinaryRange(const AnyValue& v);

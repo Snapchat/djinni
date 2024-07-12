@@ -1,6 +1,11 @@
 import DjinniSupportCxx
 import Foundation
 
+// `outcome<T>` is marshalled as a composite value
+// 1. If the `outcome` object contains a successful value, then it's the [0]
+//    element in the composite value
+// 2. If the `outcome` object contains an error value, then element [0] is void,
+//    and element [1] is the error value.
 public enum OutcomeMarshaller<Res: Marshaller, Err: Marshaller>: Marshaller
   where Err.SwiftType: Error {
     public typealias SwiftType = Result<Res.SwiftType, Err.SwiftType>

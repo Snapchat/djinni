@@ -1,12 +1,14 @@
 import DjinniSupportCxx
 import Foundation
 
+// Common interface for all Swift type marshallers
+// The C++ type is always djinni.swift.AnyValue
 public protocol Marshaller {
     associatedtype SwiftType
     static func fromCpp(_ v: djinni.swift.AnyValue) -> SwiftType
     static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue
 }
-
+// Djinni generated enums are always backed by Int32
 public enum EnumMarshaller<T: RawRepresentable>: Marshaller where T.RawValue == Int32 {
     public typealias SwiftType = T
     public static func fromCpp(_ v: djinni.swift.AnyValue) -> SwiftType {
@@ -16,7 +18,7 @@ public enum EnumMarshaller<T: RawRepresentable>: Marshaller where T.RawValue == 
         return djinni.swift.I32.fromCpp(s.rawValue)
     }
 }
-
+// All integer types smaller than 32-bit are handled by this
 public enum SmallIntMarshaller<T: BinaryInteger>: Marshaller {
     public typealias SwiftType = T
     public static func fromCpp(_ v: djinni.swift.AnyValue) -> SwiftType {
@@ -26,6 +28,7 @@ public enum SmallIntMarshaller<T: BinaryInteger>: Marshaller {
         return djinni.swift.I32.fromCpp(Int32(s))
     }
 }
+// 64-bit integer
 public enum I64Marshaller: Marshaller {
     public typealias SwiftType = Int64
     public static func fromCpp(_ v: djinni.swift.AnyValue) -> SwiftType {
@@ -35,6 +38,7 @@ public enum I64Marshaller: Marshaller {
         return djinni.swift.I64.fromCpp(s)
     }
 }
+// Both float and double are marshalled to double values
 public enum FloatMarshaller<T: BinaryFloatingPoint>: Marshaller {
     public typealias SwiftType = T
     public static func fromCpp(_ v: djinni.swift.AnyValue) -> SwiftType {
@@ -44,6 +48,7 @@ public enum FloatMarshaller<T: BinaryFloatingPoint>: Marshaller {
         return djinni.swift.F64.fromCpp(Double(s))
     }
 }
+// Bool is marshalled as Int32 (0 or 1)
 public enum BoolMarshaller: Marshaller {
     public typealias SwiftType = Bool
     public static func fromCpp(_ v: djinni.swift.AnyValue) -> SwiftType {
@@ -53,7 +58,7 @@ public enum BoolMarshaller: Marshaller {
         return djinni.swift.I32.fromCpp(s ? 1 : 0)
     }
 }
-
+// Aliases for number types
 public typealias I8Marshaller = SmallIntMarshaller<Int8>
 public typealias I16Marshaller = SmallIntMarshaller<Int16>
 public typealias I32Marshaller = SmallIntMarshaller<Int32>
@@ -158,6 +163,7 @@ public enum ListMarshaller<T: Marshaller>: Marshaller {
     }
 }
 
+// Swift don't need to box primitive types in arrays so they are identical to list
 public typealias ArrayMarshaller<T: Marshaller> = ListMarshaller<T>
 
 public enum SetMarshaller<T: Marshaller>: Marshaller where T.SwiftType: Hashable {
