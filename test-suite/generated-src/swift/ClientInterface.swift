@@ -6,9 +6,9 @@ import Foundation
 /** Client interface */
 public protocol ClientInterface: AnyObject {
     /** Returns record of given string */
-    func getRecord(recordId: Int64, utf8string: String, misc: Optional<String>) throws -> TestSuite.ClientReturnedRecord
-    func identifierCheck(data: Data, r: Int32, jret: Int64) throws -> Double
+    func getRecord(_ recordId: Int64, utf8string: String, misc: Optional<String>) throws -> TestSuite.ClientReturnedRecord
+    func identifierCheck(_ data: Data, r: Int32, jret: Int64) throws -> Double
     func returnStr() throws -> String
-    func methTakingInterface(i: TestSuite.ClientInterface) throws -> String
-    func methTakingOptionalInterface(i: Optional<TestSuite.ClientInterface>) throws -> String
+    func methTakingInterface(_ i: TestSuite.ClientInterface) throws -> String
+    func methTakingOptionalInterface(_ i: Optional<TestSuite.ClientInterface>) throws -> String
 }

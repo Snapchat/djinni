@@ -6,7 +6,7 @@ class MyListener: TextboxListener {
     deinit {
         print("*** deinit called")
     }
-    func update(items: ItemList) throws {
+    func update(_ items: ItemList) throws {
         print("*** update() called")
         print(items)
     }
@@ -15,8 +15,8 @@ class MyListener: TextboxListener {
 final class AllTests: XCTestCase {
     func testExample() throws {
         let listener = MyListener()
-        let s = try SortItems_statics.createWithListener(listener: listener)
+        let s = try SortItems_statics.createWithListener(listener)
         let items = ItemList(items: ["bbb", "ccc", "aaa"])
-        try s.sort(order: .ascending, items: items)
+        try s.sort(.ascending, items: items)
     }
 }

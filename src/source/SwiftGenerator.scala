@@ -240,6 +240,8 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
         for (m <- i.methods.filter(!_.static)) {
           writeMethodDoc(w, m, idSwift.local)
           w.w(s"func ${swiftMethodName(m.ident)}(")
+          // skip label for the first parameter
+          if (m.params.nonEmpty) { w.w("_ ") }
           w.w(m.params.map(p => s"${idSwift.local(p.ident)}: ${marshal.fqParamType(p.ty)}").mkString(", "))
           w.wl(s") throws -> ${marshal.fqReturnType(m.ret)}")
         }
@@ -253,6 +255,7 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
           w.wl("init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } ")
           for (m <- i.methods.filter(!_.static)) {
             w.w(s"func ${swiftMethodName(m.ident)}(")
+            if (m.params.nonEmpty) { w.w("_ ") }
             w.w(m.params.map(p => s"${idSwift.local(p.ident)}: ${marshal.fqParamType(p.ty)}").mkString(", "))
             w.w(s") throws -> ${marshal.fqReturnType(m.ret)}").braced {
               w.wl("var params = djinni.swift.ParameterList()")
@@ -280,7 +283,10 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
                 val pi = s"djinni.swift.getMember(params, $i)"
                 w.wl(s"let _${idSwift.local(p.ident)} = ${marshal.fromCpp(p.ty, pi)}")
               }
-              val args = m.params.map(p => s"${idSwift.local(p.ident)}: _${idSwift.local(p.ident)}").mkString(", ")
+              val args = m.params.view.zipWithIndex.map{case (p, i) =>
+                val label = if (i==0) "" else s"${idSwift.local(p.ident)}: "
+                label + s"_${idSwift.local(p.ident)}"
+              }.mkString(", ")
               val call = s"inst.${swiftMethodName(m.ident)}(${args})"
               if (m.ret.isEmpty) {
                 w.wl("try " + call)
@@ -312,6 +318,7 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
         w.w(s"public class ${marshal.typename(ident, i)}_statics").braced {
           for (m <- staticMethods) {
             w.w(s"static func ${swiftMethodName(m.ident)}(")
+            if (m.params.nonEmpty) { w.w("_ ") }
             w.w(m.params.map(p => s"${idSwift.local(p.ident)}: ${marshal.fqParamType(p.ty)}").mkString(", "))
             w.w(s") throws -> ${marshal.fqReturnType(m.ret)}").braced {
               w.wl("var params = djinni.swift.ParameterList()")

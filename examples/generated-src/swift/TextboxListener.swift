@@ -4,5 +4,5 @@
 import Foundation
 
 public protocol TextboxListener: AnyObject {
-    func update(items: TextSort.ItemList) throws -> Void
+    func update(_ items: TextSort.ItemList) throws -> Void
 }

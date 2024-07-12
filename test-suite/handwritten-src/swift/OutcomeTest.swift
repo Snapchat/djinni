@@ -16,9 +16,9 @@ final class OutcomeTest: XCTestCase {
         XCTAssertNotEqual(r, e)
 
         // construct result outcome in swift then pass to native and back
-        XCTAssertEqual(try TestOutcome_statics.putSuccessOutcome(x:.success("hello")), "hello");
+        XCTAssertEqual(try TestOutcome_statics.putSuccessOutcome(.success("hello")), "hello");
         // construct error outcome in swift then pass to native and back
-        XCTAssertEqual(try TestOutcome_statics.putErrorOutcome(x:.failure(42)), 42);
+        XCTAssertEqual(try TestOutcome_statics.putErrorOutcome(.failure(42)), 42);
 
         // Hash equal
         XCTAssertEqual(r.hashValue, Result<String, Int32>.success("hello").hashValue)
@@ -36,7 +36,7 @@ final class OutcomeTest: XCTestCase {
         XCTAssertEqual(ne.o, .failure("hello"))
         XCTAssertEqual(ne, NestedOutcome(o:.failure("hello")))
 
-        XCTAssertEqual(try TestOutcome_statics.putNestedSuccessOutcome(x:NestedOutcome(o:.success(42))), 42)
-        XCTAssertEqual(try TestOutcome_statics.putNestedErrorOutcome(x:NestedOutcome(o:.failure("hello"))), "hello")
+        XCTAssertEqual(try TestOutcome_statics.putNestedSuccessOutcome(NestedOutcome(o:.success(42))), 42)
+        XCTAssertEqual(try TestOutcome_statics.putNestedErrorOutcome(NestedOutcome(o:.failure("hello"))), "hello")
     }
 }

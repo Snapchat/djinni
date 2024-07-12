@@ -10,12 +10,12 @@ import TextSortCxx
 let textboxListenerMethods: Vtbl<TextboxListener> = [
     { inst, params, ret in
         let _items = ItemListMarshaller.fromCpp(djinni.swift.getMember(params, 0))
-        try inst.update(items: _items)
+        try inst.update(_items)
     },
 ]
 
 enum TextboxListenerMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TextboxListener
+    typealias SwiftType = TextSort.TextboxListener
     static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { fatalError("n/a") })
     }

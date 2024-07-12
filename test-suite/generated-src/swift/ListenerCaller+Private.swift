@@ -38,7 +38,7 @@ enum ListenerCallerMarshaller: DjinniSupport.Marshaller {
     }
 }
 public class ListenerCaller_statics {
-    static func _init(firstL: TestSuite.FirstListener, secondL: TestSuite.SecondListener) throws -> TestSuite.ListenerCaller {
+    static func _init(_ firstL: TestSuite.FirstListener, secondL: TestSuite.SecondListener) throws -> TestSuite.ListenerCaller {
         var params = djinni.swift.ParameterList()
         params.addValue(FirstListenerMarshaller.toCpp(firstL))
         params.addValue(SecondListenerMarshaller.toCpp(secondL))

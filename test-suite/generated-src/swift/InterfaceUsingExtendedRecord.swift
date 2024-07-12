@@ -4,5 +4,5 @@
 import Foundation
 
 public protocol InterfaceUsingExtendedRecord: AnyObject {
-    func meth(er: TestSuite.ExtendedRecord) throws -> TestSuite.ExtendedRecord
+    func meth(_ er: TestSuite.ExtendedRecord) throws -> TestSuite.ExtendedRecord
 }

@@ -20,28 +20,28 @@ enum FlagRoundtripMarshaller: DjinniSupport.Marshaller {
     }
 }
 public class FlagRoundtrip_statics {
-    static func roundtripAccess(flag: TestSuite.AccessFlags) throws -> TestSuite.AccessFlags {
+    static func roundtripAccess(_ flag: TestSuite.AccessFlags) throws -> TestSuite.AccessFlags {
         var params = djinni.swift.ParameterList()
         params.addValue(AccessFlagsMarshaller.toCpp(flag))
         var ret = djinni_generated.FlagRoundtrip_roundtripAccess(&params)
         try handleCppErrors(&ret)
         return AccessFlagsMarshaller.fromCpp(ret)
     }
-    static func roundtripEmpty(flag: TestSuite.EmptyFlags) throws -> TestSuite.EmptyFlags {
+    static func roundtripEmpty(_ flag: TestSuite.EmptyFlags) throws -> TestSuite.EmptyFlags {
         var params = djinni.swift.ParameterList()
         params.addValue(EmptyFlagsMarshaller.toCpp(flag))
         var ret = djinni_generated.FlagRoundtrip_roundtripEmpty(&params)
         try handleCppErrors(&ret)
         return EmptyFlagsMarshaller.fromCpp(ret)
     }
-    static func roundtripAccessBoxed(flag: Optional<TestSuite.AccessFlags>) throws -> Optional<TestSuite.AccessFlags> {
+    static func roundtripAccessBoxed(_ flag: Optional<TestSuite.AccessFlags>) throws -> Optional<TestSuite.AccessFlags> {
         var params = djinni.swift.ParameterList()
         params.addValue(OptionalMarshaller<AccessFlagsMarshaller>.toCpp(flag))
         var ret = djinni_generated.FlagRoundtrip_roundtripAccessBoxed(&params)
         try handleCppErrors(&ret)
         return OptionalMarshaller<AccessFlagsMarshaller>.fromCpp(ret)
     }
-    static func roundtripEmptyBoxed(flag: Optional<TestSuite.EmptyFlags>) throws -> Optional<TestSuite.EmptyFlags> {
+    static func roundtripEmptyBoxed(_ flag: Optional<TestSuite.EmptyFlags>) throws -> Optional<TestSuite.EmptyFlags> {
         var params = djinni.swift.ParameterList()
         params.addValue(OptionalMarshaller<EmptyFlagsMarshaller>.toCpp(flag))
         var ret = djinni_generated.FlagRoundtrip_roundtripEmptyBoxed(&params)

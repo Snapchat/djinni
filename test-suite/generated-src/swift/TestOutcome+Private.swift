@@ -32,14 +32,14 @@ public class TestOutcome_statics {
         try handleCppErrors(&ret)
         return OutcomeMarshaller<StringMarshaller, I32Marshaller>.fromCpp(ret)
     }
-    static func putSuccessOutcome(x: Result<String, Int32>) throws -> String {
+    static func putSuccessOutcome(_ x: Result<String, Int32>) throws -> String {
         var params = djinni.swift.ParameterList()
         params.addValue(OutcomeMarshaller<StringMarshaller, I32Marshaller>.toCpp(x))
         var ret = djinni_generated.TestOutcome_putSuccessOutcome(&params)
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }
-    static func putErrorOutcome(x: Result<String, Int32>) throws -> Int32 {
+    static func putErrorOutcome(_ x: Result<String, Int32>) throws -> Int32 {
         var params = djinni.swift.ParameterList()
         params.addValue(OutcomeMarshaller<StringMarshaller, I32Marshaller>.toCpp(x))
         var ret = djinni_generated.TestOutcome_putErrorOutcome(&params)
@@ -58,14 +58,14 @@ public class TestOutcome_statics {
         try handleCppErrors(&ret)
         return NestedOutcomeMarshaller.fromCpp(ret)
     }
-    static func putNestedSuccessOutcome(x: TestSuite.NestedOutcome) throws -> Int32 {
+    static func putNestedSuccessOutcome(_ x: TestSuite.NestedOutcome) throws -> Int32 {
         var params = djinni.swift.ParameterList()
         params.addValue(NestedOutcomeMarshaller.toCpp(x))
         var ret = djinni_generated.TestOutcome_putNestedSuccessOutcome(&params)
         try handleCppErrors(&ret)
         return I32Marshaller.fromCpp(ret)
     }
-    static func putNestedErrorOutcome(x: TestSuite.NestedOutcome) throws -> String {
+    static func putNestedErrorOutcome(_ x: TestSuite.NestedOutcome) throws -> String {
         var params = djinni.swift.ParameterList()
         params.addValue(NestedOutcomeMarshaller.toCpp(x))
         var ret = djinni_generated.TestOutcome_putNestedErrorOutcome(&params)

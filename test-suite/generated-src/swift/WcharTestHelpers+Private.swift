@@ -32,14 +32,14 @@ public class WcharTestHelpers_statics {
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }
-    static func checkString(str: String) throws -> Bool {
+    static func checkString(_ str: String) throws -> Bool {
         var params = djinni.swift.ParameterList()
         params.addValue(StringMarshaller.toCpp(str))
         var ret = djinni_generated.WcharTestHelpers_checkString(&params)
         try handleCppErrors(&ret)
         return BoolMarshaller.fromCpp(ret)
     }
-    static func checkRecord(rec: TestSuite.WcharTestRec) throws -> Bool {
+    static func checkRecord(_ rec: TestSuite.WcharTestRec) throws -> Bool {
         var params = djinni.swift.ParameterList()
         params.addValue(WcharTestRecMarshaller.toCpp(rec))
         var ret = djinni_generated.WcharTestHelpers_checkRecord(&params)

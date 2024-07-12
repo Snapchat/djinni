@@ -16,7 +16,7 @@ final class ConflictUserCppProxy: DjinniSupport.CppProxy, TestSuite.ConflictUser
         try handleCppErrors(&ret)
         return ConflictMarshaller.fromCpp(ret)
     }
-    func conflictArg(cs: Array<TestSuite.Conflict>) throws -> Bool {
+    func conflictArg(_ cs: Array<TestSuite.Conflict>) throws -> Bool {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(ListMarshaller<ConflictMarshaller>.toCpp(cs))

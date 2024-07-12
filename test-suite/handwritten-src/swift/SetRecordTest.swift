@@ -15,6 +15,6 @@ final class SetRecordTest: XCTestCase {
 
     func testSwiftSetToCppSet() throws {
         let sSetRecord = SetRecord(set: Set(["StringA", "StringB", "StringC"]), iset:Set([]))
-        XCTAssertTrue(try TestHelpers_statics.checkSetRecord(rec:sSetRecord))
+        XCTAssertTrue(try TestHelpers_statics.checkSetRecord(sSetRecord))
     }
 }

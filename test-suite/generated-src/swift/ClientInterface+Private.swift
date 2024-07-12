@@ -13,24 +13,24 @@ let clientInterfaceMethods: Vtbl<ClientInterface> = [
         let _recordId = I64Marshaller.fromCpp(djinni.swift.getMember(params, 0))
         let _utf8string = StringMarshaller.fromCpp(djinni.swift.getMember(params, 1))
         let _misc = OptionalMarshaller<StringMarshaller>.fromCpp(djinni.swift.getMember(params, 2))
-        djinni.swift.setReturnValue(ret, try ClientReturnedRecordMarshaller.toCpp(inst.getRecord(recordId: _recordId, utf8string: _utf8string, misc: _misc)))
+        djinni.swift.setReturnValue(ret, try ClientReturnedRecordMarshaller.toCpp(inst.getRecord(_recordId, utf8string: _utf8string, misc: _misc)))
     },
     { inst, params, ret in
         let _data = BinaryMarshaller.fromCpp(djinni.swift.getMember(params, 0))
         let _r = I32Marshaller.fromCpp(djinni.swift.getMember(params, 1))
         let _jret = I64Marshaller.fromCpp(djinni.swift.getMember(params, 2))
-        djinni.swift.setReturnValue(ret, try F64Marshaller.toCpp(inst.identifierCheck(data: _data, r: _r, jret: _jret)))
+        djinni.swift.setReturnValue(ret, try F64Marshaller.toCpp(inst.identifierCheck(_data, r: _r, jret: _jret)))
     },
     { inst, params, ret in
         djinni.swift.setReturnValue(ret, try StringMarshaller.toCpp(inst.returnStr()))
     },
     { inst, params, ret in
         let _i = ClientInterfaceMarshaller.fromCpp(djinni.swift.getMember(params, 0))
-        djinni.swift.setReturnValue(ret, try StringMarshaller.toCpp(inst.methTakingInterface(i: _i)))
+        djinni.swift.setReturnValue(ret, try StringMarshaller.toCpp(inst.methTakingInterface(_i)))
     },
     { inst, params, ret in
         let _i = OptionalMarshaller<ClientInterfaceMarshaller>.fromCpp(djinni.swift.getMember(params, 0))
-        djinni.swift.setReturnValue(ret, try StringMarshaller.toCpp(inst.methTakingOptionalInterface(i: _i)))
+        djinni.swift.setReturnValue(ret, try StringMarshaller.toCpp(inst.methTakingOptionalInterface(_i)))
     },
 ]
 

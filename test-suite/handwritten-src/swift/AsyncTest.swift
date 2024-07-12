@@ -7,7 +7,7 @@ import Combine
 final class AsyncTest: XCTestCase {
 
     class AsyncInterfaceImpl: AsyncInterface {
-        func futureRoundtrip(f: DJFuture<Int32>) throws -> DJFuture<String> {
+        func futureRoundtrip(_ f: DJFuture<Int32>) throws -> DJFuture<String> {
             var token: AnyCancellable? = nil
             return DJFuture() { promise in
                 token = f.sink { completion in
@@ -38,7 +38,7 @@ final class AsyncTest: XCTestCase {
             sink = f.sink { completion in if case .failure = completion {XCTAssertTrue(false)}}
             receiveValue: { s in promise(.success(Int32(s)!))}
         }
-        let f3 = try TestHelpers_statics.futureRoundtrip(f:f2)
+        let f3 = try TestHelpers_statics.futureRoundtrip(f2)
         p!(.success("36"))
         let res = try await f3.value
         XCTAssertEqual(res, "36")
@@ -49,7 +49,7 @@ final class AsyncTest: XCTestCase {
         let f = DJFuture<Void>() { promise in
             promise(.success(()))
         }
-        let f1 = try TestHelpers_statics.voidAsyncMethod(f:f)
+        let f1 = try TestHelpers_statics.voidAsyncMethod(f)
         try await f1.value
     }
 
@@ -65,7 +65,7 @@ final class AsyncTest: XCTestCase {
                 promise(.failure(DjinniError("123")))
             }
         }
-        let f3 = try TestHelpers_statics.futureRoundtrip(f:f2)
+        let f3 = try TestHelpers_statics.futureRoundtrip(f2)
         p!(.success("36"))
         var s: String? = nil
         do {
@@ -78,12 +78,12 @@ final class AsyncTest: XCTestCase {
     }
 
     func testFutureRoundtripBackwards() async throws {
-        let s = try await TestHelpers_statics.checkAsyncInterface(i:AsyncInterfaceImpl()).value
+        let s = try await TestHelpers_statics.checkAsyncInterface(AsyncInterfaceImpl()).value
         XCTAssertEqual(s, "36")
     }
 
     func testFutureComposition() async throws {
-        let s = try await TestHelpers_statics.checkAsyncComposition(i: AsyncInterfaceImpl()).value
+        let s = try await TestHelpers_statics.checkAsyncComposition(AsyncInterfaceImpl()).value
         XCTAssertEqual(s, "42")
     }
 
@@ -91,7 +91,7 @@ final class AsyncTest: XCTestCase {
         let input = DJFuture<Optional<Int32>> { promise in
             promise(.success(nil))
         }
-        let output = try await TestHelpers_statics.addOneIfPresent(f:input).value
+        let output = try await TestHelpers_statics.addOneIfPresent(input).value
         XCTAssertNil(output)
     }
 
@@ -99,7 +99,7 @@ final class AsyncTest: XCTestCase {
         let input = DJFuture<Optional<Int32>> { promise in
             promise(.success(10))
         }
-        let output = try await TestHelpers_statics.addOneIfPresent(f:input).value
+        let output = try await TestHelpers_statics.addOneIfPresent(input).value
         XCTAssertEqual(output, 11)
     }
 }

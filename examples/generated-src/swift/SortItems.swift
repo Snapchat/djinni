@@ -5,5 +5,5 @@ import Foundation
 
 public protocol SortItems: AnyObject {
     /** For the iOS / Android demo */
-    func sort(order: TextSort.SortOrder, items: TextSort.ItemList) throws -> Void
+    func sort(_ order: TextSort.SortOrder, items: TextSort.ItemList) throws -> Void
 }

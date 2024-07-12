@@ -13,7 +13,7 @@ import TestSuiteCxx
  */
 final class UsesSingleLanguageListenersCppProxy: DjinniSupport.CppProxy, TestSuite.UsesSingleLanguageListeners {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
-    func callForObjC(l: TestSuite.ObjcOnlyListener) throws -> Void {
+    func callForObjC(_ l: TestSuite.ObjcOnlyListener) throws -> Void {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(ObjcOnlyListenerMarshaller.toCpp(l))
@@ -27,7 +27,7 @@ final class UsesSingleLanguageListenersCppProxy: DjinniSupport.CppProxy, TestSui
         try handleCppErrors(&ret)
         return ObjcOnlyListenerMarshaller.fromCpp(ret)
     }
-    func callForJava(l: TestSuite.JavaOnlyListener) throws -> Void {
+    func callForJava(_ l: TestSuite.JavaOnlyListener) throws -> Void {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(JavaOnlyListenerMarshaller.toCpp(l))

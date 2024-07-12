@@ -9,7 +9,7 @@ import TestSuiteCxx
 
 final class ExternInterface1CppProxy: DjinniSupport.CppProxy, TestSuite.ExternInterface1 {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
-    func foo(i: ClientInterface) throws -> ClientReturnedRecord {
+    func foo(_ i: ClientInterface) throws -> ClientReturnedRecord {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(ClientInterfaceMarshaller.toCpp(i))
@@ -17,7 +17,7 @@ final class ExternInterface1CppProxy: DjinniSupport.CppProxy, TestSuite.ExternIn
         try handleCppErrors(&ret)
         return ClientReturnedRecordMarshaller.fromCpp(ret)
     }
-    func bar(e: Color) throws -> Color {
+    func bar(_ e: Color) throws -> Color {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(ColorMarshaller.toCpp(e))

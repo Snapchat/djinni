@@ -10,7 +10,7 @@ import TestSuiteCxx
 let asyncInterfaceMethods: Vtbl<AsyncInterface> = [
     { inst, params, ret in
         let _f = FutureMarshaller<I32Marshaller>.fromCpp(djinni.swift.getMember(params, 0))
-        djinni.swift.setReturnValue(ret, try FutureMarshaller<StringMarshaller>.toCpp(inst.futureRoundtrip(f: _f)))
+        djinni.swift.setReturnValue(ret, try FutureMarshaller<StringMarshaller>.toCpp(inst.futureRoundtrip(_f)))
     },
 ]
 

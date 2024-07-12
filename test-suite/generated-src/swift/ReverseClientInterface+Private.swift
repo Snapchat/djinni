@@ -16,7 +16,7 @@ final class ReverseClientInterfaceCppProxy: DjinniSupport.CppProxy, TestSuite.Re
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }
-    func methTakingInterface(i: TestSuite.ReverseClientInterface) throws -> String {
+    func methTakingInterface(_ i: TestSuite.ReverseClientInterface) throws -> String {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(ReverseClientInterfaceMarshaller.toCpp(i))
@@ -24,7 +24,7 @@ final class ReverseClientInterfaceCppProxy: DjinniSupport.CppProxy, TestSuite.Re
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }
-    func methTakingOptionalInterface(i: Optional<TestSuite.ReverseClientInterface>) throws -> String {
+    func methTakingOptionalInterface(_ i: Optional<TestSuite.ReverseClientInterface>) throws -> String {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(OptionalMarshaller<ReverseClientInterfaceMarshaller>.toCpp(i))

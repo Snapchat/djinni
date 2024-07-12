@@ -7,7 +7,7 @@ final class PrimitivesListTest: XCTestCase {
     let swiftPrimitiveList: PrimitiveList = PrimitiveList(list: [1, 2, 3])
     
     func testSwiftPrimitiveListToCpp() throws {
-        XCTAssertTrue(try TestHelpers_statics.checkPrimitiveList(pl:swiftPrimitiveList))
+        XCTAssertTrue(try TestHelpers_statics.checkPrimitiveList(swiftPrimitiveList))
     }
     func testCppPrimitiveListToSwift() throws {
         let converted = try TestHelpers_statics.getPrimitiveList()
@@ -15,6 +15,6 @@ final class PrimitivesListTest: XCTestCase {
     }
     func testBinary() throws {
         let b = Data([1,2,3])
-        XCTAssertEqual(try TestHelpers_statics.idBinary(b:b), b)
+        XCTAssertEqual(try TestHelpers_statics.idBinary(b), b)
     }
 }

@@ -16,7 +16,7 @@ final class CppExceptionCppProxy: DjinniSupport.CppProxy, TestSuite.CppException
         try handleCppErrors(&ret)
         return I32Marshaller.fromCpp(ret)
     }
-    func callThrowingInterface(cb: TestSuite.ThrowingInterface) throws -> Int32 {
+    func callThrowingInterface(_ cb: TestSuite.ThrowingInterface) throws -> Int32 {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(ThrowingInterfaceMarshaller.toCpp(cb))
@@ -24,7 +24,7 @@ final class CppExceptionCppProxy: DjinniSupport.CppProxy, TestSuite.CppException
         try handleCppErrors(&ret)
         return I32Marshaller.fromCpp(ret)
     }
-    func callThrowingAndCatch(cb: TestSuite.ThrowingInterface) throws -> String {
+    func callThrowingAndCatch(_ cb: TestSuite.ThrowingInterface) throws -> String {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(ThrowingInterfaceMarshaller.toCpp(cb))

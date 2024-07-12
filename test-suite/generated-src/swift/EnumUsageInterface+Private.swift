@@ -9,7 +9,7 @@ import TestSuiteCxx
 
 final class EnumUsageInterfaceCppProxy: DjinniSupport.CppProxy, TestSuite.EnumUsageInterface {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
-    func e(e: TestSuite.Color) throws -> TestSuite.Color {
+    func e(_ e: TestSuite.Color) throws -> TestSuite.Color {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(ColorMarshaller.toCpp(e))
@@ -17,7 +17,7 @@ final class EnumUsageInterfaceCppProxy: DjinniSupport.CppProxy, TestSuite.EnumUs
         try handleCppErrors(&ret)
         return ColorMarshaller.fromCpp(ret)
     }
-    func o(o: Optional<TestSuite.Color>) throws -> Optional<TestSuite.Color> {
+    func o(_ o: Optional<TestSuite.Color>) throws -> Optional<TestSuite.Color> {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(OptionalMarshaller<ColorMarshaller>.toCpp(o))
@@ -25,7 +25,7 @@ final class EnumUsageInterfaceCppProxy: DjinniSupport.CppProxy, TestSuite.EnumUs
         try handleCppErrors(&ret)
         return OptionalMarshaller<ColorMarshaller>.fromCpp(ret)
     }
-    func l(l: Array<TestSuite.Color>) throws -> Array<TestSuite.Color> {
+    func l(_ l: Array<TestSuite.Color>) throws -> Array<TestSuite.Color> {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(ListMarshaller<ColorMarshaller>.toCpp(l))
@@ -33,7 +33,7 @@ final class EnumUsageInterfaceCppProxy: DjinniSupport.CppProxy, TestSuite.EnumUs
         try handleCppErrors(&ret)
         return ListMarshaller<ColorMarshaller>.fromCpp(ret)
     }
-    func s(s: Set<TestSuite.Color>) throws -> Set<TestSuite.Color> {
+    func s(_ s: Set<TestSuite.Color>) throws -> Set<TestSuite.Color> {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(SetMarshaller<ColorMarshaller>.toCpp(s))
@@ -41,7 +41,7 @@ final class EnumUsageInterfaceCppProxy: DjinniSupport.CppProxy, TestSuite.EnumUs
         try handleCppErrors(&ret)
         return SetMarshaller<ColorMarshaller>.fromCpp(ret)
     }
-    func m(m: Dictionary<TestSuite.Color, TestSuite.Color>) throws -> Dictionary<TestSuite.Color, TestSuite.Color> {
+    func m(_ m: Dictionary<TestSuite.Color, TestSuite.Color>) throws -> Dictionary<TestSuite.Color, TestSuite.Color> {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(MapMarshaller<ColorMarshaller, ColorMarshaller>.toCpp(m))

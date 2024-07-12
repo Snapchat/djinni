@@ -8,8 +8,8 @@ import Foundation
  * on references to interfaces they don't need.
  */
 public protocol UsesSingleLanguageListeners: AnyObject {
-    func callForObjC(l: TestSuite.ObjcOnlyListener) throws -> Void
+    func callForObjC(_ l: TestSuite.ObjcOnlyListener) throws -> Void
     func returnForObjC() throws -> TestSuite.ObjcOnlyListener
-    func callForJava(l: TestSuite.JavaOnlyListener) throws -> Void
+    func callForJava(_ l: TestSuite.JavaOnlyListener) throws -> Void
     func returnForJava() throws -> TestSuite.JavaOnlyListener
 }

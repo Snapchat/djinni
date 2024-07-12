@@ -5,5 +5,5 @@ import Foundation
 
 public protocol ConflictUser: AnyObject {
     func Conflict() throws -> TestSuite.Conflict
-    func conflictArg(cs: Array<TestSuite.Conflict>) throws -> Bool
+    func conflictArg(_ cs: Array<TestSuite.Conflict>) throws -> Bool
 }

@@ -9,7 +9,7 @@ import TestSuiteCxx
 
 final class DataRefTestCppProxy: DjinniSupport.CppProxy, TestSuite.DataRefTest {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
-    func sendData(data: NSData) throws -> Void {
+    func sendData(_ data: NSData) throws -> Void {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(DataRefMarshaller.toCpp(data))
@@ -23,7 +23,7 @@ final class DataRefTestCppProxy: DjinniSupport.CppProxy, TestSuite.DataRefTest {
         try handleCppErrors(&ret)
         return BinaryMarshaller.fromCpp(ret)
     }
-    func sendMutableData(data: NSData) throws -> Void {
+    func sendMutableData(_ data: NSData) throws -> Void {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(DataRefMarshaller.toCpp(data))
@@ -51,7 +51,7 @@ final class DataRefTestCppProxy: DjinniSupport.CppProxy, TestSuite.DataRefTest {
         try handleCppErrors(&ret)
         return DataRefMarshaller.fromCpp(ret)
     }
-    func sendDataView(data: NSData) throws -> Data {
+    func sendDataView(_ data: NSData) throws -> Data {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(DataViewMarshaller.toCpp(data))

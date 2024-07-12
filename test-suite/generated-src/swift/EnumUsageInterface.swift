@@ -4,9 +4,9 @@
 import Foundation
 
 public protocol EnumUsageInterface: AnyObject {
-    func e(e: TestSuite.Color) throws -> TestSuite.Color
-    func o(o: Optional<TestSuite.Color>) throws -> Optional<TestSuite.Color>
-    func l(l: Array<TestSuite.Color>) throws -> Array<TestSuite.Color>
-    func s(s: Set<TestSuite.Color>) throws -> Set<TestSuite.Color>
-    func m(m: Dictionary<TestSuite.Color, TestSuite.Color>) throws -> Dictionary<TestSuite.Color, TestSuite.Color>
+    func e(_ e: TestSuite.Color) throws -> TestSuite.Color
+    func o(_ o: Optional<TestSuite.Color>) throws -> Optional<TestSuite.Color>
+    func l(_ l: Array<TestSuite.Color>) throws -> Array<TestSuite.Color>
+    func s(_ s: Set<TestSuite.Color>) throws -> Set<TestSuite.Color>
+    func m(_ m: Dictionary<TestSuite.Color, TestSuite.Color>) throws -> Dictionary<TestSuite.Color, TestSuite.Color>
 }

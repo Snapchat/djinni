@@ -24,7 +24,7 @@ final class CppExceptionTest: XCTestCase {
     }
 
     func testSwiftExceptionHandledByCpp() throws {
-        let res = try cppInterface.callThrowingAndCatch(cb:SwiftThrower())
+        let res = try cppInterface.callThrowingAndCatch(SwiftThrower())
         XCTAssertEqual(res, "Swift Error")
     }
 }

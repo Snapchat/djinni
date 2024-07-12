@@ -23,24 +23,24 @@ final class EnumTest: XCTestCase {
         m[Color.blue] = "blue"
         m[Color.indigo] = "indigo"
         m[Color.violet] = "violet"
-        try TestHelpers_statics.checkEnumMap(m:m)
+        try TestHelpers_statics.checkEnumMap(m)
     }
 
     func testAccessFlagRoundtrip() throws {
         let flags: [AccessFlags] = [.nobody, .everybody, .ownerRead, [.ownerRead, .ownerWrite], [.ownerRead, .ownerWrite, .ownerExecute]]
         for flag in flags {
-            XCTAssertEqual(flag, try FlagRoundtrip_statics.roundtripAccess(flag:flag))
-            XCTAssertEqual(flag, try FlagRoundtrip_statics.roundtripAccessBoxed(flag:flag))
+            XCTAssertEqual(flag, try FlagRoundtrip_statics.roundtripAccess(flag))
+            XCTAssertEqual(flag, try FlagRoundtrip_statics.roundtripAccessBoxed(flag))
         }
-        XCTAssertEqual(nil, try FlagRoundtrip_statics.roundtripAccessBoxed(flag:nil))
+        XCTAssertEqual(nil, try FlagRoundtrip_statics.roundtripAccessBoxed(nil))
     }
 
     func testEmptyFlagRoundtrip() throws {
         let flags: [EmptyFlags] = [.none, .all]
         for flag in flags {
-            XCTAssertEqual(flag, try FlagRoundtrip_statics.roundtripEmpty(flag:flag))
-            XCTAssertEqual(flag, try FlagRoundtrip_statics.roundtripEmptyBoxed(flag:flag))
+            XCTAssertEqual(flag, try FlagRoundtrip_statics.roundtripEmpty(flag))
+            XCTAssertEqual(flag, try FlagRoundtrip_statics.roundtripEmptyBoxed(flag))
         }
-        XCTAssertEqual(nil, try FlagRoundtrip_statics.roundtripEmptyBoxed(flag:nil))
+        XCTAssertEqual(nil, try FlagRoundtrip_statics.roundtripEmptyBoxed(nil))
     }
 }

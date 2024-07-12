@@ -9,6 +9,6 @@ public protocol VarnameInterface: AnyObject {
      * RArg should be rewritten.
      * _i_arg_ should not.
      */
-    func Rmethod(RArg: TestSuite.VarnameRecord) throws -> TestSuite.VarnameRecord
-    func Imethod(IArg: TestSuite.VarnameInterface) throws -> TestSuite.VarnameInterface
+    func Rmethod(_ RArg: TestSuite.VarnameRecord) throws -> TestSuite.VarnameRecord
+    func Imethod(_ IArg: TestSuite.VarnameInterface) throws -> TestSuite.VarnameInterface
 }

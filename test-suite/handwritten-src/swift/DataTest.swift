@@ -10,7 +10,7 @@ final class DataTest: XCTestCase {
     func testSend() throws {
         let input: [UInt8] = [0, 1, 2, 3]
         let buf = Data(input)
-        try test.sendData(data:buf as NSData)
+        try test.sendData(buf as NSData)
         let output = try test.retriveAsBin()
         XCTAssertEqual(Data(input), output)
     }
@@ -19,7 +19,7 @@ final class DataTest: XCTestCase {
         let input: [UInt8] = [0, 1, 2, 3]
         let buf = NSMutableData()
         buf.append(Data(input))
-        try test.sendMutableData(data:buf)
+        try test.sendMutableData(buf)
         XCTAssertEqual(Data([3,2,1,0]), buf as Data)
     }
 
@@ -44,7 +44,7 @@ final class DataTest: XCTestCase {
     func testSendDataView() throws {
         let input: [UInt8] = [0, 1, 2, 3]
         let buf = Data(input)
-        let output = try test.sendDataView(data:buf as NSData)
+        let output = try test.sendDataView(buf as NSData)
         XCTAssertEqual(buf, output)
     }
 

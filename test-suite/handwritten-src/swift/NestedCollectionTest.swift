@@ -11,6 +11,6 @@ final class NestedCollectionTest: XCTestCase {
     }
 
     func testSwiftNestedRecordToCppNestedCollection() throws {
-        XCTAssertTrue(try TestHelpers_statics.checkNestedCollection(nc:swiftNestedCollection))
+        XCTAssertTrue(try TestHelpers_statics.checkNestedCollection(swiftNestedCollection))
     }
 }

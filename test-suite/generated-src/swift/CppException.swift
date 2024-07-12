@@ -5,6 +5,6 @@ import Foundation
 
 public protocol CppException: AnyObject {
     func throwAnException() throws -> Int32
-    func callThrowingInterface(cb: TestSuite.ThrowingInterface) throws -> Int32
-    func callThrowingAndCatch(cb: TestSuite.ThrowingInterface) throws -> String
+    func callThrowingInterface(_ cb: TestSuite.ThrowingInterface) throws -> Int32
+    func callThrowingAndCatch(_ cb: TestSuite.ThrowingInterface) throws -> String
 }

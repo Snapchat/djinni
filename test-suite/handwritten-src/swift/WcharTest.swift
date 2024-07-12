@@ -9,7 +9,7 @@ final class WcharTest: XCTestCase {
     func test() throws {
         XCTAssertEqual(try WcharTestHelpers_statics.getRecord().s, STR1)
         XCTAssertEqual(try WcharTestHelpers_statics.getString(), STR2)
-        XCTAssertTrue(try WcharTestHelpers_statics.checkString(str:STR2))
-        XCTAssertTrue(try WcharTestHelpers_statics.checkRecord(rec:WcharTestRec(s:STR1)))
+        XCTAssertTrue(try WcharTestHelpers_statics.checkString(STR2))
+        XCTAssertTrue(try WcharTestHelpers_statics.checkRecord(WcharTestRec(s:STR1)))
     }
 }

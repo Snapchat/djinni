@@ -7,9 +7,9 @@ import Foundation
 import TextSort
 import TextSortCxx
 
-final class SortItemsCppProxy: DjinniSupport.CppProxy, SortItems {
+final class SortItemsCppProxy: DjinniSupport.CppProxy, TextSort.SortItems {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
-    func sort(order: TextSort.SortOrder, items: TextSort.ItemList) throws -> Void {
+    func sort(_ order: TextSort.SortOrder, items: TextSort.ItemList) throws -> Void {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(SortOrderMarshaller.toCpp(order))
@@ -19,7 +19,7 @@ final class SortItemsCppProxy: DjinniSupport.CppProxy, SortItems {
     }
 }
 enum SortItemsMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = SortItems
+    typealias SwiftType = TextSort.SortItems
     static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { SortItemsCppProxy(c) as SwiftType })
     }
@@ -28,14 +28,14 @@ enum SortItemsMarshaller: DjinniSupport.Marshaller {
     }
 }
 public class SortItems_statics {
-    static func createWithListener(listener: TextSort.TextboxListener) throws -> TextSort.SortItems {
+    static func createWithListener(_ listener: TextSort.TextboxListener) throws -> TextSort.SortItems {
         var params = djinni.swift.ParameterList()
         params.addValue(TextboxListenerMarshaller.toCpp(listener))
         var ret = djinni_generated.SortItems_createWithListener(&params)
         try handleCppErrors(&ret)
         return SortItemsMarshaller.fromCpp(ret)
     }
-    static func runSort(items: TextSort.ItemList) throws -> TextSort.ItemList {
+    static func runSort(_ items: TextSort.ItemList) throws -> TextSort.ItemList {
         var params = djinni.swift.ParameterList()
         params.addValue(ItemListMarshaller.toCpp(items))
         var ret = djinni_generated.SortItems_runSort(&params)

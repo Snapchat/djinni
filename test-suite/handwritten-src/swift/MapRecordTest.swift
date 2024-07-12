@@ -19,16 +19,16 @@ final class MapRecordTest: XCTestCase {
     }
 
     func testSwiftMapToCppMap() throws {
-        XCTAssertTrue(try TestHelpers_statics.checkMap(m:["String1": 1, "String2": 2, "String3": 3]))
+        XCTAssertTrue(try TestHelpers_statics.checkMap(["String1": 1, "String2": 2, "String3": 3]))
     }
 
     func testEmptySwiftMapToCppMap() throws {
-        XCTAssertTrue(try TestHelpers_statics.checkEmptyMap(m:[:]))
+        XCTAssertTrue(try TestHelpers_statics.checkEmptyMap([:]))
     }
 
     func testSwiftMapListToCppMapList() throws {
         let sMapList: [Dictionary<String, Int64>] = [["String1": 1, "String2": 2, "String3": 3]]
-        XCTAssertTrue(try TestHelpers_statics.checkMapListRecord(m:MapListRecord(mapList:sMapList)))
+        XCTAssertTrue(try TestHelpers_statics.checkMapListRecord(MapListRecord(mapList:sMapList)))
     }
 
     func checkSwiftMap(_ smap: Dictionary<String, Int64>) {

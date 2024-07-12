@@ -9,7 +9,7 @@ import TestSuiteCxx
 
 final class VarnameInterfaceCppProxy: DjinniSupport.CppProxy, TestSuite.VarnameInterface {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
-    func Rmethod(RArg: TestSuite.VarnameRecord) throws -> TestSuite.VarnameRecord {
+    func Rmethod(_ RArg: TestSuite.VarnameRecord) throws -> TestSuite.VarnameRecord {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(VarnameRecordMarshaller.toCpp(RArg))
@@ -17,7 +17,7 @@ final class VarnameInterfaceCppProxy: DjinniSupport.CppProxy, TestSuite.VarnameI
         try handleCppErrors(&ret)
         return VarnameRecordMarshaller.fromCpp(ret)
     }
-    func Imethod(IArg: TestSuite.VarnameInterface) throws -> TestSuite.VarnameInterface {
+    func Imethod(_ IArg: TestSuite.VarnameInterface) throws -> TestSuite.VarnameInterface {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(VarnameInterfaceMarshaller.toCpp(IArg))

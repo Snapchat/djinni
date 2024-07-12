@@ -9,7 +9,7 @@ import TestSuiteCxx
 
 final class InterfaceUsingExtendedRecordCppProxy: DjinniSupport.CppProxy, TestSuite.InterfaceUsingExtendedRecord {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
-    func meth(er: TestSuite.ExtendedRecord) throws -> TestSuite.ExtendedRecord {
+    func meth(_ er: TestSuite.ExtendedRecord) throws -> TestSuite.ExtendedRecord {
         var params = djinni.swift.ParameterList()
         params.addValue(inst)
         params.addValue(ExtendedRecordMarshaller.toCpp(er))
