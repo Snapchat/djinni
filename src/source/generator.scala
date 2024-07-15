@@ -47,6 +47,8 @@ package object generatorTools {
                    cppIncludePrefix: String,
                    cppExtendedRecordIncludePrefix: String,
                    cppNamespace: String,
+                   cppStringConstexpr: Option[String],
+                   cppStringConstexprHeader: Option[String],
                    cppIdentStyle: CppIdentStyle,
                    cppFileIdentStyle: IdentConverter,
                    cppBaseLibIncludePrefix: String,
