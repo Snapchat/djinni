@@ -199,7 +199,7 @@ swift_error_files = "handwritten-src/swift/*+Error.swift"
 swift_test(
     name = "djinni-swift-tests",
     srcs = glob(['handwritten-src/swift/*.swift'], exclude = [swift_helper_files, swift_error_files]),
-    deps = [':test-swift-bridge', '//examples:textsort-swift-bridge'],
+    deps = [':test-swift-bridge'],
     copts = [
         "-cxx-interoperability-mode=default",
         "-Xcc",
