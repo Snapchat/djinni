@@ -23,8 +23,9 @@
 #include <condition_variable>
 #include <mutex>
 #include <cassert>
+#include <exception>
 
-#ifdef __cpp_coroutines
+#if defined(__cpp_coroutines) || defined(__cpp_impl_coroutine)
 #if __has_include(<coroutine>)
     #include <coroutine>
     namespace djinni::detail {
@@ -414,7 +415,7 @@ Future<void> combine(U&& futures, size_t c) {
         return future;
     }
     for (auto& f: futures) {
-        f.then([context] (auto f) {
+        f.then([context] (auto) {
             if (--(context->counter) == 0) {
                 context->promise.setValue();
             }
