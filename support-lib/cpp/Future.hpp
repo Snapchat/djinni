@@ -56,7 +56,7 @@ template <typename T>
 struct ValueHolder {
     using type = T;
     std::optional<T> value;
-    T getValueUnsafe() const {return *value;}
+    T getValueUnsafe() {return std::move(*value);}
 };
 template <>
 struct ValueHolder<void> {
