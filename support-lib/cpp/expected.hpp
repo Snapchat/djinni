@@ -17,6 +17,7 @@ namespace djinni {
 
 using ::std::expected;
 using ::std::unexpected;
+inline constexpr ::std::unexpect_t unexpect{};
 
 }
 
@@ -28,6 +29,7 @@ namespace djinni {
 
 using ::tl::unexpected;
 using ::tl::expected;
+inline constexpr ::tl::unexpect_t unexpect{};
 
 }
 

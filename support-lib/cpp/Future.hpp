@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include "expected.hpp"
+
 #include <atomic>
 #include <functional>
 #include <memory>
@@ -25,22 +27,26 @@
 #include <cassert>
 #include <exception>
 
-#if defined(__cpp_coroutines) || defined(__cpp_impl_coroutine)
-#if __has_include(<coroutine>)
+#ifdef __has_include
+#if __has_include(<version>)
+#include <version>
+#endif
+#endif
+
+#if defined(__cpp_impl_coroutine) && defined(__cpp_lib_coroutine)
     #include <coroutine>
     namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::coroutine_handle<Promise>;
         using SuspendNever = std::suspend_never;
     }
     #define DJINNI_FUTURE_HAS_COROUTINE_SUPPORT 1
-#elif __has_include(<experimental/coroutine>)
+#elif defined(__cpp_coroutines) && __has_include(<experimental/coroutine>)
     #include <experimental/coroutine>
     namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::experimental::coroutine_handle<Promise>;
         using SuspendNever = std::experimental::suspend_never;
     }
     #define DJINNI_FUTURE_HAS_COROUTINE_SUPPORT 1
-#endif
 #endif
 
 namespace djinni {
@@ -364,34 +370,63 @@ public:
         return true;
     }
 
+    template<typename ConcretePromise>
     struct PromiseTypeBase {
         Promise<T> _promise;
+        std::optional<djinni::expected<T, std::exception_ptr>> _result{};
 
-        detail::SuspendNever initial_suspend() { return {}; }
-        detail::SuspendNever final_suspend() noexcept { return {}; }
+        struct FinalAwaiter {
+            constexpr bool await_ready() const noexcept {
+                return false;
+            }
+            bool await_suspend(detail::CoroutineHandle<ConcretePromise> finished) const noexcept {
+                auto& promise_type = finished.promise();
+                if (*promise_type._result) {
+                    if constexpr (std::is_void_v<T>) {
+                        promise_type._promise.setValue();
+                    } else {
+                        promise_type._promise.setValue(std::move(**promise_type._result));
+                    }
+                } else {
+                    promise_type._promise.setException(std::move(promise_type._result->error()));
+                }
+                return false;
+            }
+            constexpr void await_resume() const noexcept {}
+        };
+
+        constexpr detail::SuspendNever initial_suspend() const noexcept { return {}; }
+        FinalAwaiter final_suspend() const noexcept { return {}; }
 
         Future<T> get_return_object() noexcept {
             return _promise.getFuture();
         }
         void unhandled_exception() {
-            _promise.setException(std::current_exception());
+            _result.emplace(djinni::unexpect, std::current_exception());
         }
     };
-    template <typename U>
-    struct PromiseType: PromiseTypeBase{
-        template <typename V>
+
+    struct PromiseType: PromiseTypeBase<PromiseType>{
+        template <typename V, typename = std::enable_if_t<std::is_convertible_v<V, T>>>
         void return_value(V&& value) {
-            this->_promise.setValue(std::forward<V>(value));
+            this->_result.emplace(std::forward<V>(value));
+        }
+        void return_value(T&& value) {
+            this->_result.emplace(std::move(value));
+        }
+        void return_value(const T& value) {
+            this->_result.emplace(value);
         }
     };
-    using promise_type = PromiseType<T>;
+    using promise_type = PromiseType;
 #endif
 };
 
 #if defined(DJINNI_FUTURE_HAS_COROUTINE_SUPPORT)
-template<> template<> struct Future<void>::PromiseType<void>:PromiseTypeBase {
+template<>
+struct Future<void>::PromiseType : PromiseTypeBase<PromiseType> {
     void return_void() {
-        this->_promise.setValue();
+        _result.emplace();
     }
 };
 #endif
