@@ -379,7 +379,8 @@ public:
             constexpr bool await_ready() const noexcept {
                 return false;
             }
-            bool await_suspend(detail::CoroutineHandle<ConcretePromise> finished) const noexcept {
+            template <typename P>
+            bool await_suspend(detail::CoroutineHandle<P> finished) const noexcept {
                 auto& promise_type = finished.promise();
                 if (*promise_type._result) {
                     if constexpr (std::is_void_v<T>) {
