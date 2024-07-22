@@ -1,7 +1,6 @@
 import XCTest
 @testable import ProtobufTest
 @testable import TestSuite
-@testable import TestSuiteBridge
 
 typealias Person = Djinni_Test_Person
 typealias AddressBook = Djinni_Test_AddressBook

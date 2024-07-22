@@ -1,7 +1,6 @@
 import XCTest
 import DjinniSupport
 @testable import TestSuite
-@testable import TestSuiteBridge
 
 final class ConstantsTest: XCTestCase {
     func testConstPrimitives() throws {

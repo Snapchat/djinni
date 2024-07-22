@@ -2,7 +2,6 @@ import XCTest
 import DjinniSupport
 import Combine
 @testable import TestSuite
-@testable import TestSuiteBridge
 
 final class AsyncTest: XCTestCase {
 

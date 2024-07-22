@@ -1,6 +1,5 @@
 import XCTest
 @testable import TestSuite
-@testable import TestSuiteBridge
 
 final class WcharTest: XCTestCase {
     let STR1: String = "some string with unicode \u{0000}, \u{263A}, 💩 symbols";

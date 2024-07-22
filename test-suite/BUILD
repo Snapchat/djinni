@@ -200,49 +200,24 @@ swift_test(
     name = "djinni-swift-tests",
     srcs = glob(['handwritten-src/swift/*.swift'], exclude = [swift_helper_files, swift_error_files]),
     deps = [':test-swift-bridge'],
-    copts = [
-        "-cxx-interoperability-mode=default",
-        "-Xcc",
-        "-std=c++17"
-    ],
-)
-
-swift_private_files = "generated-src/swift/*+Private.swift"
-
-swift_library(
-    name = "test-swift",
-    module_name = "TestSuite",
-    generated_header_name = "TestSuite-Swift.h",
-    generates_header = True,
-    srcs = glob([
-        "generated-src/swift/*.swift",
-        swift_error_files
-    ], exclude = [ swift_private_files ]),
-    copts = [
-        "-cxx-interoperability-mode=default",
-        "-Xcc", "-std=c++17",
-    ],
-    deps = [
-        "//support-lib:djinni-support-swift",
-        ":protobuf-test-swift"
-    ],
-    visibility = ["//visibility:public"],
+    copts = ["-cxx-interoperability-mode=default", "-Xcc", "-std=c++17"],
 )
 
 swift_library(
     name = "test-swift-bridge",
-    module_name = "TestSuiteBridge",
-    srcs = glob([swift_private_files, swift_helper_files]),
-    copts = [
-        "-cxx-interoperability-mode=default",
-        "-Xcc", "-std=c++17",
-    ],
+    module_name = "TestSuite",
+    srcs = glob([
+        "generated-src/swift/*.swift",
+        swift_error_files,
+        swift_helper_files
+    ]),
+    copts = ["-cxx-interoperability-mode=default", "-Xcc", "-std=c++17",],
     deps = [
         ":djinni-tests-common",
-        ":test-swift",
         ":test-swiftxx",
         "//support-lib:djinni-support-swift",
         "//support-lib:djinni-support-swiftxx",
+        ":protobuf-test-swift"
     ],
     visibility = ["//visibility:public"],
 )
@@ -271,13 +246,10 @@ cc_library(
     ],
     deps = [
         ":djinni-tests-common",
-        ":test-swift",
         "//support-lib:djinni-support-common",
         "//support-lib:djinni-support-swiftxx",
     ],
-    copts = [
-        "-std=c++17",
-    ],
+    copts = ["-std=c++17",],
     tags = ["swift_module=TestSuiteCxx"],
     visibility = ["//visibility:public"],
 )

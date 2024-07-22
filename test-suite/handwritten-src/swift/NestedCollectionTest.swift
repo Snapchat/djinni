@@ -1,6 +1,5 @@
 import XCTest
 @testable import TestSuite
-@testable import TestSuiteBridge
 
 final class NestedCollectionTest: XCTestCase {
     let swiftNestedCollection = NestedCollection(setList: [Set(["String1", "String2"]), Set(["StringA", "StringB"])])

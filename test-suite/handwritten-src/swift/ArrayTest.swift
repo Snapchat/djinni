@@ -1,6 +1,5 @@
 import XCTest
 @testable import TestSuite
-@testable import TestSuiteBridge
 
 final class ArrayTest: XCTestCase {
     func testArrays() throws {

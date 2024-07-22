@@ -1,6 +1,5 @@
 import XCTest
 @testable import TestSuite
-@testable import TestSuiteBridge
 
 extension Duration {
     static func hours(_ h: Double) -> Duration {return .seconds(h*3600)}

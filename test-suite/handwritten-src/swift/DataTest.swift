@@ -1,7 +1,6 @@
 import XCTest
 import Foundation
 @testable import TestSuite
-@testable import TestSuiteBridge
 
 final class DataTest: XCTestCase {
 

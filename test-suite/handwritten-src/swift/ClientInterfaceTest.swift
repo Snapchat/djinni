@@ -1,6 +1,6 @@
 import XCTest
 @testable import TestSuite
-@testable import TestSuiteBridge
+
 
 struct ClientInterfaceError: Error {
     var msg: String

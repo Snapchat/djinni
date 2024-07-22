@@ -1,6 +1,5 @@
 import XCTest
 @testable import TestSuite
-@testable import TestSuiteBridge
 
 final class PrimitivesTest: XCTestCase {
     func testPrimitives() throws {
