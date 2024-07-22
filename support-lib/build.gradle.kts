@@ -32,7 +32,7 @@ java {
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            groupId = "com.bandlab"
+            groupId = "com.bandlab.djinni"
             artifactId = "djinni-support-lib"
             version = project.providers.gradleProperty("version").orNull
 
