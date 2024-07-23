@@ -175,19 +175,22 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
+  def generateConformance(deriving: Set[Record.DerivingType.Value], prefix: String) = {
+    val eq = if (deriving.contains(DerivingType.Eq)) "Equatable" else ""
+    val hashable = if (deriving.contains(DerivingType.Hashable)) "Hashable" else ""
+    val sendable = if (deriving.contains(DerivingType.Sendable)) "Sendable" else ""
+    val codable = if (deriving.contains(DerivingType.Codable)) "Codable" else ""
+    val error = if (deriving.contains(DerivingType.Error)) "Error" else ""
+    val conformance = Array(eq, hashable, sendable, codable).filter(_ != "")
+    if (conformance.nonEmpty) prefix + conformance.mkString(", ") else ""
+  }
+
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: Record) {
     val refs = new SwiftRefs(ident.name)
     r.fields.foreach(f => refs.find(f.ty))
     writeSwiftFile(ident, origin, refs.swiftImports, w => {
       writeDoc(w, doc)
-      val eq = if (r.derivingTypes.contains(DerivingType.Eq)) "Equatable" else ""
-      val hashable = if (r.derivingTypes.contains(DerivingType.Hashable)) "Hashable" else ""
-      val sendable = if (r.derivingTypes.contains(DerivingType.Sendable)) "Sendable" else ""
-      val codable = if (r.derivingTypes.contains(DerivingType.Codable)) "Codable" else ""
-      val error = if (r.derivingTypes.contains(DerivingType.Error)) "Error" else ""
-      val conformance = Array(eq, hashable, sendable, codable).filter(_ != "")
-      val conformanceClause = if (conformance.nonEmpty) ": " + conformance.mkString(", ") else ""
-      w.w(s"public struct ${marshal.typename(ident, r)}${conformanceClause}").braced {
+      w.w(s"public struct ${marshal.typename(ident, r)}${generateConformance(r.derivingTypes, ": ")}").braced {
         generateSwiftConstants(w, r.consts)
         for (f <- r.fields) {
           writeDoc(w, f.doc)
