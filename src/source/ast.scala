@@ -86,7 +86,7 @@ case class Record(ext: Ext, fields: Seq[Field], consts: Seq[Const], derivingType
 object Record {
   object DerivingType extends Enumeration {
     type DerivingType = Value
-    val Eq, Ord, AndroidParcelable, NSCopying, Req = Value
+    val Eq, Ord, AndroidParcelable, NSCopying, Req, Hashable, Sendable, Codable = Value
   }
 }
 

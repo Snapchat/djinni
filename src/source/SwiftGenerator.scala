@@ -180,8 +180,13 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
     r.fields.foreach(f => refs.find(f.ty))
     writeSwiftFile(ident, origin, refs.swiftImports, w => {
       writeDoc(w, doc)
-      val eqClause = if (r.derivingTypes.contains(DerivingType.Eq)) ": Equatable" else ""
-      w.w(s"public struct ${marshal.typename(ident, r)}${eqClause}").braced {
+      val eq = if (r.derivingTypes.contains(DerivingType.Eq)) "Equatable" else ""
+      val hashable = if (r.derivingTypes.contains(DerivingType.Hashable)) "Hashable" else ""
+      val sendable = if (r.derivingTypes.contains(DerivingType.Sendable)) "Sendable" else ""
+      val codable = if (r.derivingTypes.contains(DerivingType.Codable)) ": Codable" else ""
+      val conformance = Array(eq, hashable, sendable, codable).filter(_ != "")
+      val conformanceClause = if (conformance.nonEmpty) ": " + conformance.mkString(", ") else ""
+      w.w(s"public struct ${marshal.typename(ident, r)}${conformanceClause}").braced {
         generateSwiftConstants(w, r.consts)
         for (f <- r.fields) {
           writeDoc(w, f.doc)
