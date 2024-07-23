@@ -156,9 +156,10 @@ private object IdlParser extends RegexParsers {
       case "parcelable" => Record.DerivingType.AndroidParcelable
       case "nscopying" => Record.DerivingType.NSCopying
       case "req" => Record.DerivingType.Req
-      case "Hashable" => Record.DerivingType.Hashable
-      case "Sendable" => Record.DerivingType.Sendable
-      case "Codable" => Record.DerivingType.Codable
+      case "hashable" => Record.DerivingType.Hashable
+      case "sendable" => Record.DerivingType.Sendable
+      case "codable" => Record.DerivingType.Codable
+      case "error" => Record.DerivingType.Error
       case _ => return err( s"""Unrecognized deriving type "${ident.name}"""")
     }).toSet
   }

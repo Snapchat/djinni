@@ -183,7 +183,8 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
       val eq = if (r.derivingTypes.contains(DerivingType.Eq)) "Equatable" else ""
       val hashable = if (r.derivingTypes.contains(DerivingType.Hashable)) "Hashable" else ""
       val sendable = if (r.derivingTypes.contains(DerivingType.Sendable)) "Sendable" else ""
-      val codable = if (r.derivingTypes.contains(DerivingType.Codable)) ": Codable" else ""
+      val codable = if (r.derivingTypes.contains(DerivingType.Codable)) "Codable" else ""
+      val error = if (r.derivingTypes.contains(DerivingType.Error)) "Error" else ""
       val conformance = Array(eq, hashable, sendable, codable).filter(_ != "")
       val conformanceClause = if (conformance.nonEmpty) ": " + conformance.mkString(", ") else ""
       w.w(s"public struct ${marshal.typename(ident, r)}${conformanceClause}").braced {
