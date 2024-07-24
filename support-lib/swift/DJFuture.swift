@@ -23,9 +23,16 @@ public typealias Lock = NSLock
 public final class Future<Output, Failure> where Failure : Error {
     public typealias Promise = (Result<Output, Failure>) -> Void
 
+    // The token only needs to be unique within the scope of the Future object
+    typealias Token = Int64
+    var nextTokenValue: Token = 0
+    private func generateToken() -> Token {
+        return OSAtomicIncrement64(&nextTokenValue)
+    }
+    
     private let lock = Lock()
     private var storedResult: Result<Output, Failure>?
-    private var subscriptions = [UUID : Promise]()
+    private var subscriptions = [Token : Promise]()
 
     public init(_ attemptToFulfill: @escaping (@escaping Promise) -> Void) {
         attemptToFulfill { [weak self] result in
@@ -58,30 +65,30 @@ public final class Future<Output, Failure> where Failure : Error {
 
     public var value: Output {
         get async throws {
-            let subscriptionID = UUID()
+            let token = generateToken()
             return try await withTaskCancellationHandler {
                 return try await withCheckedThrowingContinuation { continuation in
-                    self.subscribe(subscriptionID: subscriptionID) { result in
+                    self.subscribe(token: token) { result in
                         continuation.resume(with: result)
                     }
                 }
             } onCancel: {
-                self.cancel(subscriptionID: subscriptionID)
+                self.cancel(token: token)
             }
         }
     }
 
     public func getResult(subscription: @escaping Promise) -> Cancellable {
-        let subscriptionID = UUID()
-        self.subscribe(subscriptionID: subscriptionID, subscription: subscription)
+        let token = generateToken()
+        self.subscribe(token: token, subscription: subscription)
         return Cancellable {
-            self.cancel(subscriptionID: subscriptionID)
+            self.cancel(token: token)
         }
     }
 
     // MARK: Private
 
-    private func subscribe(subscriptionID: UUID, subscription: @escaping Promise) {
+    private func subscribe(token: Token, subscription: @escaping Promise) {
         self.lock.lock()
         defer { self.lock.unlock() }
 
@@ -90,12 +97,12 @@ public final class Future<Output, Failure> where Failure : Error {
             return
         }
 
-        self.subscriptions[subscriptionID] = subscription
+        self.subscriptions[token] = subscription
     }
 
-    private func cancel(subscriptionID: UUID) {
+    private func cancel(token: Token) {
         self.lock.lock()
-        self.subscriptions[subscriptionID] = nil
+        self.subscriptions[token] = nil
         self.lock.unlock()
     }
 }
