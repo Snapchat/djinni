@@ -53,14 +53,22 @@ public:
         return await_resume();
     }
 
+    template <typename Func>
+    using ResultT = std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<Func, const SharedFuture<T>&>>>;
+
     // Transform the result of this future into a new future. The behavior is same as Future::then except that
     // it doesn't consume the future, and can be called multiple times.
     template<typename Func>
-    SharedFuture<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<Func, const SharedFuture<T>&>>>> then(
-        Func transform) const {
+    Future<ResultT<Func>> then(Func transform) const {
         auto cpy = SharedFuture(*this); // retain copy during coroutine suspension
         co_await cpy.waitIgnoringExceptions();
         co_return transform(cpy);
+    }
+
+    // Same as above but returns SharedFuture.
+    template<typename Func>
+    SharedFuture<ResultT<Func>> thenShared(Func transform) const {
+        return SharedFuture<ResultT<Func>>(then(std::move(transform)));
     }
 
     // -- coroutine support implementation only; not intended externally --

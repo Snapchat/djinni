@@ -37,17 +37,17 @@
     djinni::Promise<int> intPromise;
     djinni::SharedFuture<int> futureInt(intPromise.getFuture());
 
-    auto transformedInt = futureInt.then([](const auto& resolved) { return 2 * resolved.get(); });
+    auto transformedInt = futureInt.thenShared([](const auto& resolved) { return 2 * resolved.get(); });
 
     intPromise.setValue(42);
     XCTAssertEqual(transformedInt.get(), 84);
 
     // Also verify multiple consumers and chaining.
-    auto transformedString = futureInt.then([](const auto& resolved) { return std::to_string(resolved.get()); });
-    auto futurePlusOneTimesTwo = futureInt.then([](const auto& resolved) { return resolved.get() + 1; }).then([](const auto& resolved) {
+    auto transformedString = futureInt.thenShared([](const auto& resolved) { return std::to_string(resolved.get()); });
+    auto futurePlusOneTimesTwo = futureInt.then([](auto resolved) { return resolved.get() + 1; }).then([](auto resolved) {
         return 2 * resolved.get();
     });
-    auto futureStringLen = transformedString.then([](const auto& resolved) { return resolved.get().length(); }).toFuture();
+    auto futureStringLen = transformedString.then([](auto resolved) { return resolved.get().length(); });
 
     XCTAssertEqual(transformedString.get(), std::string("42"));
     XCTAssertEqual(futurePlusOneTimesTwo.get(), (42 + 1) * 2);
@@ -55,10 +55,10 @@
 
     XCTAssertEqual(futureInt.get(), 42);
 
-    auto voidFuture = transformedString.then([](auto) {});
+    auto voidFuture = transformedString.thenShared([](auto) {});
     voidFuture.wait();
 
-    auto intFuture2 = voidFuture.then([](auto) { return 43; });
+    auto intFuture2 = voidFuture.thenShared([](auto) { return 43; });
     XCTAssertEqual(intFuture2.get(), 43);
 }
 
@@ -72,10 +72,10 @@
 
     XCTAssertThrows(futureInt.get());
 
-    auto thenResult = futureInt.then([](const auto& resolved) { return resolved.get(); });
+    auto thenResult = futureInt.then([](auto resolved) { return resolved.get(); });
     XCTAssertThrows(thenResult.get());
 
-    auto withExceptionHandling = futureInt.then([](const auto& resolved) {
+    auto withExceptionHandling = futureInt.thenShared([](const auto& resolved) {
       try {
         return resolved.get();
       } catch (...) {
