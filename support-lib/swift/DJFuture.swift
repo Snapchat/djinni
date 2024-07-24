@@ -1,6 +1,7 @@
 import DjinniSupportCxx
 import Foundation
 
+// A custom Future<> type thanks to Logan Shire <@LoganShireSnapchat>
 public final class Cancellable {
     private let closure: () -> Void
 
