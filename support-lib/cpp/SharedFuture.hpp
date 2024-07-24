@@ -59,7 +59,7 @@ public:
     SharedFuture<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<Func, const SharedFuture<T>&>>>> then(
         Func transform) const {
         auto cpy = SharedFuture(*this); // retain copy during coroutine suspension
-        co_await waitIgnoringExceptions();
+        co_await cpy.waitIgnoringExceptions();
         co_return transform(cpy);
     }
 
