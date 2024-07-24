@@ -14,8 +14,8 @@ final class AsyncTest: XCTestCase {
                         promise(.success(String(value)))
                     case .failure:
                         XCTFail()
-                        token = withExtendedLifetime(token) {nil}
                     }
+                    token = withExtendedLifetime(token) {nil}
                 }
             }
         }
@@ -69,7 +69,7 @@ final class AsyncTest: XCTestCase {
                 switch result {
                 case .failure:
                     XCTFail()
-                case .success(let value):
+                case .success(_):
                     promise(.failure(DjinniError("123")))
                 }
             }
