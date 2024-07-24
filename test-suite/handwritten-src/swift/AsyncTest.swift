@@ -1,21 +1,21 @@
 import XCTest
 import DjinniSupport
-import Combine
 @testable import TestSuite
 
 final class AsyncTest: XCTestCase {
 
     class AsyncInterfaceImpl: AsyncInterface {
         func futureRoundtrip(_ f: DJFuture<Int32>) throws -> DJFuture<String> {
-            var token: AnyCancellable? = nil
+            var token: Cancellable? = nil
             return DJFuture() { promise in
-                token = f.sink { completion in
-                    if case .failure = completion {
-                        XCTAssertTrue(false)
+                token = f.getResult { result in
+                    switch result {
+                    case .success(let value):
+                        promise(.success(String(value)))
+                    case .failure:
+                        XCTFail()
+                        token = withExtendedLifetime(token) {nil}
                     }
-                    token = withExtendedLifetime(token) {nil}
-                } receiveValue: { i in
-                    promise(.success(String(i)))
                 }
             }
         }
@@ -32,16 +32,22 @@ final class AsyncTest: XCTestCase {
         let f = DJFuture<String>() { promise in
             p = promise
         }
-        var sink: AnyCancellable? = nil
+        var cancellable: Cancellable? = nil
         let f2 = DJFuture<Int32>() { promise in
-            sink = f.sink { completion in if case .failure = completion {XCTAssertTrue(false)}}
-            receiveValue: { s in promise(.success(Int32(s)!))}
+            cancellable = f.getResult { result in
+                switch result {
+                case .failure:
+                    XCTFail()
+                case .success(let value):
+                    promise(.success(Int32(value)!))
+                }
+            }
         }
         let f3 = try TestHelpers_statics.futureRoundtrip(f2)
         p!(.success("36"))
         let res = try await f3.value
         XCTAssertEqual(res, "36")
-        sink = withExtendedLifetime(sink) {nil}
+        cancellable = withExtendedLifetime(cancellable) {nil}
     }
 
     func testVoidRoundtrip() async throws {
@@ -57,11 +63,15 @@ final class AsyncTest: XCTestCase {
         let f = DJFuture<String>() { promise in
             p = promise
         }
-        var sink: AnyCancellable? = nil
+        var cancellable: Cancellable? = nil
         let f2 = DJFuture<Int32>() { promise in
-            sink = f.sink { completion in if case .failure = completion {XCTAssertTrue(false)}}
-            receiveValue: { s in
-                promise(.failure(DjinniError("123")))
+            cancellable = f.getResult { result in
+                switch result {
+                case .failure:
+                    XCTFail()
+                case .success(let value):
+                    promise(.failure(DjinniError("123")))
+                }
             }
         }
         let f3 = try TestHelpers_statics.futureRoundtrip(f2)
@@ -73,7 +83,7 @@ final class AsyncTest: XCTestCase {
             s = e.errorMessage
         }
         XCTAssertEqual(s, "123")
-        sink = withExtendedLifetime(sink){nil}
+        cancellable = withExtendedLifetime(cancellable){nil}
     }
 
     func testFutureRoundtripBackwards() async throws {
