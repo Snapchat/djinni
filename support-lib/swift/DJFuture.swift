@@ -1,6 +1,103 @@
 import DjinniSupportCxx
 import Foundation
-import Combine
+
+public final class Cancellable {
+    private let closure: () -> Void
+
+    init(closure: @escaping () -> Void) {
+        self.closure = closure
+    }
+
+    func cancel() {
+        self.closure()
+    }
+
+    deinit {
+        self.closure()
+    }
+}
+
+public typealias Lock = NSLock
+
+public final class Future<Output, Failure> where Failure : Error {
+    public typealias Promise = (Result<Output, Failure>) -> Void
+
+    private let lock = Lock()
+    private var storedResult: Result<Output, Failure>?
+    private var subscriptions = [UUID : Promise]()
+
+    public init(_ attemptToFulfill: @escaping (@escaping Promise) -> Void) {
+        attemptToFulfill { [weak self] result in
+            guard let self else { return }
+            
+            self.lock.lock()
+
+            // If the promise was already fulfilled, fire an assertion failure, unlock and return:
+            if self.storedResult != nil {
+                assertionFailure("attempted to fulfill future multiple times")
+                self.lock.unlock()
+                return
+            }
+
+            // Otherwise, make a copy of the completion handlers and clear them out,
+            // and then store the result and unlock:
+            let copiedSubscriptions = self.subscriptions
+            self.subscriptions = [:]
+            self.storedResult = result
+            self.lock.unlock()
+
+            // Run the completion handlers in parallel after unlocking:
+            for subscription in copiedSubscriptions.values {
+                DispatchQueue.global(qos: .default).async {
+                    subscription(result)
+                }
+            }
+        }
+    }
+
+    public var value: Output {
+        get async throws {
+            let subscriptionID = UUID()
+            return try await withTaskCancellationHandler {
+                return try await withCheckedThrowingContinuation { continuation in
+                    self.subscribe(subscriptionID: subscriptionID) { result in
+                        continuation.resume(with: result)
+                    }
+                }
+            } onCancel: {
+                self.cancel(subscriptionID: subscriptionID)
+            }
+        }
+    }
+
+    public func getResult(subscription: @escaping Promise) -> Cancellable {
+        let subscriptionID = UUID()
+        self.subscribe(subscriptionID: subscriptionID, subscription: subscription)
+        return Cancellable {
+            self.cancel(subscriptionID: subscriptionID)
+        }
+    }
+
+    // MARK: Private
+
+    private func subscribe(subscriptionID: UUID, subscription: @escaping Promise) {
+        self.lock.lock()
+        defer { self.lock.unlock() }
+
+        if let result = self.storedResult {
+            subscription(result)
+            return
+        }
+
+        self.subscriptions[subscriptionID] = subscription
+    }
+
+    private func cancel(subscriptionID: UUID) {
+        self.lock.lock()
+        self.subscriptions[subscriptionID] = nil
+        self.lock.unlock()
+    }
+}
 
 // DJinni future<> maps to Combine.Future<> in Swift
 public typealias DJFuture<T> = Future<T, DjinniError>
@@ -39,7 +136,7 @@ public func futureCb(
 // A C++ friendly function to release the subscription token stored with the C++
 // future value.
 public func cleanupCb(psubscription: UnsafeMutableRawPointer?) -> Void {
-    let _ = Unmanaged<AnyCancellable>.fromOpaque(psubscription!).takeRetainedValue()
+    let _ = Unmanaged<Cancellable>.fromOpaque(psubscription!).takeRetainedValue()
 }
 
 public enum FutureMarshaller<T: Marshaller>: Marshaller {
@@ -59,18 +156,19 @@ public enum FutureMarshaller<T: Marshaller>: Marshaller {
         // Create a C++ future
         var futureValue = djinni.swift.makeFutureValue(cleanupCb)
         // Connect it with the Swift future
-        let subscription = s.sink { completion in
-            if case let .failure(e) = completion {
+        let cancellable = s.getResult { result in
+            switch result {
+            case .success(let value):
+                var cppValue = T.toCpp(value)
+                djinni.swift.setFutureResult(&futureValue, &cppValue)
+            case .failure(let error):
                 var errorValue = djinni.swift.makeVoidValue()
-                djinni.swift.setErrorValue(&errorValue, e.wrapped)
+                djinni.swift.setErrorValue(&errorValue, error.wrapped)
                 djinni.swift.setFutureResult(&futureValue, &errorValue)
             }
-        } receiveValue:{ v in
-            var cppValue = T.toCpp(v)
-            djinni.swift.setFutureResult(&futureValue, &cppValue)
         }
-        // Store the subscription token so that the connection remains alive.
-        let pSubscription = Unmanaged.passRetained(subscription).toOpaque()
+        // Store the cancellable token so that the connection remains alive.
+        let pSubscription = Unmanaged.passRetained(cancellable).toOpaque()
         djinni.swift.storeSubscription(&futureValue, pSubscription)
         return futureValue
     }
