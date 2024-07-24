@@ -14,9 +14,11 @@
  * limitations under the License.
  */
  
- #pragma once
+#pragma once
 
 #include "Future.hpp"
+
+#if defined(DJINNI_FUTURE_HAS_COROUTINE_SUPPORT)
 
 #include <memory>
 #include <optional>
@@ -43,7 +45,7 @@ public:
     }
 
     void wait() const {
-        return [this]() -> Future<void> { co_await *this; }().wait();
+        waitIgnoringExceptions().wait();
     }
 
     decltype(auto) get() const {
@@ -54,12 +56,15 @@ public:
     // Transform the result of this future into a new future. The behavior is same as Future::then except that
     // it doesn't consume the future, and can be called multiple times.
     template<typename Func>
-    SharedFuture<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<Func, T>>>> then(Func transform) const {
-        co_return transform(co_await SharedFuture(*this)); // retain copy during coroutine suspension
+    SharedFuture<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<Func, const SharedFuture<T>&>>>> then(
+        Func transform) const {
+        auto cpy = SharedFuture(*this); // retain copy during coroutine suspension
+        co_await waitIgnoringExceptions();
+        co_return transform(cpy);
     }
 
     // Overload for T = void or `transform` takes no arugment.
-    template<typename Func, typename = std::enable_if_t<!std::is_invocable_v<Func, T>>>
+    template<typename Func, typename = std::enable_if_t<!std::is_invocable_v<Func, const SharedFuture<T>&>>>
     SharedFuture<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<Func>>>> then(Func transform) const {
         co_await SharedFuture(*this); // retain copy during coroutine suspension
         co_return transform();
@@ -73,8 +78,11 @@ public:
     }
 
     decltype(auto) await_resume() const {
+        if (!*_sharedStates->storedValue) {
+            std::rethrow_exception(_sharedStates->storedValue->error());
+        }
         if constexpr (!std::is_void_v<T>) {
-            return *_sharedStates->storedValue;
+            return const_cast<const T &>(_sharedStates->storedValue->value());
         }
     }
 
@@ -88,9 +96,17 @@ public:
     using promise_type = Promise;
 
 private:
+    Future<void> waitIgnoringExceptions() const {
+        try {
+            co_await *this;
+        } catch (...) {
+            // Ignore exceptions.
+        }
+    }
+
     struct SharedStates {
         std::recursive_mutex mutex;
-        std::optional<std::conditional_t<std::is_void_v<T>, std::monostate, T>> storedValue = std::nullopt;
+        std::optional<djinni::expected<T, std::exception_ptr>> storedValue = std::nullopt;
         std::vector<detail::CoroutineHandle<>> coroutineHandles;
     };
     // Use a shared_ptr to allow copying SharedFuture.
@@ -109,10 +125,15 @@ SharedFuture<T>::SharedFuture(Future<T>&& future) {
     future.then([sharedStates = _sharedStates](auto futureResult) {
         std::vector toCall = [&] {
             std::scoped_lock lock(sharedStates->mutex);
-            if constexpr (std::is_void_v<T>) {
-                sharedStates->storedValue.emplace();
-            } else {
-                sharedStates->storedValue = futureResult.get();
+            try {
+                if constexpr (std::is_void_v<T>) {
+                    futureResult.get();
+                    sharedStates->storedValue.emplace();
+                } else {
+                    sharedStates->storedValue = futureResult.get();
+                }
+            } catch (const std::exception& e) {
+                sharedStates->storedValue = make_unexpected(std::make_exception_ptr(e));
             }
             return std::move(sharedStates->coroutineHandles);
         }();
@@ -136,3 +157,5 @@ bool SharedFuture<T>::await_suspend(detail::CoroutineHandle<> h) const {
 }
 
 } // namespace djinni
+
+#endif
