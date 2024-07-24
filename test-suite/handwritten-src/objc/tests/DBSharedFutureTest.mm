@@ -55,10 +55,10 @@
 
     XCTAssertEqual(futureInt.get(), 42);
 
-    auto voidFuture = transformedString.then([]() {});
+    auto voidFuture = transformedString.then([](auto) {});
     voidFuture.wait();
 
-    auto intFuture2 = voidFuture.then([]() { return 43; });
+    auto intFuture2 = voidFuture.then([](auto) { return 43; });
     XCTAssertEqual(intFuture2.get(), 43);
 }
 
@@ -72,7 +72,7 @@
 
     XCTAssertThrows(futureInt.get());
 
-    auto thenResult = futureInt.then([]() { return 43; });
+    auto thenResult = futureInt.then([](const auto& resolved) { return resolved.get(); });
     XCTAssertThrows(thenResult.get());
 
     auto withExceptionHandling = futureInt.then([](const auto& resolved) {

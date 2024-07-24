@@ -63,13 +63,6 @@ public:
         co_return transform(cpy);
     }
 
-    // Overload for T = void or `transform` takes no arugment.
-    template<typename Func, typename = std::enable_if_t<!std::is_invocable_v<Func, const SharedFuture<T>&>>>
-    SharedFuture<std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<Func>>>> then(Func transform) const {
-        co_await SharedFuture(*this); // retain copy during coroutine suspension
-        co_return transform();
-    }
-
     // -- coroutine support implementation only; not intended externally --
 
     bool await_ready() const {
@@ -132,8 +125,8 @@ SharedFuture<T>::SharedFuture(Future<T>&& future) {
                 } else {
                     sharedStates->storedValue = futureResult.get();
                 }
-            } catch (const std::exception& e) {
-                sharedStates->storedValue = make_unexpected(std::make_exception_ptr(e));
+            } catch (...) {
+                sharedStates->storedValue = make_unexpected(std::current_exception());
             }
             return std::move(sharedStates->coroutineHandles);
         }();
