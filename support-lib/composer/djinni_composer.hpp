@@ -222,6 +222,9 @@ struct Optional {
     static ComposerType fromCpp(const OptionalType<typename T::CppType>& c) {
         return c ? T::Boxed::fromCpp(*c) : Composer::Value::undefined();
     }
+    static ComposerType fromCpp(OptionalType<typename T::CppType>&& c) {
+        return c ? T::Boxed::fromCpp(std::move(*c)) : Composer::Value::undefined();
+    }
     template<typename C = T>
     static ComposerType fromCpp(const typename C::CppOptType& cppOpt) {
         return T::Boxed::fromCppOpt(cppOpt);

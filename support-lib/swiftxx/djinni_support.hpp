@@ -250,6 +250,9 @@ struct Optional {
     static AnyValue fromCpp(const OptionalType<typename T::CppType>& c) {
         return c ? T::fromCpp(*c) : makeVoidValue();
     }
+    static AnyValue fromCpp(OptionalType<typename T::CppType>&& c) {
+        return c ? T::fromCpp(std::move(*c)) : makeVoidValue();
+    }
     static CppType toCpp(const AnyValue& v) {
         if (std::holds_alternative<VoidValue>(v)) {
             return CppType{};
