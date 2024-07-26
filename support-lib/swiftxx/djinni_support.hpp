@@ -2,6 +2,7 @@
 
 #include <variant>
 #include <string>
+#include <vector>
 #include <memory>
 #include <chrono>
 #include <locale>
