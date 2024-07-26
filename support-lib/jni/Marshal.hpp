@@ -322,12 +322,12 @@ namespace djinni
 
         static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const OptionalType<typename T::CppType> &c)
         {
-            return c ? T::Boxed::fromCpp(jniEnv, *c) : LocalRef<JniType>{};
+            return c ? T::Boxed::fromCpp(jniEnv, *c) : LocalRef<JniType>{ };
         }
 
         static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, OptionalType<typename T::CppType>&& c)
         {
-            return c ? T::Boxed::fromCpp(jniEnv, std::move(*c)) : LocalRef<JniType>{};
+            return c ? T::Boxed::fromCpp(jniEnv, std::move(*c)) : LocalRef<JniType>{ };
         }
 
         // fromCpp used for nullable shared_ptr
