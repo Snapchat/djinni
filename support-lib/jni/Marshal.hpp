@@ -319,7 +319,7 @@ namespace djinni
             }
         }
 
-        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const OptionalType<typename T::CppType> &c) {
+        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const OptionalType<typename T::CppType>& c) {
             return c ? T::Boxed::fromCpp(jniEnv, *c) : LocalRef<JniType>{ };
         }
         
