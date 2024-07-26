@@ -311,8 +311,7 @@ namespace djinni
 
         using Boxed = Optional;
 
-        static CppType toCpp(JNIEnv* jniEnv, JniType j)
-        {
+        static CppType toCpp(JNIEnv* jniEnv, JniType j) {
             if (j) {
                 return T::Boxed::toCpp(jniEnv, j);
             } else {
@@ -320,12 +319,11 @@ namespace djinni
             }
         }
 
-        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const OptionalType<typename T::CppType> &c)
-        {
+        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const OptionalType<typename T::CppType> &c) {
             return c ? T::Boxed::fromCpp(jniEnv, *c) : LocalRef<JniType>{ };
         }
-        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, OptionalType<typename T::CppType>&& c)
-        {
+        
+        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, OptionalType<typename T::CppType>&& c) {
             return c ? T::Boxed::fromCpp(jniEnv, std::move(*c)) : LocalRef<JniType>{ };
         }
 
