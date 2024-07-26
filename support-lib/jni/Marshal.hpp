@@ -324,7 +324,6 @@ namespace djinni
         {
             return c ? T::Boxed::fromCpp(jniEnv, *c) : LocalRef<JniType>{ };
         }
-
         static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, OptionalType<typename T::CppType>&& c)
         {
             return c ? T::Boxed::fromCpp(jniEnv, std::move(*c)) : LocalRef<JniType>{ };
