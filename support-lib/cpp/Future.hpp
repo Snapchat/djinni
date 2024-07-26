@@ -380,7 +380,7 @@ public:
             }
             template <typename P>
             bool await_suspend(detail::CoroutineHandle<P> finished) const noexcept {
-                static_assert(std::is_base_of_v<PromiseTypeBase, P>);
+                static_assert(std::is_convertible_v<P*, PromiseTypeBase*>);
                 auto& promise_type = finished.promise();
                 if (*promise_type._result) {
                     if constexpr (std::is_void_v<T>) {
