@@ -35,8 +35,8 @@ class SwiftxxGenerator(spec: Spec) extends Generator(spec) {
   class SwiftRefs(name: String) {
     var swiftHpp = mutable.TreeSet[String]()
     var swiftCpp = mutable.TreeSet[String]()
-    swiftHpp.add("#include " + q(spec.cppFileIdentStyle(name) + "." + spec.cppHeaderExt))
-    swiftHpp.add("#include " + q("djinni_support.hpp"))
+    swiftHpp.add("#include " + q(spec.swiftxxIncludeCppPrefix + spec.cppFileIdentStyle(name) + "." + spec.cppHeaderExt))
+    swiftHpp.add("#include " + q(spec.swiftxxBaseLibIncludePrefix + "djinni_support.hpp"))
     spec.cppNnHeader match {
       case Some(nnHdr) => swiftHpp.add("#include " + nnHdr)
       case _ =>

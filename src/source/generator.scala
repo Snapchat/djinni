@@ -121,6 +121,8 @@ package object generatorTools {
                    swiftxxBaseLibModule: String,
                    swiftxxClassIdentStyle: IdentConverter,
                    swiftxxFileIdentStyle: IdentConverter,
+                   swiftxxIncludeCppPrefix: String,
+                   swiftxxBaseLibIncludePrefix: String,
                    outFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],

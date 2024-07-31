@@ -119,6 +119,8 @@ object Main {
     var swiftxxBaseLibModule: String = "DjinniSupportCxx"
     var swiftxxClassIdentStyleOptional: Option[IdentConverter] = None
     var swiftxxFileIdentStyleOptional: Option[IdentConverter] = None
+    var swiftxxIncludeCppPrefix: String = ""
+    var swiftxxBaseLibIncludePrefix: String = ""
     var inFileListPath: Option[File] = None
     var outFileListPath: Option[File] = None
     var skipGeneration: Boolean = false
@@ -304,6 +306,10 @@ object Main {
         .text("Swift module name (default: \"Module\").")
       opt[File]("swiftxx-out").valueName("<out-folder>").foreach(x => swiftxxOutFolder = Some(x))
         .text("The output folder for private Swift/C++ interop files (Generator disabled if unspecified).")
+      opt[String]("swiftxx-include-cpp-prefix").valueName("<prefix>").foreach(swiftxxIncludeCppPrefix = _)
+        .text("The prefix for #includes of the main header files from Swift C++ files.")
+      opt[String]("swiftxx-base-lib-include-prefix").valueName("...").foreach(x => swiftxxBaseLibIncludePrefix = x)
+        .text("The Swift C++ base library's include path, relative to the Swift C++ classes.")
       note("")
       opt[File]("yaml-out").valueName("<out-folder>").foreach(x => yamlOutFolder = Some(x))
         .text("The output folder for YAML files (Generator disabled if unspecified).")
@@ -519,6 +525,8 @@ object Main {
       swiftxxBaseLibModule,
       swiftxxClassIdentStyle,
       swiftxxFileIdentStyle,
+      swiftxxIncludeCppPrefix,
+      swiftxxBaseLibIncludePrefix,
       outFileListWriter,
       skipGeneration,
       yamlOutFolder,
