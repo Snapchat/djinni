@@ -19,6 +19,11 @@
 
 namespace testsuite {
 
+// verify we we can put move only types in futures
+std::unique_ptr<int> testFutureMove() {
+    return djinni::Promise<std::unique_ptr<int>>::resolve(nullptr).get();
+}
+
 SetRecord TestHelpers::get_set_record() {
     return SetRecord { {
         "StringA",

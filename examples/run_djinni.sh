@@ -25,6 +25,8 @@ objc_out="$base_dir/generated-src/objc"
 java_out="$base_dir/generated-src/java/com/dropbox/textsort"
 wasm_out="$base_dir/generated-src/wasm"
 ts_out="$base_dir/generated-src/ts"
+swift_out="$base_dir/generated-src/swift"
+swiftxx_out="$base_dir/generated-src/swiftxx"
 
 java_package="com.dropbox.textsort"
 
@@ -77,6 +79,12 @@ fi
     --ts-out "$temp_out/ts" \
     --ts-module "example" \
     \
+    --swift-out "$temp_out/swift" \
+    --swift-module "TextSort" \
+    --swiftxx-out "$temp_out/swiftxx" \
+    --ident-swiftxx-class SwiftFooBar \
+    --ident-swiftxx-file SwiftFooBar \
+    \
     --idl "$in"
 
 # Copy changes from "$temp_output" to final dir.
@@ -96,6 +104,8 @@ mirror "jni" "$temp_out/jni" "$jni_out"
 mirror "objc" "$temp_out/objc" "$objc_out"
 mirror "wasm" "$temp_out/wasm" "$wasm_out"
 mirror "ts" "$temp_out/ts" "$ts_out"
+mirror "swift" "$temp_out/swift" "$swift_out"
+mirror "swiftxx" "$temp_out/swiftxx" "$swiftxx_out"
 
 date > "$gen_stamp"
 

@@ -37,6 +37,8 @@ objc_out="$base_dir/generated-src/objc"
 java_out="$base_dir/generated-src/java/com/dropbox/djinni/test"
 wasm_out="$base_dir/generated-src/wasm"
 ts_out="$base_dir/generated-src/ts"
+swift_out="$base_dir/generated-src/swift"
+swiftxx_out="$base_dir/generated-src/swiftxx"
 yaml_out="$base_dir/generated-src/yaml"
 
 java_package="com.dropbox.djinni.test"
@@ -99,6 +101,12 @@ fi
     --ts-out "$temp_out_relative/ts" \
     --ts-module "test_wchar" \
     \
+    --swift-out "$temp_out_relative/swift" \
+    --swift-module "TestSuite" \
+    --swiftxx-out "$temp_out_relative/swiftxx" \
+    --ident-swiftxx-class NativeFooBar \
+    --ident-swiftxx-file NativeFooBar \
+    \
     --yaml-out "$temp_out_relative/yaml" \
     --yaml-out-file "yaml-test.yaml" \
     --yaml-prefix "test_" \
@@ -134,6 +142,12 @@ fi
     --wasm-namespace "testsuite" \
     --ts-out "$temp_out_relative/ts" \
     --ts-module "test" \
+    \
+    --swift-out "$temp_out_relative/swift" \
+    --swift-module "TestSuite" \
+    --swiftxx-out "$temp_out_relative/swiftxx" \
+    --ident-swiftxx-class NativeFooBar \
+    --ident-swiftxx-file NativeFooBar \
     \
     --list-in-files "./generated-src/inFileList.txt" \
     --list-out-files "./generated-src/outFileList.txt"\
@@ -298,6 +312,12 @@ cp "$base_dir/djinni/yaml-test.djinni" "$temp_out/yaml"
     --ts-out "$temp_out_relative/ts" \
     --ts-module "test_yaml" \
     \
+    --swift-out "$temp_out_relative/swift" \
+    --swift-module "TestSuite" \
+    --swiftxx-out "$temp_out_relative/swiftxx" \
+    --ident-swiftxx-class NativeFooBar \
+    --ident-swiftxx-file NativeFooBar \
+    \
     --idl "$temp_out_relative/yaml/yaml-test.djinni" \
 )
 
@@ -318,6 +338,8 @@ mirror "jni" "$temp_out/jni" "$jni_out"
 mirror "objc" "$temp_out/objc" "$objc_out"
 mirror "wasm" "$temp_out/wasm" "$wasm_out"
 mirror "ts" "$temp_out/ts" "$ts_out"
+mirror "swift" "$temp_out/swift" "$swift_out"
+mirror "swiftxx" "$temp_out/swiftxx" "$swiftxx_out"
 
 date > "$gen_stamp"
 

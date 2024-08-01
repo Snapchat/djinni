@@ -6,6 +6,9 @@ java:
 ts:
     module: '../../djinni/vendor/third-party/proto/ts/test2'
     namespace: 'prototest2'
+swift:
+    module: 'ProtobufTest'
+    prefix: 'Djinni_Test2_'
  
 messages:
     - PersistingState

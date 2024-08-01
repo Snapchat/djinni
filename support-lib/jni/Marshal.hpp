@@ -311,8 +311,7 @@ namespace djinni
 
         using Boxed = Optional;
 
-        static CppType toCpp(JNIEnv* jniEnv, JniType j)
-        {
+        static CppType toCpp(JNIEnv* jniEnv, JniType j) {
             if (j) {
                 return T::Boxed::toCpp(jniEnv, j);
             } else {
@@ -320,15 +319,20 @@ namespace djinni
             }
         }
 
-        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const OptionalType<typename T::CppType> &c)
-        {
-            return c ? T::Boxed::fromCpp(jniEnv, *c) : LocalRef<JniType>{};
+        static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const OptionalType<typename T::CppType>& c) {
+            return c ? T::Boxed::fromCpp(jniEnv, *c) : LocalRef<JniType>{ };
         }
         static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, OptionalType<typename T::CppType> &&c)
         {
             return c ? T::Boxed::fromCpp(jniEnv, std::move(*c)) : LocalRef<JniType>{};
         }
 
+        // No idea why this overload breaks CI bazel build.
+        // static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, OptionalType<typename T::CppType>&& c) {
+        //     return c ? T::Boxed::fromCpp(jniEnv, std::move(*c)) : LocalRef<JniType>{ };
+        // }
+
+        
         // fromCpp used for nullable shared_ptr
         template <typename C = T>
         static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const typename C::CppOptType & cppOpt) {
