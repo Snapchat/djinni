@@ -56,6 +56,7 @@ objc_library(
     copts = [
         "-ObjC++",
         "-std=c++17",
+        "-fcoroutines-ts"
     ],
     srcs = glob([
         "generated-src/objc/**/*.mm",

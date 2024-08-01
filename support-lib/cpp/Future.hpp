@@ -370,7 +370,6 @@ public:
         return true;
     }
 
-    template<typename ConcretePromise>
     struct PromiseTypeBase {
         Promise<T> _promise;
         std::optional<djinni::expected<T, std::exception_ptr>> _result{};
@@ -379,7 +378,9 @@ public:
             constexpr bool await_ready() const noexcept {
                 return false;
             }
-            bool await_suspend(detail::CoroutineHandle<ConcretePromise> finished) const noexcept {
+            template <typename P>
+            bool await_suspend(detail::CoroutineHandle<P> finished) const noexcept {
+                static_assert(std::is_convertible_v<P*, PromiseTypeBase*>);
                 auto& promise_type = finished.promise();
                 if (*promise_type._result) {
                     if constexpr (std::is_void_v<T>) {
@@ -406,7 +407,7 @@ public:
         }
     };
 
-    struct PromiseType: PromiseTypeBase<PromiseType>{
+    struct PromiseType: PromiseTypeBase {
         template <typename V, typename = std::enable_if_t<std::is_convertible_v<V, T>>>
         void return_value(V&& value) {
             this->_result.emplace(std::forward<V>(value));
@@ -424,7 +425,7 @@ public:
 
 #if defined(DJINNI_FUTURE_HAS_COROUTINE_SUPPORT)
 template<>
-struct Future<void>::PromiseType : PromiseTypeBase<PromiseType> {
+struct Future<void>::PromiseType : PromiseTypeBase {
     void return_void() {
         _result.emplace();
     }
