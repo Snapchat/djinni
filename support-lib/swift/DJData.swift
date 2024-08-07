@@ -9,6 +9,9 @@ public enum DataViewMarshaller: Marshaller {
     public typealias SwiftType = NSData
     public static func fromCpp(_ v: djinni.swift.AnyValue) -> SwiftType {
         let range = djinni.swift.getBinaryRange(v)
+        if (range.size == 0 || range.bytes == nil) {
+            return SwiftType()
+        }
         return SwiftType(bytesNoCopy: UnsafeMutableRawPointer(mutating: range.bytes!), length: range.size, deallocator:.none)
     }
     public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
@@ -25,12 +28,12 @@ public enum DataRefMarshaller: Marshaller {
         return cfdata as NSData
     }
     public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
-        if s is CFMutableData {
-            let cfdataref = Unmanaged.passRetained(s as! CFMutableData).toOpaque()
-            return djinni.swift.makeRangeValue(cfdataref, 1)
+        if let nsMutableData = s as? NSMutableData {
+            let cfDataRef = Unmanaged.passRetained(nsMutableData).toOpaque()
+            return djinni.swift.makeRangeValue(cfDataRef, 1)
         } else {
-            let cfdataref = Unmanaged.passRetained(s as CFData).toOpaque()
-            return djinni.swift.makeRangeValue(cfdataref, 0)
+            let cfDataRef = Unmanaged.passRetained(s as CFData).toOpaque()
+            return djinni.swift.makeRangeValue(cfDataRef, 0)
         }
     }
 }
