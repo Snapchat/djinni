@@ -24,7 +24,7 @@ final class ProtoTest: XCTestCase {
 
     func testZeroSizeNativeToSwift() throws {
         let proto = try ProtoTests_statics.stringsToProto([])
-        let serialized: Data = try proto.serializedBytes()
+        let serialized: Data = try proto.serializedData()
         XCTAssertEqual(serialized.count, 0)
     }
 
