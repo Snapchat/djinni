@@ -67,4 +67,36 @@ djinni::Future<void> outer_coroutine(std::vector<int>& cleanup_ids, int id, djin
 }
 #endif
 
+- (void) testFuture_brokenPromise {
+    std::optional<djinni::Promise<void>> promise{std::in_place};
+    auto future = promise->getFuture();
+    XCTAssertFalse(future.isReady());
+
+    auto promise2 = std::make_optional(std::move(*promise));
+    XCTAssertFalse(future.isReady());
+
+    promise.reset();
+    XCTAssertFalse(future.isReady());
+
+    promise2.reset();
+    XCTAssertTrue(future.isReady());
+    if (future.isReady()) {
+        XCTAssertThrowsSpecific(future.get(), djinni::BrokenPromiseException);
+    }
+}
+
+- (void) testFuture_brokenPromiseAssignment {
+    djinni::Promise<void> promise{};
+    auto future = promise.getFuture();
+    XCTAssertFalse(future.isReady());
+
+    promise = djinni::Promise<void>{};
+    XCTAssertTrue(future.isReady());
+    if (future.isReady()) {
+        XCTAssertThrowsSpecific(future.get(), djinni::BrokenPromiseException);
+    }
+
+    XCTAssertFalse(promise.getFuture().isReady());
+}
+
 @end

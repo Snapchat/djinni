@@ -54,6 +54,12 @@ namespace djinni {
 template <typename T>
 class Future;
 
+struct BrokenPromiseException final : public std::exception {
+    inline const char* what() const noexcept final {
+        return "djinni::Promise was destructed before setting a result";
+    }
+};
+
 namespace detail {
 
 // A wrapper object to support both void and non-void result types in
@@ -117,6 +123,25 @@ using SharedStatePtr = std::shared_ptr<SharedState<T>>;
 template <typename T>
 class PromiseBase {
 public:
+    virtual ~PromiseBase() noexcept {
+        if (_sharedState) {
+            setException(BrokenPromiseException{});
+        }
+    }
+    PromiseBase() = default;
+
+    // moveable
+    PromiseBase(PromiseBase&&) noexcept = default;
+    PromiseBase& operator= (PromiseBase&& other) noexcept {
+        std::swap(other._sharedState, _sharedState);
+        std::swap(other._sharedStateReadOnly, _sharedStateReadOnly);
+        return *this;
+    }
+
+    // not copyable
+    PromiseBase(const PromiseBase&) = delete;
+    PromiseBase& operator= (const PromiseBase&) = delete;
+
     Future<T> getFuture();
 
     // Use to immediately resolve a promise and return the resulting future.
@@ -223,14 +248,7 @@ class Promise: public detail::PromiseBase<T> {
 public:
     using detail::PromiseBase<T>::setValue;
     using detail::PromiseBase<T>::setException;
-    // default constructable
-    Promise() = default;
-    // moveable
-    Promise(Promise&&) noexcept = default;
-    Promise& operator= (Promise&&) noexcept = default;
-    // not copyable
-    Promise(const Promise&) = delete;
-    Promise& operator= (const Promise&) = delete;
+    using detail::PromiseBase<T>::PromiseBase;
 };
 
 // Promise with a void result
@@ -239,14 +257,8 @@ class Promise<void>: public detail::PromiseBase<void> {
 public:
     void setValue() {setValue(true);}
     using detail::PromiseBase<void>::setException;
-    // default constructable
-    Promise() = default;
-    // moveable
-    Promise(Promise&&) noexcept = default;
-    Promise& operator= (Promise&&) noexcept = default;
-    // not copyable
-    Promise(const Promise&) = delete;
-    Promise& operator= (const Promise&) = delete;
+    using detail::PromiseBase<void>::PromiseBase;
+    
 private:
     // hide the bool version
     void setValue(const bool&) {detail::PromiseBase<void>::setValue(true);}
