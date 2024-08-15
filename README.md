@@ -65,7 +65,7 @@ verify the build and binary from the command line.
  - Protobuf type support
  - Local flags with `@flag` directive
  - DataView for copy free data passing
- - DateRef for copy free data passing with ownership
+ - DataRef for copy free data passing with ownership
  - Generating string names for C++ enums
  - Omit optional parameters from record constructors
  - Records are default mutable across all platforms
