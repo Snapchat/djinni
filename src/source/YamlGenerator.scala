@@ -130,7 +130,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   )
 
   private def typeDef(td: TypeDecl) = {
-    def ext(e: Ext): String = (if(e.cpp) " +c" else "") + (if(e.objc) " +o" else "") + (if(e.java) " +j" else "") + (if(e.js) " +w" else "")
+    def ext(e: Ext): String = (if(e.cpp) " +c" else "") + (if(e.objc) " +o" else "") + (if(e.java) " +j" else "") + (if(e.js) " +w" else "") + (if(e.swift) " +sw" else "")
     def deriving(r: Record) = {
       if(r.derivingTypes.isEmpty) {
         ""
