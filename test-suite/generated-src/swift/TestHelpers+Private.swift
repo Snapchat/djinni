@@ -207,10 +207,10 @@ public class TestHelpers_statics {
     }
     static func voidAsyncMethod(_ f: DJFuture<Void>) throws -> DJFuture<Void> {
         var params = djinni.swift.ParameterList()
-        params.addValue(FutureMarshaller<VoidMarshaller>.toCpp(f))
+        params.addValue(FutureMarshaller<Void_Marshaller>.toCpp(f))
         var ret = djinni_generated.TestHelpers_voidAsyncMethod(&params)
         try handleCppErrors(&ret)
-        return FutureMarshaller<VoidMarshaller>.fromCpp(ret)
+        return FutureMarshaller<Void_Marshaller>.fromCpp(ret)
     }
     static func addOneIfPresent(_ f: DJFuture<Optional<Int32>>) throws -> DJFuture<Optional<Int32>> {
         var params = djinni.swift.ParameterList()

@@ -125,7 +125,7 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
 
   class SwiftRefs(name: String) {
     var swiftImports = mutable.TreeSet[String]()
-    var privateImports = mutable.TreeSet[String]("DjinniSupport", "Foundation",spec.swiftxxBaseLibModule, spec.swiftModule, spec.swiftModule + "Cxx")
+    var privateImports = mutable.TreeSet[String]("DjinniSupport", "Foundation", spec.swiftxxBaseLibModule, spec.swiftModule, spec.swiftModule + "Cxx")
     swiftImports.add("Foundation")
     def find(ty: TypeRef) { find(ty.resolved) }
     def find(tm: MExpr) {
@@ -326,7 +326,7 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
       if (!staticMethods.isEmpty) {
         w.w(s"public class ${marshal.typename(ident, i)}_statics").braced {
           for (m <- staticMethods) {
-            w.w(s"static func ${swiftMethodName(m.ident)}(")
+            w.w(s"public static func ${swiftMethodName(m.ident)}(")
             if (m.params.nonEmpty) { w.w("_ ") }
             w.w(m.params.map(p => s"${idSwift.local(p.ident)}: ${marshal.fqParamType(p.ty)}").mkString(", "))
             w.w(s") throws -> ${marshal.fqReturnType(m.ret)}").braced {

@@ -102,7 +102,7 @@ class SwiftMarshal(spec: Spec) extends Marshal(spec) {
   private def helperClass(tm: MExpr): String = helperName(tm) + helperTemplates(tm)
   def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => helperClass(d.name)
-    case e: MExtern => e.swift.translatorModule + "." + e.swift.translator
+    case e: MExtern => e.swift.translator
     case o => o match {
       case p: MPrimitive => p.idlName match {
         case "i8" => "I8Marshaller"
@@ -128,7 +128,7 @@ class SwiftMarshal(spec: Spec) extends Marshal(spec) {
       case d: MDef => throw new AssertionError("unreachable")
       case e: MExtern => throw new AssertionError("unreachable")
       case p: MParam => throw new AssertionError("not applicable")
-      case MVoid => "VoidMarshaller"
+      case MVoid => "Void_Marshaller"
     }
   }
   private def helperTemplates(tm: MExpr): String = {

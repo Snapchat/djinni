@@ -118,6 +118,7 @@ package object generatorTools {
                    swiftModule: String,
                    swiftxxOutFolder: Option[File],
                    swiftxxNamespace: String,
+                   swiftxxIncludePrefix: String,
                    swiftxxBaseLibModule: String,
                    swiftxxClassIdentStyle: IdentConverter,
                    swiftxxFileIdentStyle: IdentConverter,

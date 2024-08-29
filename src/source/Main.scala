@@ -116,6 +116,7 @@ object Main {
     var swiftIdentStyle = IdentStyle.swiftDefault
     var swiftxxOutFolder: Option[File] = None
     var swiftxxNamespace: String = "djinni_generated"
+    var swiftxxIncludePrefix: String = ""
     var swiftxxBaseLibModule: String = "DjinniSupportCxx"
     var swiftxxClassIdentStyleOptional: Option[IdentConverter] = None
     var swiftxxFileIdentStyleOptional: Option[IdentConverter] = None
@@ -306,6 +307,8 @@ object Main {
         .text("Swift module name (default: \"Module\").")
       opt[File]("swiftxx-out").valueName("<out-folder>").foreach(x => swiftxxOutFolder = Some(x))
         .text("The output folder for private Swift/C++ interop files (Generator disabled if unspecified).")
+      opt[String]("swiftxx-include-prefix").valueName("<prefix>").foreach(swiftxxIncludePrefix = _)
+        .text("The prefix for #includes of Swift C++ header files.")
       opt[String]("swiftxx-include-cpp-prefix").valueName("<prefix>").foreach(swiftxxIncludeCppPrefix = _)
         .text("The prefix for #includes of the main header files from Swift C++ files.")
       opt[String]("swiftxx-base-lib-include-prefix").valueName("...").foreach(x => swiftxxBaseLibIncludePrefix = x)
@@ -522,6 +525,7 @@ object Main {
       swiftModule,
       swiftxxOutFolder,
       swiftxxNamespace,
+      swiftxxIncludePrefix,
       swiftxxBaseLibModule,
       swiftxxClassIdentStyle,
       swiftxxFileIdentStyle,

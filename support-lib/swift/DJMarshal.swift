@@ -113,7 +113,7 @@ public enum DateMarshaller: Marshaller {
     }
 }
 
-public enum VoidMarshaller: Marshaller {
+public enum Void_Marshaller: Marshaller {
     public typealias SwiftType = Void
     static public func fromCpp(_ v: djinni.swift.AnyValue) -> SwiftType {
         return ()

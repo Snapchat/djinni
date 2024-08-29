@@ -47,10 +47,10 @@ class SwiftxxMarshal(spec: Spec) extends Marshal(spec) {
     case _ => List()
   }
 
-  def include(ident: String) = q(spec.swiftxxFileIdentStyle(ident) + "." + spec.cppHeaderExt)
+  def include(ident: String) = q(spec.swiftxxIncludePrefix + spec.swiftxxFileIdentStyle(ident) + "." + spec.cppHeaderExt)
 
   def resolveExtSwiftxxHdr(path: String) = {
-    path.replaceAll("\\$", "");
+    path.replaceAll("\\$", spec.swiftxxBaseLibIncludePrefix);
   }
 
   def helperClass(name: String) = spec.swiftxxClassIdentStyle(name)
