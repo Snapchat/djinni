@@ -10,153 +10,153 @@ import TestSuiteCxx
 final class TestDurationCppProxy: DjinniSupport.CppProxy, TestSuite.TestDuration {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
 }
-enum TestDurationMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.TestDuration
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum TestDurationMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.TestDuration
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { TestDurationCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }
 public class TestDuration_statics {
-    static func hoursString(_ dt: Duration) throws -> String {
-        var params = djinni.swift.ParameterList()
-        params.addValue(DurationMarshaller<I32Marshaller, DurationH>.toCpp(dt))
-        var ret = djinni_generated.TestDuration_hoursString(&params)
+    public static func hoursString(_ dt: Duration) throws -> String {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(TestSuite.DurationMarshaller<I32Marshaller, TestSuite.DurationH>.toCpp(dt))
+        var ret = djinni_generated.TestDuration_hoursString(&_params)
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }
-    static func minutesString(_ dt: Duration) throws -> String {
-        var params = djinni.swift.ParameterList()
-        params.addValue(DurationMarshaller<I32Marshaller, DurationMin>.toCpp(dt))
-        var ret = djinni_generated.TestDuration_minutesString(&params)
+    public static func minutesString(_ dt: Duration) throws -> String {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(TestSuite.DurationMarshaller<I32Marshaller, TestSuite.DurationMin>.toCpp(dt))
+        var ret = djinni_generated.TestDuration_minutesString(&_params)
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }
-    static func secondsString(_ dt: Duration) throws -> String {
-        var params = djinni.swift.ParameterList()
-        params.addValue(DurationMarshaller<I32Marshaller, DurationS>.toCpp(dt))
-        var ret = djinni_generated.TestDuration_secondsString(&params)
+    public static func secondsString(_ dt: Duration) throws -> String {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(TestSuite.DurationMarshaller<I32Marshaller, TestSuite.DurationS>.toCpp(dt))
+        var ret = djinni_generated.TestDuration_secondsString(&_params)
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }
-    static func millisString(_ dt: Duration) throws -> String {
-        var params = djinni.swift.ParameterList()
-        params.addValue(DurationMarshaller<I32Marshaller, DurationMs>.toCpp(dt))
-        var ret = djinni_generated.TestDuration_millisString(&params)
+    public static func millisString(_ dt: Duration) throws -> String {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(TestSuite.DurationMarshaller<I32Marshaller, TestSuite.DurationMs>.toCpp(dt))
+        var ret = djinni_generated.TestDuration_millisString(&_params)
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }
-    static func microsString(_ dt: Duration) throws -> String {
-        var params = djinni.swift.ParameterList()
-        params.addValue(DurationMarshaller<I32Marshaller, DurationUs>.toCpp(dt))
-        var ret = djinni_generated.TestDuration_microsString(&params)
+    public static func microsString(_ dt: Duration) throws -> String {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(TestSuite.DurationMarshaller<I32Marshaller, TestSuite.DurationUs>.toCpp(dt))
+        var ret = djinni_generated.TestDuration_microsString(&_params)
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }
-    static func nanosString(_ dt: Duration) throws -> String {
-        var params = djinni.swift.ParameterList()
-        params.addValue(DurationMarshaller<I32Marshaller, DurationNs>.toCpp(dt))
-        var ret = djinni_generated.TestDuration_nanosString(&params)
+    public static func nanosString(_ dt: Duration) throws -> String {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(TestSuite.DurationMarshaller<I32Marshaller, TestSuite.DurationNs>.toCpp(dt))
+        var ret = djinni_generated.TestDuration_nanosString(&_params)
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }
-    static func hours(_ count: Int32) throws -> Duration {
-        var params = djinni.swift.ParameterList()
-        params.addValue(I32Marshaller.toCpp(count))
-        var ret = djinni_generated.TestDuration_hours(&params)
+    public static func hours(_ count: Int32) throws -> Duration {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(I32Marshaller.toCpp(count))
+        var ret = djinni_generated.TestDuration_hours(&_params)
         try handleCppErrors(&ret)
-        return DurationMarshaller<I32Marshaller, DurationH>.fromCpp(ret)
+        return TestSuite.DurationMarshaller<I32Marshaller, TestSuite.DurationH>.fromCpp(ret)
     }
-    static func minutes(_ count: Int32) throws -> Duration {
-        var params = djinni.swift.ParameterList()
-        params.addValue(I32Marshaller.toCpp(count))
-        var ret = djinni_generated.TestDuration_minutes(&params)
+    public static func minutes(_ count: Int32) throws -> Duration {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(I32Marshaller.toCpp(count))
+        var ret = djinni_generated.TestDuration_minutes(&_params)
         try handleCppErrors(&ret)
-        return DurationMarshaller<I32Marshaller, DurationMin>.fromCpp(ret)
+        return TestSuite.DurationMarshaller<I32Marshaller, TestSuite.DurationMin>.fromCpp(ret)
     }
-    static func seconds(_ count: Int32) throws -> Duration {
-        var params = djinni.swift.ParameterList()
-        params.addValue(I32Marshaller.toCpp(count))
-        var ret = djinni_generated.TestDuration_seconds(&params)
+    public static func seconds(_ count: Int32) throws -> Duration {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(I32Marshaller.toCpp(count))
+        var ret = djinni_generated.TestDuration_seconds(&_params)
         try handleCppErrors(&ret)
-        return DurationMarshaller<I32Marshaller, DurationS>.fromCpp(ret)
+        return TestSuite.DurationMarshaller<I32Marshaller, TestSuite.DurationS>.fromCpp(ret)
     }
-    static func millis(_ count: Int32) throws -> Duration {
-        var params = djinni.swift.ParameterList()
-        params.addValue(I32Marshaller.toCpp(count))
-        var ret = djinni_generated.TestDuration_millis(&params)
+    public static func millis(_ count: Int32) throws -> Duration {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(I32Marshaller.toCpp(count))
+        var ret = djinni_generated.TestDuration_millis(&_params)
         try handleCppErrors(&ret)
-        return DurationMarshaller<I32Marshaller, DurationMs>.fromCpp(ret)
+        return TestSuite.DurationMarshaller<I32Marshaller, TestSuite.DurationMs>.fromCpp(ret)
     }
-    static func micros(_ count: Int32) throws -> Duration {
-        var params = djinni.swift.ParameterList()
-        params.addValue(I32Marshaller.toCpp(count))
-        var ret = djinni_generated.TestDuration_micros(&params)
+    public static func micros(_ count: Int32) throws -> Duration {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(I32Marshaller.toCpp(count))
+        var ret = djinni_generated.TestDuration_micros(&_params)
         try handleCppErrors(&ret)
-        return DurationMarshaller<I32Marshaller, DurationUs>.fromCpp(ret)
+        return TestSuite.DurationMarshaller<I32Marshaller, TestSuite.DurationUs>.fromCpp(ret)
     }
-    static func nanos(_ count: Int32) throws -> Duration {
-        var params = djinni.swift.ParameterList()
-        params.addValue(I32Marshaller.toCpp(count))
-        var ret = djinni_generated.TestDuration_nanos(&params)
+    public static func nanos(_ count: Int32) throws -> Duration {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(I32Marshaller.toCpp(count))
+        var ret = djinni_generated.TestDuration_nanos(&_params)
         try handleCppErrors(&ret)
-        return DurationMarshaller<I32Marshaller, DurationNs>.fromCpp(ret)
+        return TestSuite.DurationMarshaller<I32Marshaller, TestSuite.DurationNs>.fromCpp(ret)
     }
-    static func hoursf(_ count: Double) throws -> Duration {
-        var params = djinni.swift.ParameterList()
-        params.addValue(F64Marshaller.toCpp(count))
-        var ret = djinni_generated.TestDuration_hoursf(&params)
+    public static func hoursf(_ count: Double) throws -> Duration {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(F64Marshaller.toCpp(count))
+        var ret = djinni_generated.TestDuration_hoursf(&_params)
         try handleCppErrors(&ret)
-        return DurationMarshaller<F64Marshaller, DurationH>.fromCpp(ret)
+        return TestSuite.DurationMarshaller<F64Marshaller, TestSuite.DurationH>.fromCpp(ret)
     }
-    static func minutesf(_ count: Double) throws -> Duration {
-        var params = djinni.swift.ParameterList()
-        params.addValue(F64Marshaller.toCpp(count))
-        var ret = djinni_generated.TestDuration_minutesf(&params)
+    public static func minutesf(_ count: Double) throws -> Duration {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(F64Marshaller.toCpp(count))
+        var ret = djinni_generated.TestDuration_minutesf(&_params)
         try handleCppErrors(&ret)
-        return DurationMarshaller<F64Marshaller, DurationMin>.fromCpp(ret)
+        return TestSuite.DurationMarshaller<F64Marshaller, TestSuite.DurationMin>.fromCpp(ret)
     }
-    static func secondsf(_ count: Double) throws -> Duration {
-        var params = djinni.swift.ParameterList()
-        params.addValue(F64Marshaller.toCpp(count))
-        var ret = djinni_generated.TestDuration_secondsf(&params)
+    public static func secondsf(_ count: Double) throws -> Duration {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(F64Marshaller.toCpp(count))
+        var ret = djinni_generated.TestDuration_secondsf(&_params)
         try handleCppErrors(&ret)
-        return DurationMarshaller<F64Marshaller, DurationS>.fromCpp(ret)
+        return TestSuite.DurationMarshaller<F64Marshaller, TestSuite.DurationS>.fromCpp(ret)
     }
-    static func millisf(_ count: Double) throws -> Duration {
-        var params = djinni.swift.ParameterList()
-        params.addValue(F64Marshaller.toCpp(count))
-        var ret = djinni_generated.TestDuration_millisf(&params)
+    public static func millisf(_ count: Double) throws -> Duration {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(F64Marshaller.toCpp(count))
+        var ret = djinni_generated.TestDuration_millisf(&_params)
         try handleCppErrors(&ret)
-        return DurationMarshaller<F64Marshaller, DurationMs>.fromCpp(ret)
+        return TestSuite.DurationMarshaller<F64Marshaller, TestSuite.DurationMs>.fromCpp(ret)
     }
-    static func microsf(_ count: Double) throws -> Duration {
-        var params = djinni.swift.ParameterList()
-        params.addValue(F64Marshaller.toCpp(count))
-        var ret = djinni_generated.TestDuration_microsf(&params)
+    public static func microsf(_ count: Double) throws -> Duration {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(F64Marshaller.toCpp(count))
+        var ret = djinni_generated.TestDuration_microsf(&_params)
         try handleCppErrors(&ret)
-        return DurationMarshaller<F64Marshaller, DurationUs>.fromCpp(ret)
+        return TestSuite.DurationMarshaller<F64Marshaller, TestSuite.DurationUs>.fromCpp(ret)
     }
-    static func nanosf(_ count: Double) throws -> Duration {
-        var params = djinni.swift.ParameterList()
-        params.addValue(F64Marshaller.toCpp(count))
-        var ret = djinni_generated.TestDuration_nanosf(&params)
+    public static func nanosf(_ count: Double) throws -> Duration {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(F64Marshaller.toCpp(count))
+        var ret = djinni_generated.TestDuration_nanosf(&_params)
         try handleCppErrors(&ret)
-        return DurationMarshaller<F64Marshaller, DurationNs>.fromCpp(ret)
+        return TestSuite.DurationMarshaller<F64Marshaller, TestSuite.DurationNs>.fromCpp(ret)
     }
-    static func box(_ count: Int64) throws -> Optional<Duration> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(I64Marshaller.toCpp(count))
-        var ret = djinni_generated.TestDuration_box(&params)
+    public static func box(_ count: Int64) throws -> Optional<Duration> {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(I64Marshaller.toCpp(count))
+        var ret = djinni_generated.TestDuration_box(&_params)
         try handleCppErrors(&ret)
-        return OptionalMarshaller<DurationMarshaller<I64Marshaller, DurationS>>.fromCpp(ret)
+        return OptionalMarshaller<TestSuite.DurationMarshaller<I64Marshaller, TestSuite.DurationS>>.fromCpp(ret)
     }
-    static func unbox(_ dt: Optional<Duration>) throws -> Int64 {
-        var params = djinni.swift.ParameterList()
-        params.addValue(OptionalMarshaller<DurationMarshaller<I64Marshaller, DurationS>>.toCpp(dt))
-        var ret = djinni_generated.TestDuration_unbox(&params)
+    public static func unbox(_ dt: Optional<Duration>) throws -> Int64 {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(OptionalMarshaller<TestSuite.DurationMarshaller<I64Marshaller, TestSuite.DurationS>>.toCpp(dt))
+        var ret = djinni_generated.TestDuration_unbox(&_params)
         try handleCppErrors(&ret)
         return I64Marshaller.fromCpp(ret)
     }

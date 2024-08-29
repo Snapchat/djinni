@@ -10,52 +10,52 @@ import TestSuiteCxx
 final class EnumUsageInterfaceCppProxy: DjinniSupport.CppProxy, TestSuite.EnumUsageInterface {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
     func e(_ e: TestSuite.Color) throws -> TestSuite.Color {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(ColorMarshaller.toCpp(e))
-        var ret = djinni_generated.EnumUsageInterface_e(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(ColorMarshaller.toCpp(e))
+        var ret = djinni_generated.EnumUsageInterface_e(&_params)
         try handleCppErrors(&ret)
         return ColorMarshaller.fromCpp(ret)
     }
     func o(_ o: Optional<TestSuite.Color>) throws -> Optional<TestSuite.Color> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(OptionalMarshaller<ColorMarshaller>.toCpp(o))
-        var ret = djinni_generated.EnumUsageInterface_o(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(OptionalMarshaller<ColorMarshaller>.toCpp(o))
+        var ret = djinni_generated.EnumUsageInterface_o(&_params)
         try handleCppErrors(&ret)
         return OptionalMarshaller<ColorMarshaller>.fromCpp(ret)
     }
     func l(_ l: Array<TestSuite.Color>) throws -> Array<TestSuite.Color> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(ListMarshaller<ColorMarshaller>.toCpp(l))
-        var ret = djinni_generated.EnumUsageInterface_l(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(ListMarshaller<ColorMarshaller>.toCpp(l))
+        var ret = djinni_generated.EnumUsageInterface_l(&_params)
         try handleCppErrors(&ret)
         return ListMarshaller<ColorMarshaller>.fromCpp(ret)
     }
     func s(_ s: Set<TestSuite.Color>) throws -> Set<TestSuite.Color> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(SetMarshaller<ColorMarshaller>.toCpp(s))
-        var ret = djinni_generated.EnumUsageInterface_s(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(SetMarshaller<ColorMarshaller>.toCpp(s))
+        var ret = djinni_generated.EnumUsageInterface_s(&_params)
         try handleCppErrors(&ret)
         return SetMarshaller<ColorMarshaller>.fromCpp(ret)
     }
     func m(_ m: Dictionary<TestSuite.Color, TestSuite.Color>) throws -> Dictionary<TestSuite.Color, TestSuite.Color> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(MapMarshaller<ColorMarshaller, ColorMarshaller>.toCpp(m))
-        var ret = djinni_generated.EnumUsageInterface_m(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(MapMarshaller<ColorMarshaller, ColorMarshaller>.toCpp(m))
+        var ret = djinni_generated.EnumUsageInterface_m(&_params)
         try handleCppErrors(&ret)
         return MapMarshaller<ColorMarshaller, ColorMarshaller>.fromCpp(ret)
     }
 }
-enum EnumUsageInterfaceMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.EnumUsageInterface
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum EnumUsageInterfaceMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.EnumUsageInterface
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { EnumUsageInterfaceCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }

@@ -16,33 +16,33 @@ import TestSuiteCxx
 final class ListenerCallerCppProxy: DjinniSupport.CppProxy, TestSuite.ListenerCaller {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
     func callFirst() throws -> Void {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        var ret = djinni_generated.ListenerCaller_callFirst(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        var ret = djinni_generated.ListenerCaller_callFirst(&_params)
         try handleCppErrors(&ret)
     }
     func callSecond() throws -> Void {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        var ret = djinni_generated.ListenerCaller_callSecond(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        var ret = djinni_generated.ListenerCaller_callSecond(&_params)
         try handleCppErrors(&ret)
     }
 }
-enum ListenerCallerMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.ListenerCaller
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ListenerCallerMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.ListenerCaller
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { ListenerCallerCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }
 public class ListenerCaller_statics {
-    static func _init(_ firstL: TestSuite.FirstListener, secondL: TestSuite.SecondListener) throws -> TestSuite.ListenerCaller {
-        var params = djinni.swift.ParameterList()
-        params.addValue(FirstListenerMarshaller.toCpp(firstL))
-        params.addValue(SecondListenerMarshaller.toCpp(secondL))
-        var ret = djinni_generated.ListenerCaller_init(&params)
+    public static func _init(_ firstL: TestSuite.FirstListener, secondL: TestSuite.SecondListener) throws -> TestSuite.ListenerCaller {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(FirstListenerMarshaller.toCpp(firstL))
+        _params.addValue(SecondListenerMarshaller.toCpp(secondL))
+        var ret = djinni_generated.ListenerCaller_init(&_params)
         try handleCppErrors(&ret)
         return ListenerCallerMarshaller.fromCpp(ret)
     }

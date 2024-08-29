@@ -10,65 +10,65 @@ import TestSuiteCxx
 final class TestOutcomeCppProxy: DjinniSupport.CppProxy, TestSuite.TestOutcome {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
 }
-enum TestOutcomeMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.TestOutcome
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum TestOutcomeMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.TestOutcome
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { TestOutcomeCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }
 public class TestOutcome_statics {
-    static func getSuccessOutcome() throws -> Result<String, Int32> {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestOutcome_getSuccessOutcome(&params)
+    public static func getSuccessOutcome() throws -> Result<String, Int32> {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestOutcome_getSuccessOutcome(&_params)
         try handleCppErrors(&ret)
-        return OutcomeMarshaller<StringMarshaller, I32Marshaller>.fromCpp(ret)
+        return DjinniSupport.OutcomeMarshaller<StringMarshaller, I32Marshaller>.fromCpp(ret)
     }
-    static func getErrorOutcome() throws -> Result<String, Int32> {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestOutcome_getErrorOutcome(&params)
+    public static func getErrorOutcome() throws -> Result<String, Int32> {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestOutcome_getErrorOutcome(&_params)
         try handleCppErrors(&ret)
-        return OutcomeMarshaller<StringMarshaller, I32Marshaller>.fromCpp(ret)
+        return DjinniSupport.OutcomeMarshaller<StringMarshaller, I32Marshaller>.fromCpp(ret)
     }
-    static func putSuccessOutcome(_ x: Result<String, Int32>) throws -> String {
-        var params = djinni.swift.ParameterList()
-        params.addValue(OutcomeMarshaller<StringMarshaller, I32Marshaller>.toCpp(x))
-        var ret = djinni_generated.TestOutcome_putSuccessOutcome(&params)
+    public static func putSuccessOutcome(_ x: Result<String, Int32>) throws -> String {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(DjinniSupport.OutcomeMarshaller<StringMarshaller, I32Marshaller>.toCpp(x))
+        var ret = djinni_generated.TestOutcome_putSuccessOutcome(&_params)
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }
-    static func putErrorOutcome(_ x: Result<String, Int32>) throws -> Int32 {
-        var params = djinni.swift.ParameterList()
-        params.addValue(OutcomeMarshaller<StringMarshaller, I32Marshaller>.toCpp(x))
-        var ret = djinni_generated.TestOutcome_putErrorOutcome(&params)
+    public static func putErrorOutcome(_ x: Result<String, Int32>) throws -> Int32 {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(DjinniSupport.OutcomeMarshaller<StringMarshaller, I32Marshaller>.toCpp(x))
+        var ret = djinni_generated.TestOutcome_putErrorOutcome(&_params)
         try handleCppErrors(&ret)
         return I32Marshaller.fromCpp(ret)
     }
-    static func getNestedSuccessOutcome() throws -> TestSuite.NestedOutcome {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestOutcome_getNestedSuccessOutcome(&params)
+    public static func getNestedSuccessOutcome() throws -> TestSuite.NestedOutcome {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestOutcome_getNestedSuccessOutcome(&_params)
         try handleCppErrors(&ret)
         return NestedOutcomeMarshaller.fromCpp(ret)
     }
-    static func getNestedErrorOutcome() throws -> TestSuite.NestedOutcome {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestOutcome_getNestedErrorOutcome(&params)
+    public static func getNestedErrorOutcome() throws -> TestSuite.NestedOutcome {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestOutcome_getNestedErrorOutcome(&_params)
         try handleCppErrors(&ret)
         return NestedOutcomeMarshaller.fromCpp(ret)
     }
-    static func putNestedSuccessOutcome(_ x: TestSuite.NestedOutcome) throws -> Int32 {
-        var params = djinni.swift.ParameterList()
-        params.addValue(NestedOutcomeMarshaller.toCpp(x))
-        var ret = djinni_generated.TestOutcome_putNestedSuccessOutcome(&params)
+    public static func putNestedSuccessOutcome(_ x: TestSuite.NestedOutcome) throws -> Int32 {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(NestedOutcomeMarshaller.toCpp(x))
+        var ret = djinni_generated.TestOutcome_putNestedSuccessOutcome(&_params)
         try handleCppErrors(&ret)
         return I32Marshaller.fromCpp(ret)
     }
-    static func putNestedErrorOutcome(_ x: TestSuite.NestedOutcome) throws -> String {
-        var params = djinni.swift.ParameterList()
-        params.addValue(NestedOutcomeMarshaller.toCpp(x))
-        var ret = djinni_generated.TestOutcome_putNestedErrorOutcome(&params)
+    public static func putNestedErrorOutcome(_ x: TestSuite.NestedOutcome) throws -> String {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(NestedOutcomeMarshaller.toCpp(x))
+        var ret = djinni_generated.TestOutcome_putNestedErrorOutcome(&_params)
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }

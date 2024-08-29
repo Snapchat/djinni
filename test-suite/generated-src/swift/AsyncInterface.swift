@@ -5,5 +5,5 @@ import DjinniSupport
 import Foundation
 
 public protocol AsyncInterface: AnyObject {
-    func futureRoundtrip(_ f: DJFuture<Int32>) throws -> DJFuture<String>
+    func futureRoundtrip(_ f: DjinniSupport.DJFuture<Int32>) throws -> DjinniSupport.DJFuture<String>
 }

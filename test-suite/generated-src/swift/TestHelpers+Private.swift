@@ -15,267 +15,267 @@ import TestSuiteCxx
 final class TestHelpersCppProxy: DjinniSupport.CppProxy, TestSuite.TestHelpers {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
 }
-enum TestHelpersMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.TestHelpers
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum TestHelpersMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.TestHelpers
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { TestHelpersCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }
 public class TestHelpers_statics {
-    static func getSetRecord() throws -> TestSuite.SetRecord {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestHelpers_getSetRecord(&params)
+    public static func getSetRecord() throws -> TestSuite.SetRecord {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestHelpers_getSetRecord(&_params)
         try handleCppErrors(&ret)
         return SetRecordMarshaller.fromCpp(ret)
     }
-    static func checkSetRecord(_ rec: TestSuite.SetRecord) throws -> Bool {
-        var params = djinni.swift.ParameterList()
-        params.addValue(SetRecordMarshaller.toCpp(rec))
-        var ret = djinni_generated.TestHelpers_checkSetRecord(&params)
+    public static func checkSetRecord(_ rec: TestSuite.SetRecord) throws -> Bool {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(SetRecordMarshaller.toCpp(rec))
+        var ret = djinni_generated.TestHelpers_checkSetRecord(&_params)
         try handleCppErrors(&ret)
         return BoolMarshaller.fromCpp(ret)
     }
-    static func getPrimitiveList() throws -> TestSuite.PrimitiveList {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestHelpers_getPrimitiveList(&params)
+    public static func getPrimitiveList() throws -> TestSuite.PrimitiveList {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestHelpers_getPrimitiveList(&_params)
         try handleCppErrors(&ret)
         return PrimitiveListMarshaller.fromCpp(ret)
     }
-    static func checkPrimitiveList(_ pl: TestSuite.PrimitiveList) throws -> Bool {
-        var params = djinni.swift.ParameterList()
-        params.addValue(PrimitiveListMarshaller.toCpp(pl))
-        var ret = djinni_generated.TestHelpers_checkPrimitiveList(&params)
+    public static func checkPrimitiveList(_ pl: TestSuite.PrimitiveList) throws -> Bool {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(PrimitiveListMarshaller.toCpp(pl))
+        var ret = djinni_generated.TestHelpers_checkPrimitiveList(&_params)
         try handleCppErrors(&ret)
         return BoolMarshaller.fromCpp(ret)
     }
-    static func getNestedCollection() throws -> TestSuite.NestedCollection {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestHelpers_getNestedCollection(&params)
+    public static func getNestedCollection() throws -> TestSuite.NestedCollection {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestHelpers_getNestedCollection(&_params)
         try handleCppErrors(&ret)
         return NestedCollectionMarshaller.fromCpp(ret)
     }
-    static func checkNestedCollection(_ nc: TestSuite.NestedCollection) throws -> Bool {
-        var params = djinni.swift.ParameterList()
-        params.addValue(NestedCollectionMarshaller.toCpp(nc))
-        var ret = djinni_generated.TestHelpers_checkNestedCollection(&params)
+    public static func checkNestedCollection(_ nc: TestSuite.NestedCollection) throws -> Bool {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(NestedCollectionMarshaller.toCpp(nc))
+        var ret = djinni_generated.TestHelpers_checkNestedCollection(&_params)
         try handleCppErrors(&ret)
         return BoolMarshaller.fromCpp(ret)
     }
-    static func getMap() throws -> Dictionary<String, Int64> {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestHelpers_getMap(&params)
+    public static func getMap() throws -> Dictionary<String, Int64> {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestHelpers_getMap(&_params)
         try handleCppErrors(&ret)
         return MapMarshaller<StringMarshaller, I64Marshaller>.fromCpp(ret)
     }
-    static func checkMap(_ m: Dictionary<String, Int64>) throws -> Bool {
-        var params = djinni.swift.ParameterList()
-        params.addValue(MapMarshaller<StringMarshaller, I64Marshaller>.toCpp(m))
-        var ret = djinni_generated.TestHelpers_checkMap(&params)
+    public static func checkMap(_ m: Dictionary<String, Int64>) throws -> Bool {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(MapMarshaller<StringMarshaller, I64Marshaller>.toCpp(m))
+        var ret = djinni_generated.TestHelpers_checkMap(&_params)
         try handleCppErrors(&ret)
         return BoolMarshaller.fromCpp(ret)
     }
-    static func getEmptyMap() throws -> Dictionary<String, Int64> {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestHelpers_getEmptyMap(&params)
+    public static func getEmptyMap() throws -> Dictionary<String, Int64> {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestHelpers_getEmptyMap(&_params)
         try handleCppErrors(&ret)
         return MapMarshaller<StringMarshaller, I64Marshaller>.fromCpp(ret)
     }
-    static func checkEmptyMap(_ m: Dictionary<String, Int64>) throws -> Bool {
-        var params = djinni.swift.ParameterList()
-        params.addValue(MapMarshaller<StringMarshaller, I64Marshaller>.toCpp(m))
-        var ret = djinni_generated.TestHelpers_checkEmptyMap(&params)
+    public static func checkEmptyMap(_ m: Dictionary<String, Int64>) throws -> Bool {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(MapMarshaller<StringMarshaller, I64Marshaller>.toCpp(m))
+        var ret = djinni_generated.TestHelpers_checkEmptyMap(&_params)
         try handleCppErrors(&ret)
         return BoolMarshaller.fromCpp(ret)
     }
-    static func getMapListRecord() throws -> TestSuite.MapListRecord {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestHelpers_getMapListRecord(&params)
+    public static func getMapListRecord() throws -> TestSuite.MapListRecord {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestHelpers_getMapListRecord(&_params)
         try handleCppErrors(&ret)
         return MapListRecordMarshaller.fromCpp(ret)
     }
-    static func checkMapListRecord(_ m: TestSuite.MapListRecord) throws -> Bool {
-        var params = djinni.swift.ParameterList()
-        params.addValue(MapListRecordMarshaller.toCpp(m))
-        var ret = djinni_generated.TestHelpers_checkMapListRecord(&params)
+    public static func checkMapListRecord(_ m: TestSuite.MapListRecord) throws -> Bool {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(MapListRecordMarshaller.toCpp(m))
+        var ret = djinni_generated.TestHelpers_checkMapListRecord(&_params)
         try handleCppErrors(&ret)
         return BoolMarshaller.fromCpp(ret)
     }
-    static func checkClientInterfaceAscii(_ i: TestSuite.ClientInterface) throws -> Void {
-        var params = djinni.swift.ParameterList()
-        params.addValue(ClientInterfaceMarshaller.toCpp(i))
-        var ret = djinni_generated.TestHelpers_checkClientInterfaceAscii(&params)
+    public static func checkClientInterfaceAscii(_ i: TestSuite.ClientInterface) throws -> Void {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(ClientInterfaceMarshaller.toCpp(i))
+        var ret = djinni_generated.TestHelpers_checkClientInterfaceAscii(&_params)
         try handleCppErrors(&ret)
     }
-    static func checkClientInterfaceNonascii(_ i: TestSuite.ClientInterface) throws -> Void {
-        var params = djinni.swift.ParameterList()
-        params.addValue(ClientInterfaceMarshaller.toCpp(i))
-        var ret = djinni_generated.TestHelpers_checkClientInterfaceNonascii(&params)
+    public static func checkClientInterfaceNonascii(_ i: TestSuite.ClientInterface) throws -> Void {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(ClientInterfaceMarshaller.toCpp(i))
+        var ret = djinni_generated.TestHelpers_checkClientInterfaceNonascii(&_params)
         try handleCppErrors(&ret)
     }
-    static func checkClientInterfaceArgs(_ i: TestSuite.ClientInterface) throws -> Void {
-        var params = djinni.swift.ParameterList()
-        params.addValue(ClientInterfaceMarshaller.toCpp(i))
-        var ret = djinni_generated.TestHelpers_checkClientInterfaceArgs(&params)
+    public static func checkClientInterfaceArgs(_ i: TestSuite.ClientInterface) throws -> Void {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(ClientInterfaceMarshaller.toCpp(i))
+        var ret = djinni_generated.TestHelpers_checkClientInterfaceArgs(&_params)
         try handleCppErrors(&ret)
     }
-    static func checkEnumMap(_ m: Dictionary<TestSuite.Color, String>) throws -> Void {
-        var params = djinni.swift.ParameterList()
-        params.addValue(MapMarshaller<ColorMarshaller, StringMarshaller>.toCpp(m))
-        var ret = djinni_generated.TestHelpers_checkEnumMap(&params)
+    public static func checkEnumMap(_ m: Dictionary<TestSuite.Color, String>) throws -> Void {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(MapMarshaller<ColorMarshaller, StringMarshaller>.toCpp(m))
+        var ret = djinni_generated.TestHelpers_checkEnumMap(&_params)
         try handleCppErrors(&ret)
     }
-    static func checkEnum(_ c: TestSuite.Color) throws -> Void {
-        var params = djinni.swift.ParameterList()
-        params.addValue(ColorMarshaller.toCpp(c))
-        var ret = djinni_generated.TestHelpers_checkEnum(&params)
+    public static func checkEnum(_ c: TestSuite.Color) throws -> Void {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(ColorMarshaller.toCpp(c))
+        var ret = djinni_generated.TestHelpers_checkEnum(&_params)
         try handleCppErrors(&ret)
     }
-    static func tokenId(_ t: Optional<TestSuite.UserToken>) throws -> Optional<TestSuite.UserToken> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(OptionalMarshaller<UserTokenMarshaller>.toCpp(t))
-        var ret = djinni_generated.TestHelpers_tokenId(&params)
+    public static func tokenId(_ t: Optional<TestSuite.UserToken>) throws -> Optional<TestSuite.UserToken> {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(OptionalMarshaller<UserTokenMarshaller>.toCpp(t))
+        var ret = djinni_generated.TestHelpers_tokenId(&_params)
         try handleCppErrors(&ret)
         return OptionalMarshaller<UserTokenMarshaller>.fromCpp(ret)
     }
-    static func createCppToken() throws -> TestSuite.UserToken {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestHelpers_createCppToken(&params)
+    public static func createCppToken() throws -> TestSuite.UserToken {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestHelpers_createCppToken(&_params)
         try handleCppErrors(&ret)
         return UserTokenMarshaller.fromCpp(ret)
     }
-    static func checkCppToken(_ t: TestSuite.UserToken) throws -> Void {
-        var params = djinni.swift.ParameterList()
-        params.addValue(UserTokenMarshaller.toCpp(t))
-        var ret = djinni_generated.TestHelpers_checkCppToken(&params)
+    public static func checkCppToken(_ t: TestSuite.UserToken) throws -> Void {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(UserTokenMarshaller.toCpp(t))
+        var ret = djinni_generated.TestHelpers_checkCppToken(&_params)
         try handleCppErrors(&ret)
     }
-    static func cppTokenId(_ t: TestSuite.UserToken) throws -> Int64 {
-        var params = djinni.swift.ParameterList()
-        params.addValue(UserTokenMarshaller.toCpp(t))
-        var ret = djinni_generated.TestHelpers_cppTokenId(&params)
+    public static func cppTokenId(_ t: TestSuite.UserToken) throws -> Int64 {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(UserTokenMarshaller.toCpp(t))
+        var ret = djinni_generated.TestHelpers_cppTokenId(&_params)
         try handleCppErrors(&ret)
         return I64Marshaller.fromCpp(ret)
     }
-    static func checkTokenType(_ t: TestSuite.UserToken, type: String) throws -> Void {
-        var params = djinni.swift.ParameterList()
-        params.addValue(UserTokenMarshaller.toCpp(t))
-        params.addValue(StringMarshaller.toCpp(type))
-        var ret = djinni_generated.TestHelpers_checkTokenType(&params)
+    public static func checkTokenType(_ t: TestSuite.UserToken, type: String) throws -> Void {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(UserTokenMarshaller.toCpp(t))
+        _params.addValue(StringMarshaller.toCpp(type))
+        var ret = djinni_generated.TestHelpers_checkTokenType(&_params)
         try handleCppErrors(&ret)
     }
-    static func returnNone() throws -> Optional<Int32> {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestHelpers_returnNone(&params)
+    public static func returnNone() throws -> Optional<Int32> {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestHelpers_returnNone(&_params)
         try handleCppErrors(&ret)
         return OptionalMarshaller<I32Marshaller>.fromCpp(ret)
     }
-    static func assortedPrimitivesId(_ i: TestSuite.AssortedPrimitives) throws -> TestSuite.AssortedPrimitives {
-        var params = djinni.swift.ParameterList()
-        params.addValue(AssortedPrimitivesMarshaller.toCpp(i))
-        var ret = djinni_generated.TestHelpers_assortedPrimitivesId(&params)
+    public static func assortedPrimitivesId(_ i: TestSuite.AssortedPrimitives) throws -> TestSuite.AssortedPrimitives {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(AssortedPrimitivesMarshaller.toCpp(i))
+        var ret = djinni_generated.TestHelpers_assortedPrimitivesId(&_params)
         try handleCppErrors(&ret)
         return AssortedPrimitivesMarshaller.fromCpp(ret)
     }
-    static func idBinary(_ b: Data) throws -> Data {
-        var params = djinni.swift.ParameterList()
-        params.addValue(BinaryMarshaller.toCpp(b))
-        var ret = djinni_generated.TestHelpers_idBinary(&params)
+    public static func idBinary(_ b: Data) throws -> Data {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(BinaryMarshaller.toCpp(b))
+        var ret = djinni_generated.TestHelpers_idBinary(&_params)
         try handleCppErrors(&ret)
         return BinaryMarshaller.fromCpp(ret)
     }
-    static func getAsyncResult() throws -> DJFuture<Int32> {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestHelpers_getAsyncResult(&params)
+    public static func getAsyncResult() throws -> DjinniSupport.DJFuture<Int32> {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestHelpers_getAsyncResult(&_params)
         try handleCppErrors(&ret)
-        return FutureMarshaller<I32Marshaller>.fromCpp(ret)
+        return DjinniSupport.FutureMarshaller<I32Marshaller>.fromCpp(ret)
     }
-    static func futureRoundtrip(_ f: DJFuture<Int32>) throws -> DJFuture<String> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(FutureMarshaller<I32Marshaller>.toCpp(f))
-        var ret = djinni_generated.TestHelpers_futureRoundtrip(&params)
+    public static func futureRoundtrip(_ f: DjinniSupport.DJFuture<Int32>) throws -> DjinniSupport.DJFuture<String> {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(DjinniSupport.FutureMarshaller<I32Marshaller>.toCpp(f))
+        var ret = djinni_generated.TestHelpers_futureRoundtrip(&_params)
         try handleCppErrors(&ret)
-        return FutureMarshaller<StringMarshaller>.fromCpp(ret)
+        return DjinniSupport.FutureMarshaller<StringMarshaller>.fromCpp(ret)
     }
-    static func asyncEarlyThrow() throws -> DJFuture<Int32> {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestHelpers_asyncEarlyThrow(&params)
+    public static func asyncEarlyThrow() throws -> DjinniSupport.DJFuture<Int32> {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestHelpers_asyncEarlyThrow(&_params)
         try handleCppErrors(&ret)
-        return FutureMarshaller<I32Marshaller>.fromCpp(ret)
+        return DjinniSupport.FutureMarshaller<I32Marshaller>.fromCpp(ret)
     }
-    static func voidAsyncMethod(_ f: DJFuture<Void>) throws -> DJFuture<Void> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(FutureMarshaller<Void_Marshaller>.toCpp(f))
-        var ret = djinni_generated.TestHelpers_voidAsyncMethod(&params)
+    public static func voidAsyncMethod(_ f: DjinniSupport.DJFuture<Void>) throws -> DjinniSupport.DJFuture<Void> {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(DjinniSupport.FutureMarshaller<Void_Marshaller>.toCpp(f))
+        var ret = djinni_generated.TestHelpers_voidAsyncMethod(&_params)
         try handleCppErrors(&ret)
-        return FutureMarshaller<Void_Marshaller>.fromCpp(ret)
+        return DjinniSupport.FutureMarshaller<Void_Marshaller>.fromCpp(ret)
     }
-    static func addOneIfPresent(_ f: DJFuture<Optional<Int32>>) throws -> DJFuture<Optional<Int32>> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(FutureMarshaller<OptionalMarshaller<I32Marshaller>>.toCpp(f))
-        var ret = djinni_generated.TestHelpers_addOneIfPresent(&params)
+    public static func addOneIfPresent(_ f: DjinniSupport.DJFuture<Optional<Int32>>) throws -> DjinniSupport.DJFuture<Optional<Int32>> {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(DjinniSupport.FutureMarshaller<OptionalMarshaller<I32Marshaller>>.toCpp(f))
+        var ret = djinni_generated.TestHelpers_addOneIfPresent(&_params)
         try handleCppErrors(&ret)
-        return FutureMarshaller<OptionalMarshaller<I32Marshaller>>.fromCpp(ret)
+        return DjinniSupport.FutureMarshaller<OptionalMarshaller<I32Marshaller>>.fromCpp(ret)
     }
-    static func returnExceptionString(_ f: DJFuture<Int32>) throws -> DJFuture<String> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(FutureMarshaller<I32Marshaller>.toCpp(f))
-        var ret = djinni_generated.TestHelpers_returnExceptionString(&params)
+    public static func returnExceptionString(_ f: DjinniSupport.DJFuture<Int32>) throws -> DjinniSupport.DJFuture<String> {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(DjinniSupport.FutureMarshaller<I32Marshaller>.toCpp(f))
+        var ret = djinni_generated.TestHelpers_returnExceptionString(&_params)
         try handleCppErrors(&ret)
-        return FutureMarshaller<StringMarshaller>.fromCpp(ret)
+        return DjinniSupport.FutureMarshaller<StringMarshaller>.fromCpp(ret)
     }
-    static func checkAsyncInterface(_ i: TestSuite.AsyncInterface) throws -> DJFuture<String> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(AsyncInterfaceMarshaller.toCpp(i))
-        var ret = djinni_generated.TestHelpers_checkAsyncInterface(&params)
+    public static func checkAsyncInterface(_ i: TestSuite.AsyncInterface) throws -> DjinniSupport.DJFuture<String> {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(AsyncInterfaceMarshaller.toCpp(i))
+        var ret = djinni_generated.TestHelpers_checkAsyncInterface(&_params)
         try handleCppErrors(&ret)
-        return FutureMarshaller<StringMarshaller>.fromCpp(ret)
+        return DjinniSupport.FutureMarshaller<StringMarshaller>.fromCpp(ret)
     }
-    static func checkAsyncComposition(_ i: TestSuite.AsyncInterface) throws -> DJFuture<String> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(AsyncInterfaceMarshaller.toCpp(i))
-        var ret = djinni_generated.TestHelpers_checkAsyncComposition(&params)
+    public static func checkAsyncComposition(_ i: TestSuite.AsyncInterface) throws -> DjinniSupport.DJFuture<String> {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(AsyncInterfaceMarshaller.toCpp(i))
+        var ret = djinni_generated.TestHelpers_checkAsyncComposition(&_params)
         try handleCppErrors(&ret)
-        return FutureMarshaller<StringMarshaller>.fromCpp(ret)
+        return DjinniSupport.FutureMarshaller<StringMarshaller>.fromCpp(ret)
     }
-    static func getOptionalList() throws -> Array<Optional<String>> {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestHelpers_getOptionalList(&params)
+    public static func getOptionalList() throws -> Array<Optional<String>> {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestHelpers_getOptionalList(&_params)
         try handleCppErrors(&ret)
         return ListMarshaller<OptionalMarshaller<StringMarshaller>>.fromCpp(ret)
     }
-    static func checkOptionalList(_ ol: Array<Optional<String>>) throws -> Bool {
-        var params = djinni.swift.ParameterList()
-        params.addValue(ListMarshaller<OptionalMarshaller<StringMarshaller>>.toCpp(ol))
-        var ret = djinni_generated.TestHelpers_checkOptionalList(&params)
+    public static func checkOptionalList(_ ol: Array<Optional<String>>) throws -> Bool {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(ListMarshaller<OptionalMarshaller<StringMarshaller>>.toCpp(ol))
+        var ret = djinni_generated.TestHelpers_checkOptionalList(&_params)
         try handleCppErrors(&ret)
         return BoolMarshaller.fromCpp(ret)
     }
-    static func getOptionalSet() throws -> Set<Optional<String>> {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestHelpers_getOptionalSet(&params)
+    public static func getOptionalSet() throws -> Set<Optional<String>> {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestHelpers_getOptionalSet(&_params)
         try handleCppErrors(&ret)
         return SetMarshaller<OptionalMarshaller<StringMarshaller>>.fromCpp(ret)
     }
-    static func checkOptionalSet(_ os: Set<Optional<String>>) throws -> Bool {
-        var params = djinni.swift.ParameterList()
-        params.addValue(SetMarshaller<OptionalMarshaller<StringMarshaller>>.toCpp(os))
-        var ret = djinni_generated.TestHelpers_checkOptionalSet(&params)
+    public static func checkOptionalSet(_ os: Set<Optional<String>>) throws -> Bool {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(SetMarshaller<OptionalMarshaller<StringMarshaller>>.toCpp(os))
+        var ret = djinni_generated.TestHelpers_checkOptionalSet(&_params)
         try handleCppErrors(&ret)
         return BoolMarshaller.fromCpp(ret)
     }
-    static func getOptionalMap() throws -> Dictionary<Optional<String>, Optional<String>> {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestHelpers_getOptionalMap(&params)
+    public static func getOptionalMap() throws -> Dictionary<Optional<String>, Optional<String>> {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestHelpers_getOptionalMap(&_params)
         try handleCppErrors(&ret)
         return MapMarshaller<OptionalMarshaller<StringMarshaller>, OptionalMarshaller<StringMarshaller>>.fromCpp(ret)
     }
-    static func checkOptionalMap(_ om: Dictionary<Optional<String>, Optional<String>>) throws -> Bool {
-        var params = djinni.swift.ParameterList()
-        params.addValue(MapMarshaller<OptionalMarshaller<StringMarshaller>, OptionalMarshaller<StringMarshaller>>.toCpp(om))
-        var ret = djinni_generated.TestHelpers_checkOptionalMap(&params)
+    public static func checkOptionalMap(_ om: Dictionary<Optional<String>, Optional<String>>) throws -> Bool {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(MapMarshaller<OptionalMarshaller<StringMarshaller>, OptionalMarshaller<StringMarshaller>>.toCpp(om))
+        var ret = djinni_generated.TestHelpers_checkOptionalMap(&_params)
         try handleCppErrors(&ret)
         return BoolMarshaller.fromCpp(ret)
     }

@@ -4,5 +4,5 @@
 import Foundation
 
 public protocol ExternInterface2: AnyObject {
-    func foo(_ i: TestHelpers) throws -> TestSuite.ExternRecordWithDerivings
+    func foo(_ i: TestSuite.TestHelpers) throws -> TestSuite.ExternRecordWithDerivings
 }

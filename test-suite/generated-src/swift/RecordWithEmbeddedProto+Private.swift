@@ -8,15 +8,15 @@ import ProtobufTest
 import TestSuite
 import TestSuiteCxx
 
-enum RecordWithEmbeddedProtoMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.RecordWithEmbeddedProto
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum RecordWithEmbeddedProtoMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.RecordWithEmbeddedProto
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let person = ProtobufMarshaller<Djinni_Test_Person>.fromCpp(djinni.swift.getMember(p, 0))
             return SwiftType(person: person)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, ProtobufMarshaller<Djinni_Test_Person>.toCpp(s.person))
         return ret

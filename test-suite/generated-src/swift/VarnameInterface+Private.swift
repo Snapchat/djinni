@@ -10,28 +10,28 @@ import TestSuiteCxx
 final class VarnameInterfaceCppProxy: DjinniSupport.CppProxy, TestSuite.VarnameInterface {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
     func Rmethod(_ RArg: TestSuite.VarnameRecord) throws -> TestSuite.VarnameRecord {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(VarnameRecordMarshaller.toCpp(RArg))
-        var ret = djinni_generated.VarnameInterface_Rmethod(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(VarnameRecordMarshaller.toCpp(RArg))
+        var ret = djinni_generated.VarnameInterface_Rmethod(&_params)
         try handleCppErrors(&ret)
         return VarnameRecordMarshaller.fromCpp(ret)
     }
     func Imethod(_ IArg: TestSuite.VarnameInterface) throws -> TestSuite.VarnameInterface {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(VarnameInterfaceMarshaller.toCpp(IArg))
-        var ret = djinni_generated.VarnameInterface_Imethod(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(VarnameInterfaceMarshaller.toCpp(IArg))
+        var ret = djinni_generated.VarnameInterface_Imethod(&_params)
         try handleCppErrors(&ret)
         return VarnameInterfaceMarshaller.fromCpp(ret)
     }
 }
-enum VarnameInterfaceMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.VarnameInterface
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum VarnameInterfaceMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.VarnameInterface
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { VarnameInterfaceCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }

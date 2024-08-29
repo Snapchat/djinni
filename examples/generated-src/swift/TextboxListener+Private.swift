@@ -14,12 +14,12 @@ let textboxListenerMethods: Vtbl<TextboxListener> = [
     },
 ]
 
-enum TextboxListenerMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TextSort.TextboxListener
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum TextboxListenerMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TextSort.TextboxListener
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { fatalError("n/a") })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { djinni_generated.TextboxListenerSwiftProxy.make(ctxPtr(s, textboxListenerMethods), dispatcherProtocalCall)})
     }
 }

@@ -7,9 +7,9 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum AssortedPrimitivesMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.AssortedPrimitives
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum AssortedPrimitivesMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.AssortedPrimitives
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let b = BoolMarshaller.fromCpp(djinni.swift.getMember(p, 0))
             let eight = I8Marshaller.fromCpp(djinni.swift.getMember(p, 1))
@@ -28,7 +28,7 @@ enum AssortedPrimitivesMarshaller: DjinniSupport.Marshaller {
             return SwiftType(b: b, eight: eight, sixteen: sixteen, thirtytwo: thirtytwo, sixtyfour: sixtyfour, fthirtytwo: fthirtytwo, fsixtyfour: fsixtyfour, oB: oB, oEight: oEight, oSixteen: oSixteen, oThirtytwo: oThirtytwo, oSixtyfour: oSixtyfour, oFthirtytwo: oFthirtytwo, oFsixtyfour: oFsixtyfour)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, BoolMarshaller.toCpp(s.b))
         djinni.swift.addMember(&ret, I8Marshaller.toCpp(s.eight))

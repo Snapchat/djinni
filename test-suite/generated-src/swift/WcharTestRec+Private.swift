@@ -7,15 +7,15 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum WcharTestRecMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.WcharTestRec
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum WcharTestRecMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.WcharTestRec
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let s = StringMarshaller.fromCpp(djinni.swift.getMember(p, 0))
             return SwiftType(s: s)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, StringMarshaller.toCpp(s.s))
         return ret

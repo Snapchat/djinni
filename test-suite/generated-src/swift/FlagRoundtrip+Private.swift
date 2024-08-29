@@ -10,41 +10,41 @@ import TestSuiteCxx
 final class FlagRoundtripCppProxy: DjinniSupport.CppProxy, TestSuite.FlagRoundtrip {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
 }
-enum FlagRoundtripMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.FlagRoundtrip
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum FlagRoundtripMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.FlagRoundtrip
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { FlagRoundtripCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }
 public class FlagRoundtrip_statics {
-    static func roundtripAccess(_ flag: TestSuite.AccessFlags) throws -> TestSuite.AccessFlags {
-        var params = djinni.swift.ParameterList()
-        params.addValue(AccessFlagsMarshaller.toCpp(flag))
-        var ret = djinni_generated.FlagRoundtrip_roundtripAccess(&params)
+    public static func roundtripAccess(_ flag: TestSuite.AccessFlags) throws -> TestSuite.AccessFlags {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(AccessFlagsMarshaller.toCpp(flag))
+        var ret = djinni_generated.FlagRoundtrip_roundtripAccess(&_params)
         try handleCppErrors(&ret)
         return AccessFlagsMarshaller.fromCpp(ret)
     }
-    static func roundtripEmpty(_ flag: TestSuite.EmptyFlags) throws -> TestSuite.EmptyFlags {
-        var params = djinni.swift.ParameterList()
-        params.addValue(EmptyFlagsMarshaller.toCpp(flag))
-        var ret = djinni_generated.FlagRoundtrip_roundtripEmpty(&params)
+    public static func roundtripEmpty(_ flag: TestSuite.EmptyFlags) throws -> TestSuite.EmptyFlags {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(EmptyFlagsMarshaller.toCpp(flag))
+        var ret = djinni_generated.FlagRoundtrip_roundtripEmpty(&_params)
         try handleCppErrors(&ret)
         return EmptyFlagsMarshaller.fromCpp(ret)
     }
-    static func roundtripAccessBoxed(_ flag: Optional<TestSuite.AccessFlags>) throws -> Optional<TestSuite.AccessFlags> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(OptionalMarshaller<AccessFlagsMarshaller>.toCpp(flag))
-        var ret = djinni_generated.FlagRoundtrip_roundtripAccessBoxed(&params)
+    public static func roundtripAccessBoxed(_ flag: Optional<TestSuite.AccessFlags>) throws -> Optional<TestSuite.AccessFlags> {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(OptionalMarshaller<AccessFlagsMarshaller>.toCpp(flag))
+        var ret = djinni_generated.FlagRoundtrip_roundtripAccessBoxed(&_params)
         try handleCppErrors(&ret)
         return OptionalMarshaller<AccessFlagsMarshaller>.fromCpp(ret)
     }
-    static func roundtripEmptyBoxed(_ flag: Optional<TestSuite.EmptyFlags>) throws -> Optional<TestSuite.EmptyFlags> {
-        var params = djinni.swift.ParameterList()
-        params.addValue(OptionalMarshaller<EmptyFlagsMarshaller>.toCpp(flag))
-        var ret = djinni_generated.FlagRoundtrip_roundtripEmptyBoxed(&params)
+    public static func roundtripEmptyBoxed(_ flag: Optional<TestSuite.EmptyFlags>) throws -> Optional<TestSuite.EmptyFlags> {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(OptionalMarshaller<EmptyFlagsMarshaller>.toCpp(flag))
+        var ret = djinni_generated.FlagRoundtrip_roundtripEmptyBoxed(&_params)
         try handleCppErrors(&ret)
         return OptionalMarshaller<EmptyFlagsMarshaller>.fromCpp(ret)
     }

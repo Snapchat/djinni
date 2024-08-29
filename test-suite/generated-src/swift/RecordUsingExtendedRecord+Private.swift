@@ -7,15 +7,15 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum RecordUsingExtendedRecordMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.RecordUsingExtendedRecord
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum RecordUsingExtendedRecordMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.RecordUsingExtendedRecord
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let er = ExtendedRecordMarshaller.fromCpp(djinni.swift.getMember(p, 0))
             return SwiftType(er: er)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, ExtendedRecordMarshaller.toCpp(s.er))
         return ret

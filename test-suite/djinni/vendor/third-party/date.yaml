@@ -40,7 +40,7 @@ ts:
 swift:
   typename: 'Date'
   translator: 'DateMarshaller'
-  module: 'DjinniSupport'
+  translatorModule: 'TestSuite'
 swiftxx:
   translator: '::djinni::swift::Date'
   header: '"djinni_support.hpp"'

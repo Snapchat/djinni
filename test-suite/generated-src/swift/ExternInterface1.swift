@@ -4,6 +4,6 @@
 import Foundation
 
 public protocol ExternInterface1: AnyObject {
-    func foo(_ i: ClientInterface) throws -> ClientReturnedRecord
-    func bar(_ e: Color) throws -> Color
+    func foo(_ i: TestSuite.ClientInterface) throws -> TestSuite.ClientReturnedRecord
+    func bar(_ e: TestSuite.Color) throws -> TestSuite.Color
 }

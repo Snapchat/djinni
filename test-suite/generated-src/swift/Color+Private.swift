@@ -4,4 +4,4 @@
 import DjinniSupport
 import TestSuite
 
-typealias ColorMarshaller = DjinniSupport.EnumMarshaller<Color>
+public typealias ColorMarshaller = DjinniSupport.EnumMarshaller<Color>

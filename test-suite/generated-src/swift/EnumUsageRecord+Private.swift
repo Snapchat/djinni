@@ -7,9 +7,9 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum EnumUsageRecordMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.EnumUsageRecord
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum EnumUsageRecordMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.EnumUsageRecord
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let e = ColorMarshaller.fromCpp(djinni.swift.getMember(p, 0))
             let o = OptionalMarshaller<ColorMarshaller>.fromCpp(djinni.swift.getMember(p, 1))
@@ -19,7 +19,7 @@ enum EnumUsageRecordMarshaller: DjinniSupport.Marshaller {
             return SwiftType(e: e, o: o, l: l, s: s, m: m)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, ColorMarshaller.toCpp(s.e))
         djinni.swift.addMember(&ret, OptionalMarshaller<ColorMarshaller>.toCpp(s.o))

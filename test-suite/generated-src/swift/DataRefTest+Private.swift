@@ -9,77 +9,77 @@ import TestSuiteCxx
 
 final class DataRefTestCppProxy: DjinniSupport.CppProxy, TestSuite.DataRefTest {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
-    func sendData(_ data: NSData) throws -> Void {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(DataRefMarshaller.toCpp(data))
-        var ret = djinni_generated.DataRefTest_sendData(&params)
+    func sendData(_ data: Foundation.NSData) throws -> Void {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(DjinniSupport.DataRefMarshaller.toCpp(data))
+        var ret = djinni_generated.DataRefTest_sendData(&_params)
         try handleCppErrors(&ret)
     }
     func retriveAsBin() throws -> Data {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        var ret = djinni_generated.DataRefTest_retriveAsBin(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        var ret = djinni_generated.DataRefTest_retriveAsBin(&_params)
         try handleCppErrors(&ret)
         return BinaryMarshaller.fromCpp(ret)
     }
-    func sendMutableData(_ data: NSData) throws -> Void {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(DataRefMarshaller.toCpp(data))
-        var ret = djinni_generated.DataRefTest_sendMutableData(&params)
+    func sendMutableData(_ data: Foundation.NSData) throws -> Void {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(DjinniSupport.DataRefMarshaller.toCpp(data))
+        var ret = djinni_generated.DataRefTest_sendMutableData(&_params)
         try handleCppErrors(&ret)
     }
-    func generateData() throws -> NSData {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        var ret = djinni_generated.DataRefTest_generateData(&params)
+    func generateData() throws -> Foundation.NSData {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        var ret = djinni_generated.DataRefTest_generateData(&_params)
         try handleCppErrors(&ret)
-        return DataRefMarshaller.fromCpp(ret)
+        return DjinniSupport.DataRefMarshaller.fromCpp(ret)
     }
-    func dataFromVec() throws -> NSData {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        var ret = djinni_generated.DataRefTest_dataFromVec(&params)
+    func dataFromVec() throws -> Foundation.NSData {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        var ret = djinni_generated.DataRefTest_dataFromVec(&_params)
         try handleCppErrors(&ret)
-        return DataRefMarshaller.fromCpp(ret)
+        return DjinniSupport.DataRefMarshaller.fromCpp(ret)
     }
-    func dataFromStr() throws -> NSData {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        var ret = djinni_generated.DataRefTest_dataFromStr(&params)
+    func dataFromStr() throws -> Foundation.NSData {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        var ret = djinni_generated.DataRefTest_dataFromStr(&_params)
         try handleCppErrors(&ret)
-        return DataRefMarshaller.fromCpp(ret)
+        return DjinniSupport.DataRefMarshaller.fromCpp(ret)
     }
-    func sendDataView(_ data: NSData) throws -> Data {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(DataViewMarshaller.toCpp(data))
-        var ret = djinni_generated.DataRefTest_sendDataView(&params)
+    func sendDataView(_ data: Foundation.NSData) throws -> Data {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(DjinniSupport.DataViewMarshaller.toCpp(data))
+        var ret = djinni_generated.DataRefTest_sendDataView(&_params)
         try handleCppErrors(&ret)
         return BinaryMarshaller.fromCpp(ret)
     }
-    func recvDataView() throws -> NSData {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        var ret = djinni_generated.DataRefTest_recvDataView(&params)
+    func recvDataView() throws -> Foundation.NSData {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        var ret = djinni_generated.DataRefTest_recvDataView(&_params)
         try handleCppErrors(&ret)
-        return DataViewMarshaller.fromCpp(ret)
+        return DjinniSupport.DataViewMarshaller.fromCpp(ret)
     }
 }
-enum DataRefTestMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.DataRefTest
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum DataRefTestMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.DataRefTest
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { DataRefTestCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }
 public class DataRefTest_statics {
-    static func create() throws -> TestSuite.DataRefTest {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.DataRefTest_create(&params)
+    public static func create() throws -> TestSuite.DataRefTest {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.DataRefTest_create(&_params)
         try handleCppErrors(&ret)
         return DataRefTestMarshaller.fromCpp(ret)
     }

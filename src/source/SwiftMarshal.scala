@@ -59,7 +59,7 @@ class SwiftMarshal(spec: Spec) extends Marshal(spec) {
             case MOptional => throw new AssertionError("nested optional?")
             case m => s"Optional<${f(arg)}>"
           }
-        case e: MExtern => e.swift.module + "." + e.swift.typename + (if (e.swift.generic) args(tm) else "")
+        case e: MExtern => Array(e.swift.module, e.swift.typename).filter(s => !s.isEmpty).mkString(".") + (if (e.swift.generic) args(tm) else "")
         case p: MProtobuf => p.body.swift match {
           case Some(o) => o.prefix + p.name
           case None => p.name
@@ -102,7 +102,7 @@ class SwiftMarshal(spec: Spec) extends Marshal(spec) {
   private def helperClass(tm: MExpr): String = helperName(tm) + helperTemplates(tm)
   def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => helperClass(d.name)
-    case e: MExtern => e.swift.translator
+    case e: MExtern => Array(e.swift.translatorModule, e.swift.translator).filter(s => !s.isEmpty).mkString(".")
     case o => o match {
       case p: MPrimitive => p.idlName match {
         case "i8" => "I8Marshaller"

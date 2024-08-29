@@ -34,12 +34,12 @@ let clientInterfaceMethods: Vtbl<ClientInterface> = [
     },
 ]
 
-enum ClientInterfaceMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.ClientInterface
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ClientInterfaceMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.ClientInterface
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { fatalError("n/a") })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { djinni_generated.ClientInterfaceSwiftProxy.make(ctxPtr(s, clientInterfaceMethods), dispatcherProtocalCall)})
     }
 }

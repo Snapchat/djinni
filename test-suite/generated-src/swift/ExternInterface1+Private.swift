@@ -9,29 +9,29 @@ import TestSuiteCxx
 
 final class ExternInterface1CppProxy: DjinniSupport.CppProxy, TestSuite.ExternInterface1 {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
-    func foo(_ i: ClientInterface) throws -> ClientReturnedRecord {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(ClientInterfaceMarshaller.toCpp(i))
-        var ret = djinni_generated.ExternInterface1_foo(&params)
+    func foo(_ i: TestSuite.ClientInterface) throws -> TestSuite.ClientReturnedRecord {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(TestSuite.ClientInterfaceMarshaller.toCpp(i))
+        var ret = djinni_generated.ExternInterface1_foo(&_params)
         try handleCppErrors(&ret)
-        return ClientReturnedRecordMarshaller.fromCpp(ret)
+        return TestSuite.ClientReturnedRecordMarshaller.fromCpp(ret)
     }
-    func bar(_ e: Color) throws -> Color {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(ColorMarshaller.toCpp(e))
-        var ret = djinni_generated.ExternInterface1_bar(&params)
+    func bar(_ e: TestSuite.Color) throws -> TestSuite.Color {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(TestSuite.ColorMarshaller.toCpp(e))
+        var ret = djinni_generated.ExternInterface1_bar(&_params)
         try handleCppErrors(&ret)
-        return ColorMarshaller.fromCpp(ret)
+        return TestSuite.ColorMarshaller.fromCpp(ret)
     }
 }
-enum ExternInterface1Marshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.ExternInterface1
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ExternInterface1Marshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.ExternInterface1
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { ExternInterface1CppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }

@@ -7,14 +7,14 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum ConstantsMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.Constants
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ConstantsMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.Constants
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             return SwiftType()
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return djinni.swift.makeCompositeValue()
     }
 }

@@ -4,4 +4,4 @@
 import DjinniSupport
 import TextSort
 
-typealias SortOrderMarshaller = DjinniSupport.EnumMarshaller<SortOrder>
+public typealias SortOrderMarshaller = DjinniSupport.EnumMarshaller<SortOrder>

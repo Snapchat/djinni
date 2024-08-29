@@ -11,12 +11,12 @@ import TestSuiteCxx
 final class ConstantInterfaceWithEnumCppProxy: DjinniSupport.CppProxy, TestSuite.ConstantInterfaceWithEnum {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
 }
-enum ConstantInterfaceWithEnumMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.ConstantInterfaceWithEnum
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ConstantInterfaceWithEnumMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.ConstantInterfaceWithEnum
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { ConstantInterfaceWithEnumCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }

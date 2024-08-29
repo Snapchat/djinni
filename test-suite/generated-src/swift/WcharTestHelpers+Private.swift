@@ -10,39 +10,39 @@ import TestSuiteCxx
 final class WcharTestHelpersCppProxy: DjinniSupport.CppProxy, TestSuite.WcharTestHelpers {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
 }
-enum WcharTestHelpersMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.WcharTestHelpers
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum WcharTestHelpersMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.WcharTestHelpers
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { WcharTestHelpersCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }
 public class WcharTestHelpers_statics {
-    static func getRecord() throws -> TestSuite.WcharTestRec {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.WcharTestHelpers_getRecord(&params)
+    public static func getRecord() throws -> TestSuite.WcharTestRec {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.WcharTestHelpers_getRecord(&_params)
         try handleCppErrors(&ret)
         return WcharTestRecMarshaller.fromCpp(ret)
     }
-    static func getString() throws -> String {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.WcharTestHelpers_getString(&params)
+    public static func getString() throws -> String {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.WcharTestHelpers_getString(&_params)
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }
-    static func checkString(_ str: String) throws -> Bool {
-        var params = djinni.swift.ParameterList()
-        params.addValue(StringMarshaller.toCpp(str))
-        var ret = djinni_generated.WcharTestHelpers_checkString(&params)
+    public static func checkString(_ str: String) throws -> Bool {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(StringMarshaller.toCpp(str))
+        var ret = djinni_generated.WcharTestHelpers_checkString(&_params)
         try handleCppErrors(&ret)
         return BoolMarshaller.fromCpp(ret)
     }
-    static func checkRecord(_ rec: TestSuite.WcharTestRec) throws -> Bool {
-        var params = djinni.swift.ParameterList()
-        params.addValue(WcharTestRecMarshaller.toCpp(rec))
-        var ret = djinni_generated.WcharTestHelpers_checkRecord(&params)
+    public static func checkRecord(_ rec: TestSuite.WcharTestRec) throws -> Bool {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(WcharTestRecMarshaller.toCpp(rec))
+        var ret = djinni_generated.WcharTestHelpers_checkRecord(&_params)
         try handleCppErrors(&ret)
         return BoolMarshaller.fromCpp(ret)
     }

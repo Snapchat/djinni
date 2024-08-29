@@ -4,12 +4,12 @@
 import Foundation
 
 public protocol DataRefTest: AnyObject {
-    func sendData(_ data: NSData) throws -> Void
+    func sendData(_ data: Foundation.NSData) throws -> Void
     func retriveAsBin() throws -> Data
-    func sendMutableData(_ data: NSData) throws -> Void
-    func generateData() throws -> NSData
-    func dataFromVec() throws -> NSData
-    func dataFromStr() throws -> NSData
-    func sendDataView(_ data: NSData) throws -> Data
-    func recvDataView() throws -> NSData
+    func sendMutableData(_ data: Foundation.NSData) throws -> Void
+    func generateData() throws -> Foundation.NSData
+    func dataFromVec() throws -> Foundation.NSData
+    func dataFromStr() throws -> Foundation.NSData
+    func sendDataView(_ data: Foundation.NSData) throws -> Data
+    func recvDataView() throws -> Foundation.NSData
 }

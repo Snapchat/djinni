@@ -10,20 +10,20 @@ import TestSuiteCxx
 final class InterfaceUsingExtendedRecordCppProxy: DjinniSupport.CppProxy, TestSuite.InterfaceUsingExtendedRecord {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
     func meth(_ er: TestSuite.ExtendedRecord) throws -> TestSuite.ExtendedRecord {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(ExtendedRecordMarshaller.toCpp(er))
-        var ret = djinni_generated.InterfaceUsingExtendedRecord_meth(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(ExtendedRecordMarshaller.toCpp(er))
+        var ret = djinni_generated.InterfaceUsingExtendedRecord_meth(&_params)
         try handleCppErrors(&ret)
         return ExtendedRecordMarshaller.fromCpp(ret)
     }
 }
-enum InterfaceUsingExtendedRecordMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.InterfaceUsingExtendedRecord
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum InterfaceUsingExtendedRecordMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.InterfaceUsingExtendedRecord
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { InterfaceUsingExtendedRecordCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }

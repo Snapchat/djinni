@@ -7,14 +7,14 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum EmptyRecordMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.EmptyRecord
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum EmptyRecordMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.EmptyRecord
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             return SwiftType()
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return djinni.swift.makeCompositeValue()
     }
 }

@@ -4,9 +4,9 @@
 import Foundation
 
 public struct TestOptionalExternInterfaceRecord {
-    public var sampleInterface: Optional<SampleInterface>
+    public var sampleInterface: Optional<TestSuite.SampleInterface>
 
-    public init(sampleInterface: Optional<SampleInterface>)
+    public init(sampleInterface: Optional<TestSuite.SampleInterface>)
     {
         self.sampleInterface = sampleInterface
     }

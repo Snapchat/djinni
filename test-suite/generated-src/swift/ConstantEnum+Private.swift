@@ -4,4 +4,4 @@
 import DjinniSupport
 import TestSuite
 
-typealias ConstantEnumMarshaller = DjinniSupport.EnumMarshaller<ConstantEnum>
+public typealias ConstantEnumMarshaller = DjinniSupport.EnumMarshaller<ConstantEnum>

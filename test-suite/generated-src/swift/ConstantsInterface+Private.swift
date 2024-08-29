@@ -11,18 +11,18 @@ import TestSuiteCxx
 final class ConstantsInterfaceCppProxy: DjinniSupport.CppProxy, TestSuite.ConstantsInterface {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
     func dummy() throws -> Void {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        var ret = djinni_generated.ConstantsInterface_dummy(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        var ret = djinni_generated.ConstantsInterface_dummy(&_params)
         try handleCppErrors(&ret)
     }
 }
-enum ConstantsInterfaceMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.ConstantsInterface
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ConstantsInterfaceMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.ConstantsInterface
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { ConstantsInterfaceCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }

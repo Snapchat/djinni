@@ -7,15 +7,15 @@ import Foundation
 import TextSort
 import TextSortCxx
 
-enum ItemListMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TextSort.ItemList
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ItemListMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TextSort.ItemList
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let items = ListMarshaller<StringMarshaller>.fromCpp(djinni.swift.getMember(p, 0))
             return SwiftType(items: items)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, ListMarshaller<StringMarshaller>.toCpp(s.items))
         return ret

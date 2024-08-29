@@ -7,17 +7,17 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum NestedOutcomeMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.NestedOutcome
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum NestedOutcomeMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.NestedOutcome
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
-            let o = OutcomeMarshaller<I32Marshaller, StringMarshaller>.fromCpp(djinni.swift.getMember(p, 0))
+            let o = DjinniSupport.OutcomeMarshaller<I32Marshaller, StringMarshaller>.fromCpp(djinni.swift.getMember(p, 0))
             return SwiftType(o: o)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
-        djinni.swift.addMember(&ret, OutcomeMarshaller<I32Marshaller, StringMarshaller>.toCpp(s.o))
+        djinni.swift.addMember(&ret, DjinniSupport.OutcomeMarshaller<I32Marshaller, StringMarshaller>.toCpp(s.o))
         return ret
     }
 }

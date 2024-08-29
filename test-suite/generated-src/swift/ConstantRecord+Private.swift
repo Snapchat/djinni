@@ -7,16 +7,16 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum ConstantRecordMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.ConstantRecord
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ConstantRecordMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.ConstantRecord
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let someInteger = I32Marshaller.fromCpp(djinni.swift.getMember(p, 0))
             let someString = StringMarshaller.fromCpp(djinni.swift.getMember(p, 1))
             return SwiftType(someInteger: someInteger, someString: someString)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, I32Marshaller.toCpp(s.someInteger))
         djinni.swift.addMember(&ret, StringMarshaller.toCpp(s.someString))

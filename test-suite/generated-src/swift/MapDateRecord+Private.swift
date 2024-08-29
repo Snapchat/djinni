@@ -7,15 +7,15 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum MapDateRecordMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.MapDateRecord
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum MapDateRecordMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.MapDateRecord
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let datesById = MapMarshaller<StringMarshaller, DateMarshaller>.fromCpp(djinni.swift.getMember(p, 0))
             return SwiftType(datesById: datesById)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, MapMarshaller<StringMarshaller, DateMarshaller>.toCpp(s.datesById))
         return ret

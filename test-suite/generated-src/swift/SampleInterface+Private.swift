@@ -14,12 +14,12 @@ import TestSuiteCxx
 final class SampleInterfaceCppProxy: DjinniSupport.CppProxy, TestSuite.SampleInterface {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
 }
-enum SampleInterfaceMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.SampleInterface
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum SampleInterfaceMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.SampleInterface
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { SampleInterfaceCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }

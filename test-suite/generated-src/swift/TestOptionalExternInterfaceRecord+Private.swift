@@ -7,17 +7,17 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum TestOptionalExternInterfaceRecordMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.TestOptionalExternInterfaceRecord
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum TestOptionalExternInterfaceRecordMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.TestOptionalExternInterfaceRecord
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
-            let sampleInterface = OptionalMarshaller<SampleInterfaceMarshaller>.fromCpp(djinni.swift.getMember(p, 0))
+            let sampleInterface = OptionalMarshaller<TestSuite.SampleInterfaceMarshaller>.fromCpp(djinni.swift.getMember(p, 0))
             return SwiftType(sampleInterface: sampleInterface)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
-        djinni.swift.addMember(&ret, OptionalMarshaller<SampleInterfaceMarshaller>.toCpp(s.sampleInterface))
+        djinni.swift.addMember(&ret, OptionalMarshaller<TestSuite.SampleInterfaceMarshaller>.toCpp(s.sampleInterface))
         return ret
     }
 }

@@ -10,12 +10,12 @@ import TestSuiteCxx
 final class TestStaticMethodLanguageCppProxy: DjinniSupport.CppProxy, TestSuite.TestStaticMethodLanguage {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
 }
-enum TestStaticMethodLanguageMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.TestStaticMethodLanguage
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum TestStaticMethodLanguageMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.TestStaticMethodLanguage
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { TestStaticMethodLanguageCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }

@@ -7,15 +7,15 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum NestedCollectionMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.NestedCollection
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum NestedCollectionMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.NestedCollection
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let setList = ListMarshaller<SetMarshaller<StringMarshaller>>.fromCpp(djinni.swift.getMember(p, 0))
             return SwiftType(setList: setList)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, ListMarshaller<SetMarshaller<StringMarshaller>>.toCpp(s.setList))
         return ret

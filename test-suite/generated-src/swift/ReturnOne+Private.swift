@@ -11,26 +11,26 @@ import TestSuiteCxx
 final class ReturnOneCppProxy: DjinniSupport.CppProxy, TestSuite.ReturnOne {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
     func returnOne() throws -> Int8 {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        var ret = djinni_generated.ReturnOne_returnOne(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        var ret = djinni_generated.ReturnOne_returnOne(&_params)
         try handleCppErrors(&ret)
         return I8Marshaller.fromCpp(ret)
     }
 }
-enum ReturnOneMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.ReturnOne
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ReturnOneMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.ReturnOne
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { ReturnOneCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }
 public class ReturnOne_statics {
-    static func getInstance() throws -> TestSuite.ReturnOne {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.ReturnOne_getInstance(&params)
+    public static func getInstance() throws -> TestSuite.ReturnOne {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.ReturnOne_getInstance(&_params)
         try handleCppErrors(&ret)
         return ReturnOneMarshaller.fromCpp(ret)
     }

@@ -10,35 +10,35 @@ import TextSortCxx
 final class SortItemsCppProxy: DjinniSupport.CppProxy, TextSort.SortItems {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
     func sort(_ order: TextSort.SortOrder, items: TextSort.ItemList) throws -> Void {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        params.addValue(SortOrderMarshaller.toCpp(order))
-        params.addValue(ItemListMarshaller.toCpp(items))
-        var ret = djinni_generated.SortItems_sort(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(SortOrderMarshaller.toCpp(order))
+        _params.addValue(ItemListMarshaller.toCpp(items))
+        var ret = djinni_generated.SortItems_sort(&_params)
         try handleCppErrors(&ret)
     }
 }
-enum SortItemsMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TextSort.SortItems
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum SortItemsMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TextSort.SortItems
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { SortItemsCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }
 public class SortItems_statics {
-    static func createWithListener(_ listener: TextSort.TextboxListener) throws -> TextSort.SortItems {
-        var params = djinni.swift.ParameterList()
-        params.addValue(TextboxListenerMarshaller.toCpp(listener))
-        var ret = djinni_generated.SortItems_createWithListener(&params)
+    public static func createWithListener(_ listener: TextSort.TextboxListener) throws -> TextSort.SortItems {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(TextboxListenerMarshaller.toCpp(listener))
+        var ret = djinni_generated.SortItems_createWithListener(&_params)
         try handleCppErrors(&ret)
         return SortItemsMarshaller.fromCpp(ret)
     }
-    static func runSort(_ items: TextSort.ItemList) throws -> TextSort.ItemList {
-        var params = djinni.swift.ParameterList()
-        params.addValue(ItemListMarshaller.toCpp(items))
-        var ret = djinni_generated.SortItems_runSort(&params)
+    public static func runSort(_ items: TextSort.ItemList) throws -> TextSort.ItemList {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(ItemListMarshaller.toCpp(items))
+        var ret = djinni_generated.SortItems_runSort(&_params)
         try handleCppErrors(&ret)
         return ItemListMarshaller.fromCpp(ret)
     }

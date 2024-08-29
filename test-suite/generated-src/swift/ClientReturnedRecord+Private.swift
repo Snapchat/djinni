@@ -7,9 +7,9 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum ClientReturnedRecordMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.ClientReturnedRecord
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ClientReturnedRecordMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.ClientReturnedRecord
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let recordId = I64Marshaller.fromCpp(djinni.swift.getMember(p, 0))
             let content = StringMarshaller.fromCpp(djinni.swift.getMember(p, 1))
@@ -17,7 +17,7 @@ enum ClientReturnedRecordMarshaller: DjinniSupport.Marshaller {
             return SwiftType(recordId: recordId, content: content, misc: misc)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, I64Marshaller.toCpp(s.recordId))
         djinni.swift.addMember(&ret, StringMarshaller.toCpp(s.content))

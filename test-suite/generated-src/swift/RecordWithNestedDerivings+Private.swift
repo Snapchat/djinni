@@ -7,16 +7,16 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum RecordWithNestedDerivingsMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.RecordWithNestedDerivings
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum RecordWithNestedDerivingsMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.RecordWithNestedDerivings
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let key = I32Marshaller.fromCpp(djinni.swift.getMember(p, 0))
             let rec = RecordWithDerivingsMarshaller.fromCpp(djinni.swift.getMember(p, 1))
             return SwiftType(key: key, rec: rec)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, I32Marshaller.toCpp(s.key))
         djinni.swift.addMember(&ret, RecordWithDerivingsMarshaller.toCpp(s.rec))

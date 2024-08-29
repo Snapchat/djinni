@@ -7,15 +7,15 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum SupportCopyingMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.SupportCopying
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum SupportCopyingMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.SupportCopying
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let x = I32Marshaller.fromCpp(djinni.swift.getMember(p, 0))
             return SwiftType(x: x)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, I32Marshaller.toCpp(s.x))
         return ret

@@ -7,12 +7,12 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum JavaOnlyListenerMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.JavaOnlyListener
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum JavaOnlyListenerMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.JavaOnlyListener
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { fatalError("n/a") })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }

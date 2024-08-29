@@ -7,17 +7,17 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum RecordWithDurationAndDerivingsMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.RecordWithDurationAndDerivings
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum RecordWithDurationAndDerivingsMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.RecordWithDurationAndDerivings
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
-            let dt = DurationMarshaller<F64Marshaller, DurationNs>.fromCpp(djinni.swift.getMember(p, 0))
+            let dt = TestSuite.DurationMarshaller<F64Marshaller, TestSuite.DurationNs>.fromCpp(djinni.swift.getMember(p, 0))
             return SwiftType(dt: dt)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
-        djinni.swift.addMember(&ret, DurationMarshaller<F64Marshaller, DurationNs>.toCpp(s.dt))
+        djinni.swift.addMember(&ret, TestSuite.DurationMarshaller<F64Marshaller, TestSuite.DurationNs>.toCpp(s.dt))
         return ret
     }
 }

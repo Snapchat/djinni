@@ -4,4 +4,4 @@
 import DjinniSupport
 import TestSuite
 
-typealias AccessFlagsMarshaller = DjinniSupport.EnumMarshaller<AccessFlags>
+public typealias AccessFlagsMarshaller = DjinniSupport.EnumMarshaller<AccessFlags>

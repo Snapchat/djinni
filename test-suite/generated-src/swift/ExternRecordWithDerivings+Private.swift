@@ -7,19 +7,19 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum ExternRecordWithDerivingsMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.ExternRecordWithDerivings
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ExternRecordWithDerivingsMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.ExternRecordWithDerivings
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
-            let member = RecordWithDerivingsMarshaller.fromCpp(djinni.swift.getMember(p, 0))
-            let e = ColorMarshaller.fromCpp(djinni.swift.getMember(p, 1))
+            let member = TestSuite.RecordWithDerivingsMarshaller.fromCpp(djinni.swift.getMember(p, 0))
+            let e = TestSuite.ColorMarshaller.fromCpp(djinni.swift.getMember(p, 1))
             return SwiftType(member: member, e: e)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
-        djinni.swift.addMember(&ret, RecordWithDerivingsMarshaller.toCpp(s.member))
-        djinni.swift.addMember(&ret, ColorMarshaller.toCpp(s.e))
+        djinni.swift.addMember(&ret, TestSuite.RecordWithDerivingsMarshaller.toCpp(s.member))
+        djinni.swift.addMember(&ret, TestSuite.ColorMarshaller.toCpp(s.e))
         return ret
     }
 }

@@ -9,17 +9,17 @@ import TestSuiteCxx
 
 let asyncInterfaceMethods: Vtbl<AsyncInterface> = [
     { inst, params, ret in
-        let _f = FutureMarshaller<I32Marshaller>.fromCpp(djinni.swift.getMember(params, 0))
-        djinni.swift.setReturnValue(ret, try FutureMarshaller<StringMarshaller>.toCpp(inst.futureRoundtrip(_f)))
+        let _f = DjinniSupport.FutureMarshaller<I32Marshaller>.fromCpp(djinni.swift.getMember(params, 0))
+        djinni.swift.setReturnValue(ret, try DjinniSupport.FutureMarshaller<StringMarshaller>.toCpp(inst.futureRoundtrip(_f)))
     },
 ]
 
-enum AsyncInterfaceMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.AsyncInterface
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum AsyncInterfaceMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.AsyncInterface
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { fatalError("n/a") })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { djinni_generated.AsyncInterfaceSwiftProxy.make(ctxPtr(s, asyncInterfaceMethods), dispatcherProtocalCall)})
     }
 }

@@ -14,12 +14,12 @@ import TestSuiteCxx
 final class ConflictCppProxy: DjinniSupport.CppProxy, TestSuite.Conflict {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
 }
-enum ConflictMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.Conflict
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ConflictMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.Conflict
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { ConflictCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }

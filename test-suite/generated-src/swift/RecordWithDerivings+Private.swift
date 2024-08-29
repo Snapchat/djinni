@@ -7,9 +7,9 @@ import Foundation
 import TestSuite
 import TestSuiteCxx
 
-enum RecordWithDerivingsMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.RecordWithDerivings
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum RecordWithDerivingsMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.RecordWithDerivings
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let eight = I8Marshaller.fromCpp(djinni.swift.getMember(p, 0))
             let sixteen = I16Marshaller.fromCpp(djinni.swift.getMember(p, 1))
@@ -22,7 +22,7 @@ enum RecordWithDerivingsMarshaller: DjinniSupport.Marshaller {
             return SwiftType(eight: eight, sixteen: sixteen, thirtytwo: thirtytwo, sixtyfour: sixtyfour, fthirtytwo: fthirtytwo, fsixtyfour: fsixtyfour, d: d, s: s)
         }
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, I8Marshaller.toCpp(s.eight))
         djinni.swift.addMember(&ret, I16Marshaller.toCpp(s.sixteen))

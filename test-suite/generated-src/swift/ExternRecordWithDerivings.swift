@@ -5,10 +5,10 @@ import Foundation
 
 /** This file tests YAML dumped by Djinni can be parsed back in */
 public struct ExternRecordWithDerivings: Equatable {
-    public var member: RecordWithDerivings
-    public var e: Color
+    public var member: TestSuite.RecordWithDerivings
+    public var e: TestSuite.Color
 
-    public init(member: RecordWithDerivings, e: Color)
+    public init(member: TestSuite.RecordWithDerivings, e: TestSuite.Color)
     {
         self.member = member
         self.e = e

@@ -11,26 +11,26 @@ import TestSuiteCxx
 final class ReturnTwoCppProxy: DjinniSupport.CppProxy, TestSuite.ReturnTwo {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
     func returnTwo() throws -> Int8 {
-        var params = djinni.swift.ParameterList()
-        params.addValue(inst)
-        var ret = djinni_generated.ReturnTwo_returnTwo(&params)
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        var ret = djinni_generated.ReturnTwo_returnTwo(&_params)
         try handleCppErrors(&ret)
         return I8Marshaller.fromCpp(ret)
     }
 }
-enum ReturnTwoMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.ReturnTwo
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ReturnTwoMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.ReturnTwo
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { ReturnTwoCppProxy(c) as SwiftType })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { fatalError("n/a") })
     }
 }
 public class ReturnTwo_statics {
-    static func getInstance() throws -> TestSuite.ReturnTwo {
-        var params = djinni.swift.ParameterList()
-        var ret = djinni_generated.ReturnTwo_getInstance(&params)
+    public static func getInstance() throws -> TestSuite.ReturnTwo {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.ReturnTwo_getInstance(&_params)
         try handleCppErrors(&ret)
         return ReturnTwoMarshaller.fromCpp(ret)
     }

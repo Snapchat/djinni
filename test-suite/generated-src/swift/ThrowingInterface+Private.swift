@@ -13,12 +13,12 @@ let throwingInterfaceMethods: Vtbl<ThrowingInterface> = [
     },
 ]
 
-enum ThrowingInterfaceMarshaller: DjinniSupport.Marshaller {
-    typealias SwiftType = TestSuite.ThrowingInterface
-    static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
+public enum ThrowingInterfaceMarshaller: DjinniSupport.Marshaller {
+    public typealias SwiftType = TestSuite.ThrowingInterface
+    public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return cppInterfaceToSwift(c, { fatalError("n/a") })
     }
-    static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
+    public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         return swiftInterfaceToCpp(s, { djinni_generated.ThrowingInterfaceSwiftProxy.make(ctxPtr(s, throwingInterfaceMethods), dispatcherProtocalCall)})
     }
 }
