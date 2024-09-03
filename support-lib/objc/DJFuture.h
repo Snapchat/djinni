@@ -25,7 +25,7 @@
 // If the future is ready, then calling its `get` method will not block.
 - (BOOL) isReady;
 // Block and wait for the result (or exception). This can only be called once.
-- (nonnull DJValue) get;
+- (nullable DJValue) get;
 // Tell the future to Call the specified handler routine when it becomes
 // ready. Returns a new future that wraps the return value of the handler
 // routine. The current future becomes invalid after this call.
@@ -40,7 +40,7 @@
 - (nonnull DJFuture<DJValue> *)getFuture;
 // `setValue` or `setException` can only be called once on a promise. After
 // which the internal state becomes invalid.
-- (void)setValue:(nonnull DJValue)val;
+- (void)setValue:(nullable DJValue)val;
 // for NSNull* (void)
 - (void)setValue;
 - (void)setException:(nonnull NSException *)exception;
