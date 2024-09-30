@@ -67,6 +67,7 @@ verify the build and binary from the command line.
  - DataView for copy free data passing
  - DataRef for copy free data passing with ownership
  - Generating string names for C++ enums
+ - Support for custom constexpr strings such as "string_view" and "const char*"
  - Bug fixes
 
 ## Using new features
