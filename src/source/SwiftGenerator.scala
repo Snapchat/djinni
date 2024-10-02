@@ -87,6 +87,7 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
     writeSwiftFile(ident, origin, List[String](), w => {
       val t = marshal.typename(ident, e)
       if (e.flags) {
+        writeDoc(w, doc)
         w.w(s"public struct $t: OptionSet").braced {
           w.wl("public let rawValue: Int32")
           w.wl("public init(rawValue: Int32) { self.rawValue = rawValue }")
@@ -95,6 +96,7 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
           writeFlagAll(w, e, idSwift.enum, t)
         }
       } else {
+        writeDoc(w, doc)
         w.w(s"public enum ${marshal.typename(ident, e)}: Int32").braced {
           writeEnumOptions(w, e, idSwift.enum, "=", "case ", "")
         }
@@ -326,6 +328,7 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
       if (!staticMethods.isEmpty) {
         w.w(s"public class ${marshal.typename(ident, i)}_statics").braced {
           for (m <- staticMethods) {
+            writeMethodDoc(w, m, idSwift.local)
             w.w(s"public static func ${swiftMethodName(m.ident)}(")
             if (m.params.nonEmpty) { w.w("_ ") }
             w.w(m.params.map(p => s"${idSwift.local(p.ident)}: ${marshal.fqParamType(p.ty)}").mkString(", "))
