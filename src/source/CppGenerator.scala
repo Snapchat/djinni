@@ -12,7 +12,7 @@
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
-  * 
+  *
   * This file has been modified by Snap, Inc.
   */
 
@@ -72,6 +72,7 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
     val underlyingType = if(e.flags) flagsType else enumType
 
     writeHppFile(ident, origin, refs.hpp, refs.hppFwds, w => {
+      writeDoc(w, doc)
       w.w(s"enum class $self : $underlyingType").bracedSemi {
         writeEnumOptionNone(w, e, idCpp.enum)
         writeEnumOptions(w, e, idCpp.enum)
@@ -264,9 +265,9 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
               writeAlignedCall(w, ": " + actualSelf + "(", r.fields, ")", f => {
                 var param = "std::move(" + idCpp.local(f.ident) + "_)"
                 if (isOptional(f.ty.resolved))
-                  if (isInterface(f.ty.resolved.args.head)) 
-                    param = s"nullptr" 
-                  else 
+                  if (isInterface(f.ty.resolved.args.head))
+                    param = s"nullptr"
+                  else
                     param = s"${spec.cppNulloptValue}"
 
                 param

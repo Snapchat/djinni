@@ -7,6 +7,7 @@
 
 namespace testsuite {
 
+/** enum for use in constants */
 enum class constant_enum : int {
     SOME_VALUE = 0,
     SOME_OTHER_VALUE = 1,
