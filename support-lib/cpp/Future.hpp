@@ -17,6 +17,7 @@
 #pragma once
 
 #include "expected.hpp"
+#include "stop_token.hpp"
 
 #include <atomic>
 #include <functional>
@@ -57,6 +58,12 @@ class Future;
 struct BrokenPromiseException final : public std::exception {
     inline const char* what() const noexcept final {
         return "djinni::Promise was destructed before setting a result";
+    }
+};
+
+struct CancelledFutureException final : public std::exception {
+    inline const char* what() const noexcept final {
+        return "djinni::Future was cancelled";
     }
 };
 
@@ -110,6 +117,9 @@ struct SharedState: ValueHolder<T> {
     std::mutex mutex;
     std::exception_ptr exception;
     std::unique_ptr<ValueHandlerBase<T>> handler;
+    
+    inplace_stop_source stopSource;
+    inplace_stop_token stopToken = stopSource.get_token();
 
     bool isReady() const {
         return this->value.has_value() || exception != nullptr;
@@ -185,6 +195,13 @@ public:
         PromiseBase<T> promise;
         promise.setException(ex);
         return promise.getFuture();
+    }
+
+    [[nodiscard]] std::shared_ptr<inplace_stop_token> getStopToken() const noexcept {
+        return {
+            _sharedStateReadOnly,
+            &_sharedStateReadOnly->stopToken
+        };
     }
 
 protected:
@@ -359,6 +376,13 @@ public:
         return nextFuture;
     }
 
+    [[nodiscard]] std::shared_ptr<inplace_stop_source> getStopSource() const noexcept {
+        return {
+            _sharedState,
+            &_sharedState->stopSource,
+        };
+    }
+
 private:
     detail::SharedStatePtr<T> _sharedState;
 
@@ -441,6 +465,48 @@ struct Future<void>::PromiseType : PromiseTypeBase {
         _result.emplace();
     }
 };
+
+struct CheckCancelledT {
+    std::shared_ptr<inplace_stop_token> stop_token{};
+    constexpr bool await_ready() const noexcept {
+        return false;
+    }
+    template<typename P>
+    constexpr bool await_suspend(detail::CoroutineHandle<P> handle) const noexcept {
+        stop_token = handle.promise().getStopToken();
+        return false;
+    }
+    bool await_resume() const noexcept {
+        return stop_token->stop_requested();
+    }
+};
+inline CheckCancelledT check_cancelled() {
+    return {};
+}
+
+struct AbortIfCancelledT {
+    constexpr bool await_ready() const noexcept {
+        return false;
+    }
+    template<typename P>
+    constexpr bool await_suspend(detail::CoroutineHandle<P> suspended) const noexcept {
+        if (!suspended.promise()._promise.getStopToken()->stop_requested()) {
+            return false;
+        }
+
+        // Move Promise<T> out of the coroutine promise
+        auto promise { std::move(suspended.promise()._promise) };
+        // Destroy the coroutine state to destruct local variables etc
+        suspended.destroy();
+        // Then finalize the Promise<T> with an exception
+        promise.setException(CancelledFutureException{});
+        return true;
+    }
+    constexpr void await_resume() const noexcept {}
+};
+constexpr AbortIfCancelledT abort_if_cancelled() {
+    return {};
+}
 #endif
 
 template <typename T>
