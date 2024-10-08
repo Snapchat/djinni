@@ -374,12 +374,11 @@ public:
         sharedState = std::atomic_exchange(&_sharedState, sharedState);
         return Future<T>(sharedState).get();
     }
-    bool await_suspend(detail::CoroutineHandle<> h) {
+    void await_suspend(detail::CoroutineHandle<> h) {
         this->then([h, this] (Future<T> x) mutable {
             std::atomic_store(&_sharedState, x._sharedState);
             h();
         });
-        return true;
     }
 
     struct PromiseTypeBase {
