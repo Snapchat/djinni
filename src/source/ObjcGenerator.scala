@@ -42,6 +42,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
     def find(m: Meta) = for(r <- marshal.references(m)) r match {
       case ImportRef(arg) => header.add("#import " + arg)
       case DeclRef(decl, _) => header.add(decl)
+      case _ =>
     }
   }
 

@@ -4,7 +4,7 @@
 #pragma once
 
 #include <memory>
-#include <unordered_set>
+#include <vector>
 
 namespace testsuite {
 
@@ -16,7 +16,7 @@ public:
 
     virtual /*not-null*/ std::shared_ptr<::testsuite::Conflict> Conflict() = 0;
 
-    virtual bool conflict_arg(const std::unordered_set</*not-null*/ std::shared_ptr<::testsuite::Conflict>> & cs) = 0;
+    virtual bool conflict_arg(const std::vector</*not-null*/ std::shared_ptr<::testsuite::Conflict>> & cs) = 0;
 };
 
 } // namespace testsuite

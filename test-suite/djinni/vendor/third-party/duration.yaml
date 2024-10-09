@@ -38,6 +38,13 @@ wasm:
 ts:
   typename: 'number'
   module: ''
+swift:
+  typename: 'Duration'
+  translator: 'DurationMarshaller'
+  translator.module: 'TestSuite'
+swiftxx:
+  translator: '::djinni::swift::Duration'
+  header: '"Duration-swift.hpp"'
 ---
 name: h
 typedef: 'record'
@@ -74,6 +81,13 @@ wasm:
 ts:
   typename: 'number'
   module: ''
+swift:
+  typename: 'Duration'
+  translator: 'DurationH'
+  translator.module: 'TestSuite'
+swiftxx:
+  translator: '::djinni::swift::Duration_h'
+  header: '"Duration-swift.hpp"'
 ---
 name: min
 typedef: 'record'
@@ -110,6 +124,13 @@ wasm:
 ts:
   typename: 'number'
   module: ''
+swift:
+  typename: 'Duration'
+  translator: 'DurationMin'
+  translator.module: 'TestSuite'
+swiftxx:
+  translator: '::djinni::swift::Duration_min'
+  header: '"Duration-swift.hpp"'
 ---
 name: s
 typedef: 'record'
@@ -146,6 +167,13 @@ wasm:
 ts:
   typename: 'number'
   module: ''
+swift:
+  typename: 'Duration'
+  translator: 'DurationS'
+  translator.module: 'TestSuite'
+swiftxx:
+  translator: '::djinni::swift::Duration_s'
+  header: '"Duration-swift.hpp"'
 ---
 name: ms
 typedef: 'record'
@@ -182,6 +210,13 @@ wasm:
 ts:
   typename: 'number'
   module: ''
+swift:
+  typename: 'Duration'
+  translator: 'DurationMs'
+  translator.module: 'TestSuite'
+swiftxx:
+  translator: '::djinni::swift::Duration_ms'
+  header: '"Duration-swift.hpp"'
 ---
 name: us
 typedef: 'record'
@@ -218,6 +253,13 @@ wasm:
 ts:
   typename: 'number'
   module: ''
+swift:
+  typename: 'Duration'
+  translator: 'DurationUs'
+  translator.module: 'TestSuite'
+swiftxx:
+  translator: '::djinni::swift::Duration_us'
+  header: '"Duration-swift.hpp"'
 ---
 name: ns
 typedef: 'record'
@@ -254,3 +296,10 @@ wasm:
 ts:
   typename: 'number'
   module: ''
+swift:
+  typename: 'Duration'
+  translator: 'DurationNs'
+  translator.module: 'TestSuite'
+swiftxx:
+  translator: '::djinni::swift::Duration_ns'
+  header: '"Duration-swift.hpp"'

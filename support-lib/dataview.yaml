@@ -36,3 +36,12 @@ ts:
 composer:
   translator: '::djinni::composer::NativeDataView'
   header: '"$DataView_composer.hpp"'
+swift:
+  typename: 'NSData'
+  module: 'Foundation'
+  generic: false
+  translator: 'DataViewMarshaller'
+  translator.module: 'DjinniSupport'
+swiftxx:
+  translator: '::djinni::swift::DataViewAdaptor'
+  header: '"Data_swift.hpp"'

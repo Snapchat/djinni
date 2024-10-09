@@ -47,3 +47,18 @@ def djinni_deps():
         url = "https://github.com/bazelbuild/rules_jvm_external/archive/{}.zip".format(rules_jvm_external_tag),
         sha256 = "62133c125bf4109dfd9d2af64830208356ce4ef8b165a6ef15bbff7460b35c3a",
     )
+    swiftprotobuf_version = "1.26.0"
+    maybe(
+        name = "apple_swift_protobuf",
+        repo_rule = http_archive,
+        url = "https://github.com/apple/swift-protobuf/archive/refs/tags/{}.tar.gz".format(swiftprotobuf_version),
+        strip_prefix = "swift-protobuf-{}".format(swiftprotobuf_version),
+        sha256 = "25224376205a54bb719fe7d97aeb9d8f5219c7ef668f426a5dab2da7db992842",
+        build_file_content = """
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+swift_library(
+    name = "swift-protobuf",
+    module_name = "SwiftProtobuf",
+    srcs = glob(["Sources/SwiftProtobuf/**/*.swift"]),
+    visibility = ["//visibility:public"],
+)""")

@@ -485,7 +485,7 @@ export interface Conflict {
 
 export interface ConflictUser {
     Conflict(): Conflict;
-    conflictArg(cs: Set<Conflict>): boolean;
+    conflictArg(cs: Array<Conflict>): boolean;
 }
 
 /**

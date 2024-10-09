@@ -2,7 +2,7 @@
 constant_record = record {
     some_integer: i32;
     some_string: string;
-}
+} deriving(eq)
 
 # Record containing constants
 constants = record {

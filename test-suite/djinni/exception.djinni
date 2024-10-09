@@ -1,4 +1,4 @@
-throwing_interface = interface +w {
+throwing_interface = interface +w +sw {
     throw_exception();
 }
 

@@ -39,6 +39,25 @@ public class ConstantRecord {
     }
 
     @Override
+    public boolean equals(@CheckForNull Object obj) {
+        if (!(obj instanceof ConstantRecord)) {
+            return false;
+        }
+        ConstantRecord other = (ConstantRecord) obj;
+        return this.mSomeInteger == other.mSomeInteger &&
+                this.mSomeString.equals(other.mSomeString);
+    }
+
+    @Override
+    public int hashCode() {
+        // Pick an arbitrary non-zero starting value
+        int hashCode = 17;
+        hashCode = hashCode * 31 + mSomeInteger;
+        hashCode = hashCode * 31 + mSomeString.hashCode();
+        return hashCode;
+    }
+
+    @Override
     public String toString() {
         return "ConstantRecord{" +
                 "mSomeInteger=" + mSomeInteger +

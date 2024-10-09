@@ -9,7 +9,9 @@ objc:
 ts:
     module: '../../djinni/vendor/third-party/proto/ts/test'
     namespace: 'prototest'
-
+swift:
+    module: 'ProtobufTest'
+    prefix: 'Djinni_Test_'
 messages:
     - Person
     - AddressBook
