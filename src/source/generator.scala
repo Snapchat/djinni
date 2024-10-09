@@ -187,6 +187,15 @@ package object generatorTools {
     private val underLowerStrict = (s: String) => s.toLowerCase
     private val underUpperStrict = (s: String) => s.split('_').map(leadingUpperStrict).mkString("_")
 
+    private val avoidKeywords = (keywords: List[String], converter: IdentConverter) => (s: String) => {
+      val ident = converter(s)
+      if (keywords.contains(ident))
+        ident + "_"
+      else
+        ident
+    }
+    private val swiftKeywords = List("protocol")
+
     val camelUpper = (s: String) => s.split("[-_]").map(firstUpper).mkString
     val camelLower = (s: String) => {
       val parts = s.split('_')
@@ -201,7 +210,7 @@ package object generatorTools {
     val cppDefault = CppIdentStyle(camelUpper, camelUpper, camelUpper, underLower, underLower, underLower, underCaps, underCaps)
     val objcDefault = ObjcIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, camelUpper, camelUpper)
     val jsDefault = JsIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, underCaps, underCaps)
-    val swiftDefault = SwiftIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, camelLower, camelLower)
+    val swiftDefault = SwiftIdentStyle(camelUpper, camelUpper, avoidKeywords(swiftKeywords, camelLower), avoidKeywords(swiftKeywords, camelLower), camelLower, camelLower, camelLower)
 
     val styles = Map(
       "FooBar" -> camelUpper,
