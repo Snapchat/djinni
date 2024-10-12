@@ -289,16 +289,15 @@ public:
         std::unique_lock lk(sharedState->mutex);
         return sharedState->isReady();
     }
+    // wait until future becomes `isReady()` or the timeout elapses
+    // returns true if the future is ready, false if the timeout elapsed
+    template<typename Rep, typename Period>
+    bool waitFor(std::chrono::duration<Rep, Period> duration) const {
+        return waitImpl(std::make_optional(std::chrono::steady_clock::now() + duration));
+    }
     // wait until future becomes `isReady()`
     void wait() const {
-        auto sharedState = std::atomic_load(&_sharedState);
-        assert(sharedState);    // call on invalid future will trigger assertion
-        std::unique_lock lk(sharedState->mutex);
-#if defined(__EMSCRIPTEN__)
-        assert(sharedState->isReady()); // in wasm we must not block and wait
-#else
-        sharedState->cv.wait(lk, [state = sharedState] {return state->isReady();});
-#endif
+        waitImpl({});
     }
     // wait until future becomes `isReady()` and return the result. This can
     // only be called once.
@@ -361,6 +360,24 @@ public:
 
 private:
     detail::SharedStatePtr<T> _sharedState;
+    
+    template<typename Clock = std::chrono::steady_clock, typename Duration = std::chrono::steady_clock::duration>
+    bool waitImpl(std::optional<std::chrono::time_point<Clock, Duration>> deadline) const {
+        auto sharedState = std::atomic_load(&_sharedState);
+        assert(sharedState);    // call on invalid future will trigger assertion
+        std::unique_lock lk(sharedState->mutex);
+#if defined(__EMSCRIPTEN__)
+        assert(sharedState->isReady()); // in wasm we must not block and wait
+#else
+        auto predicate = [&sharedState] {return sharedState->isReady();};
+        if (deadline) {
+            return sharedState->cv.wait_until(lk, *deadline, std::move(predicate));
+        } else {
+            sharedState->cv.wait(lk, std::move(predicate));
+            return true;
+        }
+#endif
+    }
 
 #if defined(DJINNI_FUTURE_HAS_COROUTINE_SUPPORT)
 public:
