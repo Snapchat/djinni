@@ -35,6 +35,7 @@ public class SortItems_statics {
         try handleCppErrors(&ret)
         return SortItemsMarshaller.fromCpp(ret)
     }
+    /** For the localhost / command-line demo */
     public static func runSort(_ items: TextSort.ItemList) throws -> TextSort.ItemList {
         var _params = djinni.swift.ParameterList()
         _params.addValue(ItemListMarshaller.toCpp(items))

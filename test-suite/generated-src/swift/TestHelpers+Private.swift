@@ -25,12 +25,18 @@ public enum TestHelpersMarshaller: DjinniSupport.Marshaller {
     }
 }
 public class TestHelpers_statics {
+    /** Method with documentation */
     public static func getSetRecord() throws -> TestSuite.SetRecord {
         var _params = djinni.swift.ParameterList()
         var ret = djinni_generated.TestHelpers_getSetRecord(&_params)
         try handleCppErrors(&ret)
         return SetRecordMarshaller.fromCpp(ret)
     }
+    /**
+     * Method with long documentation
+     * (Second line of multi-line documentation.
+     *   Indented third line of multi-line documentation.)
+     */
     public static func checkSetRecord(_ rec: TestSuite.SetRecord) throws -> Bool {
         var _params = djinni.swift.ParameterList()
         _params.addValue(SetRecordMarshaller.toCpp(rec))
@@ -172,6 +178,7 @@ public class TestHelpers_statics {
         try handleCppErrors(&ret)
         return OptionalMarshaller<I32Marshaller>.fromCpp(ret)
     }
+    /** Ensures that we generate integer translation code */
     public static func assortedPrimitivesId(_ i: TestSuite.AssortedPrimitives) throws -> TestSuite.AssortedPrimitives {
         var _params = djinni.swift.ParameterList()
         _params.addValue(AssortedPrimitivesMarshaller.toCpp(i))
@@ -212,6 +219,10 @@ public class TestHelpers_statics {
         try handleCppErrors(&ret)
         return DjinniSupport.FutureMarshaller<Void_Marshaller>.fromCpp(ret)
     }
+    /**
+     * If the input is empty, returns back an empty future.
+     * If the input is non-empty, returns back the value plus one.
+     */
     public static func addOneIfPresent(_ f: DjinniSupport.DJFuture<Optional<Int32>>) throws -> DjinniSupport.DJFuture<Optional<Int32>> {
         var _params = djinni.swift.ParameterList()
         _params.addValue(DjinniSupport.FutureMarshaller<OptionalMarshaller<I32Marshaller>>.toCpp(f))
@@ -219,6 +230,7 @@ public class TestHelpers_statics {
         try handleCppErrors(&ret)
         return DjinniSupport.FutureMarshaller<OptionalMarshaller<I32Marshaller>>.fromCpp(ret)
     }
+    /** try-catches the future f, and accesses the error message, and returns as a string. */
     public static func returnExceptionString(_ f: DjinniSupport.DJFuture<Int32>) throws -> DjinniSupport.DJFuture<String> {
         var _params = djinni.swift.ParameterList()
         _params.addValue(DjinniSupport.FutureMarshaller<I32Marshaller>.toCpp(f))
