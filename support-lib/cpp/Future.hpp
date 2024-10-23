@@ -121,6 +121,17 @@ struct SharedState: ValueHolder<T> {
     inplace_stop_source stopSource;
     inplace_stop_token stopToken = stopSource.get_token();
 
+    struct ForwardingStopCallback final {
+        std::shared_ptr<inplace_stop_source> _stopSource;
+        void operator()() noexcept {
+            _stopSource->request_stop();
+        }
+        
+        ForwardingStopCallback(std::shared_ptr<inplace_stop_source> stopSource)
+        :_stopSource{std::move(stopSource)} {}
+    };
+    std::optional<inplace_stop_callback<ForwardingStopCallback>> stopCallback{};
+
     bool isReady() const {
         return this->value.has_value() || exception != nullptr;
     }
@@ -347,6 +358,7 @@ public:
         assert(sharedState);    // a second call will trigger assertion
         auto nextPromise = std::make_unique<Promise<HandlerReturnType>>();
         auto nextFuture = nextPromise->getFuture();
+        forwardCancellationFrom(*nextPromise->getStopToken(), sharedState);
         auto continuation = [handler = std::forward<FUNC>(handler), nextPromise = std::move(nextPromise)] (detail::SharedStatePtr<T> x) mutable {
             try {
                 if constexpr(std::is_void_v<HandlerReturnType>) {
@@ -386,6 +398,14 @@ public:
 private:
     detail::SharedStatePtr<T> _sharedState;
 
+    static void forwardCancellationFrom(inplace_stop_token stop_token, const detail::SharedStatePtr<T>& to) {
+        assert(!to->stopCallback); // future that already gets cancellations forwarded will trigger assertion
+        to->stopCallback.emplace(stop_token, std::shared_ptr<inplace_stop_source>{
+            to,
+            &to->stopSource,
+        });
+    }
+
 #if defined(DJINNI_FUTURE_HAS_COROUTINE_SUPPORT)
 public:
     bool await_ready() {
@@ -398,8 +418,12 @@ public:
         sharedState = std::atomic_exchange(&_sharedState, sharedState);
         return Future<T>(sharedState).get();
     }
-    void await_suspend(detail::CoroutineHandle<> h) {
-        this->then([h, this] (Future<T> x) mutable {
+    template<typename P>
+    void await_suspend(detail::CoroutineHandle<P> h) {
+        auto& promise = h.promise();
+
+        forwardCancellationFrom(*promise._promise.getStopToken(), _sharedState);
+        this->then([h, this](Future<T> x) mutable {
             std::atomic_store(&_sharedState, x._sharedState);
             h();
         });
