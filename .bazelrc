@@ -1,1 +1,1 @@
-build --cxxopt=-std=c++17 --cxxopt=-fcoroutines-ts --host_cxxopt=-std=c++17 --host_cxxopt=-fcoroutines-ts --incompatible_java_common_parameters=false --define=android_dexmerger_tool=d8_dexmerger --define=android_incremental_dexing_tool=d8_dexbuilder --nouse_workers_with_dexbuilder
+build --cxxopt=-std=c++17 --host_cxxopt=-std=c++17  --incompatible_java_common_parameters=false --define=android_dexmerger_tool=d8_dexmerger --define=android_incremental_dexing_tool=d8_dexbuilder --nouse_workers_with_dexbuilder
