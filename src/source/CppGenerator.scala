@@ -39,13 +39,13 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
     var hppFwds = mutable.TreeSet[String]()
     var cpp = mutable.TreeSet[String]()
 
-    def find(ty: TypeRef, forwardDeclareOnly: Boolean) { find(ty.resolved, forwardDeclareOnly) }
-    def find(tm: MExpr, forwardDeclareOnly: Boolean) {
-      tm.args.foreach((x) => find(x, forwardDeclareOnly))
-      find(tm.base, forwardDeclareOnly)
+    def find(ty: TypeRef, forwardDeclareOnly: Boolean, constants: Boolean) { find(ty.resolved, forwardDeclareOnly, constants) }
+    def find(tm: MExpr, forwardDeclareOnly: Boolean, constants: Boolean) {
+      tm.args.foreach((x) => find(x, forwardDeclareOnly, constants))
+      find(tm.base, forwardDeclareOnly, constants)
     }
-    def find(m: Meta, forwardDeclareOnly : Boolean) = {
-      for(r <- marshal.hppReferences(m, name, forwardDeclareOnly)) r match {
+    def find(m: Meta, forwardDeclareOnly : Boolean, constants: Boolean) = {
+      for(r <- marshal.hppReferences(m, name, forwardDeclareOnly, constants)) r match {
         case ImportRef(arg) => hpp.add("#include " + arg)
         case DeclRef(decl, Some(spec.cppNamespace)) => hppFwds.add(decl)
         case DeclRef(_, _) =>
@@ -129,9 +129,18 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
     // Make sure we don't constexpr optionals as some might not support it
     val canConstexpr = c.ty.resolved.base match {
       case p: MPrimitive if c.ty.resolved.base != MOptional => true
+      // if we have defined a constexpr string
+      case MString => spec.cppStringConstexpr.isDefined 
       case _ => false
     }
     canConstexpr
+  }
+
+  // Gets the type of the constant to be used in the header file
+  // If the type is a string and we have defined constexpr string we use that one.
+  def generateHppConstantType(constexpr: Boolean, field_type: String) : String = {
+      val ft = if(constexpr && field_type == "std::string") spec.cppStringConstexpr.get else field_type
+      if (constexpr) s"constexpr ${ft}" else s"${ft} const"
   }
 
   def generateHppConstants(w: IndentWriter, consts: Seq[Const]) = {
@@ -139,16 +148,18 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
       // set value in header if can constexpr (only primitives)
       var constexpr = shouldConstexpr(c)
       var constValue = ";"
+      var field_type = marshal.fieldType(c.ty)
       if (constexpr) {
         constValue = c.value match {
         case l: Long => " = " + l.toString + ";"
-        case d: Double if marshal.fieldType(c.ty) == "float" => " = " + d.toString + "f;"
+        case d: Double if field_type == "float" => " = " + d.toString + "f;"
         case d: Double => " = " + d.toString + ";"
         case b: Boolean => if (b) " = true;" else " = false;"
+        case s: String => " = " + s + ";"
         case _ => ";"
         }
       }
-      val constFieldType = if (constexpr) s"constexpr ${marshal.fieldType(c.ty)}" else s"${marshal.fieldType(c.ty)} const"
+      val constFieldType = generateHppConstantType(constexpr, field_type)
 
       // Write code to the header file
       w.wl
@@ -197,8 +208,8 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
 
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: Record) {
     val refs = new CppRefs(ident.name)
-    r.fields.foreach(f => refs.find(f.ty, false))
-    r.consts.foreach(c => refs.find(c.ty, false))
+    r.fields.foreach(f => refs.find(f.ty, false, false))
+    r.consts.foreach(c => refs.find(c.ty, false, true))
     refs.hpp.add("#include <utility>") // Add for std::move
 
     val self = marshal.typename(ident, r)
@@ -329,11 +340,11 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface) {
     val refs = new CppRefs(ident.name)
     i.methods.map(m => {
-      m.params.map(p => refs.find(p.ty, true))
-      m.ret.foreach((x)=>refs.find(x, true))
+      m.params.map(p => refs.find(p.ty, true, false))
+      m.ret.foreach((x)=>refs.find(x, true, false))
     })
     i.consts.map(c => {
-      refs.find(c.ty, true)
+      refs.find(c.ty, true, true)
     })
 
     val self = marshal.typename(ident, i)
