@@ -439,7 +439,12 @@ using WcharConverter = std::wstring_convert<std::codecvt_utf16<wchar_t, 0x10ffff
 using Utf8Converter = std::wstring_convert<std::codecvt_utf8_utf16<char16_t, 0x10ffff, std::codecvt_mode::little_endian>, char16_t>;
 
 jstring jniStringFromWString(JNIEnv * env, const std::wstring & str) {
-    std::string u16 = WcharConverter{}.to_bytes(str);
+    std::string u16{};
+    try {
+        u16 = WcharConverter{}.to_bytes(str);
+    } catch (...) {
+        // Conversion error - empty string will be returned
+    }
     jstring res = env->NewString(reinterpret_cast<const jchar*>(u16.data()), u16.size()/sizeof(jchar));
     DJINNI_ASSERT(res, env);
     return res;
@@ -457,7 +462,12 @@ std::wstring jniWStringFromString(JNIEnv * env, const jstring jstr) {
 }
 
 jstring jniStringFromUTF8(JNIEnv * env, const std::string & str) {
-    std::u16string u16 = Utf8Converter{}.from_bytes(str);
+    std::u16string u16{};
+    try {
+        u16 = Utf8Converter{}.from_bytes(str);
+    } catch (...) {
+        // Conversion error - empty string will be returned
+    }
     jstring res = env->NewString(reinterpret_cast<const jchar*>(u16.data()), u16.size());
     DJINNI_ASSERT(res, env);
     return res;
