@@ -20,7 +20,7 @@
 
 namespace djinni::composer {
 
-using namespace Composer;
+using namespace Valdi;
 
 std::unordered_map<ComposerProxyId, std::weak_ptr<ComposerProxyBase>> jsProxyCache;
 std::unordered_map<void*, CppProxyCacheEntry> cppProxyCache;
