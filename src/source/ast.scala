@@ -52,9 +52,9 @@ case class ExternTypeDecl(override val ident: Ident, override val params: Seq[Ty
 case class ProtobufTypeDecl(override val ident: Ident, override val params: Seq[TypeParam], override val body: TypeDef, override val origin: String) extends TypeDecl
 
 // `Ext.js` is shared by both wasm and composer
-case class Ext(java: Boolean, cpp: Boolean, objc: Boolean, js: Boolean) {
+case class Ext(java: Boolean, cpp: Boolean, objc: Boolean, js: Boolean, swift: Boolean) {
   def any(): Boolean = {
-    java || cpp || objc || js
+    java || cpp || objc || js || swift
   }
 }
 
@@ -86,7 +86,7 @@ case class Record(ext: Ext, fields: Seq[Field], consts: Seq[Const], derivingType
 object Record {
   object DerivingType extends Enumeration {
     type DerivingType = Value
-    val Eq, Ord, AndroidParcelable, NSCopying, Req = Value
+    val Eq, Ord, AndroidParcelable, NSCopying, Req, Hashable, Sendable, Codable, Error = Value
   }
 }
 
@@ -97,10 +97,11 @@ object Interface {
 
 case class Field(ident: Ident, ty: TypeRef, doc: Doc)
 
-case class ProtobufMessage(cpp: ProtobufMessage.Cpp, java: ProtobufMessage.Java, objc: Option[ProtobufMessage.Objc], ts: Option[ProtobufMessage.Ts]) extends TypeDef
+case class ProtobufMessage(cpp: ProtobufMessage.Cpp, java: ProtobufMessage.Java, objc: Option[ProtobufMessage.Objc], ts: Option[ProtobufMessage.Ts], swift: Option[ProtobufMessage.Swift]) extends TypeDef
 object ProtobufMessage {
   case class Cpp(header: String, ns: String)
   case class Java(pkg: String, jniClass: Option[String], jniHeader: Option[String])
   case class Objc(header: String, prefix: String)
   case class Ts(module: String, ns: String)
+  case class Swift(module: String, prefix: String)
 }

@@ -82,7 +82,7 @@ public:
 
         __block auto p = std::make_unique<NativePromiseType>();
         auto f = p->getFuture();
-        [o then: ^id(DJFuture* res) {
+        [o then: ^id(DJFuture*) {
                 @try {
                     p->setValue();
                 } @catch (NSException* e) {
@@ -98,7 +98,7 @@ public:
         DJPromise<NSNull*>* promise = [[DJPromise alloc] init];
         DJFuture<NSNull*>* future = [promise getFuture];
 
-        c.then([promise] (Future<void> res) {
+        c.then([promise] (Future<void>) {
                 try {
                     [promise setValue:[NSNull null]];
                 } catch (const std::exception& e) {

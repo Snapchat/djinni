@@ -120,7 +120,7 @@ class TsGenerator(spec: Spec, composerMode: Boolean) extends Generator(spec) {
 
   def references(m: Meta): Seq[TsSymbolRefBase] = m match {
     case e: MExtern => List(TsSymbolRef(idJs.ty(e.name), fixDjinniSupportModulePath(e.ts.module)))
-    case MProtobuf(name, _, ProtobufMessage(_,_,_,Some(ts))) =>
+    case MProtobuf(name, _, ProtobufMessage(_,_,_,Some(ts),_)) =>
       if (composerMode) List(ProtoSymbolRef(name, ts.module, ts.ns))
         else List(TsSymbolRef(name, ts.module))
     case _ => List()

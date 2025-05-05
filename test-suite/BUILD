@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary", "objc_library")
 load("@rules_java//java:defs.bzl", "java_test")
 load("@build_bazel_rules_apple//apple:macos.bzl", "macos_unit_test")
+load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library", "swift_test")
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
 
 cc_library(
@@ -55,6 +56,7 @@ objc_library(
     copts = [
         "-ObjC++",
         "-std=c++17",
+        "-fcoroutines-ts"
     ],
     srcs = glob([
         "generated-src/objc/**/*.mm",
@@ -190,4 +192,65 @@ sh_binary(
     srcs = ["handwritten-src/js/run.sh"],
     data = glob(["handwritten-src/js/*.html",
                  "handwritten-src/js/*.js"]) + [":wasm"]
+)
+
+swift_helper_files = "handwritten-src/swift/*+Helper.swift"
+swift_error_files = "handwritten-src/swift/*+Error.swift"
+
+swift_test(
+    name = "djinni-swift-tests",
+    srcs = glob(['handwritten-src/swift/*.swift'], exclude = [swift_helper_files, swift_error_files]),
+    deps = [':test-swift-bridge'],
+    copts = ["-cxx-interoperability-mode=default", "-Xcc", "-std=c++17"],
+)
+
+swift_library(
+    name = "test-swift-bridge",
+    module_name = "TestSuite",
+    srcs = glob([
+        "generated-src/swift/*.swift",
+        swift_error_files,
+        swift_helper_files
+    ]),
+    copts = ["-cxx-interoperability-mode=default", "-Xcc", "-std=c++17",],
+    deps = [
+        ":djinni-tests-common",
+        ":test-swiftxx",
+        "//support-lib:djinni-support-swift",
+        "//support-lib:djinni-support-swiftxx",
+        ":protobuf-test-swift"
+    ],
+    visibility = ["//visibility:public"],
+)
+
+swift_library(
+    name = "protobuf-test-swift",
+    module_name = "ProtobufTest",
+    srcs = glob(["djinni/vendor/third-party/proto/swift/*.swift"]),
+    deps = [
+        "@apple_swift_protobuf//:swift-protobuf"
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "test-swiftxx",
+    srcs = glob([
+        "generated-src/swiftxx/*.cpp",
+    ]),
+    hdrs = glob([
+        "generated-src/swiftxx/*.hpp",
+    ]),
+    includes = [
+        "generated-src/swiftxx",
+        ".",
+    ],
+    deps = [
+        ":djinni-tests-common",
+        "//support-lib:djinni-support-common",
+        "//support-lib:djinni-support-swiftxx",
+    ],
+    copts = ["-std=c++17",],
+    tags = ["swift_module=TestSuiteCxx"],
+    visibility = ["//visibility:public"],
 )
