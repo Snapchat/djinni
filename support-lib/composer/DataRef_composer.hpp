@@ -23,13 +23,13 @@ namespace djinni::composer {
 
 struct NativeDataRef {
     using CppType = DataRef;
-    using ComposerType = Composer::Value;
+    using ComposerType = Valdi::Value;
     using Boxed = NativeDataRef;
 
     static CppType toCpp(const ComposerType& v);
     static ComposerType fromCpp(const CppType& c);
     
-    static const Composer::ValueSchema& schema();
+    static const Valdi::ValueSchema& schema();
 };
 
 } // namespace djinni

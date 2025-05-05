@@ -20,7 +20,7 @@
 
 namespace djinni::composer {
 
-using namespace Composer;
+using namespace Valdi;
 
 std::unordered_map<ComposerProxyId, std::weak_ptr<ComposerProxyBase>> jsProxyCache;
 std::unordered_map<void*, CppProxyCacheEntry> cppProxyCache;
@@ -35,7 +35,7 @@ void checkForNull(void* ptr, const char* context) {
 
 ValueSchema resolveSchema(const ValueSchema& unresolved, std::function<void()> registerSchemaFunc) noexcept {
     registerSchemaFunc();
-    Composer::ValueSchemaTypeResolver resolver(Composer::ValueSchemaRegistry::sharedInstance().get());
+    Valdi::ValueSchemaTypeResolver resolver(Valdi::ValueSchemaRegistry::sharedInstance().get());
     auto result = resolver.resolveTypeReferences(unresolved);
     result.ensureSuccess();
     return result.moveValue();
@@ -46,7 +46,7 @@ void registerSchemaImpl(const ValueSchema& schema, bool resolve) noexcept {
     if (!resolve) {
         registry->registerSchema(schema);
     } else {
-        Composer::ValueSchemaTypeResolver resolver(registry.get());
+        Valdi::ValueSchemaTypeResolver resolver(registry.get());
         auto result = resolver.resolveTypeReferences(schema);
         result.ensureSuccess();
         auto key = ValueSchemaRegistryKey(ValueSchema::typeReference(ValueSchemaTypeReference::named(schema.getClass()->getClassName())));
@@ -79,7 +79,7 @@ Date::CppType Date::toCpp(const Date::ComposerType& v) noexcept {
 
 Date::ComposerType Date::fromCpp(const Date::CppType& c) noexcept {
     auto millisecondsSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(c.time_since_epoch());
-    return Composer::Value(static_cast<double>(millisecondsSinceEpoch.count()));
+    return Valdi::Value(static_cast<double>(millisecondsSinceEpoch.count()));
 }
 
 const ValueSchema& Date::schema() noexcept {

@@ -23,7 +23,7 @@ namespace djinni::composer {
 
 struct NativeDataView {
     using CppType = DataView;
-    using ComposerType = Composer::Value;
+    using ComposerType = Valdi::Value;
     using Boxed = NativeDataView;
 
     static CppType toCpp(const ComposerType& v) {
@@ -33,13 +33,13 @@ struct NativeDataView {
     }
 
     static ComposerType fromCpp(const CppType& c) {
-        Composer::BytesView buf(nullptr, c.buf(), c.len());
-        auto arr = Composer::makeShared<Composer::ValueTypedArray>(Composer::kDefaultTypedArrayType, buf);
-        return Composer::Value(arr);
+        Valdi::BytesView buf(nullptr, c.buf(), c.len());
+        auto arr = Valdi::makeShared<Valdi::ValueTypedArray>(Valdi::kDefaultTypedArrayType, buf);
+        return Valdi::Value(arr);
     }
     
-    static const Composer::ValueSchema& schema() {
-        static auto schema = Composer::ValueSchema::valueTypedArray();
+    static const Valdi::ValueSchema& schema() {
+        static auto schema = Valdi::ValueSchema::valueTypedArray();
         return schema;
     }
 };
