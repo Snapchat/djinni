@@ -15,6 +15,18 @@ def djinni_deps():
         ],
         sha256 = "1c531376ac7e5a180e0237938a2536de0c54d93f5c278634818e0efc952dd56c",
     )
+    # override zlib for protobuf/grpc to inlucde https://github.com/madler/zlib/commit/4bd9a71f3539b5ce47f0c67ab5e01f3196dc8ef9
+    maybe(
+        name = "zlib",
+        repo_rule = http_archive,
+        build_file = "@com_google_protobuf//:third_party/zlib.BUILD",
+        sha256 = "38ef96b8dfe510d42707d9c781877914792541133e1870841463bfa73f883e32",
+        strip_prefix = "zlib-1.3.1",
+        urls = [
+            "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.xz",
+            "https://zlib.net/zlib-1.3.1.tar.xz",
+        ],
+    )
     rules_scala_version = "6.1.0"
     maybe(
         name = "io_bazel_rules_scala",
