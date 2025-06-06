@@ -37,5 +37,5 @@ ts:
   module: ''
   generic: true
 composer:
-  translator: '::djinni::composer::FutureAdaptor'
-  header: '"$Future_composer.hpp"'
+  translator: '::djinni::valdi::FutureAdaptor'
+  header: '"$Future_valdi.hpp"'

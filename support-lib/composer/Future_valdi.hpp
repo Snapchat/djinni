@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include "djinni_composer.hpp"
+#include "djinni_valdi.hpp"
 #include "../cpp/Future.hpp"
 #include "composer_core/cpp/Utils/ResolvablePromise.hpp"
 
-namespace djinni::composer {
+namespace djinni::valdi {
 
 template <class RESULT>
 class FutureAdaptor
@@ -29,13 +29,13 @@ class FutureAdaptor
 
 public:
     using CppType = Future<CppResType>;
-    using ComposerType = Composer::Value;
+    using ValdiType = Composer::Value;
 
     using Boxed = FutureAdaptor;
 
     using NativePromiseType = Promise<CppResType>;
 
-    static CppType toCpp(ComposerType o)
+    static CppType toCpp(ValdiType o)
     {
         auto composerPromise = castOrNull<Composer::Promise>(o.getComposerObject());
         auto cppPromise = Composer::makeShared<Promise<CppResType>>();
@@ -54,7 +54,7 @@ public:
         return cppFuture;
     }
 
-    static ComposerType fromCpp(CppType c)
+    static ValdiType fromCpp(CppType c)
     {
         auto composerPromise = Composer::makeShared<Composer::ResolvablePromise>();
         c.then([composerPromise] (Future<CppResType> f) {

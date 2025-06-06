@@ -34,5 +34,5 @@ ts:
   typename: 'Uint8Array'
   module: ''
 composer:
-  translator: '::djinni::composer::NativeDataRef'
-  header: '"$DataRef_composer.hpp"'
+  translator: '::djinni::valdi::NativeDataRef'
+  header: '"$DataRef_valdi.hpp"'

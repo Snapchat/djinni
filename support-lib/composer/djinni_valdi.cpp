@@ -14,15 +14,15 @@
   * limitations under the License.
   */
 
-#include "djinni_composer.hpp"
+#include "djinni_valdi.hpp"
 
 #include "composer_core/cpp/Utils/ValueTypedArray.hpp"
 
-namespace djinni::composer {
+namespace djinni::valdi {
 
 using namespace Composer;
 
-std::unordered_map<ComposerProxyId, std::weak_ptr<ComposerProxyBase>> jsProxyCache;
+std::unordered_map<ValdiProxyId, std::weak_ptr<ValdiProxyBase>> jsProxyCache;
 std::unordered_map<void*, CppProxyCacheEntry> cppProxyCache;
 std::mutex jsProxyCacheMutex;
 std::mutex cppProxyCacheMutex;
@@ -54,13 +54,13 @@ void registerSchemaImpl(const ValueSchema& schema, bool resolve) noexcept {
     }
 }
 
-Binary::CppType Binary::toCpp(const Binary::ComposerType& v) noexcept {
+Binary::CppType Binary::toCpp(const Binary::ValdiType& v) noexcept {
     auto a = v.getTypedArrayRef();
     auto buffer = a->getBuffer();
     return CppType(buffer.begin(), buffer.end());
 }
 
-Binary::ComposerType Binary::fromCpp(const Binary::CppType& c) noexcept {
+Binary::ValdiType Binary::fromCpp(const Binary::CppType& c) noexcept {
     auto bytes = makeShared<Bytes>();
     bytes->assignData(c.data(), c.size());
     auto va = makeShared<ValueTypedArray>(TypedArrayType::Uint8Array, bytes);
@@ -72,12 +72,12 @@ const ValueSchema& Binary::schema() noexcept {
     return schema;
 }
 
-Date::CppType Date::toCpp(const Date::ComposerType& v) noexcept {
+Date::CppType Date::toCpp(const Date::ValdiType& v) noexcept {
     auto millisecondsSinceEpoch = std::chrono::milliseconds(static_cast<int64_t>(v.toDouble()));
     return CppType(std::chrono::duration_cast<std::chrono::system_clock::duration>(millisecondsSinceEpoch));
 }
 
-Date::ComposerType Date::fromCpp(const Date::CppType& c) noexcept {
+Date::ValdiType Date::fromCpp(const Date::CppType& c) noexcept {
     auto millisecondsSinceEpoch = std::chrono::duration_cast<std::chrono::milliseconds>(c.time_since_epoch());
     return Composer::Value(static_cast<double>(millisecondsSinceEpoch.count()));
 }
