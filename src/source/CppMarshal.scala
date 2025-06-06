@@ -12,7 +12,7 @@
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
-  * 
+  *
   * This file has been modified by Snap, Inc.
   */
 
@@ -117,7 +117,12 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
     case e: MExtern => e.defType match {
       // Do not forward declare extern types, they might be in arbitrary namespaces.
       // This isn't a problem as extern types cannot cause dependency cycles with types being generated here
-      case DInterface => List(ImportRef("<memory>"), ImportRef(e.cpp.header))
+      case DInterface =>
+        val base = List(ImportRef("<memory>"), ImportRef(e.cpp.header))
+        spec.cppNnHeader match {
+          case Some(nnHdr) => ImportRef(nnHdr) :: base
+          case _ => base
+        }
       case _ => List(ImportRef(resolveExtCppHdr(e.cpp.header)))
     }
     case p: MProtobuf =>
@@ -211,11 +216,21 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
                 case DInterface => s"${nnType}<${withNamespace(idCpp.ty(d.name))}>"
                 case _ => base(tm.base) + args
               }
+            case e: MExtern =>
+              e.defType match {
+                case DInterface => s"${nnType}<${e.cpp.typename}>"
+                case _ => base(tm.base) + args
+              }
             case MOptional =>
               tm.args.head.base match {
                 case d: MDef =>
                   d.defType match {
                     case DInterface => s"std::shared_ptr<${withNamespace(idCpp.ty(d.name))}>"
+                    case _ => base(tm.base) + args
+                  }
+                case e: MExtern =>
+                  e.defType match {
+                    case DInterface => s"std::shared_ptr<${e.cpp.typename}>"
                     case _ => base(tm.base) + args
                   }
                 case _ => base(tm.base) + args

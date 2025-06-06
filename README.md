@@ -26,9 +26,9 @@ to build and run Objective-C and Java tests.
 
 ### Building and running the mobile example apps
 
-The Android example app can be build with bazel: `bazel build
-//examples:android-app`, and then install to a device with `adb install
-bazel-bin/examples/android-app.apk`
+You need to install the Android SDK 30.0.2 and the NDK 21.4.7075529. You need both `ANDROID_SDK_HOME` and `ANDROID_NDK_HOME` env variables set.
+The Android example app can be build with bazel: `bazel build //examples:android-app`, 
+and then install to a device with `adb install bazel-bin/examples/android-app.apk`
 
 The iOS example app are built with Xcode. Simply open the project in Xcode and
 it should work.
@@ -65,7 +65,7 @@ verify the build and binary from the command line.
  - Protobuf type support
  - Local flags with `@flag` directive
  - DataView for copy free data passing
- - DateRef for copy free data passing with ownership
+ - DataRef for copy free data passing with ownership
  - Generating string names for C++ enums
  - Omit optional parameters from record constructors
  - Records are default mutable across all platforms
@@ -141,7 +141,8 @@ outcome<RESULT, ERROR>
 Where RESULT and ERROR can be any Djinni types (primitives or records).
 
 
-In C++, the `outcome<>` type maps to the template class `djinni::expected<>`.
+In C++, the `outcome<>` type maps to the template `djinni::expected<>`,
+which is an alias of `std::expected<>` if supported or a drop-in replacement otherwise.
 In Java, it maps to the generic class `com.snapchat.djinni.Outcome<>`. In ObjC,
 it maps to the generic class `DJOutcome<>`.
 
@@ -303,9 +304,11 @@ Notable differences when comparing to the Java/ObjC support:
   easily add extension methods (by add functions to prototype) without having to
   derive from a base class.
 
-The command to run Wasm/TypeScript unit tests is `bazel run
-//test-suite:server-ts`. You will need the `tsc` compiler and the `browserify`
-tool to run these tests.
+Use `bazel run //test-suite:server-ts` to run the Wasm/TypeScript unit tests.
+You will need `npm` and run `npm install` in the `test-suite` folder.
+You need as well the `tsc` compiler and the `browserify` tool to run these tests.
+
+To run the examples server: `bazel run //examples:server`
 
 ## Async interface support
 

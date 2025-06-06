@@ -116,7 +116,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
       case MMap =>
         assert(tm.args.size == 2)
         f
-      case MProtobuf(name, _, ProtobufMessage(cpp,_,_,Some(ts))) =>
+      case MProtobuf(name, _, ProtobufMessage(cpp,_,_,Some(ts),_)) =>
         assert(tm.args.size == 0)
         val tsname = if (ts.ns.isEmpty) name else ts.ns + "." + name
         s"""<${withNs(Some(cpp.ns), name)}, ${jsClassNameAsCppType(tsname)}>"""
@@ -189,17 +189,17 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.wl(s"struct $helper").bracedSemi {
         w.wl(s"using CppType = $cls;")
-        w.wl("using ValdiType = Composer:: Value;")
+        w.wl("using ValdiType = Valid:: Value;")
         w.wl(s"using Boxed = $helper;")
         w.wl
         w.wl("static CppType toCpp(const ValdiType& v);")
         w.wl("static ValdiType fromCpp(const CppType& c);")
         w.wl
-        w.wl("static const Composer::ValueSchema& schema() noexcept;")
+        w.wl("static const Valdi::ValueSchema& schema() noexcept;")
       }
     }), (w => {}))
     writeCppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle, spec.composerIncludePrefix) (ident.name, origin, refs.cpp, (w => {
-      w.wl("using namespace Composer;")
+      w.wl("using namespace Valdi;")
       w.wl
       w.w(s"auto $helper::toCpp(const ValdiType& v) -> CppType").braced {
         w.wl("auto o = v.getTypedObjectRef();")
@@ -247,18 +247,18 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.w(s"struct $helper : ::djinni::valdi::JsInterface<$cls, $helper>").bracedSemi {
         w.wl("static void registerSchema(bool resolve) noexcept;")
-        w.wl("static const Composer::ValueSchema& schemaRef() noexcept;")
-        w.wl("static const Composer::ValueSchema& schema() noexcept;")
+        w.wl("static const Valdi::ValueSchema& schemaRef() noexcept;")
+        w.wl("static const Valdi::ValueSchema& schema() noexcept;")
 
         // cpp marshal helper
         if (i.ext.cpp) {
-          w.wl("static Composer::Ref<Composer::ValueTypedProxyObject> toComposer(const CppOptType& c);")
+          w.wl("static Valdi::Ref<Valdi::ValueTypedProxyObject> toComposer(const CppOptType& c);")
         }
 
         // js proxy
         if (i.ext.js) {
-          w.w(s"struct ValdiProxy: $cls, ::djinni::valdi::ValdiProxyBase").bracedSemi {
-            w.wl("ValdiProxy(Composer::Ref<Composer::ValueTypedProxyObject> js) : ValdiProxyBase(js) {}")
+          w.w(s"struct ValdiProxy: $cls, ::djinni::composer::ValdiProxyBase").bracedSemi {
+            w.wl("ValdiProxy(Valdi::Ref<Valdi::ValueTypedProxyObject> js) : ValdiProxyBase(js) {}")
             for (m <- i.methods.filter(m => !m.static)) {
               w.w(s"${cppMarshal.fqReturnType(m.ret)} ${idCpp.method(m.ident)}(")
               w.w(m.params.map(p => {
@@ -273,7 +273,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         //static methods
         val staticMethods = i.methods.filter(m => m.static)
         if (!staticMethods.isEmpty) {
-          w.wl("static void djinniInitStaticMethods(Composer::Ref<Composer::ValueMap> m) noexcept;")
+          w.wl("static void djinniInitStaticMethods(Valdi::Ref<Valdi::ValueMap> m) noexcept;")
         }
 
         //TODO ???
@@ -285,7 +285,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     }), (w => {}))
 
     writeCppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle, spec.composerIncludePrefix)(ident.name, origin, refs.cpp, (w => {
-      w.wl("using namespace Composer;")
+      w.wl("using namespace Valdi;")
       w.wl("using namespace std::placeholders;")
       w.wl
       w.wl(s"""static STRING_CONST(schemaName, "${schemaTypeNameForInterface(ident)}");""")

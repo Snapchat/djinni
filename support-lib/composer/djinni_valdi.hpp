@@ -46,31 +46,31 @@ namespace djinni::valdi {
 class JsException : public std::runtime_error {
 public:
     // Input must be an instanceof an Error Type
-    JsException(Composer::Error e): std::runtime_error(e.toString()), _jsEx(std::move(e))
+    JsException(Valdi::Error e): std::runtime_error(e.toString()), _jsEx(std::move(e))
     {}
-    const Composer::Error& cause() const noexcept { return _jsEx; }
+    const Valdi::Error& cause() const noexcept { return _jsEx; }
 private:
-    Composer::Error _jsEx;
+    Valdi::Error _jsEx;
 };
 
 template<typename T>
 struct ExceptionHandlingTraits {
-    static Composer::Value handleNativeException(const std::exception& e, const Composer::ValueFunctionCallContext& callContext) noexcept {
+    static Valdi::Value handleNativeException(const std::exception& e, const Valdi::ValueFunctionCallContext& callContext) noexcept {
         // store C++ exception in JS Error and raise in JS runtime
         auto msg = STRING_FORMAT("C++: {}", e.what());
-        callContext.getExceptionTracker().onError(Composer::Error(std::move(msg)));
-        return Composer::Value::undefined();
+        callContext.getExceptionTracker().onError(Valdi::Error(std::move(msg)));
+        return Valdi::Value::undefined();
     }
-    static Composer::Value handleNativeException(const JsException& e, const Composer::ValueFunctionCallContext& callContext) noexcept {
+    static Valdi::Value handleNativeException(const JsException& e, const Valdi::ValueFunctionCallContext& callContext) noexcept {
         // JS error passthrough
         callContext.getExceptionTracker().onError(e.cause());
-        return Composer::Value::undefined();
+        return Valdi::Value::undefined();
     }
 };
 
 template<typename T, typename F>
-Composer::Value tsFunc(F&& f) noexcept {
-    return Composer::Value(Composer::makeShared<Composer::ValueFunctionWithCallable>([f = std::forward<F>(f)] (const Composer::ValueFunctionCallContext& callContext) noexcept {
+Valdi::Value tsFunc(F&& f) noexcept {
+    return Valdi::Value(Valdi::makeShared<Valdi::ValueFunctionWithCallable>([f = std::forward<F>(f)] (const Valdi::ValueFunctionCallContext& callContext) noexcept {
         try {
             return f(callContext);
         }
@@ -79,21 +79,21 @@ Composer::Value tsFunc(F&& f) noexcept {
         } catch (const std::exception& e) {
             return ExceptionHandlingTraits<T>::handleNativeException(e, callContext);
         }
-        return Composer::Value::undefined();
+        return Valdi::Value::undefined();
     }));
 }
 
 void checkForNull(void* ptr, const char* context);
 
-Composer::ValueSchema resolveSchema(const Composer::ValueSchema& unresolved, std::function<void()> registerSchemaFunc) noexcept;
+Valdi::ValueSchema resolveSchema(const Valdi::ValueSchema& unresolved, std::function<void()> registerSchemaFunc) noexcept;
 
-void registerSchemaImpl(const Composer::ValueSchema& schema, bool resolve) noexcept;
+void registerSchemaImpl(const Valdi::ValueSchema& schema, bool resolve) noexcept;
 
 template<typename T>
-Composer::ValueSchema getResolvedSchema(const Composer::StringBox& typeName) noexcept {
+Valdi::ValueSchema getResolvedSchema(const Valdi::StringBox& typeName) noexcept {
     T::registerSchema(false);
     T::registerSchema(true);
-    auto registry = Composer::ValueSchemaRegistry::sharedInstance();
+    auto registry = Valdi::ValueSchemaRegistry::sharedInstance();
     auto result = registry->getSchemaForTypeName(typeName);
     return result.value();
 }
@@ -104,7 +104,7 @@ template<class T>
 struct hasSchemaRef<T, std::void_t<decltype(T::schemaRef)>> : std::true_type { };
 
 template<typename T>
-const Composer::ValueSchema& schemaOrRef() noexcept {
+const Valdi::ValueSchema& schemaOrRef() noexcept {
     if constexpr (hasSchemaRef<T>::value) {
         return T::schemaRef();
     } else {
@@ -117,7 +117,11 @@ template<typename T, typename U = T>
 class Primitive {
 public:
     using CppType = T;
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     using ValdiType = Composer::Value;
+=======
+    using ComposerType = Valdi::Value;
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
 
     using Boxed = Primitive;
 
@@ -127,8 +131,8 @@ public:
     static ValdiType fromCpp(const CppType& c) noexcept {
         return ValdiType(static_cast<U>(c));
     }
-    static const Composer::ValueSchema& schema() noexcept {
-        static auto schema = Composer::ValueSchema::primitiveType<U>();
+    static const Valdi::ValueSchema& schema() noexcept {
+        static auto schema = Valdi::ValueSchema::primitiveType<U>();
         return schema;
     }
 };
@@ -151,7 +155,11 @@ class WString {
     using Utf16Converter = std::wstring_convert<std::codecvt_utf16<wchar_t>>;
 public:
     using CppType = std::wstring;
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     using ValdiType = Composer::Value;
+=======
+    using ComposerType = Valdi::Value;
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
 
     using Boxed = WString;
 
@@ -161,7 +169,7 @@ public:
             return Utf8Converter{}.from_bytes(utf8str.data(), utf8str.data() + utf8str.size());
         } else {
             const auto* sstr = v.getStaticString();
-            if (sstr->encoding() == Composer::StaticString::Encoding::UTF8) {
+            if (sstr->encoding() == Valdi::StaticString::Encoding::UTF8) {
                 return Utf8Converter{}.from_bytes(sstr->utf8Data(), sstr->utf8Data() + sstr->size());
             } else {
                 const auto* begin = reinterpret_cast<const char*>(sstr->utf16Data());
@@ -173,8 +181,8 @@ public:
     static ValdiType fromCpp(const CppType& c) {
         return ValdiType(Utf8Converter{}.to_bytes(c));
     }
-    static const Composer::ValueSchema& schema() noexcept {
-        static auto schema = Composer::ValueSchema::string();
+    static const Valdi::ValueSchema& schema() noexcept {
+        static auto schema = Valdi::ValueSchema::string();
         return schema;
     }
 };
@@ -183,23 +191,41 @@ public:
 class Binary {
 public:
     using CppType = std::vector<uint8_t>;
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     using ValdiType = Composer::Value;
     using Boxed = Binary;
 
     static CppType toCpp(const ValdiType& j) noexcept;
     static ValdiType fromCpp(const CppType& c) noexcept;
     static const Composer::ValueSchema& schema() noexcept ;
+=======
+    using ComposerType = Valdi::Value;
+    using Boxed = Binary;
+
+    static CppType toCpp(const ComposerType& j) noexcept;
+    static ComposerType fromCpp(const CppType& c) noexcept;
+    static const Valdi::ValueSchema& schema() noexcept ;
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
 };
 
 class Date {
 public:
     using CppType = std::chrono::system_clock::time_point;
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     using ValdiType = Composer::Value;
     using Boxed = Date;
     
     static CppType toCpp(const ValdiType& v) noexcept;
     static ValdiType fromCpp(const CppType& c) noexcept;
     static const Composer::ValueSchema& schema() noexcept;
+=======
+    using ComposerType = Valdi::Value;
+    using Boxed = Date;
+    
+    static CppType toCpp(const ComposerType& v) noexcept;
+    static ComposerType fromCpp(const CppType& c) noexcept;
+    static const Valdi::ValueSchema& schema() noexcept;
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
 };
 
 template<template<class> class OptionalType, class T>
@@ -209,7 +235,11 @@ struct Optional {
     template<typename C>
     static typename C::CppOptType opt_type(typename C::CppOptType*);
     using CppType = decltype(opt_type<T>(nullptr));
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     using ValdiType = Composer::Value;
+=======
+    using ComposerType = Valdi::Value;
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
     using Boxed = Optional;
 
     static CppType toCpp(const ValdiType& j) {
@@ -219,17 +249,25 @@ struct Optional {
             return T::Boxed::toCpp(j);
         }
     }
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     static ValdiType fromCpp(const OptionalType<typename T::CppType>& c) {
         return c ? T::Boxed::fromCpp(*c) : Composer::Value::undefined();
     }
     static ValdiType fromCpp(OptionalType<typename T::CppType>&& c) {
         return c ? T::Boxed::fromCpp(std::move(*c)) : Composer::Value::undefined();
+=======
+    static ComposerType fromCpp(const OptionalType<typename T::CppType>& c) {
+        return c ? T::Boxed::fromCpp(*c) : Valdi::Value::undefined();
+    }
+    static ComposerType fromCpp(OptionalType<typename T::CppType>&& c) {
+        return c ? T::Boxed::fromCpp(std::move(*c)) : Valdi::Value::undefined();
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
     }
     template<typename C = T>
     static ValdiType fromCpp(const typename C::CppOptType& cppOpt) {
         return T::Boxed::fromCppOpt(cppOpt);
     }
-    static const Composer::ValueSchema& schema() noexcept {
+    static const Valdi::ValueSchema& schema() noexcept {
         static auto schema = schemaOrRef<T>().asOptional();
         return schema;
     }
@@ -242,11 +280,15 @@ class List {
 
 public:
     using CppType = std::vector<ECppType>;
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     using ValdiType = Composer::Value;
+=======
+    using ComposerType = Valdi::Value;
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
     using Boxed = List;
 
-    static const Composer::ValueSchema& schema() noexcept {
-        static auto schema = Composer::ValueSchema::array(schemaOrRef<T>());
+    static const Valdi::ValueSchema& schema() noexcept {
+        static auto schema = Valdi::ValueSchema::array(schemaOrRef<T>());
         return schema;
     }
 
@@ -261,12 +303,17 @@ public:
         }
         return c;
     }
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     static ValdiType fromCpp(const CppType& c) {
         auto newArray = Composer::ValueArray::make(c.size());
+=======
+    static ComposerType fromCpp(const CppType& c) {
+        auto newArray = Valdi::ValueArray::make(c.size());
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
         for (size_t i = 0; i < c.size(); ++i) {
             (*newArray)[i] = T::Boxed::fromCpp(c[i]);
         }
-        return Composer::Value(newArray);
+        return Valdi::Value(newArray);
     }
 };
 
@@ -276,26 +323,39 @@ class Set  {
     using EValdiType = typename T::Boxed::ValdiType;
 public:
     using CppType = std::unordered_set<ECppType>;
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     using ValdiType = Composer::Value;
     using Boxed = Set;
 
     static CppType toCpp(const ValdiType& v) {
         auto es6set = castOrNull<Composer::ES6Set>(v.getComposerObject());
+=======
+    using ComposerType = Valdi::Value;
+    using Boxed = Set;
+
+    static CppType toCpp(const ComposerType& v) {
+        auto es6set = castOrNull<Valdi::ES6Set>(v.getComposerObject());
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
         CppType cppSet;
         for (auto i = es6set->entries.begin(); i != es6set->entries.end(); i++) {
             cppSet.insert(T::toCpp(*i));
         }
         return cppSet;
     }
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     static ValdiType fromCpp(const CppType& c) {
         auto es6set = Composer::makeShared<Composer::ES6Set>();
+=======
+    static ComposerType fromCpp(const CppType& c) {
+        auto es6set = Valdi::makeShared<Valdi::ES6Set>();
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
         for (const auto& k: c) {
             es6set->entries.push_back(T::fromCpp(k));
         }
-        return Composer::Value(es6set);
+        return Valdi::Value(es6set);
     }
-    static const Composer::ValueSchema& schema() noexcept {
-        static auto schema = Composer::ValueSchema::es6set(schemaOrRef<T>());
+    static const Valdi::ValueSchema& schema() noexcept {
+        static auto schema = Valdi::ValueSchema::es6set(schemaOrRef<T>());
         return schema;
     }
 };
@@ -309,10 +369,17 @@ class Map {
 
 public:
     using CppType = std::unordered_map<CppKeyType, CppValueType>;
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     using ValdiType = Composer::Value;
     using Boxed = Map;
     static CppType toCpp(const ValdiType& v) {
         auto es6map = castOrNull<Composer::ES6Map>(v.getComposerObject());
+=======
+    using ComposerType = Valdi::Value;
+    using Boxed = Map;
+    static CppType toCpp(const ComposerType& v) {
+        auto es6map = castOrNull<Valdi::ES6Map>(v.getComposerObject());
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
         CppType cppMap;
         for (auto i = es6map->entries.begin(); i != es6map->entries.end();) {
             auto k = Key::toCpp(*i++);
@@ -321,16 +388,21 @@ public:
         }
         return cppMap;
     }
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     static ValdiType fromCpp(const CppType& c) {
         auto es6Map = Composer::makeShared<Composer::ES6Map>();
+=======
+    static ComposerType fromCpp(const CppType& c) {
+        auto es6Map = Valdi::makeShared<Valdi::ES6Map>();
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
         for (const auto& [k, v]: c) {
             es6Map->entries.push_back(Key::fromCpp(k));
             es6Map->entries.push_back(Value::fromCpp(v));
         }
-        return Composer::Value(es6Map);
+        return Valdi::Value(es6Map);
     }
-    static const Composer::ValueSchema& schema() noexcept {
-        static auto schema = Composer::ValueSchema::es6map(schemaOrRef<Key>(), schemaOrRef<Value>());
+    static const Valdi::ValueSchema& schema() noexcept {
+        static auto schema = Valdi::ValueSchema::es6map(schemaOrRef<Key>(), schemaOrRef<Value>());
         return schema;
     }
 };
@@ -338,10 +410,14 @@ public:
 class Void {
 public:
     using CppType = void;
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     using ValdiType = Composer::Value;
+=======
+    using ComposerType = Valdi::Value;
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
     using Boxed = Void;
-    static const Composer::ValueSchema& schema() noexcept {
-        static auto schema = Composer::ValueSchema::untyped();
+    static const Valdi::ValueSchema& schema() noexcept {
+        static auto schema = Valdi::ValueSchema::untyped();
         return schema;
     }
 };
@@ -354,7 +430,11 @@ template<typename CppProto, CTS ... JsClassName>
 class Protobuf {
 public:
     using CppType = CppProto;
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     using ValdiType = Composer::Value;
+=======
+    using ComposerType = Valdi::Value;
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
     using Boxed = Protobuf;
 
     static CppType toCpp(ValdiType v)
@@ -370,15 +450,15 @@ public:
     {
         std::vector<uint8_t> cbuf(c.ByteSizeLong());
         c.SerializeToArray(cbuf.data(), static_cast<int>(cbuf.size()));
-        auto bytes = Composer::makeShared<Composer::Bytes>();
+        auto bytes = Valdi::makeShared<Valdi::Bytes>();
         bytes->assignVec(std::move(cbuf));
-        auto array = Composer::makeShared<Composer::ValueTypedArray>(Composer::kDefaultTypedArrayType, bytes);
-        return Composer::Value(array);
+        auto array = Valdi::makeShared<Valdi::ValueTypedArray>(Valdi::kDefaultTypedArrayType, bytes);
+        return Valdi::Value(array);
     }
 
-    static const Composer::ValueSchema& schema() noexcept {
+    static const Valdi::ValueSchema& schema() noexcept {
         constexpr std::array<const std::string_view, sizeof...(JsClassName)> jsClassName = {JsClassName.data...};
-        static auto schema = Composer::ValueSchema::proto(jsClassName.begin(), jsClassName.end());
+        static auto schema = Valdi::ValueSchema::proto(jsClassName.begin(), jsClassName.end());
         return schema;
     }
 };
@@ -386,7 +466,11 @@ public:
 template <typename T>
 struct Array {
     using CppType = std::vector<typename T::CppType>;
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     using ValdiType = Composer::Value;
+=======
+    using ComposerType = Valdi::Value;
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
     using Boxed = Array;
 
     static CppType toCpp(const ValdiType& v) {
@@ -396,7 +480,7 @@ struct Array {
         return List<T>::fromCpp(c);
     }
     
-    static const Composer::ValueSchema& schema() noexcept {
+    static const Valdi::ValueSchema& schema() noexcept {
         return List<T>::schema();
     }
 };
@@ -404,7 +488,11 @@ struct Array {
 template <typename T, typename U = Array<T>>
 struct PrimitiveArray {
     using CppType = std::vector<typename T::CppType>;
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     using ValdiType = Composer::Value;
+=======
+    using ComposerType = Valdi::Value;
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
     using Boxed = PrimitiveArray;
     using CppElemType = typename T::CppType;
 
@@ -416,56 +504,64 @@ struct PrimitiveArray {
         const auto typedSize = byteSize / sizeof(CppElemType);
         return CppType(typedData, typedData + typedSize);
     }
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     static ValdiType fromCpp(const CppType& c) noexcept {
         auto bytes = Composer::makeShared<Composer::Bytes>();
         bytes->assignData(reinterpret_cast<const Composer::Byte*>(c.data()), c.size() * sizeof(CppElemType));
         auto arr = Composer::makeShared<Composer::ValueTypedArray>(U::getArrayType(), bytes);
         return Composer::Value(arr);
+=======
+    static ComposerType fromCpp(const CppType& c) noexcept {
+        auto bytes = Valdi::makeShared<Valdi::Bytes>();
+        bytes->assignData(reinterpret_cast<const Valdi::Byte*>(c.data()), c.size() * sizeof(CppElemType));
+        auto arr = Valdi::makeShared<Valdi::ValueTypedArray>(U::getArrayType(), bytes);
+        return Valdi::Value(arr);
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
     }
-    static const Composer::ValueSchema& schema() noexcept {
-        static auto schema = Composer::ValueSchema::valueTypedArray();
+    static const Valdi::ValueSchema& schema() noexcept {
+        static auto schema = Valdi::ValueSchema::valueTypedArray();
         return schema;
     }
 };
 template <>
 struct Array<I8> : PrimitiveArray<I8> {
-    static constexpr Composer::TypedArrayType getArrayType() noexcept {
-        return Composer::TypedArrayType::Int8Array;
+    static constexpr Valdi::TypedArrayType getArrayType() noexcept {
+        return Valdi::TypedArrayType::Int8Array;
     }
 };
 template <>
 struct Array<I16> : PrimitiveArray<I16> {
-    static constexpr Composer::TypedArrayType getArrayType() noexcept {
-        return Composer::TypedArrayType::Int16Array;
+    static constexpr Valdi::TypedArrayType getArrayType() noexcept {
+        return Valdi::TypedArrayType::Int16Array;
     }
 };
 template <>
 struct Array<I32> : PrimitiveArray<I32> {
-    static constexpr Composer::TypedArrayType getArrayType() noexcept {
-        return Composer::TypedArrayType::Int32Array;
+    static constexpr Valdi::TypedArrayType getArrayType() noexcept {
+        return Valdi::TypedArrayType::Int32Array;
     }
 };
 template <>
 struct Array<I64> : PrimitiveArray<I64> {
-    // Composer::TypedArrayType does not support BigInt64Array
+    // Valdi::TypedArrayType does not support BigInt64Array
 };
 template <>
 struct Array<F32> : PrimitiveArray<F32> {
-    static constexpr Composer::TypedArrayType getArrayType() noexcept {
-        return Composer::TypedArrayType::Float32Array;
+    static constexpr Valdi::TypedArrayType getArrayType() noexcept {
+        return Valdi::TypedArrayType::Float32Array;
     }
 };
 template <>
 struct Array<F64> : PrimitiveArray<F64> {
-    static constexpr Composer::TypedArrayType getArrayType() noexcept {
-        return Composer::TypedArrayType::Float64Array;
+    static constexpr Valdi::TypedArrayType getArrayType() noexcept {
+        return Valdi::TypedArrayType::Float64Array;
     }
 };
 
 // -------- Interface support
 using ValdiProxyId = uint32_t;
 struct CppProxyCacheEntry {
-    Composer::Weak<Composer::ValueTypedProxyObject> ref;
+    Valdi::Weak<Valdi::ValueTypedProxyObject> ref;
     int count;
 };
 class ValdiProxyBase;
@@ -476,27 +572,27 @@ extern std::mutex cppProxyCacheMutex;
 
 class ValdiProxyBase {
 protected:
-    Composer::Ref<Composer::ValueTypedProxyObject> _js;
-    std::vector<Composer::Ref<Composer::ValueFunction>> _methods;
+    Valdi::Ref<Valdi::ValueTypedProxyObject> _js;
+    std::vector<Valdi::Ref<Valdi::ValueFunction>> _methods;
 
 public:
-    ValdiProxyBase(Composer::Ref<Composer::ValueTypedProxyObject> js)
+    ValdiProxyBase(Valdi::Ref<Valdi::ValueTypedProxyObject> js)
         : _js(js), _methods(_js->getTypedObject()->getPropertiesSize()) {}
     virtual ~ValdiProxyBase() {
         std::lock_guard lk(jsProxyCacheMutex);
         jsProxyCache.erase(_js->getId());
     }
-    Composer::Ref<Composer::ValueTypedProxyObject> getProxy() noexcept {
+    Valdi::Ref<Valdi::ValueTypedProxyObject> getProxy() noexcept {
         return _js;
     }
-    Composer::Value callJsMethod(size_t i, std::initializer_list<Composer::Value> parameters) {
+    Valdi::Value callJsMethod(size_t i, std::initializer_list<Valdi::Value> parameters) {
         if (_js->expired()) {
-            throw JsException(Composer::Error("proxy expired"));
+            throw JsException(Valdi::Error("proxy expired"));
         }
         if (_methods[i] == nullptr) {
             _methods[i] = _js->getTypedObject()->getProperty(i).getFunctionRef();
         }
-        constexpr auto flags = static_cast<Composer::ValueFunctionFlags>(Composer::ValueFunctionFlagsCallSync | Composer::ValueFunctionFlagsPropagatesError);
+        constexpr auto flags = static_cast<Valdi::ValueFunctionFlags>(Valdi::ValueFunctionFlagsCallSync | Valdi::ValueFunctionFlagsPropagatesError);
         auto res = _methods[i]->call(flags,  parameters);
         if (res.success()) {
             return res.moveValue();
@@ -508,10 +604,10 @@ public:
 };
 
 template<typename T>
-class DjinniCppProxyObject : public Composer::ValueTypedProxyObject {
+class DjinniCppProxyObject : public Valdi::ValueTypedProxyObject {
 public:
-    DjinniCppProxyObject(const Composer::Ref<Composer::ValueTypedObject>& typedObject, const std::shared_ptr<T>& impl)
-        : Composer::ValueTypedProxyObject(typedObject), _impl(impl) {}
+    DjinniCppProxyObject(const Valdi::Ref<Valdi::ValueTypedObject>& typedObject, const std::shared_ptr<T>& impl)
+        : Valdi::ValueTypedProxyObject(typedObject), _impl(impl) {}
     ~DjinniCppProxyObject() override {
         std::lock_guard lk(cppProxyCacheMutex);
         auto i = cppProxyCache.find(_impl.get());
@@ -536,7 +632,11 @@ class JsInterface {
 public:
     using CppType = std::shared_ptr<I>;
     using CppOptType = std::shared_ptr<I>;
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     using ValdiType = Composer::Value;
+=======
+    using ComposerType = Valdi::Value;
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
     using Boxed = Self;
 
     static CppType toCpp(const ValdiType& v) {
@@ -553,14 +653,19 @@ public:
 private:
     template<typename, typename>
     struct GetOrCreateJsProxy {
-        std::shared_ptr<I> operator()(const Composer::Value& js) noexcept {
+        std::shared_ptr<I> operator()(const Valdi::Value& js) noexcept {
             assert(false && "Attempting to pass JS object but interface lacks +p");
             return {};
         }
     };
     template<typename T>
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
     struct GetOrCreateJsProxy<T, std::void_t<typename T::ValdiProxy>> {
         std::shared_ptr<I> operator()(const Composer::Value& js) noexcept {
+=======
+    struct GetOrCreateJsProxy<T, std::void_t<typename T::ComposerProxy>> {
+        std::shared_ptr<I> operator()(const Valdi::Value& js) noexcept {
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
             auto proxy = js.getTypedProxyObjectRef();
             auto obj = proxy->getTypedObject();
             std::lock_guard lk(jsProxyCacheMutex);
@@ -581,7 +686,7 @@ private:
         }
     };
 
-    static std::shared_ptr<I> _fromJs(const Composer::Value& v) {
+    static std::shared_ptr<I> _fromJs(const Valdi::Value& v) {
         // null object
         if (v.isUndefined() || v.isNull()) {
             return {};
@@ -598,14 +703,14 @@ private:
     // (interface +c)
     template<typename, typename>
     struct GetOrCreateCppProxy {
-        Composer::Value operator()(const std::shared_ptr<I>& c) noexcept {
+        Valdi::Value operator()(const std::shared_ptr<I>& c) noexcept {
             assert(false && "Attempting to pass C++ object but interface lacks +c");
-            return Composer::Value::undefined();
+            return Valdi::Value::undefined();
         }
     };
     template<typename T>
     struct GetOrCreateCppProxy<T, std::void_t<decltype(T::toComposer)>> {
-        Composer::Value operator()(const std::shared_ptr<I>& c) noexcept {
+        Valdi::Value operator()(const std::shared_ptr<I>& c) noexcept {
             // look up in cpp proxy cache
             std::lock_guard lk(cppProxyCacheMutex);
             auto i = cppProxyCache.find(c.get());
@@ -613,9 +718,9 @@ private:
             if (i != cppProxyCache.end()) {
                 // found existing cpp proxy
                 jsRefCount += i->second.count;
-                if (auto strong = Composer::strongRef(i->second.ref); strong != nullptr) {
+                if (auto strong = Valdi::strongRef(i->second.ref); strong != nullptr) {
                     // and it's not expired
-                    return Composer::Value(Composer::Ref(strong));
+                    return Valdi::Value(Valdi::Ref(strong));
                 }
             }
             // not found or cache entry expired
@@ -626,17 +731,22 @@ private:
             } else {
                 i->second = CppProxyCacheEntry{o.toWeak(), jsRefCount};
             }
-            return Composer::Value(o);
+            return Valdi::Value(o);
         }
     };
 
-    static Composer::Value _toJs(const std::shared_ptr<I>& c) {
+    static Valdi::Value _toJs(const std::shared_ptr<I>& c) {
         if (c == nullptr) {
             // null object
+<<<<<<< HEAD:support-lib/composer/djinni_valdi.hpp
             return Composer::Value::undefined();
         } else if (auto* p = dynamic_cast<ValdiProxyBase*>(c.get())) {
+=======
+            return Valdi::Value::undefined();
+        } else if (auto* p = dynamic_cast<ComposerProxyBase*>(c.get())) {
+>>>>>>> 6b4988062380a5d79032ba022d25363e2f6e30bc:support-lib/composer/djinni_composer.hpp
             // unwrap existing js proxy
-            return Composer::Value(p->getProxy());
+            return Valdi::Value(p->getProxy());
         } else {
             return GetOrCreateCppProxy<Self, void>()(c);
         }

@@ -37,3 +37,10 @@ wasm:
 ts:
   typename: 'Date'
   module: ''
+swift:
+  typename: 'Date'
+  translator: 'DateMarshaller'
+  translatorModule: 'TestSuite'
+swiftxx:
+  translator: '::djinni::swift::Date'
+  header: '"djinni_support.hpp"'

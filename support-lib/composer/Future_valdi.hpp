@@ -29,7 +29,7 @@ class FutureAdaptor
 
 public:
     using CppType = Future<CppResType>;
-    using ValdiType = Composer::Value;
+    using ValdiType = Valdi::Value;
 
     using Boxed = FutureAdaptor;
 
@@ -37,10 +37,10 @@ public:
 
     static CppType toCpp(ValdiType o)
     {
-        auto composerPromise = castOrNull<Composer::Promise>(o.getComposerObject());
-        auto cppPromise = Composer::makeShared<Promise<CppResType>>();
+        auto composerPromise = castOrNull<Valdi::Promise>(o.getComposerObject());
+        auto cppPromise = Valdi::makeShared<Promise<CppResType>>();
         auto cppFuture = cppPromise->getFuture();
-        composerPromise->onComplete([cppPromise] (const Composer::Result<Composer::Value>& result) {
+        composerPromise->onComplete([cppPromise] (const Valdi::Result<Valdi::Value>& result) {
             if (result.success()) {
                 if constexpr(std::is_same_v<Void, RESULT>) {
                     cppPromise->setValue();
@@ -56,40 +56,40 @@ public:
 
     static ValdiType fromCpp(CppType c)
     {
-        auto composerPromise = Composer::makeShared<Composer::ResolvablePromise>();
+        auto composerPromise = Valdi::makeShared<Valdi::ResolvablePromise>();
         c.then([composerPromise] (Future<CppResType> f) {
             try {
                 if constexpr(std::is_same_v<Void, RESULT>) {
-                    composerPromise->fulfill(Composer::Result<Composer::Value>(Composer::Value::undefined()));
+                    composerPromise->fulfill(Valdi::Result<Valdi::Value>(Valdi::Value::undefined()));
                 } else {
-                    composerPromise->fulfill(Composer::Result<Composer::Value>(RESULT::fromCpp(f.get())));
+                    composerPromise->fulfill(Valdi::Result<Valdi::Value>(RESULT::fromCpp(f.get())));
                 }
             } catch (const std::exception& e) {
-                composerPromise->fulfill({Composer::Result<Composer::Value>{Composer::Error(e.what())}});
+                composerPromise->fulfill({Valdi::Result<Valdi::Value>{Valdi::Error(e.what())}});
             }
         });
-        return Composer::Value(composerPromise);
+        return Valdi::Value(composerPromise);
     }
-    static const Composer::ValueSchema& schema() {
-        static auto schema = Composer::ValueSchema::promise(schemaOrRef<RESULT>());
+    static const Valdi::ValueSchema& schema() {
+        static auto schema = Valdi::ValueSchema::promise(schemaOrRef<RESULT>());
         return schema;
     }
 };
 
 template<typename U>
 struct ExceptionHandlingTraits<FutureAdaptor<U>> {
-    static Composer::Value handleNativeException(const std::exception& e, const Composer::ValueFunctionCallContext& callContext) noexcept {
+    static Valdi::Value handleNativeException(const std::exception& e, const Valdi::ValueFunctionCallContext& callContext) noexcept {
         // store C++ exception in JS Error and raise in JS runtime
         auto msg = STRING_FORMAT("C++: {}", e.what());
-        auto composerPromise = Composer::makeShared<Composer::ResolvablePromise>();
-        composerPromise->fulfill(Composer::Result<Composer::Value>(Composer::Error(std::move(msg))));
-        return Composer::Value(composerPromise);
+        auto composerPromise = Valdi::makeShared<Valdi::ResolvablePromise>();
+        composerPromise->fulfill(Valdi::Result<Valdi::Value>(Valdi::Error(std::move(msg))));
+        return Valdi::Value(composerPromise);
     }
-    static Composer::Value handleNativeException(const JsException& e, const Composer::ValueFunctionCallContext& callContext) noexcept {
+    static Valdi::Value handleNativeException(const JsException& e, const Valdi::ValueFunctionCallContext& callContext) noexcept {
         // JS error passthrough
-        auto composerPromise = Composer::makeShared<Composer::ResolvablePromise>();
-        composerPromise->fulfill(Composer::Result<Composer::Value>(e.cause()));
-        return Composer::Value(composerPromise);
+        auto composerPromise = Valdi::makeShared<Valdi::ResolvablePromise>();
+        composerPromise->fulfill(Valdi::Result<Valdi::Value>(e.cause()));
+        return Valdi::Value(composerPromise);
     }
 };
 

@@ -111,6 +111,17 @@ object Main {
     var composerIncludePrefix: String = ""
     var composerIncludeCppPrefix: String = ""
     var composerBaseLibIncludePrefix: String = ""
+    var swiftOutFolder: Option[File] = None
+    var swiftModule: String = "Module"
+    var swiftIdentStyle = IdentStyle.swiftDefault
+    var swiftxxOutFolder: Option[File] = None
+    var swiftxxNamespace: String = "djinni_generated"
+    var swiftxxIncludePrefix: String = ""
+    var swiftxxBaseLibModule: String = "DjinniSupportCxx"
+    var swiftxxClassIdentStyleOptional: Option[IdentConverter] = None
+    var swiftxxFileIdentStyleOptional: Option[IdentConverter] = None
+    var swiftxxIncludeCppPrefix: String = ""
+    var swiftxxBaseLibIncludePrefix: String = ""
     var inFileListPath: Option[File] = None
     var outFileListPath: Option[File] = None
     var skipGeneration: Boolean = false
@@ -290,6 +301,19 @@ object Main {
       opt[File]("composer-ts-out").valueName("<out-folder>").foreach(x => composerTsOutFolder = Some(x))
         .text("The output for the Composer TypeScript interface files (Generator disabled if unspecified).")
       note("")
+      opt[File]("swift-out").valueName("<out-folder>").foreach(x => swiftOutFolder = Some(x))
+        .text("The output folder for Swift files (Generator disabled if unspecified).")
+      opt[String]("swift-module").valueName("<name>").foreach(swiftModule = _)
+        .text("Swift module name (default: \"Module\").")
+      opt[File]("swiftxx-out").valueName("<out-folder>").foreach(x => swiftxxOutFolder = Some(x))
+        .text("The output folder for private Swift/C++ interop files (Generator disabled if unspecified).")
+      opt[String]("swiftxx-include-prefix").valueName("<prefix>").foreach(swiftxxIncludePrefix = _)
+        .text("The prefix for #includes of Swift C++ header files.")
+      opt[String]("swiftxx-include-cpp-prefix").valueName("<prefix>").foreach(swiftxxIncludeCppPrefix = _)
+        .text("The prefix for #includes of the main header files from Swift C++ files.")
+      opt[String]("swiftxx-base-lib-include-prefix").valueName("...").foreach(x => swiftxxBaseLibIncludePrefix = x)
+        .text("The Swift C++ base library's include path, relative to the Swift C++ classes.")
+      note("")
       opt[File]("yaml-out").valueName("<out-folder>").foreach(x => yamlOutFolder = Some(x))
         .text("The output folder for YAML files (Generator disabled if unspecified).")
       opt[String]("yaml-out-file").valueName("<out-file>").foreach(x => yamlOutFile = Some(x))
@@ -328,6 +352,8 @@ object Main {
       identStyle("ident-objc-file",       c => { objcFileIdentStyleOptional = Some(c) })
       identStyle("ident-composer-class", c => { composerClassIdentStyleOptional = Some(c)})
       identStyle("ident-composer-file",  c => { composerFileIdentStyleOptional = Some(c)})
+      identStyle("ident-swiftxx-class", c => { swiftxxClassIdentStyleOptional = Some(c)})
+      identStyle("ident-swiftxx-file",  c => { swiftxxFileIdentStyleOptional = Some(c)})
     }
 
     if (!argParser.parse(args)) {
@@ -352,6 +378,9 @@ object Main {
     if (cppTypeEnumIdentStyle != null) {
       cppIdentStyle = cppIdentStyle.copy(enumType = cppTypeEnumIdentStyle)
     }
+
+    val swiftxxClassIdentStyle = swiftxxClassIdentStyleOptional.getOrElse(cppIdentStyle.ty)
+    val swiftxxFileIdentStyle = swiftxxFileIdentStyleOptional.getOrElse(cppFileIdentStyle)
 
     // Parse IDL file.
     System.out.println("Parsing...")
@@ -491,6 +520,17 @@ object Main {
       composerClassIdentStyle,
       composerFileIdentStyle,
       composerTsOutFolder,
+      swiftOutFolder,
+      swiftIdentStyle,
+      swiftModule,
+      swiftxxOutFolder,
+      swiftxxNamespace,
+      swiftxxIncludePrefix,
+      swiftxxBaseLibModule,
+      swiftxxClassIdentStyle,
+      swiftxxFileIdentStyle,
+      swiftxxIncludeCppPrefix,
+      swiftxxBaseLibIncludePrefix,
       outFileListWriter,
       skipGeneration,
       yamlOutFolder,

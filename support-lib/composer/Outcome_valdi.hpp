@@ -30,12 +30,12 @@ class Outcome
     using ErrorValdiType = typename ERROR::Boxed::ValdiType;
 public:
     using CppType = expected<ResultCppType, ErrorCppType>;
-    using ValdiType = Composer::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = Outcome;
 
     static CppType toCpp(ValdiType v)
     {
-        auto outcomeCpp = castOrNull<Composer::ComposerOutcome>(v.getComposerObject());
+        auto outcomeCpp = castOrNull<Valdi::ComposerOutcome>(v.getComposerObject());
         if (outcomeCpp->error.isUndefined()) {
             return {RESULT::toCpp(outcomeCpp->result)};
         } else {
@@ -45,17 +45,17 @@ public:
 
     static ValdiType fromCpp(const CppType& c)
     {
-        auto outcomeCpp = Composer::makeShared<Composer::ComposerOutcome>();
+        auto outcomeCpp = Valdi::makeShared<Valdi::ComposerOutcome>();
         if (c.has_value()) {
             outcomeCpp->result = RESULT::fromCpp(c.value());
         } else {
             outcomeCpp->error = ERROR::fromCpp(c.error());
         }
-        return Composer::Value(outcomeCpp);
+        return Valdi::Value(outcomeCpp);
     }
 
-    static const Composer::ValueSchema& schema() {
-        static auto schema = Composer::ValueSchema::outcome(schemaOrRef<RESULT>(), schemaOrRef<ERROR>());
+    static const Valdi::ValueSchema& schema() {
+        static auto schema = Valdi::ValueSchema::outcome(schemaOrRef<RESULT>(), schemaOrRef<ERROR>());
         return schema;
     }
 };

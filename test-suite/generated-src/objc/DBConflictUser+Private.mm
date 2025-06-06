@@ -39,9 +39,9 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-- (BOOL)conflictArg:(nonnull NSSet<DBConflict *> *)cs {
+- (BOOL)conflictArg:(nonnull NSArray<DBConflict *> *)cs {
     try {
-        auto objcpp_result_ = _cppRefHandle.get()->conflict_arg(::djinni::Set<::djinni_generated::Conflict>::toCpp(cs));
+        auto objcpp_result_ = _cppRefHandle.get()->conflict_arg(::djinni::List<::djinni_generated::Conflict>::toCpp(cs));
         return ::djinni::Bool::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }

@@ -1,3 +1,3 @@
-user_token = interface +c +j +o +w {
+user_token = interface +c +nc {
   whoami() : string;
 }

@@ -16,28 +16,25 @@ android_workspace()
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-build_bazel_rules_apple_version = "1.0.1"
+build_bazel_rules_apple_version = "1.1.3"
 http_archive(
     name = "build_bazel_rules_apple",
-    sha256 = "36072d4f3614d309d6a703da0dfe48684ec4c65a89611aeb9590b45af7a3e592",
-    url = "https://github.com/bazelbuild/rules_apple/releases/download/{0}/rules_apple.{0}.tar.gz"
-        .format(build_bazel_rules_apple_version),
+    sha256 = "f94e6dddf74739ef5cb30f000e13a2a613f6ebfa5e63588305a71fce8a8a9911",
+    url = "https://github.com/bazelbuild/rules_apple/releases/download/{0}/rules_apple.{0}.tar.gz" .format(build_bazel_rules_apple_version),
 )
 
-build_bazel_rules_swift_version = "1.0.0"
+build_bazel_rules_swift_version = "1.14.0"
 http_archive(
     name = "build_bazel_rules_swift",
-    sha256 = "12057b7aa904467284eee640de5e33853e51d8e31aae50b3fb25d2823d51c6b8",
-    url = "https://github.com/bazelbuild/rules_swift/releases/download/{0}/rules_swift.{0}.tar.gz"
-        .format(build_bazel_rules_swift_version),
+    sha256 = "9b0064197e3b6c123cf7cbd377ad5071ac020cbd208fcc23dbc9f3928baf4fa2",
+    url = "https://github.com/bazelbuild/rules_swift/releases/download/{0}/rules_swift.{0}.tar.gz" .format(build_bazel_rules_swift_version),
 )
 
-build_bazel_apple_support_version = "1.0.0"
+build_bazel_apple_support_version = "1.15.1"
 http_archive(
     name = "build_bazel_apple_support",
-    sha256 = "df317473b5894dd8eb432240d209271ebc83c76bb30c55481374b36ddf1e4fd1",
-    url = "https://github.com/bazelbuild/apple_support/releases/download/{0}/apple_support.{0}.tar.gz"
-        .format(build_bazel_apple_support_version),
+    sha256 = "c4bb2b7367c484382300aee75be598b92f847896fb31bbd22f3a2346adf66a80",
+    url = "https://github.com/bazelbuild/apple_support/releases/download/{0}/apple_support.{0}.tar.gz" .format(build_bazel_apple_support_version),
 )
 
 rules_kotlin_version = "legacy-1.3.0"
@@ -50,13 +47,15 @@ http_archive(
 )
 
 load("@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies")
-load("@build_bazel_rules_swift//swift:repositories.bzl", "swift_rules_dependencies")
 load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies")
+load("@build_bazel_rules_swift//swift:repositories.bzl", "swift_rules_dependencies")
+load("@build_bazel_rules_swift//swift:extras.bzl", "swift_rules_extra_dependencies",)
 load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kotlin_repositories", "kt_register_toolchains")
 
 apple_rules_dependencies()
-swift_rules_dependencies()
 apple_support_dependencies()
+swift_rules_dependencies()
+swift_rules_extra_dependencies()
 
 kotlin_repositories()
 kt_register_toolchains()

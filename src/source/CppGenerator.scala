@@ -49,10 +49,12 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
         case ImportRef(arg) => hpp.add("#include " + arg)
         case DeclRef(decl, Some(spec.cppNamespace)) => hppFwds.add(decl)
         case DeclRef(_, _) =>
+        case _ =>
       }
       for(r <- marshal.cppReferences(m, name, forwardDeclareOnly)) r match {
         case ImportRef(arg) => cpp.add("#include " + arg)
         case DeclRef(_, _) =>
+        case _ =>
       }
     }
   }
