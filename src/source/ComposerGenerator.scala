@@ -189,7 +189,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.wl(s"struct $helper").bracedSemi {
         w.wl(s"using CppType = $cls;")
-        w.wl("using ValdiType = Valid:: Value;")
+        w.wl("using ValdiType = Valdi:: Value;")
         w.wl(s"using Boxed = $helper;")
         w.wl
         w.wl("static CppType toCpp(const ValdiType& v);")
@@ -257,7 +257,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
 
         // js proxy
         if (i.ext.js) {
-          w.w(s"struct ValdiProxy: $cls, ::djinni::composer::ValdiProxyBase").bracedSemi {
+          w.w(s"struct ValdiProxy: $cls, ::djinni::valdi::ValdiProxyBase").bracedSemi {
             w.wl("ValdiProxy(Valdi::Ref<Valdi::ValueTypedProxyObject> js) : ValdiProxyBase(js) {}")
             for (m <- i.methods.filter(m => !m.static)) {
               w.w(s"${cppMarshal.fqReturnType(m.ret)} ${idCpp.method(m.ident)}(")
