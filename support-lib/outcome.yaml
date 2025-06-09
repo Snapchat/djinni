@@ -37,8 +37,8 @@ ts:
   module: '@djinni_support/Outcome'
   generic: true
 composer:
-  translator: '::djinni::composer::Outcome'
-  header: '"$Outcome_composer.hpp"'
+  translator: '::djinni::valdi::Outcome'
+  header: '"$Outcome_valdi.hpp"'
 swift:
   typename: 'Result'
   generic: true

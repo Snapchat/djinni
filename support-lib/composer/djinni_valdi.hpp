@@ -40,7 +40,7 @@
 #include <functional>
 #include <codecvt>
 
-namespace djinni::composer {
+namespace djinni::valdi {
 
 // -------- Helper functions and classes
 class JsException : public std::runtime_error {
@@ -117,15 +117,15 @@ template<typename T, typename U = T>
 class Primitive {
 public:
     using CppType = T;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
 
     using Boxed = Primitive;
 
-    static CppType toCpp(const ComposerType& v) noexcept {
+    static CppType toCpp(const ValdiType& v) noexcept {
         return static_cast<T>(v.to<U>());
     }
-    static ComposerType fromCpp(const CppType& c) noexcept {
-        return ComposerType(static_cast<U>(c));
+    static ValdiType fromCpp(const CppType& c) noexcept {
+        return ValdiType(static_cast<U>(c));
     }
     static const Valdi::ValueSchema& schema() noexcept {
         static auto schema = Valdi::ValueSchema::primitiveType<U>();
@@ -151,11 +151,11 @@ class WString {
     using Utf16Converter = std::wstring_convert<std::codecvt_utf16<wchar_t>>;
 public:
     using CppType = std::wstring;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
 
     using Boxed = WString;
 
-    static CppType toCpp(const ComposerType& v) {
+    static CppType toCpp(const ValdiType& v) {
         if (v.isInternedString()) {
             auto utf8str = v.toStringBox().toStringView();
             return Utf8Converter{}.from_bytes(utf8str.data(), utf8str.data() + utf8str.size());
@@ -170,8 +170,8 @@ public:
             }
         }
     }
-    static ComposerType fromCpp(const CppType& c) {
-        return ComposerType(Utf8Converter{}.to_bytes(c));
+    static ValdiType fromCpp(const CppType& c) {
+        return ValdiType(Utf8Converter{}.to_bytes(c));
     }
     static const Valdi::ValueSchema& schema() noexcept {
         static auto schema = Valdi::ValueSchema::string();
@@ -183,22 +183,22 @@ public:
 class Binary {
 public:
     using CppType = std::vector<uint8_t>;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = Binary;
 
-    static CppType toCpp(const ComposerType& j) noexcept;
-    static ComposerType fromCpp(const CppType& c) noexcept;
+    static CppType toCpp(const ValdiType& j) noexcept;
+    static ValdiType fromCpp(const CppType& c) noexcept;
     static const Valdi::ValueSchema& schema() noexcept ;
 };
 
 class Date {
 public:
     using CppType = std::chrono::system_clock::time_point;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = Date;
     
-    static CppType toCpp(const ComposerType& v) noexcept;
-    static ComposerType fromCpp(const CppType& c) noexcept;
+    static CppType toCpp(const ValdiType& v) noexcept;
+    static ValdiType fromCpp(const CppType& c) noexcept;
     static const Valdi::ValueSchema& schema() noexcept;
 };
 
@@ -209,24 +209,24 @@ struct Optional {
     template<typename C>
     static typename C::CppOptType opt_type(typename C::CppOptType*);
     using CppType = decltype(opt_type<T>(nullptr));
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = Optional;
 
-    static CppType toCpp(const ComposerType& j) {
+    static CppType toCpp(const ValdiType& j) {
         if (j.isUndefined() || j.isNull()) {
             return CppType{};
         } else {
             return T::Boxed::toCpp(j);
         }
     }
-    static ComposerType fromCpp(const OptionalType<typename T::CppType>& c) {
+    static ValdiType fromCpp(const OptionalType<typename T::CppType>& c) {
         return c ? T::Boxed::fromCpp(*c) : Valdi::Value::undefined();
     }
-    static ComposerType fromCpp(OptionalType<typename T::CppType>&& c) {
+    static ValdiType fromCpp(OptionalType<typename T::CppType>&& c) {
         return c ? T::Boxed::fromCpp(std::move(*c)) : Valdi::Value::undefined();
     }
     template<typename C = T>
-    static ComposerType fromCpp(const typename C::CppOptType& cppOpt) {
+    static ValdiType fromCpp(const typename C::CppOptType& cppOpt) {
         return T::Boxed::fromCppOpt(cppOpt);
     }
     static const Valdi::ValueSchema& schema() noexcept {
@@ -238,11 +238,11 @@ struct Optional {
 template<typename T>
 class List {
     using ECppType = typename T::CppType;
-    using EComposerType = typename T::Boxed::ComposerType;
+    using EValdiType = typename T::Boxed::ValdiType;
 
 public:
     using CppType = std::vector<ECppType>;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = List;
 
     static const Valdi::ValueSchema& schema() noexcept {
@@ -250,7 +250,7 @@ public:
         return schema;
     }
 
-    static CppType toCpp(const ComposerType& v) {
+    static CppType toCpp(const ValdiType& v) {
         CppType c;
         const auto* a = v.getArray();
         if (a != nullptr) {
@@ -261,7 +261,7 @@ public:
         }
         return c;
     }
-    static ComposerType fromCpp(const CppType& c) {
+    static ValdiType fromCpp(const CppType& c) {
         auto newArray = Valdi::ValueArray::make(c.size());
         for (size_t i = 0; i < c.size(); ++i) {
             (*newArray)[i] = T::Boxed::fromCpp(c[i]);
@@ -273,13 +273,13 @@ public:
 template <typename T>
 class Set  {
     using ECppType = typename T::CppType;
-    using EComposerType = typename T::Boxed::ComposerType;
+    using EValdiType = typename T::Boxed::ValdiType;
 public:
     using CppType = std::unordered_set<ECppType>;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = Set;
 
-    static CppType toCpp(const ComposerType& v) {
+    static CppType toCpp(const ValdiType& v) {
         auto es6set = castOrNull<Valdi::ES6Set>(v.getComposerObject());
         CppType cppSet;
         for (auto i = es6set->entries.begin(); i != es6set->entries.end(); i++) {
@@ -287,7 +287,7 @@ public:
         }
         return cppSet;
     }
-    static ComposerType fromCpp(const CppType& c) {
+    static ValdiType fromCpp(const CppType& c) {
         auto es6set = Valdi::makeShared<Valdi::ES6Set>();
         for (const auto& k: c) {
             es6set->entries.push_back(T::fromCpp(k));
@@ -304,14 +304,14 @@ template<typename Key, typename Value>
 class Map {
     using CppKeyType = typename Key::CppType;
     using CppValueType = typename Value::CppType;
-    using ComposerKeyType = typename Key::Boxed::ComposerType;
-    using ComposerValueType = typename Value::Boxed::ComposerType;
+    using ComposerKeyType = typename Key::Boxed::ValdiType;
+    using ComposerValueType = typename Value::Boxed::ValdiType;
 
 public:
     using CppType = std::unordered_map<CppKeyType, CppValueType>;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = Map;
-    static CppType toCpp(const ComposerType& v) {
+    static CppType toCpp(const ValdiType& v) {
         auto es6map = castOrNull<Valdi::ES6Map>(v.getComposerObject());
         CppType cppMap;
         for (auto i = es6map->entries.begin(); i != es6map->entries.end();) {
@@ -321,7 +321,7 @@ public:
         }
         return cppMap;
     }
-    static ComposerType fromCpp(const CppType& c) {
+    static ValdiType fromCpp(const CppType& c) {
         auto es6Map = Valdi::makeShared<Valdi::ES6Map>();
         for (const auto& [k, v]: c) {
             es6Map->entries.push_back(Key::fromCpp(k));
@@ -338,7 +338,7 @@ public:
 class Void {
 public:
     using CppType = void;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = Void;
     static const Valdi::ValueSchema& schema() noexcept {
         static auto schema = Valdi::ValueSchema::untyped();
@@ -354,10 +354,10 @@ template<typename CppProto, CTS ... JsClassName>
 class Protobuf {
 public:
     using CppType = CppProto;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = Protobuf;
 
-    static CppType toCpp(ComposerType v)
+    static CppType toCpp(ValdiType v)
     {
         auto array = v.getTypedArrayRef();
         auto buffer = array->getBuffer();
@@ -366,7 +366,7 @@ public:
         return ret;
     }
         
-    static ComposerType fromCpp(const CppType& c)
+    static ValdiType fromCpp(const CppType& c)
     {
         std::vector<uint8_t> cbuf(c.ByteSizeLong());
         c.SerializeToArray(cbuf.data(), static_cast<int>(cbuf.size()));
@@ -386,13 +386,13 @@ public:
 template <typename T>
 struct Array {
     using CppType = std::vector<typename T::CppType>;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = Array;
 
-    static CppType toCpp(const ComposerType& v) {
+    static CppType toCpp(const ValdiType& v) {
         return List<T>::toCpp(v);
     }
-    static ComposerType fromCpp(const CppType& c) {
+    static ValdiType fromCpp(const CppType& c) {
         return List<T>::fromCpp(c);
     }
     
@@ -404,11 +404,11 @@ struct Array {
 template <typename T, typename U = Array<T>>
 struct PrimitiveArray {
     using CppType = std::vector<typename T::CppType>;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = PrimitiveArray;
     using CppElemType = typename T::CppType;
 
-    static CppType toCpp(const ComposerType& v) noexcept {
+    static CppType toCpp(const ValdiType& v) noexcept {
         auto arr = v.getTypedArrayRef();
         const auto* bytes = arr->getBuffer().data();
         const auto byteSize = arr->getBuffer().size();
@@ -416,7 +416,7 @@ struct PrimitiveArray {
         const auto typedSize = byteSize / sizeof(CppElemType);
         return CppType(typedData, typedData + typedSize);
     }
-    static ComposerType fromCpp(const CppType& c) noexcept {
+    static ValdiType fromCpp(const CppType& c) noexcept {
         auto bytes = Valdi::makeShared<Valdi::Bytes>();
         bytes->assignData(reinterpret_cast<const Valdi::Byte*>(c.data()), c.size() * sizeof(CppElemType));
         auto arr = Valdi::makeShared<Valdi::ValueTypedArray>(U::getArrayType(), bytes);
@@ -463,26 +463,26 @@ struct Array<F64> : PrimitiveArray<F64> {
 };
 
 // -------- Interface support
-using ComposerProxyId = uint32_t;
+using ValdiProxyId = uint32_t;
 struct CppProxyCacheEntry {
     Valdi::Weak<Valdi::ValueTypedProxyObject> ref;
     int count;
 };
-class ComposerProxyBase;
-extern std::unordered_map<ComposerProxyId, std::weak_ptr<ComposerProxyBase>> jsProxyCache;
+class ValdiProxyBase;
+extern std::unordered_map<ValdiProxyId, std::weak_ptr<ValdiProxyBase>> jsProxyCache;
 extern std::unordered_map<void*, CppProxyCacheEntry> cppProxyCache;
 extern std::mutex jsProxyCacheMutex;
 extern std::mutex cppProxyCacheMutex;
 
-class ComposerProxyBase {
+class ValdiProxyBase {
 protected:
     Valdi::Ref<Valdi::ValueTypedProxyObject> _js;
     std::vector<Valdi::Ref<Valdi::ValueFunction>> _methods;
 
 public:
-    ComposerProxyBase(Valdi::Ref<Valdi::ValueTypedProxyObject> js)
+    ValdiProxyBase(Valdi::Ref<Valdi::ValueTypedProxyObject> js)
         : _js(js), _methods(_js->getTypedObject()->getPropertiesSize()) {}
-    virtual ~ComposerProxyBase() {
+    virtual ~ValdiProxyBase() {
         std::lock_guard lk(jsProxyCacheMutex);
         jsProxyCache.erase(_js->getId());
     }
@@ -536,17 +536,17 @@ class JsInterface {
 public:
     using CppType = std::shared_ptr<I>;
     using CppOptType = std::shared_ptr<I>;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = Self;
 
-    static CppType toCpp(const ComposerType& v) {
+    static CppType toCpp(const ValdiType& v) {
         return _fromJs(v);
     }
-    static ComposerType fromCppOpt(const CppOptType& c) {
+    static ValdiType fromCppOpt(const CppOptType& c) {
         return {_toJs(c)};
     }
-    static ComposerType fromCpp(const CppType& c) {
-        ::djinni::composer::checkForNull(c.get(), typeid(Self).name());
+    static ValdiType fromCpp(const CppType& c) {
+        ::djinni::valdi::checkForNull(c.get(), typeid(Self).name());
         return fromCppOpt(c);
     }
 
@@ -559,23 +559,23 @@ private:
         }
     };
     template<typename T>
-    struct GetOrCreateJsProxy<T, std::void_t<typename T::ComposerProxy>> {
+    struct GetOrCreateJsProxy<T, std::void_t<typename T::ValdiProxy>> {
         std::shared_ptr<I> operator()(const Valdi::Value& js) noexcept {
             auto proxy = js.getTypedProxyObjectRef();
             auto obj = proxy->getTypedObject();
             std::lock_guard lk(jsProxyCacheMutex);
             // check prsence of proxy id in js object
-            ComposerProxyId id = proxy->getId();
+            ValdiProxyId id = proxy->getId();
             auto i = jsProxyCache.find(id);
             if (i != jsProxyCache.end()) {
                 auto strongProxyRef = i->second.lock();
                 if (strongProxyRef != nullptr) {
-                    return std::dynamic_pointer_cast<typename Self::ComposerProxy>(strongProxyRef);
+                    return std::dynamic_pointer_cast<typename Self::ValdiProxy>(strongProxyRef);
                 }
             }
             // not found or cache entry expired
             // create new js proxy and store it in cache
-            auto newproxy = std::make_shared<typename Self::ComposerProxy>(proxy);
+            auto newproxy = std::make_shared<typename Self::ValdiProxy>(proxy);
             jsProxyCache.emplace(id, newproxy);
             return newproxy;
         }
@@ -634,7 +634,7 @@ private:
         if (c == nullptr) {
             // null object
             return Valdi::Value::undefined();
-        } else if (auto* p = dynamic_cast<ComposerProxyBase*>(c.get())) {
+        } else if (auto* p = dynamic_cast<ValdiProxyBase*>(c.get())) {
             // unwrap existing js proxy
             return Valdi::Value(p->getProxy());
         } else {

@@ -16,18 +16,18 @@
 
 #pragma once
 
-#include "djinni_composer.hpp"
+#include "djinni_valdi.hpp"
 #include "../cpp/DataRef.hpp"
 
-namespace djinni::composer {
+namespace djinni::valdi {
 
 struct NativeDataRef {
     using CppType = DataRef;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = NativeDataRef;
 
-    static CppType toCpp(const ComposerType& v);
-    static ComposerType fromCpp(const CppType& c);
+    static CppType toCpp(const ValdiType& v);
+    static ValdiType fromCpp(const CppType& c);
     
     static const Valdi::ValueSchema& schema();
 };

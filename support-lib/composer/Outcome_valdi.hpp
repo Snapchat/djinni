@@ -16,24 +16,24 @@
 
 #pragma once
 
-#include "djinni_composer.hpp"
+#include "djinni_valdi.hpp"
 #include "../cpp/expected.hpp"
 
-namespace djinni::composer {
+namespace djinni::valdi {
 
 template <class RESULT, class ERROR>
 class Outcome
 {
     using ResultCppType = typename RESULT::CppType;
     using ErrorCppType = typename ERROR::CppType;
-    using ResultComposerType = typename RESULT::Boxed::ComposerType;
-    using ErrorComposerType = typename ERROR::Boxed::ComposerType;
+    using ResultValdiType = typename RESULT::Boxed::ValdiType;
+    using ErrorValdiType = typename ERROR::Boxed::ValdiType;
 public:
     using CppType = expected<ResultCppType, ErrorCppType>;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = Outcome;
 
-    static CppType toCpp(ComposerType v)
+    static CppType toCpp(ValdiType v)
     {
         auto outcomeCpp = castOrNull<Valdi::ComposerOutcome>(v.getComposerObject());
         if (outcomeCpp->error.isUndefined()) {
@@ -43,7 +43,7 @@ public:
         }
     }
 
-    static ComposerType fromCpp(const CppType& c)
+    static ValdiType fromCpp(const CppType& c)
     {
         auto outcomeCpp = Valdi::makeShared<Valdi::ComposerOutcome>();
         if (c.has_value()) {

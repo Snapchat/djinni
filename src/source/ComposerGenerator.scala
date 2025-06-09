@@ -34,7 +34,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     val nameParts = jsClass.split("""\.""")
     val ns = nameParts.dropRight(1).mkString(".")
     val cls = nameParts.takeRight(1).last
-    return Seq(ns, cls).map( e=> s"""djinni::composer::CTS{"$e"}""").mkString(", ")
+    return Seq(ns, cls).map( e=> s"""djinni::valdi::CTS{"$e"}""").mkString(", ")
   }
 
   class ComposerRefs(name: String, cppPrefixOverride: Option[String]=None) {
@@ -44,7 +44,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
 
     val cppPrefix = cppPrefixOverride.getOrElse(spec.composerIncludeCppPrefix)
     hpp.add("#include " + q(cppPrefix + spec.cppFileIdentStyle(name) + "." + spec.cppHeaderExt))
-    hpp.add("#include " + q(spec.composerBaseLibIncludePrefix + "djinni_composer.hpp"))
+    hpp.add("#include " + q(spec.composerBaseLibIncludePrefix + "djinni_valdi.hpp"))
     spec.cppNnHeader match {
       case Some(nnHdr) => hpp.add("#include " + nnHdr)
       case _ =>
@@ -78,7 +78,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
   def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => withNs(Some(helperNamespace()), helperClass(d.name))
     case e: MExtern => e.composer.translator
-    case o => withNs(Some("djinni::composer"), o match {
+    case o => withNs(Some("djinni::valdi"), o match {
       case p: MPrimitive => p.idlName match {
         case "i8" => "I8"
         case "i16" => "I16"
@@ -174,7 +174,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     // val fullyQualifiedName = withWasmNamespace(idJs.ty(ident))
     val fullyQualifiedName = idJs.ty(ident)
     writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
-      w.wl(s"using $helper = ::djinni::composer::Enum<$cls>;")
+      w.wl(s"using $helper = ::djinni::valdi::Enum<$cls>;")
     }), (w => {}))
   }
 
@@ -189,11 +189,11 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.wl(s"struct $helper").bracedSemi {
         w.wl(s"using CppType = $cls;")
-        w.wl("using ComposerType = Valdi:: Value;")
+        w.wl("using ValdiType = Valdi:: Value;")
         w.wl(s"using Boxed = $helper;")
         w.wl
-        w.wl("static CppType toCpp(const ComposerType& v);")
-        w.wl("static ComposerType fromCpp(const CppType& c);")
+        w.wl("static CppType toCpp(const ValdiType& v);")
+        w.wl("static ValdiType fromCpp(const CppType& c);")
         w.wl
         w.wl("static const Valdi::ValueSchema& schema() noexcept;")
       }
@@ -201,7 +201,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     writeCppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle, spec.composerIncludePrefix) (ident.name, origin, refs.cpp, (w => {
       w.wl("using namespace Valdi;")
       w.wl
-      w.w(s"auto $helper::toCpp(const ComposerType& v) -> CppType").braced {
+      w.w(s"auto $helper::toCpp(const ValdiType& v) -> CppType").braced {
         w.wl("auto o = v.getTypedObjectRef();")
         var nextIdx = 0;
         writeAlignedCall(w, "return {", r.fields, "}", f => {
@@ -211,7 +211,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         })
         w.wl(";")
       }
-      w.w(s"auto $helper::fromCpp(const CppType& c) -> ComposerType").braced {
+      w.w(s"auto $helper::fromCpp(const CppType& c) -> ValdiType").braced {
         w.wl("auto o = ValueTypedObject::make(schema().getClassRef(),").bracedEnd(");"){
           for (f <- r.fields) {
             w.wl(s"${helperClass(f.ty.resolved)}::Boxed::fromCpp(${cppMarshal.maybeMove("c." + idCpp.field(f.ident), f.ty)}),")
@@ -245,7 +245,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     val cls = withNs(Some(spec.cppNamespace), idCpp.ty(ident))
     val helper = helperClass(ident)
     writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
-      w.w(s"struct $helper : ::djinni::composer::JsInterface<$cls, $helper>").bracedSemi {
+      w.w(s"struct $helper : ::djinni::valdi::JsInterface<$cls, $helper>").bracedSemi {
         w.wl("static void registerSchema(bool resolve) noexcept;")
         w.wl("static const Valdi::ValueSchema& schemaRef() noexcept;")
         w.wl("static const Valdi::ValueSchema& schema() noexcept;")
@@ -257,8 +257,8 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
 
         // js proxy
         if (i.ext.js) {
-          w.w(s"struct ComposerProxy: $cls, ::djinni::composer::ComposerProxyBase").bracedSemi {
-            w.wl("ComposerProxy(Valdi::Ref<Valdi::ValueTypedProxyObject> js) : ComposerProxyBase(js) {}")
+          w.w(s"struct ValdiProxy: $cls, ::djinni::valdi::ValdiProxyBase").bracedSemi {
+            w.wl("ValdiProxy(Valdi::Ref<Valdi::ValueTypedProxyObject> js) : ValdiProxyBase(js) {}")
             for (m <- i.methods.filter(m => !m.static)) {
               w.w(s"${cppMarshal.fqReturnType(m.ret)} ${idCpp.method(m.ident)}(")
               w.w(m.params.map(p => {
@@ -320,10 +320,10 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         w.w(s"Ref<ValueTypedProxyObject> $helper::toComposer(const CppOptType& c)").braced{
           w.w("auto o = ValueTypedObject::make(schema().getClassRef(),").bracedEnd(");") {
             for (m <- i.methods.filter(m => !m.static)) {
-              w.wl(s"""djinni::composer::tsFunc<${exceptionHandlingTraits(m)}>(std::bind(shim::${idCpp.method(m.ident)}, c, _1)),""")
+              w.wl(s"""djinni::valdi::tsFunc<${exceptionHandlingTraits(m)}>(std::bind(shim::${idCpp.method(m.ident)}, c, _1)),""")
             }
           }
-          w.wl("return makeShared<djinni::composer::DjinniCppProxyObject<CppType::element_type>>(o, c);")
+          w.wl("return makeShared<djinni::valdi::DjinniCppProxyObject<CppType::element_type>>(o, c);")
         }
       }
       //value schema
@@ -345,7 +345,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
           w.wl(s"${t}::registerSchema(resolve);")
         }
         w.wl("static bool flag[2] = {false, false};")
-        w.wl("if (std::exchange(flag[resolve ? 1 : 0], true) == false) { djinni::composer::registerSchemaImpl(unresolvedSchema(), resolve); }")
+        w.wl("if (std::exchange(flag[resolve ? 1 : 0], true) == false) { djinni::valdi::registerSchemaImpl(unresolvedSchema(), resolve); }")
       }
       // type reference
       w.w(s"const ValueSchema& $helper::schemaRef() noexcept").braced {
@@ -353,14 +353,14 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         w.wl("return ref;")
       }
       w.w(s"const ValueSchema& $helper::schema() noexcept").braced {
-        w.wl(s"static auto schema = djinni::composer::getResolvedSchema<$helper>(schemaName());")
+        w.wl(s"static auto schema = djinni::valdi::getResolvedSchema<$helper>(schemaName());")
         w.wl("return schema;")
       }
       // js proxy
       if (i.ext.js) {
         var idx = 0
         for (m <- i.methods.filter(m => !m.static)) {
-          w.w(s"${cppMarshal.fqReturnType(m.ret)} $helper::ComposerProxy::${idCpp.method(m.ident)}(")
+          w.w(s"${cppMarshal.fqReturnType(m.ret)} $helper::ValdiProxy::${idCpp.method(m.ident)}(")
           w.w(m.params.map(p => {
             s"${cppMarshal.fqParamType(p.ty)} ${idCpp.local(p.ident)}"
           }).mkString(","))
@@ -395,10 +395,10 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
               }
             }
           }
-          w.wl(s"auto staticSchema = djinni::composer::resolveSchema(unresolvedStaticSchema, [] { registerSchema(false); registerSchema(true);} );")
+          w.wl(s"auto staticSchema = djinni::valdi::resolveSchema(unresolvedStaticSchema, [] { registerSchema(false); registerSchema(true);} );")
           w.w(s"""(*m)[STRING_LITERAL("${idJs.ty(ident)}")] = Value(ValueTypedObject::make(staticSchema.getClassRef(),""").bracedEnd("));") {
             for (m <- staticMethods) {
-              w.wl(s"""djinni::composer::tsFunc<${exceptionHandlingTraits(m)}>(shim::${idCpp.method(m.ident)}),""")
+              w.wl(s"""djinni::valdi::tsFunc<${exceptionHandlingTraits(m)}>(shim::${idCpp.method(m.ident)}),""")
             }
           }
         }

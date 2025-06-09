@@ -16,23 +16,23 @@
 
 #pragma once
 
-#include "djinni_composer.hpp"
+#include "djinni_valdi.hpp"
 #include "../cpp/DataView.hpp"
 
-namespace djinni::composer {
+namespace djinni::valdi {
 
 struct NativeDataView {
     using CppType = DataView;
-    using ComposerType = Valdi::Value;
+    using ValdiType = Valdi::Value;
     using Boxed = NativeDataView;
 
-    static CppType toCpp(const ComposerType& v) {
+    static CppType toCpp(const ValdiType& v) {
         auto arr = v.getTypedArrayRef();
         const auto& buf = arr->getBuffer();
         return DataView(buf.data(), buf.size());
     }
 
-    static ComposerType fromCpp(const CppType& c) {
+    static ValdiType fromCpp(const CppType& c) {
         Valdi::BytesView buf(nullptr, c.buf(), c.len());
         auto arr = Valdi::makeShared<Valdi::ValueTypedArray>(Valdi::kDefaultTypedArrayType, buf);
         return Valdi::Value(arr);

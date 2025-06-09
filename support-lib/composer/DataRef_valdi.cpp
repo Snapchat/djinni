@@ -15,10 +15,10 @@
   */
 
 #include "../cpp/DataRef.hpp"
-#include "DataRef_composer.hpp"
+#include "DataRef_valdi.hpp"
 #include <variant>
 
-namespace djinni::composer {
+namespace djinni::valdi {
 
 struct ComposerDataObject: Valdi::ComposerObject {
     COMPOSER_CLASS_HEADER(ComposerDataObject);
