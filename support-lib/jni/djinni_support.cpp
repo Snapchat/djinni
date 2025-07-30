@@ -304,8 +304,8 @@ GlobalRef<jclass> jniFindClass(const char * name) {
     if (!clazz) {
         env->ExceptionClear();
         // Use cached class loader, needed for our classes on non-Java thread
-        jstring jname = env->NewStringUTF(name);
-        clazz = static_cast<jclass>(env->CallObjectMethod(g_ourClassLoader, g_loadClassMethodID, jname));
+        LocalRef<jstring> jname(env->NewStringUTF(name));
+        clazz = static_cast<jclass>(env->CallObjectMethod(g_ourClassLoader, g_loadClassMethodID, jname.get()));
         jniExceptionCheck(env);
     }
     GlobalRef<jclass> guard(env, LocalRef<jclass>(env, clazz).get());
