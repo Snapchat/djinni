@@ -85,6 +85,12 @@ export interface /*record*/ MapDateRecord {
     datesById: Map<string, Date>;
 }
 
+/** @flag "--cpp-use-string-view true" */
+export interface TestInterfaceWithString {
+    /** Method with string parameter to test string_view generation */
+    processString(message: string): string;
+}
+
 export interface DataRefTest {
     sendData(data: Uint8Array): void;
     retriveAsBin(): Uint8Array;

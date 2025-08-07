@@ -72,7 +72,9 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
       case "i8" | "i16" | "i32" | "i64" => List(ImportRef("<cstdint>"))
       case _ => List()
     }
-    case MString => List(ImportRef("<string>"))
+    case MString => 
+      val includes = List(ImportRef("<string>"))
+      if (spec.cppUseStringView) ImportRef("<string_view>") :: includes else includes
     case MDate => List(ImportRef("<chrono>"))
     case MBinary => List(ImportRef("<vector>"), ImportRef("<cstdint>"))
     case MOptional => List(ImportRef(spec.cppOptionalHeader))
@@ -258,10 +260,15 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
 
   // this can be used in c++ generation to know whether a const& should be applied to the parameter or not
   private def toCppParamType(tm: MExpr, namespace: Option[String] = None, scopeSymbols: Seq[String] = Seq()): String = {
-    val cppType = toCppType(tm, namespace, scopeSymbols)
-    val refType = "const " + cppType + " &"
-    val valueType = cppType
-    if(byValue(tm)) valueType else refType
+    tm.base match {
+      case MString if spec.cppUseStringView => 
+        if (spec.cppUseWideStrings) "std::wstring_view" else "std::string_view"
+      case _ =>
+        val cppType = toCppType(tm, namespace, scopeSymbols)
+        val refType = "const " + cppType + " &"
+        val valueType = cppType
+        if(byValue(tm)) valueType else refType
+    }
   }
 
   private def moveOnly(tm: MExpr): Boolean = tm.base match {

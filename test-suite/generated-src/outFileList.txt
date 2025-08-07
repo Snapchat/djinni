@@ -10,6 +10,7 @@ djinni-output-temp/cpp/record_with_duration_and_derivings.cpp
 djinni-output-temp/cpp/date_record.hpp
 djinni-output-temp/cpp/date_record.cpp
 djinni-output-temp/cpp/map_date_record.hpp
+djinni-output-temp/cpp/test_interface_with_string.hpp
 djinni-output-temp/cpp/DataRefTest.hpp
 djinni-output-temp/cpp/constant_enum.hpp
 djinni-output-temp/cpp/constant_with_enum.hpp
@@ -81,6 +82,7 @@ djinni-output-temp/java/TestDuration.java
 djinni-output-temp/java/RecordWithDurationAndDerivings.java
 djinni-output-temp/java/DateRecord.java
 djinni-output-temp/java/MapDateRecord.java
+djinni-output-temp/java/TestInterfaceWithString.java
 djinni-output-temp/java/DataRefTest.java
 djinni-output-temp/java/ConstantEnum.java
 djinni-output-temp/java/ConstantWithEnum.java
@@ -150,6 +152,8 @@ djinni-output-temp/jni/NativeDateRecord.hpp
 djinni-output-temp/jni/NativeDateRecord.cpp
 djinni-output-temp/jni/NativeMapDateRecord.hpp
 djinni-output-temp/jni/NativeMapDateRecord.cpp
+djinni-output-temp/jni/NativeTestInterfaceWithString.hpp
+djinni-output-temp/jni/NativeTestInterfaceWithString.cpp
 djinni-output-temp/jni/NativeDataRefTest.hpp
 djinni-output-temp/jni/NativeDataRefTest.cpp
 djinni-output-temp/jni/NativeConstantEnum.hpp
@@ -263,6 +267,7 @@ djinni-output-temp/objc/DBDateRecord.h
 djinni-output-temp/objc/DBDateRecord.mm
 djinni-output-temp/objc/DBMapDateRecord.h
 djinni-output-temp/objc/DBMapDateRecord.mm
+djinni-output-temp/objc/DBTestInterfaceWithString.h
 djinni-output-temp/objc/DBDataRefTest.h
 djinni-output-temp/objc/DBConstantEnum.h
 djinni-output-temp/objc/DBConstantWithEnum.h
@@ -355,6 +360,8 @@ djinni-output-temp/objc/DBDateRecord+Private.h
 djinni-output-temp/objc/DBDateRecord+Private.mm
 djinni-output-temp/objc/DBMapDateRecord+Private.h
 djinni-output-temp/objc/DBMapDateRecord+Private.mm
+djinni-output-temp/objc/DBTestInterfaceWithString+Private.h
+djinni-output-temp/objc/DBTestInterfaceWithString+Private.mm
 djinni-output-temp/objc/DBDataRefTest+Private.h
 djinni-output-temp/objc/DBDataRefTest+Private.mm
 djinni-output-temp/objc/DBConstantEnum+Private.h
@@ -471,6 +478,8 @@ djinni-output-temp/wasm/NativeDateRecord.hpp
 djinni-output-temp/wasm/NativeDateRecord.cpp
 djinni-output-temp/wasm/NativeMapDateRecord.hpp
 djinni-output-temp/wasm/NativeMapDateRecord.cpp
+djinni-output-temp/wasm/NativeTestInterfaceWithString.hpp
+djinni-output-temp/wasm/NativeTestInterfaceWithString.cpp
 djinni-output-temp/wasm/NativeDataRefTest.hpp
 djinni-output-temp/wasm/NativeDataRefTest.cpp
 djinni-output-temp/wasm/NativeConstantEnum.hpp

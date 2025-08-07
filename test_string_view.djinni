@@ -1,0 +1,17 @@
+# Test interface for string_view functionality
+test_interface = interface +c {
+    # Method with string parameter to test string_view generation
+    process_string(message: string): string;
+    
+    # Method with multiple string parameters
+    concatenate_strings(first: string, second: string): string;
+    
+    # Static method with string parameter
+    static validate_string(input: string): bool;
+}
+
+# Record with string field (should still use std::string for fields)
+test_record = record {
+    name: string;
+    description: string;
+}
