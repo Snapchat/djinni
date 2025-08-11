@@ -84,18 +84,18 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     })
   }
 
-  private def writeCommaDelimited[T](w: IndentWriter, seq: Seq[T], nested: (T) => Unit): Unit = {
+  private def writeDelimited[T](w: IndentWriter, seq: Seq[T], delimiter: String)(nested: T => Unit): Unit = {
     val lastIndex = seq.size - 1
     for ((v, i) <- seq.zipWithIndex) {
       nested(v)
       if (i != lastIndex) {
-        w.w(", ")
+        w.w(delimiter)
       }
     }
   }
 
   private def writeParamList(w: IndentWriter, params: Seq[(Ident, CTypeTranslator)]): Unit = {
-    writeCommaDelimited(w, params, (t: (Ident, CTypeTranslator)) => {
+    writeDelimited(w, params, ", ")(t => {
       w.w(t._2.typename)
       w.w(" " + t._1.name)
     })
@@ -104,14 +104,14 @@ class CGenerator(spec: Spec) extends Generator(spec) {
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: ast.Record): Unit = {
     val selfCpp = cppMarshal.fqTypename(ident, r)
 
-    val typeResolver = new CTypeResolver(spec)
+    val typeResolver = new CTypeResolver(spec, cppMarshal)
     val prefix = resolveSymbolName(ident.name)
     val typeName = resolveSymbolTypeName(ident)
 
-    val associatedFields = r.fields.map(f => (f, typeResolver.resolve(f.ty)))
+    val associatedFields = r.fields.map(f => (f, typeResolver.resolve(f.ty.resolved)))
 
     writeCFilePair(origin, ident, doc)((w: IndentWriter) => {
-      w.wl(s"""typedef void * ${typeName};""")
+      w.wl(s"""typedef djinni_record_ptr ${typeName};""")
       w.wl
 
       w.w(s"""${typeName} ${prefix}_create(""")
@@ -132,14 +132,11 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       w.wl(") ")
 
       w.braced {
-        w.w(s"""return ::djinni::c_api::makeRecordInstance<${selfCpp}>(""")
+        w.w(s"""return ::djinni::c_api::Record<${selfCpp}>::make(""")
 
-        val lastIndex = params.size - 1
-        for (((f, t), i) <- associatedFields.zipWithIndex) {
-          w.wl(s"""${t.typename} ${prefix}_get_${f.ident.name}(${typeName} instance);""")
-          w.wl(s"""void ${prefix}_set_${f.ident.name}(${typeName} instance, ${t.typename} value);""")
-          w.wl
-        }
+        writeDelimited(w, associatedFields, ", ")(t => {
+          w.w(t._2.toCppTranslatorFn(t._1.ident.name))
+        })
 
         w.wl(");")
       }
@@ -147,10 +144,24 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       w.wl
       w.wl(s"""void ${prefix}_destroy(${typeName} instance) """)
       w.braced {
-        w.wl(s"::djinni::c_api::releaseRecordInstance<${selfCpp}>(instance);")
+        w.wl(s"::djinni::c_api::Record<${selfCpp}>::release(instance);")
       }
 
-
+      val toCppExpr = s"::djinni::c_api::Record<${selfCpp}>::toCpp(instance)"
+      for ((f, t) <- associatedFields) {
+        w.wl(s"""${t.typename} ${prefix}_get_${f.ident.name}(${typeName} instance)""")
+        w.braced {
+          val param = s"${toCppExpr}->${idCpp.field(f.ident)}"
+          w.wl(s"return ${t.fromCppTranslatorFn(param)};")
+        }
+        w.wl
+        w.wl(s"""void ${prefix}_set_${f.ident.name}(${typeName} instance, ${t.typename} value)""")
+        w.braced {
+          val toCppValue = t.toCppTranslatorFn("value")
+          w.wl(s"${toCppExpr}->${idCpp.field(f.ident)} = ${toCppValue};")
+        }
+        w.wl
+      }
 
     })
   }
