@@ -323,7 +323,13 @@ object YamlGenerator {
       getOptionalField(td, "swift", "generic", false)),
     MExtern.Swiftxx(
       getOptionalField(td, "swiftxx", "translator"),
-      getOptionalField(td, "swiftxx", "header"))
+      getOptionalField(td, "swiftxx", "header")),
+    MExtern.C(
+      getOptionalField(td, "c", "typename"),
+      getOptionalField(td, "c", "public_header"),
+      getOptionalField(td, "c", "private_header"),
+      getOptionalField(td, "c", "translator")
+  )
   )
 
   private def nested(td: ExternTypeDecl, key: String) = {

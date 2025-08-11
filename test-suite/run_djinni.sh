@@ -32,6 +32,7 @@ optional_in_relative="djinni/optionals.djinni"
 temp_out_relative="djinni-output-temp"
 
 cpp_out="$base_dir/generated-src/cpp"
+c_out="$base_dir/generated-src/c"
 jni_out="$base_dir/generated-src/jni"
 objc_out="$base_dir/generated-src/objc"
 java_out="$base_dir/generated-src/java/com/dropbox/djinni/test"
@@ -54,7 +55,7 @@ elif [ $# -eq 1 ]; then
         echo "Unexpected arguemnt: \"$command\"." 1>&2
         exit 1
     fi
-    for dir in "$temp_out" "$cpp_out" "$jni_out" "$java_out"; do
+    for dir in "$temp_out" "$cpp_out" "$c_out" "$jni_out" "$java_out"; do
         if [ -e "$dir" ]; then
             echo "Deleting \"$dir\"..."
             rm -r "$dir"
@@ -148,6 +149,9 @@ fi
     --swiftxx-out "$temp_out_relative/swiftxx" \
     --ident-swiftxx-class NativeFooBar \
     --ident-swiftxx-file NativeFooBar \
+    \
+    --c-out "$temp_out_relative/c" \
+    --c-namespace "testsuite_" \
     \
     --list-in-files "./generated-src/inFileList.txt" \
     --list-out-files "./generated-src/outFileList.txt"\
@@ -340,6 +344,7 @@ mirror "wasm" "$temp_out/wasm" "$wasm_out"
 mirror "ts" "$temp_out/ts" "$ts_out"
 mirror "swift" "$temp_out/swift" "$swift_out"
 mirror "swiftxx" "$temp_out/swiftxx" "$swiftxx_out"
+mirror "c" "$temp_out/c" "$c_out"
 
 date > "$gen_stamp"
 

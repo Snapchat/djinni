@@ -111,6 +111,9 @@ object Main {
     var composerIncludePrefix: String = ""
     var composerIncludeCppPrefix: String = ""
     var composerBaseLibIncludePrefix: String = ""
+    var cOutFolder: Option[File] = None
+    var cNamespace: String = ""
+    var cBaseLibIncludePrefix: String = ""
     var swiftOutFolder: Option[File] = None
     var swiftModule: String = "Module"
     var swiftIdentStyle = IdentStyle.swiftDefault
@@ -301,6 +304,12 @@ object Main {
       opt[File]("composer-ts-out").valueName("<out-folder>").foreach(x => composerTsOutFolder = Some(x))
         .text("The output for the Composer TypeScript interface files (Generator disabled if unspecified).")
       note("")
+      opt[File]("c-out").valueName("<out-folder>").foreach(x => cOutFolder = Some(x))
+        .text("The output for the C files (Generated disabled if unspecified).")
+      opt[String]("c-namespace").valueName("<namespace.").foreach(x => cNamespace = x)
+        .text("The C namespace, used as function prefixes for generated functions")
+      opt[String]("c-base-lib-include-prefix").valueName("...").foreach(x => cBaseLibIncludePrefix = x)
+        .text("The C base library's include path, relative to the C files.")
       opt[File]("swift-out").valueName("<out-folder>").foreach(x => swiftOutFolder = Some(x))
         .text("The output folder for Swift files (Generator disabled if unspecified).")
       opt[String]("swift-module").valueName("<name>").foreach(swiftModule = _)
@@ -520,6 +529,9 @@ object Main {
       composerClassIdentStyle,
       composerFileIdentStyle,
       composerTsOutFolder,
+      cOutFolder,
+      cNamespace,
+      cBaseLibIncludePrefix,
       swiftOutFolder,
       swiftIdentStyle,
       swiftModule,
