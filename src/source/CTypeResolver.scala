@@ -1,9 +1,12 @@
 package djinni
 
-import generatorTools.Spec
+import generatorTools.{DeclRef, ImportRef, Spec, q}
 
-import djinni.ast.{TypeDef, TypeRef}
+import djinni.ast.{Ident, TypeDef, TypeRef}
 import djinni.meta.{MExpr, MPrimitive, Meta}
+import djinni.writer.IndentWriter
+
+import scala.collection.mutable
 
 class CTypeTranslator(val typename: String,
                       val toCppTranslatorFn: (String) => String,
@@ -11,11 +14,17 @@ class CTypeTranslator(val typename: String,
 
 }
 
-class CTypeResolver(val spec: Spec, val cppMarshal: CppMarshal) {
+class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal) {
 
-  private val publicImports = Set.empty[String]
-  private var importStatements = List.empty[String]
+  val publicImports = mutable.TreeSet[String]()
+  val privateImports = mutable.TreeSet[String]()
 
+  initSelfInclude()
+
+  private def initSelfInclude(): Unit = {
+    val myHeader = q(spec.cppIncludePrefix + spec.cppFileIdentStyle(ident.name) + "." + spec.cppHeaderExt)
+    privateImports.add(s"#include $myHeader")
+  }
 
   def valueTypeName(str: String): String = {
     spec.cNamespace + str
@@ -36,7 +45,7 @@ class CTypeResolver(val spec: Spec, val cppMarshal: CppMarshal) {
     expr.base match {
       case opaque: meta.MOpaque =>
         opaque match {
-          case MPrimitive(_,_,_,_,_,_,_,_) => return opaque.asInstanceOf[MPrimitive]
+          case MPrimitive(_, _, _, _, _, _, _, _) => return opaque.asInstanceOf[MPrimitive]
           case _ =>
         }
       case _ =>
@@ -60,12 +69,20 @@ class CTypeResolver(val spec: Spec, val cppMarshal: CppMarshal) {
     )
   }
 
+  private def updateImports(meta: Meta): Unit = {
+    for (r <- cppMarshal.hppReferences(meta, ident.name, false)) r match {
+      case ImportRef(arg) => privateImports.add("#include " + arg)
+      case _ =>
+    }
+  }
+
   def resolve(expr: MExpr): CTypeTranslator = {
     expr.base match {
       case meta.MParam(name) => {
         throw new AssertionError("Unsupported MParam type")
       }
       case meta.MDef(name, numParams, defType, body) => {
+        updateImports(expr.base)
         val cppTypename = cppMarshal.fqTypename(name, body)
         body match {
           case ast.Enum(options, flags) => new CTypeTranslator(valueTypeName(name),
@@ -78,18 +95,22 @@ class CTypeResolver(val spec: Spec, val cppMarshal: CppMarshal) {
           )
           case ast.Interface(ext, methods, consts) => makeTranslator(
             ptrTypeName(name),
-            s"::djinni::c_api::Record<${cppTypename}>"
+            s"::djinni::c_api::Interface<${cppTypename}>"
           )
           case ast.ProtobufMessage(cpp, java, objc, ts, swift) => throw new AssertionError("Unsupported")
         }
       }
       case meta.MExtern(name, numParams, defType, body, _, _, _, _, _, _, _, _, _, _, c) => {
+        updateImports(expr.base)
         makeTranslator(c.typename, c.translator)
       }
-      case meta.MProtobuf(name, numParams, body) => makeTranslator(
-        "djinni_binary_ref",
-        s"::djinni::c_api::Protobuf<${body.cpp.ns}>"
-      )
+      case meta.MProtobuf(name, numParams, body) => {
+        updateImports(expr.base)
+        makeTranslator(
+          "djinni_binary_ref",
+          s"::djinni::c_api::Protobuf<${body.cpp.ns}>"
+        )
+      }
       case opaque: meta.MOpaque => {
         opaque match {
           case meta.MPrimitive(_idlName, jName, jniName, cName, jBoxed, jSig, objcName, objcBoxed) => new CTypeTranslator(cName, p => p, p => p)

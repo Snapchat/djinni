@@ -25,7 +25,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     w.wl("#ifdef __cplusplus")
     w.wl("extern \"C\" {")
     w.wl("#endif // __cplusplus")
-    }
+  }
 
   private def writeExternCEnd(w: IndentWriter): Unit = {
     w.wl("#ifdef __cplusplus")
@@ -43,12 +43,13 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     })
   }
 
-  private def writeCFilePair(origin: String, ident: Ident, doc: Doc)(header: IndentWriter => Unit, impl: IndentWriter => Unit): Unit = {
+  private def writeCFilePair(origin: String, ident: Ident, doc: Doc, publicIncludes: Seq[String], privateIncludes: Seq[String])(header: IndentWriter => Unit, impl: IndentWriter => Unit): Unit = {
     writeCFile(origin, ident, "h", (w: IndentWriter) => {
       w.wl("#pragma once")
       w.wl
 
       w.wl("#include " + q(spec.cBaseLibIncludePrefix + "djinni_c.h"))
+      publicIncludes.foreach(w.wl)
 
       writeDoc(w, doc)
 
@@ -63,6 +64,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     writeCFile(origin, ident, "cpp", (w: IndentWriter) => {
       w.wl(s"""#include "${ident.name}.h"""")
       w.wl("#include " + q(spec.cppBaseLibIncludePrefix + "djinni_c_helpers.hpp"))
+      privateIncludes.foreach(w.wl)
 
       w.wl
       impl(w)
@@ -70,7 +72,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
   }
 
   override def generateEnum(origin: String, ident: Ident, doc: Doc, e: ast.Enum): Unit = {
-    writeCFilePair(origin, ident, doc)((w: IndentWriter) => {
+    writeCFilePair(origin, ident, doc, List.empty[String], List.empty[String])((w: IndentWriter) => {
       val symbolName = resolveSymbolName(ident.name)
       val enumCasePrefix = symbolName + "_"
       w.w("enum " + symbolName)
@@ -104,13 +106,13 @@ class CGenerator(spec: Spec) extends Generator(spec) {
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: ast.Record): Unit = {
     val selfCpp = cppMarshal.fqTypename(ident, r)
 
-    val typeResolver = new CTypeResolver(spec, cppMarshal)
+    val typeResolver = new CTypeResolver(ident, spec, cppMarshal)
     val prefix = resolveSymbolName(ident.name)
     val typeName = resolveSymbolTypeName(ident)
 
     val associatedFields = r.fields.map(f => (f, typeResolver.resolve(f.ty.resolved)))
 
-    writeCFilePair(origin, ident, doc)((w: IndentWriter) => {
+    writeCFilePair(origin, ident, doc, typeResolver.publicImports.toSeq, typeResolver.privateImports.toSeq)((w: IndentWriter) => {
       w.wl(s"""typedef djinni_record_ptr ${typeName};""")
       w.wl
 
@@ -167,7 +169,8 @@ class CGenerator(spec: Spec) extends Generator(spec) {
   }
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface): Unit = {
-    writeCFilePair(origin, ident, doc)((w: IndentWriter) => {
+    val typeResolver = new CTypeResolver(ident, spec, cppMarshal)
+    writeCFilePair(origin, ident, doc, typeResolver.publicImports.toSeq, typeResolver.privateImports.toSeq)((w: IndentWriter) => {
       w.wl("// This is a test interface")
 
     }, (w: IndentWriter) => {
