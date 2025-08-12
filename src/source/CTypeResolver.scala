@@ -3,7 +3,7 @@ package djinni
 import generatorTools.Spec
 
 import djinni.ast.{TypeDef, TypeRef}
-import djinni.meta.{MExpr, MPrimitive}
+import djinni.meta.{MExpr, MPrimitive, Meta}
 
 class CTypeTranslator(val typename: String,
                       val toCppTranslatorFn: (String) => String,
@@ -32,20 +32,29 @@ class CTypeResolver(val spec: Spec, val cppMarshal: CppMarshal) {
     )
   }
 
-  private def resolveOptional(expr: MExpr): CTypeTranslator = {
-    val resolved = resolve(expr)
-    var nestedTypename = resolved.typename
-
+  private def getPrimitiveOrNull(expr: MExpr): meta.MPrimitive = {
     expr.base match {
       case opaque: meta.MOpaque =>
-        case meta.MPrimitive(_idlName, jName, jniName, cName, jBoxed, jSig, objcName, objcBoxed) => {
-          nestedTypename = s"djinni_optional_${resolved.typename}"
+        opaque match {
+          case MPrimitive(_,_,_,_,_,_,_,_) => return opaque.asInstanceOf[MPrimitive]
+          case _ =>
         }
-        case _ =>
       case _ =>
     }
+    null
+  }
 
-    return new CTypeTranslator(nestedTypename,
+  private def resolveOptional(expr: MExpr): CTypeTranslator = {
+    val resolved = resolve(expr)
+
+    val primitive = getPrimitiveOrNull(expr)
+    val nestedTypename = if (primitive != null) {
+      s"djinni_optional_${resolved.typename}"
+    } else {
+      resolved.typename
+    }
+
+    new CTypeTranslator(nestedTypename,
       (p) => s"djinni::c_api::Optional::toCpp(${resolved.toCppTranslatorFn(p)})",
       (p) => s"djinni::c_api::Optional::fromCpp(${resolved.fromCppTranslatorFn(p)})"
     )
