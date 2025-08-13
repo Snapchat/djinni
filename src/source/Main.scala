@@ -114,6 +114,7 @@ object Main {
     var cOutFolder: Option[File] = None
     var cNamespace: String = ""
     var cBaseLibIncludePrefix: String = ""
+    var cIncludePrefix: String = ""
     var swiftOutFolder: Option[File] = None
     var swiftModule: String = "Module"
     var swiftIdentStyle = IdentStyle.swiftDefault
@@ -310,6 +311,8 @@ object Main {
         .text("The C namespace, used as function prefixes for generated functions")
       opt[String]("c-base-lib-include-prefix").valueName("...").foreach(x => cBaseLibIncludePrefix = x)
         .text("The C base library's include path, relative to the C files.")
+      opt[String]("c-include-prefix").valueName("...").foreach(x => cIncludePrefix = x)
+        .text("The prefix for #includes of header files from C++ files.")
       opt[File]("swift-out").valueName("<out-folder>").foreach(x => swiftOutFolder = Some(x))
         .text("The output folder for Swift files (Generator disabled if unspecified).")
       opt[String]("swift-module").valueName("<name>").foreach(swiftModule = _)
@@ -532,6 +535,7 @@ object Main {
       cOutFolder,
       cNamespace,
       cBaseLibIncludePrefix,
+      cIncludePrefix,
       swiftOutFolder,
       swiftIdentStyle,
       swiftModule,

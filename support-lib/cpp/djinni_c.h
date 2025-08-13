@@ -2,7 +2,52 @@
 
 #include <stdint.h>
 
-typedef void *djinni_record_ptr;
+typedef void *djinni_ref;
+
+typedef djinni_ref djinni_string_ref;
+typedef djinni_ref djinni_binary_ref;
+typedef djinni_ref djinni_number_ref;
+typedef djinni_ref djinni_array_ref;
+typedef djinni_ref djinni_keyval_array_ref;
+typedef djinni_ref djinni_date_ref;
+
+typedef djinni_ref djinni_record_ref;
+typedef djinni_ref djinni_interface_ref;
+
+void djinni_ref_retain(djinni_ref ref);
+void djinni_ref_release(djinni_ref ref);
+
+djinni_string_ref djinni_string_create(const char *str, size_t length);
+
+const char *djinni_string_get_data(djinni_string_ref str);
+
+size_t djinni_string_get_length(djinni_string_ref str);
+
+djinni_binary_ref djinni_binary_create(const uint8_t *data, size_t length);
+
+djinni_number_ref djinni_number_int64_create(int64_t v);
+djinni_number_ref djinni_number_uint64_create(uint64_t v);
+djinni_number_ref djinni_number_double_create(double v);
+
+int64_t djinni_number_get_int64(djinni_number_ref number);
+uint64_t djinni_number_get_uint64(djinni_number_ref number);
+double djinni_number_get_double(djinni_number_ref number);
+
+djinni_keyval_array_ref djinni_keyval_array_create(size_t size);
+
+djinni_keyval_array_ref djinni_keyval_array_get_length(djinni_keyval_array_ref keyval_array);
+djinni_ref djinni_keyval_array_get_key(djinni_keyval_array_ref keyval_array, size_t index);
+djinni_ref djinni_keyval_array_get_value(djinni_keyval_array_ref keyval_array, size_t index);
+
+void djinni_keyval_array_set_entry(djinni_keyval_array_ref keyval_array, size_t index, djinni_ref key, djinni_ref value);
+
+djinni_array_ref djinni_array_create(size_t length);
+size_t djinni_array_get_length(djinni_array_ref array);
+djinni_ref djinni_array_get_value(djinni_array_ref array, size_t index);
+void djinni_array_set_value(djinni_array_ref array, size_t index, djinni_ref value);
+
+djinni_date_ref djinni_date_create(uint64_t epoch_time_ms);
+uint64_t djinni_date_get_epoch(djinni_date_ref date);
 
 #define DJINNI_OPTIONAL_PRIMITIVE(__type__) typedef struct { \
   __type__ value; \

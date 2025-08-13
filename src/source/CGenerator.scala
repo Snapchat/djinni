@@ -14,11 +14,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
   }
 
   private def resolveSymbolTypeName(ident: Ident): String = {
-    return resolveSymbolName(ident.name) + "_ptr"
-  }
-
-  private def getPtrSymbolName(name: String): String = {
-    return resolveSymbolName(name) + "_ptr"
+    resolveSymbolName(ident.name) + "_ref"
   }
 
   private def writeExternCBegin(w: IndentWriter): Unit = {
@@ -113,15 +109,12 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     val associatedFields = r.fields.map(f => (f, typeResolver.resolve(f.ty.resolved)))
 
     writeCFilePair(origin, ident, doc, typeResolver.publicImports.toSeq, typeResolver.privateImports.toSeq)((w: IndentWriter) => {
-      w.wl(s"""typedef djinni_record_ptr ${typeName};""")
+      w.wl(s"""typedef djinni_record_ref ${typeName};""")
       w.wl
 
       w.w(s"""${typeName} ${prefix}_create(""")
       writeParamList(w, associatedFields.map(f => (f._1.ident, f._2)))
       w.wl(");")
-
-      w.wl(s"""void ${prefix}_destroy(${typeName} instance);""")
-      w.wl
 
       for ((f, t) <- associatedFields) {
         w.wl(s"""${t.typename} ${prefix}_get_${f.ident.name}(${typeName} instance);""")
@@ -144,10 +137,6 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       }
 
       w.wl
-      w.wl(s"""void ${prefix}_destroy(${typeName} instance) """)
-      w.braced {
-        w.wl(s"::djinni::c_api::Record<${selfCpp}>::release(instance);")
-      }
 
       val toCppExpr = s"::djinni::c_api::Record<${selfCpp}>::toCpp(instance)"
       for ((f, t) <- associatedFields) {

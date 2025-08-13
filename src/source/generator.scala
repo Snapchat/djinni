@@ -116,6 +116,7 @@ package object generatorTools {
                    cOutFolder: Option[File],
                    cNamespace: String,
                    cBaseLibIncludePrefix: String,
+                   cIncludePrefix: String,
                    swiftOutFolder: Option[File],
                    swiftIdentStyle: SwiftIdentStyle,
                    swiftModule: String,
