@@ -1,9 +1,9 @@
 #pragma once
 
 #include "djinni_c.h"
+#include "djinni_c_types.hpp"
 #include <atomic>
 #include <memory>
-#include <optional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -124,36 +124,27 @@ private:
 
 class Optional {
 public:
-  static djinni_optional_bool fromCpp(std::optional<bool> value) {
-    return fromCppPrimitive<djinni_optional_bool>(value);
+  template <typename Opt, typename T> static T fromCppPrimitive(Opt value) {
+    T out = {0};
+
+    if (value) {
+      out.has_value = true;
+      out.value = value.value();
+    }
+
+    return out;
   }
 
-  static djinni_optional_int8_t fromCpp(std::optional<int8_t> value) {
-    return fromCppPrimitive<djinni_optional_int8_t>(value);
+  template <typename Opt, typename T> static Opt toCppPrimitive(T value) {
+    if (value.has_value) {
+      return Opt(value.value);
+    } else {
+      return Opt();
+    }
   }
 
-  static djinni_optional_int16_t fromCpp(std::optional<int16_t> value) {
-    return fromCppPrimitive<djinni_optional_int16_t>(value);
-  }
-
-  static djinni_optional_int32_t fromCpp(std::optional<int32_t> value) {
-    return fromCppPrimitive<djinni_optional_int32_t>(value);
-  }
-
-  static djinni_optional_int64_t fromCpp(std::optional<int64_t> value) {
-    return fromCppPrimitive<djinni_optional_int64_t>(value);
-  }
-
-  static djinni_optional_float fromCpp(std::optional<float> value) {
-    return fromCppPrimitive<djinni_optional_float>(value);
-  }
-
-  static djinni_optional_double fromCpp(std::optional<double> value) {
-    return fromCppPrimitive<djinni_optional_double>(value);
-  }
-
-  template <typename T, typename F>
-  static djinni_ref fromCpp(const std::optional<T> &value, F &&convert) {
+  template <typename Opt, typename F>
+  static djinni_ref fromCpp(const Opt &value, F &&convert) {
     if (!value) {
       return nullptr;
     } else {
@@ -161,8 +152,8 @@ public:
     }
   }
 
-  template <typename T, typename F>
-  static djinni_ref fromCpp(std::optional<T> &&value, F &&convert) {
+  template <typename Opt, typename F>
+  static djinni_ref fromCpp(Opt &&value, F &&convert) {
     if (!value) {
       return nullptr;
     } else {
@@ -170,42 +161,42 @@ public:
     }
   }
 
-  template <typename F>
-  static auto toCpp(djinni_ref ptr, F &&convert)
-      -> std::optional<std::invoke_result_t<F, djinni_ref>> {
+  template <typename Opt, typename F>
+  static Opt toCpp(djinni_ref ptr, F &&convert) {
     if (ptr == nullptr) {
-      return std::nullopt;
+      return Opt();
     } else {
-      return std::make_optional(convert(ptr));
+      return Opt(convert(ptr));
     }
   }
 
 private:
-  template <typename Opt, typename T>
-  static Opt fromCppPrimitive(std::optional<T> value) {
-    Opt out = {0};
-
-    if (value.has_value()) {
-      out.has_value = true;
-      out.value = value.value();
-    }
-
-    return out;
-  }
 };
 
 template <typename T> class Record {
 public:
   template <typename... Args> static djinni_record_ref make(Args &&...args) {
-    return reinterpret_cast<djinni_record_ref>(
-        new T(std::forward<Args>(args)...));
+    Object *obj = new RecordHolder<T>(T(std::forward<Args>(args)...));
+    return reinterpret_cast<djinni_record_ref>(obj);
   }
 
-  static T *toCpp(djinni_record_ref ptr) { return reinterpret_cast<T *>(ptr); }
+  static T *toCpp(djinni_record_ref ptr) {
+    auto *record =
+        static_cast<RecordHolder<T> *>(reinterpret_cast<Object *>(ptr));
+    if (record == nullptr) {
+      return nullptr;
+    }
+
+    return &record->data();
+  }
 
   static djinni_record_ref fromCpp(T &&value) { return make(std::move(value)); }
 
-  static void release(djinni_record_ref ptr) { delete toCpp(ptr); }
+  static djinni_record_ref fromCpp(const T &value) { return make(value); }
+
+  static void release(djinni_record_ref ptr) {
+    Object::release(reinterpret_cast<Object *>(ptr));
+  }
 };
 
 template <typename Cpp, typename C> class Enum {
@@ -213,12 +204,12 @@ public:
   static Cpp toCpp(C value) { return static_cast<Cpp>(value); }
   static C fromCpp(Cpp value) { return static_cast<C>(value); }
 
-  static std::optional<Cpp> toCppBoxed(djinni_number_ref value) {
-    return value != nullptr ? static_cast<C>(djinni_number_get_int64(value))
-                            : std::nullopt;
+  template <typename Opt> static Opt toCppBoxed(djinni_number_ref value) {
+    return value != nullptr ? Opt(static_cast<Cpp>(djinni_number_get_int64(value)))
+                            : Opt();
   }
 
-  static djinni_number_ref fromCppBoxed(std::optional<Cpp> value) {
+  template <typename Opt> static djinni_number_ref fromCppBoxed(Opt value) {
     return value ? Number::fromCpp(static_cast<int64_t>(value.value()))
                  : nullptr;
   }
@@ -316,7 +307,7 @@ public:
     djinni_keyval_array_ref output = djinni_keyval_array_create(map.size());
     size_t index = 0;
     for (const auto &it : map) {
-      auto pair = convert(it.first, it.value);
+      auto pair = convert(it.first, it.second);
 
       djinni_keyval_array_set_entry(output, index++, pair.first, pair.second);
 

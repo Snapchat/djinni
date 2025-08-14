@@ -3,7 +3,7 @@ package djinni
 import generatorTools.{DeclRef, ImportRef, Spec, q}
 
 import djinni.ast.{Ident, TypeDef, TypeRef}
-import djinni.meta.{MExpr, MPrimitive, Meta}
+import djinni.meta.{MExpr, MOptional, MPrimitive, Meta}
 import djinni.writer.IndentWriter
 
 import scala.collection.mutable
@@ -73,25 +73,37 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
       },
       (p) => {
         val innerFromCpp = inner.fromCppTranslatorFn("value")
-        s"$translator::fromCpp(${p}, [](auto value) { return ${innerFromCpp}); })"
+        s"$translator::fromCpp(${p}, [](auto value) { return ${innerFromCpp}; })"
       }
     )
   }
 
-  private def resolveOptional(expr: MExpr, asBoxed: Boolean): CTypeTranslator = {
+  private def resolveOptional(expr: MExpr, asBoxed: Boolean, parent: MExpr): CTypeTranslator = {
     if (isEnum(expr)) {
       return resolve(expr, true)
     }
     val resolved = resolve(expr, asBoxed)
     val primitive = getPrimitiveOrNull(expr)
 
+    val cppOptionalTemplate = cppMarshal.fqTypename(parent)
+
     if (primitive != null && !asBoxed) {
-      new CTypeTranslator(s"djinni_optional_${resolved.typename}",
-        (p) => s"djinni::c_api::Optional::toCpp(${resolved.toCppTranslatorFn(p)})",
-        (p) => s"djinni::c_api::Optional::fromCpp(${resolved.fromCppTranslatorFn(p)})"
+      val typename = s"djinni_optional_${resolved.typename}"
+      new CTypeTranslator(typename,
+        (p) => s"::djinni::c_api::Optional::toCppPrimitive<${cppOptionalTemplate}, ${typename}>(${resolved.toCppTranslatorFn(p)})",
+        (p) => s"::djinni::c_api::Optional::fromCppPrimitive<${cppOptionalTemplate}, ${typename}>(${resolved.fromCppTranslatorFn(p)})"
       )
     } else {
-      makeNestedTranslator(resolved, resolved.typename, "::djinni::c_api::Optional")
+      new CTypeTranslator(resolved.typename,
+        (p) => {
+          val innerToCpp = resolved.toCppTranslatorFn("value")
+          s"::djinni::c_api::Optional::toCpp<${cppOptionalTemplate}>(${p}, [](auto value) { return ${innerToCpp}; })"
+        },
+        (p) => {
+          val innerFromCpp = resolved.fromCppTranslatorFn("value")
+          s"::djinni::c_api::Optional::fromCpp<${cppOptionalTemplate}>(${p}, [](auto value) { return ${innerFromCpp}; })"
+        }
+      )
     }
   }
 
@@ -153,9 +165,10 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
   private def resolveEnum(name: String, cppTypename: String, asBoxed: Boolean): CTypeTranslator = {
     val typename = valueTypeName(name)
     if (asBoxed) {
+      val optionalType = s"${spec.cppOptionalTemplate}<${cppTypename}>"
       new CTypeTranslator("djinni_number_ref",
-        (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::toCppBoxed(${p})",
-        (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::fromCppBoxed(${p})"
+        (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::toCppBoxed<${optionalType}>(${p})",
+        (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::fromCppBoxed<${optionalType}>(${p})"
       )
     } else {
       new CTypeTranslator(typename,
@@ -209,7 +222,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
           case meta.MString => makeTranslator("djinni_string_ref", "::djinni::c_api::String")
           case meta.MDate => makeTranslator("djinni_date_ref", "::djinni::c_api::Date")
           case meta.MBinary => makeTranslator("djinni_binary_ref", "::djinni::c_api::Binary")
-          case meta.MOptional => resolveOptional(expr.args.head, asBoxed)
+          case meta.MOptional => resolveOptional(expr.args.head, asBoxed, expr)
           case meta.MList => resolveListLike(expr.args.head, "::djinni::c_api::List")
           case meta.MSet => resolveListLike(expr.args.head, "::djinni::c_api::Set")
           case meta.MMap => resolveMap(expr.args.head, expr.args(1))

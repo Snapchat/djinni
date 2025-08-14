@@ -33,13 +33,6 @@ template <typename T, typename ValueType> struct ArrayAllocator {
   }
 };
 
-static Object *swapObject(Object *prevValue, Object *newValue) {
-  Object::retain(newValue);
-  Object::release(prevValue);
-
-  return newValue;
-}
-
 Object::Object() : _ref(1) {}
 
 Object::~Object() = default;

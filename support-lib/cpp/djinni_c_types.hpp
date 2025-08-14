@@ -95,4 +95,17 @@ private:
   ValueType _type;
 };
 
+template <typename T> class RecordHolder : public Object {
+public:
+  RecordHolder(T data) : _data(std::move(data)) {}
+  ~RecordHolder() override = default;
+
+  const T &data() const { return _data; }
+
+  T &data() { return _data; }
+
+private:
+  T _data;
+};
+
 } // namespace djinni
