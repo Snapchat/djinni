@@ -11,15 +11,6 @@
 
 namespace djinni::c_api {
 
-class Object {
-public:
-  Object();
-  virtual ~Object();
-
-private:
-  std::atomic_int _ref;
-};
-
 class String {
 public:
   static djinni_string_ref fromCpp(std::string &&str);
@@ -125,12 +116,14 @@ public:
   static Cpp toCpp(C value) { return static_cast<Cpp>(value); }
   static C fromCpp(Cpp value) { return static_cast<C>(value); }
 
-  static djinni_number_ref toCppBoxed(C value) {
-    return Number::toCpp(static_cast<int64_t>(value));
+  static std::optional<Cpp> toCppBoxed(djinni_number_ref value) {
+    return value != nullptr ? static_cast<C>(djinni_number_get_int64(value))
+                            : std::nullopt;
   }
 
-  static C fromCpp(djinni_number_ref value) {
-    return static_cast<C>(djinni_number_get_int64(value));
+  static djinni_number_ref fromCppBoxed(std::optional<Cpp> value) {
+    return value ? Number::fromCpp(static_cast<int64_t>(value.value()))
+                 : nullptr;
   }
 };
 

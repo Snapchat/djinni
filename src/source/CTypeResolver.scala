@@ -53,6 +53,18 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     null
   }
 
+  private def isEnum(expr: MExpr): Boolean = {
+    expr.base match {
+      case meta.MDef(name, numParams, defType, body) => {
+        body match {
+          case ast.Enum(options, flags) => true
+          case _ => false
+        }
+      }
+      case _ => false
+    }
+  }
+
   private def makeNestedTranslator(inner: CTypeTranslator, typename: String, translator: String): CTypeTranslator = {
     new CTypeTranslator(typename,
       (p) => {
@@ -67,8 +79,10 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
   }
 
   private def resolveOptional(expr: MExpr, asBoxed: Boolean): CTypeTranslator = {
+    if (isEnum(expr)) {
+      return resolve(expr, true)
+    }
     val resolved = resolve(expr, asBoxed)
-
     val primitive = getPrimitiveOrNull(expr)
 
     if (primitive != null && !asBoxed) {
@@ -103,7 +117,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
       (p) => {
         val innerFromCppKey = resolvedKey.fromCppTranslatorFn("key")
         val innerFromCppValue = resolvedValue.fromCppTranslatorFn("value")
-        s"::djinni::c_api::Map<${cppTypeKey}, ${cppTypeValue}>::fromCpp(${p}, [](auto value, auto value) { return std::make_pair(${innerFromCppKey}, ${innerFromCppValue}); })"
+        s"::djinni::c_api::Map<${cppTypeKey}, ${cppTypeValue}>::fromCpp(${p}, [](auto key, auto value) { return std::make_pair(${innerFromCppKey}, ${innerFromCppValue}); })"
       })
 
   }
@@ -139,7 +153,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
   private def resolveEnum(name: String, cppTypename: String, asBoxed: Boolean): CTypeTranslator = {
     val typename = valueTypeName(name)
     if (asBoxed) {
-      new CTypeTranslator(typename,
+      new CTypeTranslator("djinni_number_ref",
         (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::toCppBoxed(${p})",
         (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::fromCppBoxed(${p})"
       )
