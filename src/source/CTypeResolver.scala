@@ -79,10 +79,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
   }
 
   private def resolveOptional(expr: MExpr, asBoxed: Boolean, parent: MExpr): CTypeTranslator = {
-    if (isEnum(expr)) {
-      return resolve(expr, true)
-    }
-    val resolved = resolve(expr, asBoxed)
+    val resolved = resolve(expr, asBoxed || isEnum(expr))
     val primitive = getPrimitiveOrNull(expr)
 
     val cppOptionalTemplate = cppMarshal.fqTypename(parent)
@@ -165,10 +162,9 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
   private def resolveEnum(name: String, cppTypename: String, asBoxed: Boolean): CTypeTranslator = {
     val typename = valueTypeName(name)
     if (asBoxed) {
-      val optionalType = s"${spec.cppOptionalTemplate}<${cppTypename}>"
       new CTypeTranslator("djinni_number_ref",
-        (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::toCppBoxed<${optionalType}>(${p})",
-        (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::fromCppBoxed<${optionalType}>(${p})"
+        (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::toCppBoxed(${p})",
+        (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::fromCppBoxed(${p})"
       )
     } else {
       new CTypeTranslator(typename,

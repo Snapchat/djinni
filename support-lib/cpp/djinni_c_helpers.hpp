@@ -180,14 +180,14 @@ public:
     return reinterpret_cast<djinni_record_ref>(obj);
   }
 
-  static T *toCpp(djinni_record_ref ptr) {
+  static T &toCpp(djinni_record_ref ptr) {
     auto *record =
         static_cast<RecordHolder<T> *>(reinterpret_cast<Object *>(ptr));
     if (record == nullptr) {
-      return nullptr;
+      std::abort();
     }
 
-    return &record->data();
+    return record->data();
   }
 
   static djinni_record_ref fromCpp(T &&value) { return make(std::move(value)); }
@@ -204,14 +204,12 @@ public:
   static Cpp toCpp(C value) { return static_cast<Cpp>(value); }
   static C fromCpp(Cpp value) { return static_cast<C>(value); }
 
-  template <typename Opt> static Opt toCppBoxed(djinni_number_ref value) {
-    return value != nullptr ? Opt(static_cast<Cpp>(djinni_number_get_int64(value)))
-                            : Opt();
+  static Cpp toCppBoxed(djinni_number_ref value) {
+    return static_cast<Cpp>(djinni_number_get_int64(value));
   }
 
-  template <typename Opt> static djinni_number_ref fromCppBoxed(Opt value) {
-    return value ? Number::fromCpp(static_cast<int64_t>(value.value()))
-                 : nullptr;
+  static djinni_number_ref fromCppBoxed(Cpp value) {
+    return Number::fromCpp(static_cast<int64_t>(value));
   }
 };
 

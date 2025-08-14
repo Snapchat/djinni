@@ -142,14 +142,14 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       for ((f, t) <- associatedFields) {
         w.wl(s"""${t.typename} ${prefix}_get_${f.ident.name}(${typeName} instance)""")
         w.braced {
-          val param = s"${toCppExpr}->${idCpp.field(f.ident)}"
+          val param = s"${toCppExpr}.${idCpp.field(f.ident)}"
           w.wl(s"return ${t.fromCppTranslatorFn(param)};")
         }
         w.wl
         w.wl(s"""void ${prefix}_set_${f.ident.name}(${typeName} instance, ${t.typename} value)""")
         w.braced {
           val toCppValue = t.toCppTranslatorFn("value")
-          w.wl(s"${toCppExpr}->${idCpp.field(f.ident)} = ${toCppValue};")
+          w.wl(s"${toCppExpr}.${idCpp.field(f.ident)} = ${toCppValue};")
         }
         w.wl
       }
