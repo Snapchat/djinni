@@ -1,0 +1,115 @@
+#include "djinni_c.h"
+#include "djinni_c_types.hpp"
+
+using namespace djinni;
+
+static djinni_ref toC(Object *obj) { return reinterpret_cast<djinni_ref>(obj); }
+
+template <typename T> static T *fromC(djinni_ref ref) {
+  return static_cast<T *>(reinterpret_cast<Object *>(ref));
+}
+
+void djinni_ref_retain(djinni_ref ref) { Object::retain(fromC<Object>(ref)); }
+
+void djinni_ref_release(djinni_ref ref) { Object::retain(fromC<Object>(ref)); }
+
+djinni_string_ref djinni_string_create(const char *str, size_t length) {
+  return toC(String::make(str, length));
+}
+
+const char *djinni_string_get_data(djinni_string_ref str) {
+  return fromC<String>(str)->data();
+}
+
+size_t djinni_string_get_length(djinni_string_ref str) {
+  return fromC<String>(str)->length();
+}
+
+djinni_binary_ref djinni_binary_create(uint8_t *data, size_t length,
+                                       void *opaque,
+                                       djinni_binary_deallocator deallocator) {
+  return toC(Binary::make(data, length, opaque, deallocator));
+}
+
+djinni_number_ref djinni_number_int64_create(int64_t v) {
+  Number::Value value;
+  value.i = v;
+  return toC(Number::make(value, Number::ValueType::SIGNED_INT));
+}
+
+djinni_number_ref djinni_number_uint64_create(uint64_t v) {
+  Number::Value value;
+  value.u = v;
+  return toC(Number::make(value, Number::ValueType::UNSIGNED_INT));
+}
+
+djinni_number_ref djinni_number_double_create(double v) {
+  Number::Value value;
+  value.d = v;
+  return toC(Number::make(value, Number::ValueType::DOUBLE));
+}
+
+int64_t djinni_number_get_int64(djinni_number_ref number) {
+  return fromC<Number>(number)->toSignedInt();
+}
+
+uint64_t djinni_number_get_uint64(djinni_number_ref number) {
+  return fromC<Number>(number)->toUnsignedInt();
+}
+
+double djinni_number_get_double(djinni_number_ref number) {
+  return fromC<Number>(number)->toDouble();
+}
+
+djinni_keyval_array_ref djinni_keyval_array_create(size_t size) {
+  auto *array = ObjectArray::make(size << 1);
+  return toC(array);
+}
+
+size_t djinni_keyval_array_get_length(djinni_keyval_array_ref keyval_array) {
+  return fromC<ObjectArray>(keyval_array)->length() >> 1;
+}
+
+djinni_ref djinni_keyval_array_get_key(djinni_keyval_array_ref keyval_array,
+                                       size_t index) {
+  return toC(fromC<ObjectArray>(keyval_array)->getObjectAtIndex(index << 1));
+}
+
+djinni_ref djinni_keyval_array_get_value(djinni_keyval_array_ref keyval_array,
+                                         size_t index) {
+  return toC(
+      fromC<ObjectArray>(keyval_array)->getObjectAtIndex((index << 1) + 1));
+}
+
+void djinni_keyval_array_set_entry(djinni_keyval_array_ref keyval_array,
+                                   size_t index, djinni_ref key,
+                                   djinni_ref value) {
+  auto *array = fromC<ObjectArray>(keyval_array);
+  array->setObjectAtIndex(index << 1, fromC<Object>(key));
+  array->setObjectAtIndex((index << 1) + 1, fromC<Object>(value));
+}
+
+djinni_array_ref djinni_array_create(size_t length) {
+  return toC(ObjectArray::make(length));
+}
+
+size_t djinni_array_get_length(djinni_array_ref array) {
+  return fromC<ObjectArray>(array)->length();
+}
+
+djinni_ref djinni_array_get_value(djinni_array_ref array, size_t index) {
+  return toC(fromC<ObjectArray>(array)->getObjectAtIndex(index));
+}
+
+void djinni_array_set_value(djinni_array_ref array, size_t index,
+                            djinni_ref value) {
+  fromC<ObjectArray>(array)->setObjectAtIndex(index, fromC<Object>(value));
+}
+
+djinni_date_ref djinni_date_create(uint64_t epoch_time_ms) {
+  return djinni_number_uint64_create(epoch_time_ms);
+}
+
+uint64_t djinni_date_get_epoch(djinni_date_ref date) {
+  return djinni_number_get_uint64(date);
+}

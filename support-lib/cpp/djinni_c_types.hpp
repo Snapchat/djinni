@@ -43,7 +43,7 @@ public:
   size_t length() const;
 
   Object *getObjectAtIndex(size_t index) const;
-  void setObjectAtIndex(Object *object, size_t index);
+  void setObjectAtIndex(size_t index, Object *object);
 
   static ObjectArray *make(size_t length);
 

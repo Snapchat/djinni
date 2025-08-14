@@ -110,7 +110,7 @@ Object *ObjectArray::getObjectAtIndex(size_t index) const {
   return object;
 }
 
-void ObjectArray::setObjectAtIndex(Object *object, size_t index) {
+void ObjectArray::setObjectAtIndex(size_t index, Object *object) {
   ObjectArrayAllocator allocator;
   Object **data = allocator.getContainerStartPtr(this);
 

@@ -25,6 +25,103 @@ public:
   static std::chrono::system_clock::time_point toCpp(djinni_date_ref date);
 };
 
+class Number {
+public:
+  template <typename T> static djinni_number_ref fromCpp(T value) = delete;
+  template <typename T> static T toCpp(djinni_number_ref value) = delete;
+
+  template <> djinni_number_ref fromCpp(uint8_t value) {
+    return fromCppUnsignedInt(value);
+  }
+  template <> djinni_number_ref fromCpp(uint16_t value) {
+    return fromCppUnsignedInt(value);
+  }
+  template <> djinni_number_ref fromCpp(uint32_t value) {
+    return fromCppUnsignedInt(value);
+  }
+  template <> djinni_number_ref fromCpp(uint64_t value) {
+    return fromCppUnsignedInt(value);
+  }
+  template <> djinni_number_ref fromCpp(bool value) {
+    return fromCppUnsignedInt(value);
+  }
+
+  template <> uint8_t toCpp(djinni_number_ref value) {
+    return toCppUnsignedInt<uint8_t>(value);
+  }
+  template <> uint16_t toCpp(djinni_number_ref value) {
+    return toCppUnsignedInt<uint16_t>(value);
+  }
+  template <> uint32_t toCpp(djinni_number_ref value) {
+    return toCppUnsignedInt<uint32_t>(value);
+  }
+  template <> uint64_t toCpp(djinni_number_ref value) {
+    return toCppUnsignedInt<uint64_t>(value);
+  }
+  template <> bool toCpp(djinni_number_ref value) {
+    return toCppUnsignedInt<bool>(value);
+  }
+
+  template <> djinni_number_ref fromCpp(int8_t value) {
+    return fromCppSignedInt(value);
+  }
+  template <> djinni_number_ref fromCpp(int16_t value) {
+    return fromCppSignedInt(value);
+  }
+  template <> djinni_number_ref fromCpp(int32_t value) {
+    return fromCppSignedInt(value);
+  }
+  template <> djinni_number_ref fromCpp(int64_t value) {
+    return fromCppSignedInt(value);
+  }
+
+  template <> int8_t toCpp(djinni_number_ref value) {
+    return toCppSignedInt<int8_t>(value);
+  }
+  template <> int16_t toCpp(djinni_number_ref value) {
+    return toCppSignedInt<int16_t>(value);
+  }
+  template <> int32_t toCpp(djinni_number_ref value) {
+    return toCppSignedInt<int32_t>(value);
+  }
+  template <> int64_t toCpp(djinni_number_ref value) {
+    return toCppSignedInt<int64_t>(value);
+  }
+
+  template <> djinni_number_ref fromCpp(float value) {
+    return djinni_number_double_create(value);
+  }
+
+  template <> djinni_number_ref fromCpp(double value) {
+    return djinni_number_double_create(value);
+  }
+
+  template <> float toCpp(djinni_number_ref value) {
+    return static_cast<float>(djinni_number_get_double(value));
+  }
+
+  template <> double toCpp(djinni_number_ref value) {
+    return djinni_number_get_double(value);
+  }
+
+private:
+  template <typename T> static djinni_number_ref fromCppUnsignedInt(T value) {
+    return djinni_number_uint64_create(static_cast<uint64_t>(value));
+  }
+
+  template <typename T> static T toCppUnsignedInt(djinni_number_ref value) {
+    return static_cast<T>(djinni_number_get_uint64(value));
+  }
+
+  template <typename T> static djinni_number_ref fromCppSignedInt(T value) {
+    return djinni_number_int64_create(static_cast<int64_t>(value));
+  }
+
+  template <typename T> static T toCppSignedInt(djinni_number_ref value) {
+    return static_cast<T>(djinni_number_get_int64(value));
+  }
+};
+
 class Optional {
 public:
   static djinni_optional_bool fromCpp(std::optional<bool> value) {
@@ -79,7 +176,7 @@ public:
     if (ptr == nullptr) {
       return std::nullopt;
     } else {
-      return std::optional<T>(convert(ptr));
+      return std::make_optional(convert(ptr));
     }
   }
 
@@ -99,16 +196,16 @@ private:
 
 template <typename T> class Record {
 public:
-  template <typename... Args> static djinni_record_ptr make(Args &&...args) {
-    return reinterpret_cast<djinni_record_ptr>(
+  template <typename... Args> static djinni_record_ref make(Args &&...args) {
+    return reinterpret_cast<djinni_record_ref>(
         new T(std::forward<Args>(args)...));
   }
 
-  static T *toCpp(djinni_record_ptr ptr) { return reinterpret_cast<T *>(ptr); }
+  static T *toCpp(djinni_record_ref ptr) { return reinterpret_cast<T *>(ptr); }
 
-  static djinni_record_ptr fromCpp(T &&value) { return make(std::move(value)); }
+  static djinni_record_ref fromCpp(T &&value) { return make(std::move(value)); }
 
-  static void release(djinni_record_ptr ptr) { delete toCpp(ptr); }
+  static void release(djinni_record_ref ptr) { delete toCpp(ptr); }
 };
 
 template <typename Cpp, typename C> class Enum {
@@ -136,9 +233,9 @@ public:
     output.reserve(length);
 
     for (size_t i = 0; i < length; i++) {
-      auto value = djinni_array_get_value(value, i);
-      output.emplace_back(convert(value));
-      djinni_ref_release(value);
+      auto item = djinni_array_get_value(value, i);
+      output.emplace_back(convert(item));
+      djinni_ref_release(item);
     }
 
     return output;
@@ -168,9 +265,9 @@ public:
     output.reserve(length);
 
     for (size_t i = 0; i < length; i++) {
-      auto value = djinni_array_get_value(value, i);
-      output.emplace(convert(value));
-      djinni_ref_release(value);
+      auto item = djinni_array_get_value(value, i);
+      output.emplace(convert(item));
+      djinni_ref_release(item);
     }
 
     return output;

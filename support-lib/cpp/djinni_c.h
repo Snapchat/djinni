@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stddef.h>
 
 typedef void *djinni_ref;
 
@@ -14,6 +15,8 @@ typedef djinni_ref djinni_date_ref;
 typedef djinni_ref djinni_record_ref;
 typedef djinni_ref djinni_interface_ref;
 
+typedef void(*djinni_binary_deallocator)(uint8_t *, size_t, void *);
+
 void djinni_ref_retain(djinni_ref ref);
 void djinni_ref_release(djinni_ref ref);
 
@@ -23,7 +26,7 @@ const char *djinni_string_get_data(djinni_string_ref str);
 
 size_t djinni_string_get_length(djinni_string_ref str);
 
-djinni_binary_ref djinni_binary_create(const uint8_t *data, size_t length);
+djinni_binary_ref djinni_binary_create(uint8_t *data, size_t length, void *opaque, djinni_binary_deallocator deallocator);
 
 djinni_number_ref djinni_number_int64_create(int64_t v);
 djinni_number_ref djinni_number_uint64_create(uint64_t v);
@@ -35,7 +38,7 @@ double djinni_number_get_double(djinni_number_ref number);
 
 djinni_keyval_array_ref djinni_keyval_array_create(size_t size);
 
-djinni_keyval_array_ref djinni_keyval_array_get_length(djinni_keyval_array_ref keyval_array);
+size_t djinni_keyval_array_get_length(djinni_keyval_array_ref keyval_array);
 djinni_ref djinni_keyval_array_get_key(djinni_keyval_array_ref keyval_array, size_t index);
 djinni_ref djinni_keyval_array_get_value(djinni_keyval_array_ref keyval_array, size_t index);
 
