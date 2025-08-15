@@ -179,6 +179,7 @@ java_test(
     ],
 )
 
+# Uncomment before merging. This rule causes issues for me.
 # macos_unit_test(
 #     name = "djinni-objc-tests",
 #     minimum_os_version = "10.10",
