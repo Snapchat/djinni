@@ -11,7 +11,7 @@ template <typename T> static T *fromC(djinni_ref ref) {
 
 void djinni_ref_retain(djinni_ref ref) { Object::retain(fromC<Object>(ref)); }
 
-void djinni_ref_release(djinni_ref ref) { Object::retain(fromC<Object>(ref)); }
+void djinni_ref_release(djinni_ref ref) { Object::release(fromC<Object>(ref)); }
 
 djinni_string_ref djinni_string_create(const char *str, size_t length) {
   return toC(String::make(str, length));

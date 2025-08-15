@@ -31,7 +31,9 @@ public:
     djinni_ref_retain(binary);
   }
 
-  ~DataRefImpl() override { djinni_ref_release(_binary); }
+  ~DataRefImpl() override {
+    djinni_ref_release(_binary);
+  }
 
   const uint8_t *buf() const override {
     return djinni_binary_get_data(_binary);

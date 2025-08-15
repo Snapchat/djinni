@@ -5,6 +5,7 @@
 #include "map_record.h"
 #include "primitive_list.h"
 #include "gtest/gtest.h"
+#include <memory>
 
 namespace djinni {
 
@@ -379,6 +380,16 @@ TEST(DjinniCAPI, supportsEnum) {
   ASSERT_EQ(testsuite_color_ORANGE, djinni_number_get_uint64(entry.value));
 }
 
+struct DataHolder {
+  std::vector<uint8_t> data;
+  bool deallocCalled = false;
+};
+
+static void data_holder_free_callback(uint8_t *data, size_t length,
+                                      void *opaque) {
+  reinterpret_cast<DataHolder *>(opaque)->deallocCalled = true;
+}
+
 TEST(DjinniCAPI, supportsBinaryRef) {
   auto ref = CRef(testsuite_DataRefTest_create());
 
@@ -391,6 +402,35 @@ TEST(DjinniCAPI, supportsBinaryRef) {
   ASSERT_EQ(1, djinni_binary_get_data(receivedData.value)[1]);
   ASSERT_EQ(2, djinni_binary_get_data(receivedData.value)[2]);
   ASSERT_EQ(3, djinni_binary_get_data(receivedData.value)[3]);
+
+  auto dataHolder = std::make_unique<DataHolder>();
+  dataHolder->data.resize(3);
+  dataHolder->data[0] = 1;
+  dataHolder->data[1] = 10;
+  dataHolder->data[2] = 100;
+
+  {
+    auto input = CRef(
+        djinni_binary_create(dataHolder->data.data(), dataHolder->data.size(),
+                             dataHolder.get(), &data_holder_free_callback));
+    auto received =
+        CRef(testsuite_DataRefTest_sendDataView(ref.value, input.value));
+
+    ASSERT_EQ(3, djinni_binary_get_length(received.value));
+    ASSERT_EQ(1, djinni_binary_get_data(received.value)[0]);
+    ASSERT_EQ(10, djinni_binary_get_data(received.value)[1]);
+    ASSERT_EQ(100, djinni_binary_get_data(received.value)[2]);
+
+    testsuite_DataRefTest_sendData(ref.value, input.value);
+  }
+
+  ASSERT_FALSE(dataHolder->deallocCalled);
+  // Create another one and send it.Because it's received as an actual DataRef,
+  // the C++ will have retained the data ref and then release it to set the new
+  // one
+  auto newInput = CRef(djinni_binary_create_with_bytes_copy(nullptr, 0));
+  testsuite_DataRefTest_sendData(ref.value, newInput.value);
+  ASSERT_TRUE(dataHolder->deallocCalled);
 }
 
 TEST(DjinniCAPI, supportsInterface) {}
