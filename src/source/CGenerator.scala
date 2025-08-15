@@ -2,12 +2,16 @@ package djinni
 
 import generatorTools.{Spec, q}
 
-import djinni.ast.{Doc, Ident, Interface, ProtobufMessage, TypeParam, TypeRef}
+import djinni.ast.{Doc, Field, Ident, Interface, ProtobufMessage, TypeParam, TypeRef}
 import djinni.writer.IndentWriter
 
 class CGenerator(spec: Spec) extends Generator(spec) {
 
   private val cppMarshal = new CppMarshal(spec)
+
+  private class ResolvedField(val field: Field, val translator: CTypeTranslator)
+
+  private class ResolvedMethod(val method: Interface.Method, val parameters: Seq[ResolvedField], val returnType: Option[CTypeTranslator])
 
   private def resolveSymbolName(name: String): String = {
     return spec.cNamespace + name
@@ -39,15 +43,13 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     })
   }
 
-  private def writeCFilePair(origin: String, ident: Ident, doc: Doc, publicIncludes: Seq[String], privateIncludes: Seq[String])(header: IndentWriter => Unit, impl: IndentWriter => Unit): Unit = {
+  private def writeCFilePair(origin: String, ident: Ident, publicIncludes: Seq[String], privateIncludes: Seq[String])(header: IndentWriter => Unit, impl: IndentWriter => Unit): Unit = {
     writeCFile(origin, ident, "h", (w: IndentWriter) => {
       w.wl("#pragma once")
       w.wl
 
       w.wl("#include " + q(spec.cBaseLibIncludePrefix + "djinni_c.h"))
       publicIncludes.foreach(w.wl)
-
-      writeDoc(w, doc)
 
       writeExternCBegin(w)
       w.wl
@@ -68,9 +70,10 @@ class CGenerator(spec: Spec) extends Generator(spec) {
   }
 
   override def generateEnum(origin: String, ident: Ident, doc: Doc, e: ast.Enum): Unit = {
-    writeCFilePair(origin, ident, doc, List.empty[String], List.empty[String])((w: IndentWriter) => {
+    writeCFilePair(origin, ident, List.empty[String], List.empty[String])((w: IndentWriter) => {
       val symbolName = resolveSymbolName(ident.name)
       val enumCasePrefix = symbolName + "_"
+      writeDoc(w, doc)
       w.w("enum " + symbolName)
       w.bracedSemi {
         writeEnumOptionNone(w, e, idCpp.enum, "=", enumCasePrefix)
@@ -92,11 +95,15 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  private def writeParamList(w: IndentWriter, params: Seq[(Ident, CTypeTranslator)]): Unit = {
+  private def writeParamList(w: IndentWriter, params: Seq[(String, String)]): Unit = {
     writeDelimited(w, params, ", ")(t => {
-      w.w(t._2.typename)
-      w.w(" " + t._1.name)
+      w.w(t._1)
+      w.w(" " + t._2)
     })
+  }
+
+  private def writeParamListWithResolvedFields(w: IndentWriter, params: Seq[ResolvedField]): Unit = {
+    writeParamList(w, params.map(p => (p.translator.typename, p.field.ident.name)))
   }
 
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: ast.Record): Unit = {
@@ -106,31 +113,35 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     val prefix = resolveSymbolName(ident.name)
     val typeName = resolveSymbolTypeName(ident)
 
-    val associatedFields = r.fields.map(f => (f, typeResolver.resolve(f.ty.resolved)))
+    val resolvedFields = r.fields.map(f => (new ResolvedField(f, typeResolver.resolve(f.ty.resolved))))
 
-    writeCFilePair(origin, ident, doc, typeResolver.publicImports.toSeq, typeResolver.privateImports.toSeq)((w: IndentWriter) => {
+    writeCFilePair(origin, ident, typeResolver.publicImports.toSeq, typeResolver.privateImports.toSeq)((w: IndentWriter) => {
+      writeDoc(w, doc)
       w.wl(s"""typedef djinni_record_ref ${typeName};""")
       w.wl
 
       w.w(s"""${typeName} ${prefix}_create(""")
-      writeParamList(w, associatedFields.map(f => (f._1.ident, f._2)))
+      writeParamListWithResolvedFields(w, resolvedFields)
       w.wl(");")
 
-      for ((f, t) <- associatedFields) {
-        w.wl(s"""${t.typename} ${prefix}_get_${f.ident.name}(${typeName} instance);""")
-        w.wl(s"""void ${prefix}_set_${f.ident.name}(${typeName} instance, ${t.typename} value);""")
+      for (resolvedField <- resolvedFields) {
+        val fieldName = resolvedField.field.ident.name
+        val fieldTypename = resolvedField.translator.typename
+        writeDoc(w, resolvedField.field.doc)
+        w.wl(s"""${fieldTypename} ${prefix}_get_${fieldName}(${typeName} instance);""")
+        w.wl(s"""void ${prefix}_set_${fieldName}(${typeName} instance, ${fieldTypename} value);""")
         w.wl
       }
     }, (w: IndentWriter) => {
       w.w(s"""${typeName} ${prefix}_create(""")
-      writeParamList(w, associatedFields.map(f => (f._1.ident, f._2)))
+      writeParamListWithResolvedFields(w, resolvedFields)
       w.wl(") ")
 
       w.braced {
         w.w(s"""return ::djinni::c_api::Record<${selfCpp}>::make(""")
 
-        writeDelimited(w, associatedFields, ", ")(t => {
-          w.w(t._2.toCppTranslatorFn(t._1.ident.name))
+        writeDelimited(w, resolvedFields, ", ")(t => {
+          w.w(t.translator.toCppTranslatorFn(t.field.ident.name))
         })
 
         w.wl(");")
@@ -139,17 +150,19 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       w.wl
 
       val toCppExpr = s"::djinni::c_api::Record<${selfCpp}>::toCpp(instance)"
-      for ((f, t) <- associatedFields) {
-        w.wl(s"""${t.typename} ${prefix}_get_${f.ident.name}(${typeName} instance)""")
+      for (resolvedField <- resolvedFields) {
+        val fieldName = resolvedField.field.ident.name
+        val fieldTypename = resolvedField.translator.typename
+        w.wl(s"""${fieldTypename} ${prefix}_get_${fieldName}(${typeName} instance)""")
         w.braced {
-          val param = s"${toCppExpr}.${idCpp.field(f.ident)}"
-          w.wl(s"return ${t.fromCppTranslatorFn(param)};")
+          val param = s"${toCppExpr}.${idCpp.field(resolvedField.field.ident)}"
+          w.wl(s"return ${resolvedField.translator.fromCppTranslatorFn(param)};")
         }
         w.wl
-        w.wl(s"""void ${prefix}_set_${f.ident.name}(${typeName} instance, ${t.typename} value)""")
+        w.wl(s"""void ${prefix}_set_${fieldName}(${typeName} instance, ${fieldTypename} value)""")
         w.braced {
-          val toCppValue = t.toCppTranslatorFn("value")
-          w.wl(s"${toCppExpr}.${idCpp.field(f.ident)} = ${toCppValue};")
+          val toCppValue = resolvedField.translator.toCppTranslatorFn("value")
+          w.wl(s"${toCppExpr}.${idCpp.field(resolvedField.field.ident)} = ${toCppValue};")
         }
         w.wl
       }
@@ -158,12 +171,83 @@ class CGenerator(spec: Spec) extends Generator(spec) {
   }
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface): Unit = {
+    val selfCpp = cppMarshal.fqTypename(ident, i)
     val typeResolver = new CTypeResolver(ident, spec, cppMarshal)
-    writeCFilePair(origin, ident, doc, typeResolver.publicImports.toSeq, typeResolver.privateImports.toSeq)((w: IndentWriter) => {
-      w.wl("// This is a test interface")
+    val resolvedMethods = i.methods.map(m =>
+      new ResolvedMethod(
+        m,
+        m.params.map(p =>
+          new ResolvedField(
+            p,
+            typeResolver.resolve(p.ty.resolved))
+        ),
+        m.ret.map(r => typeResolver.resolve(r.resolved))
+      ))
+
+    val prefix = resolveSymbolName(ident.name)
+    val typeName = resolveSymbolTypeName(ident)
+
+    writeCFilePair(origin, ident, typeResolver.publicImports.toSeq, typeResolver.privateImports.toSeq)((w: IndentWriter) => {
+      writeDoc(w, doc)
+      w.wl(s"""typedef djinni_interface_ref ${typeName};""")
+      w.wl
+
+      for (resolvedMethod <- resolvedMethods) {
+        writeDoc(w, resolvedMethod.method.doc)
+        val retTypeName = if (resolvedMethod.returnType.isDefined) resolvedMethod.returnType.get.typename else "void"
+        w.w(s"${retTypeName} ${prefix}_${resolvedMethod.method.ident.name}(")
+
+        if (resolvedMethod.method.static) {
+          writeParamList(w, resolvedMethod.parameters.map(p => (p.translator.typename, p.field.ident.name)))
+        } else {
+          writeParamList(w, (typeName, "instance") +: resolvedMethod.parameters.map(p => (p.translator.typename, p.field.ident.name)))
+        }
+
+        w.wl(");")
+
+        w.wl
+      }
 
     }, (w: IndentWriter) => {
-      w.wl("// Impl goes here")
+      for (resolvedMethod <- resolvedMethods) {
+        writeDoc(w, resolvedMethod.method.doc)
+        val retTypeName = if (resolvedMethod.returnType.isDefined) resolvedMethod.returnType.get.typename else "void"
+        w.w(s"${retTypeName} ${prefix}_${resolvedMethod.method.ident.name}(")
+
+        if (resolvedMethod.method.static) {
+          writeParamList(w, resolvedMethod.parameters.map(p => (p.translator.typename, p.field.ident.name)))
+        } else {
+          writeParamList(w, (typeName, "instance") +: resolvedMethod.parameters.map(p => (p.translator.typename, p.field.ident.name)))
+        }
+
+        w.wl(")")
+        w.braced {
+          val needsReturnValue = (resolvedMethod.returnType.isDefined && resolvedMethod.returnType.get.typename != "void")
+
+          if (needsReturnValue) {
+            w.w(s"auto retValue = ")
+          }
+
+          if (resolvedMethod.method.static) {
+            w.w(s"""${selfCpp}::${resolvedMethod.method.ident.name}(""")
+          } else {
+            w.w(s"""::djinni::c_api::Interface<${selfCpp}>::toCpp(instance)->${resolvedMethod.method.ident.name}(""")
+          }
+
+          writeDelimited(w, resolvedMethod.parameters, ", ")(p => {
+            w.w(p.translator.toCppTranslatorFn(p.field.ident.name))
+          })
+
+          w.w(")")
+
+          w.wl(";")
+          if (needsReturnValue) {
+            w.wl(s"""return ${resolvedMethod.returnType.get.fromCppTranslatorFn("std::move(retValue)")};""")
+          }
+        }
+
+        w.wl
+      }
     })
   }
 }

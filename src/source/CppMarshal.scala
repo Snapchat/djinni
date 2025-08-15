@@ -271,6 +271,19 @@ class CppMarshal(spec: Spec) extends Marshal(spec) {
     case p: ProtobufMessage => false
   }
 
+  def bySharedPtr(tm: MExpr): Boolean = tm.base match {
+    case d: MDef => d.defType match {
+      case DInterface => true
+      case _  => false
+    }
+    case e: MExtern => e.defType match {
+      case DInterface => true
+      case _  => false
+    }
+    case MOptional => bySharedPtr(tm.args.head)
+    case _ => false
+  }
+
   // this can be used in c++ generation to know whether a const& should be applied to the parameter or not
   private def toCppParamType(tm: MExpr, namespace: Option[String] = None, scopeSymbols: Seq[String] = Seq()): String = {
     val cppType = toCppType(tm, namespace, scopeSymbols)

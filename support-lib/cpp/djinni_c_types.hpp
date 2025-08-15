@@ -108,4 +108,15 @@ private:
   T _data;
 };
 
+template <typename T> class InterfaceHolder : public Object {
+public:
+  InterfaceHolder(std::shared_ptr<T> data) : _data(std::move(data)) {}
+  ~InterfaceHolder() override = default;
+
+  const std::shared_ptr<T> &data() const { return _data; }
+
+private:
+  std::shared_ptr<T> _data;
+};
+
 } // namespace djinni

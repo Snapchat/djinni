@@ -45,6 +45,11 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Duration'
   header: '"Duration-swift.hpp"'
+c:
+  typename: 'djinni_number_ref'
+  translator: '::djinni::c_api::Duration'
+  public_header: '"djinni_c.h"'
+  private_header: '"$djinni_c_helpers.hpp"'
 ---
 name: h
 typedef: 'record'
@@ -88,6 +93,11 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Duration_h'
   header: '"Duration-swift.hpp"'
+c:
+  typename: 'djinni_number_ref'
+  translator: '::djinni::c_api::Duration_h'
+  public_header: '"djinni_c.h"'
+  private_header: '"$djinni_c_helpers.hpp"'
 ---
 name: min
 typedef: 'record'
@@ -131,6 +141,11 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Duration_min'
   header: '"Duration-swift.hpp"'
+c:
+  typename: 'djinni_number_ref'
+  translator: '::djinni::c_api::Duration_min'
+  public_header: '"djinni_c.h"'
+  private_header: '"$djinni_c_helpers.hpp"'
 ---
 name: s
 typedef: 'record'
@@ -174,6 +189,11 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Duration_s'
   header: '"Duration-swift.hpp"'
+c:
+  typename: 'djinni_number_ref'
+  translator: '::djinni::c_api::Duration_s'
+  public_header: '"djinni_c.h"'
+  private_header: '"$djinni_c_helpers.hpp"'
 ---
 name: ms
 typedef: 'record'
@@ -217,6 +237,11 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Duration_ms'
   header: '"Duration-swift.hpp"'
+c:
+  typename: 'djinni_number_ref'
+  translator: '::djinni::c_api::Duration_ms'
+  public_header: '"djinni_c.h"'
+  private_header: '"$djinni_c_helpers.hpp"'
 ---
 name: us
 typedef: 'record'
@@ -260,6 +285,11 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Duration_us'
   header: '"Duration-swift.hpp"'
+c:
+  typename: 'djinni_number_ref'
+  translator: '::djinni::c_api::Duration_us'
+  public_header: '"djinni_c.h"'
+  private_header: '"$djinni_c_helpers.hpp"'
 ---
 name: ns
 typedef: 'record'
@@ -305,5 +335,6 @@ swiftxx:
   header: '"Duration-swift.hpp"'
 c:
   typename: 'djinni_number_ref'
-  translator: '::djinni::c_api::Number'
+  translator: '::djinni::c_api::Duration_ns'
   public_header: '"djinni_c.h"'
+  private_header: '"$djinni_c_helpers.hpp"'

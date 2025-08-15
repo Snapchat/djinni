@@ -2,12 +2,17 @@
 
 #include "djinni_c.h"
 #include "djinni_c_types.hpp"
+#include "DataRef.hpp"
+#include "DataView.hpp"
+#include "Future.hpp"
+#include "expected.hpp"
 #include <atomic>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <chrono>
 
 namespace djinni::c_api {
 
@@ -143,6 +148,24 @@ public:
     }
   }
 
+  template <typename T, typename F>
+  static djinni_ref fromSharedPtrCpp(const T &value, F &&convert) {
+    if (value == nullptr) {
+      return nullptr;
+    } else {
+      return convert(value);
+    }
+  }
+
+  template <typename T, typename F>
+  static djinni_ref fromSharedPtrCpp(T &&value, F &&convert) {
+    if (value == nullptr) {
+      return nullptr;
+    } else {
+      return convert(std::move(value));
+    }
+  }
+
   template <typename Opt, typename F>
   static djinni_ref fromCpp(const Opt &value, F &&convert) {
     if (!value) {
@@ -170,47 +193,15 @@ public:
     }
   }
 
-private:
-};
-
-template <typename T> class Record {
-public:
-  template <typename... Args> static djinni_record_ref make(Args &&...args) {
-    Object *obj = new RecordHolder<T>(T(std::forward<Args>(args)...));
-    return reinterpret_cast<djinni_record_ref>(obj);
-  }
-
-  static T &toCpp(djinni_record_ref ptr) {
-    auto *record =
-        static_cast<RecordHolder<T> *>(reinterpret_cast<Object *>(ptr));
-    if (record == nullptr) {
-      std::abort();
+  template <typename T, typename F>
+  static T toSharedPtrCpp(djinni_ref ptr, F &&convert) {
+    if (ptr == nullptr) {
+      return T();
+    } else {
+      return convert(ptr);
     }
-
-    return record->data();
   }
-
-  static djinni_record_ref fromCpp(T &&value) { return make(std::move(value)); }
-
-  static djinni_record_ref fromCpp(const T &value) { return make(value); }
-
-  static void release(djinni_record_ref ptr) {
-    Object::release(reinterpret_cast<Object *>(ptr));
-  }
-};
-
-template <typename Cpp, typename C> class Enum {
-public:
-  static Cpp toCpp(C value) { return static_cast<Cpp>(value); }
-  static C fromCpp(Cpp value) { return static_cast<C>(value); }
-
-  static Cpp toCppBoxed(djinni_number_ref value) {
-    return static_cast<Cpp>(djinni_number_get_int64(value));
-  }
-
-  static djinni_number_ref fromCppBoxed(Cpp value) {
-    return Number::fromCpp(static_cast<int64_t>(value));
-  }
+private:
 };
 
 template <typename T> class List {
@@ -315,5 +306,105 @@ public:
     return output;
   }
 };
+
+template <typename T> class Record {
+public:
+  template <typename... Args> static djinni_record_ref make(Args &&...args) {
+    Object *obj = new RecordHolder<T>(T(std::forward<Args>(args)...));
+    return reinterpret_cast<djinni_record_ref>(obj);
+  }
+
+  static T &toCpp(djinni_record_ref ref) {
+    auto *record =
+        static_cast<RecordHolder<T> *>(reinterpret_cast<Object *>(ref));
+    if (record == nullptr) {
+      std::abort();
+    }
+
+    return record->data();
+  }
+
+  static djinni_record_ref fromCpp(T &&value) { return make(std::move(value)); }
+
+  static djinni_record_ref fromCpp(const T &value) { return make(value); }
+
+  static void release(djinni_record_ref ptr) {
+    Object::release(reinterpret_cast<Object *>(ptr));
+  }
+};
+
+template <typename T> class Interface {
+public:
+  static const std::shared_ptr<T> &toCpp(djinni_interface_ref ref) {
+    auto *i =
+        static_cast<InterfaceHolder<T> *>(reinterpret_cast<Object *>(ref));
+    if (i == nullptr) {
+      std::abort();
+    }
+
+    return i->data();
+  }
+
+  static djinni_interface_ref fromCpp(std::shared_ptr<T> value) {
+    Object *obj = new InterfaceHolder<T>(std::move(value));
+    return reinterpret_cast<djinni_interface_ref>(obj);
+  }
+};
+
+template <typename Cpp, typename C> class Enum {
+public:
+  static Cpp toCpp(C value) { return static_cast<Cpp>(value); }
+  static C fromCpp(Cpp value) { return static_cast<C>(value); }
+
+  static Cpp toCppBoxed(djinni_number_ref value) {
+    return static_cast<Cpp>(djinni_number_get_int64(value));
+  }
+
+  static djinni_number_ref fromCppBoxed(Cpp value) {
+    return Number::fromCpp(static_cast<int64_t>(value));
+  }
+};
+
+
+class DataRef {
+public:
+  static ::djinni::DataRef toCpp(djinni_binary_ref binary);
+  static djinni_binary_ref fromCpp(const ::djinni::DataRef &dataRef);
+};
+
+class DataView {
+public:
+  static ::djinni::DataView toCpp(djinni_binary_ref binary);
+  static djinni_binary_ref fromCpp(const ::djinni::DataView &dataRef);
+};
+
+class Binary {
+public:
+  static std::vector<uint8_t> toCpp(djinni_binary_ref binary);
+  static djinni_binary_ref fromCpp(std::vector<uint8_t> &&binary);
+  static djinni_binary_ref fromCpp(const std::vector<uint8_t> &binary);
+};
+
+template<typename T>
+class Future {
+public:
+  static ::djinni::Future<T> toCpp(djinni_future_ref future);
+  static djinni_future_ref fromCpp(::djinni::Future<T> &&future);
+};
+
+template<typename T, typename E>
+class Outcome {
+public:
+  static ::djinni::expected<T, E> toCpp(djinni_outcome_ref future);
+  static djinni_outcome_ref fromCpp(::djinni::expected<T, E> &&outcome);
+};
+
+template<class Rep, class Ratio>
+class Duration {
+public:
+  static std::chrono::duration<Rep, Ratio> toCpp(djinni_number_ref value);
+  static djinni_number_ref fromCpp(const std::chrono::duration<Rep, Ratio> &value);
+};
+
 
 } // namespace djinni::c_api

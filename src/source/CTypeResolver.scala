@@ -91,14 +91,17 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
         (p) => s"::djinni::c_api::Optional::fromCppPrimitive<${cppOptionalTemplate}, ${typename}>(${resolved.fromCppTranslatorFn(p)})"
       )
     } else {
+      val sharedPtr = cppMarshal.bySharedPtr(expr)
+      val toCppMethodName = if (sharedPtr) "toSharedPtrCpp" else "toCpp"
+      val fromCppMethodName = if (sharedPtr) "fromSharedPtrCpp" else "fromCpp"
       new CTypeTranslator(resolved.typename,
         (p) => {
           val innerToCpp = resolved.toCppTranslatorFn("value")
-          s"::djinni::c_api::Optional::toCpp<${cppOptionalTemplate}>(${p}, [](auto value) { return ${innerToCpp}; })"
+          s"::djinni::c_api::Optional::${toCppMethodName}<${cppOptionalTemplate}>(${p}, [](auto value) { return ${innerToCpp}; })"
         },
         (p) => {
           val innerFromCpp = resolved.fromCppTranslatorFn("value")
-          s"::djinni::c_api::Optional::fromCpp<${cppOptionalTemplate}>(${p}, [](auto value) { return ${innerFromCpp}; })"
+          s"::djinni::c_api::Optional::${fromCppMethodName}<${cppOptionalTemplate}>(${p}, [](auto value) { return ${innerFromCpp}; })"
         }
       )
     }
@@ -174,6 +177,21 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     }
   }
 
+  private def resolveExtern(expr: MExpr, c: meta.MExtern.C): CTypeTranslator = {
+    updatePrivateImports(expr.base)
+    addPublicImport(c.publicHeader)
+    privateImports.add("#include " + cppMarshal.resolveExtCppHdr(c.privateHeader))
+
+    val resolvedTranslator: String = if (expr.args.isEmpty) {
+      c.translator
+    } else {
+      val templateArgs = expr.args.map(a => cppMarshal.fqTypename(a)).mkString(", ")
+      s"${c.translator}<${templateArgs}>"
+    }
+
+    makeTranslator(c.typename, resolvedTranslator)
+  }
+
   def resolve(expr: MExpr): CTypeTranslator = {
     resolve(expr, false)
   }
@@ -200,11 +218,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
           case ast.ProtobufMessage(cpp, java, objc, ts, swift) => throw new AssertionError("Unsupported")
         }
       }
-      case meta.MExtern(name, numParams, defType, body, _, _, _, _, _, _, _, _, _, _, c) => {
-        updatePrivateImports(expr.base)
-        addPublicImport(c.publicHeader)
-        makeTranslator(c.typename, c.translator)
-      }
+      case meta.MExtern(name, numParams, defType, body, _, _, _, _, _, _, _, _, _, _, c) => resolveExtern(expr, c)
       case meta.MProtobuf(name, numParams, body) => {
         updatePrivateImports(expr.base)
         makeTranslator(

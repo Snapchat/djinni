@@ -45,3 +45,8 @@ swift:
 swiftxx:
   translator: '::djinni::swift::DataRefAdaptor'
   header: '"Data_swift.hpp"'
+c:
+  typename: 'djinni_binary_ref'
+  translator: '::djinni::c_api::DataRef'
+  public_header: '"djinni_c.h"'
+  private_header: '"$djinni_c_helpers.hpp"'
