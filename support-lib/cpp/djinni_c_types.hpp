@@ -53,22 +53,31 @@ private:
 
 class Binary : public Object {
 public:
-  using Deallocator = void (*)(uint8_t *, size_t, void *);
-  Binary(uint8_t *data, size_t length, void *opaque,
-         Binary::Deallocator deallocator);
+  Binary(uint8_t *data, size_t length);
   ~Binary() override;
 
   uint8_t *data() const;
   size_t length() const;
 
-  static Binary *make(uint8_t *data, size_t length, void *opaque,
-                      Binary::Deallocator deallocator);
-
 private:
   uint8_t *_data;
   size_t _length;
+};
+
+class BinaryWithDeallocator : public Binary {
+public:
+  using Deallocator = void (*)(uint8_t *, size_t, void *);
+  BinaryWithDeallocator(uint8_t *data, size_t length, void *opaque,
+                        BinaryWithDeallocator::Deallocator deallocator);
+  ~BinaryWithDeallocator() override;
+
+  static BinaryWithDeallocator *
+  make(uint8_t *data, size_t length, void *opaque,
+       BinaryWithDeallocator::Deallocator deallocator);
+
+private:
   void *_opaque;
-  Binary::Deallocator _deallocator;
+  BinaryWithDeallocator::Deallocator _deallocator;
 };
 
 class Number : public Object {

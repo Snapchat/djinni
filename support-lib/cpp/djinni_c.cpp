@@ -28,7 +28,28 @@ size_t djinni_string_get_length(djinni_string_ref str) {
 djinni_binary_ref djinni_binary_create(uint8_t *data, size_t length,
                                        void *opaque,
                                        djinni_binary_deallocator deallocator) {
-  return toC(Binary::make(data, length, opaque, deallocator));
+  return toC(BinaryWithDeallocator::make(data, length, opaque, deallocator));
+}
+
+static void djinni_binary_malloc_release(uint8_t *data, size_t length,
+                                         void *opaque) {
+  free(opaque);
+}
+
+djinni_binary_ref djinni_binary_create_with_bytes_copy(const uint8_t *data,
+                                                       size_t length) {
+  auto *mutableData = (uint8_t *)malloc(length);
+  memcpy(mutableData, data, length);
+  return djinni_binary_create(mutableData, length, mutableData,
+                              &djinni_binary_malloc_release);
+}
+
+uint8_t *djinni_binary_get_data(djinni_binary_ref binary) {
+  return fromC<Binary>(binary)->data();
+}
+
+size_t djinni_binary_get_length(djinni_binary_ref binary) {
+    return fromC<Binary>(binary)->length();
 }
 
 djinni_number_ref djinni_number_int64_create(int64_t v) {
@@ -91,11 +112,11 @@ void djinni_keyval_array_set_entry(djinni_keyval_array_ref keyval_array,
 
 djinni_array_ref djinni_array_create(size_t length) {
   if (length == 0) {
-      static auto *kEmptyArray = ObjectArray::make(length);
-      Object::retain(kEmptyArray);
-      return toC(kEmptyArray);
+    static auto *kEmptyArray = ObjectArray::make(length);
+    Object::retain(kEmptyArray);
+    return toC(kEmptyArray);
   } else {
-      return toC(ObjectArray::make(length));
+    return toC(ObjectArray::make(length));
   }
 }
 

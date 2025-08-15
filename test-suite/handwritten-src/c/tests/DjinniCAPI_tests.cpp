@@ -1,5 +1,7 @@
+#include "DataRefTest.h"
 #include "assorted_primitives.h"
 #include "client_returned_record.h"
+#include "enum_usage_record.h"
 #include "map_record.h"
 #include "primitive_list.h"
 #include "gtest/gtest.h"
@@ -326,7 +328,6 @@ TEST(DjinniCAPI, supportsMap) {
                           djinni_string_get_length(collectedEntry2Key.value)));
     ASSERT_EQ(42, djinni_number_get_int64(collectedEntry2Value.value));
   } else {
-
     ASSERT_EQ(std::string("key1"),
               std::string(djinni_string_get_data(collectedEntry1Key.value),
                           djinni_string_get_length(collectedEntry1Key.value)));
@@ -349,12 +350,49 @@ TEST(DjinniCAPI, supportsMap) {
   ASSERT_EQ(20, djinni_number_get_int64(collectedImapValue.value));
 }
 
-TEST(DjinniCAPI, supportsEnum) {}
+TEST(DjinniCAPI, supportsEnum) {
+  auto optionalEnum = CRef(djinni_number_uint64_create(testsuite_color_VIOLET));
+  auto list = CRef(djinni_array_create(1));
+  auto listEntry = CRef(djinni_number_uint64_create(testsuite_color_ORANGE));
+  djinni_array_set_value(list.value, 0, listEntry.value);
 
-TEST(DjinniCAPI, supportsBinaryRef) {}
+  auto map = CRef(djinni_keyval_array_create(0));
+
+  auto record = CRef(testsuite_enum_usage_record_create(
+      testsuite_color_BLUE, optionalEnum.value, list.value, list.value,
+      map.value));
+
+  ASSERT_EQ(testsuite_color_BLUE,
+            testsuite_enum_usage_record_get_e(record.value));
+
+  auto returnedOptional = CRef(testsuite_enum_usage_record_get_o(record.value));
+
+  ASSERT_EQ(testsuite_color_VIOLET,
+            djinni_number_get_uint64(returnedOptional.value));
+
+  auto returnedList = CRef(testsuite_enum_usage_record_get_l(record.value));
+
+  ASSERT_EQ(1, djinni_array_get_length(returnedList.value));
+
+  auto entry = CRef(djinni_array_get_value(returnedList.value, 0));
+
+  ASSERT_EQ(testsuite_color_ORANGE, djinni_number_get_uint64(entry.value));
+}
+
+TEST(DjinniCAPI, supportsBinaryRef) {
+  auto ref = CRef(testsuite_DataRefTest_create());
+
+  auto receivedData = CRef(testsuite_DataRefTest_generateData(ref.value));
+
+  auto length = djinni_binary_get_length(receivedData.value);
+  ASSERT_EQ(4, length);
+
+  ASSERT_EQ(0, djinni_binary_get_data(receivedData.value)[0]);
+  ASSERT_EQ(1, djinni_binary_get_data(receivedData.value)[1]);
+  ASSERT_EQ(2, djinni_binary_get_data(receivedData.value)[2]);
+  ASSERT_EQ(3, djinni_binary_get_data(receivedData.value)[3]);
+}
 
 TEST(DjinniCAPI, supportsInterface) {}
-
-TEST(DjinniCAPI, supportsCallingStaticMethodsOnInterface) {}
 
 } // namespace djinni

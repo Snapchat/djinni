@@ -33,6 +33,11 @@ djinni_binary_ref djinni_binary_create(uint8_t *data, size_t length,
                                        void *opaque,
                                        djinni_binary_deallocator deallocator);
 
+djinni_binary_ref djinni_binary_create_with_bytes_copy(const uint8_t *data, size_t length);
+
+uint8_t *djinni_binary_get_data(djinni_binary_ref binary);
+size_t djinni_binary_get_length(djinni_binary_ref binary);
+
 djinni_number_ref djinni_number_int64_create(int64_t v);
 djinni_number_ref djinni_number_uint64_create(uint64_t v);
 djinni_number_ref djinni_number_double_create(double v);

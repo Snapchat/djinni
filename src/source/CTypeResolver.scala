@@ -223,7 +223,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
         updatePrivateImports(expr.base)
         makeTranslator(
           "djinni_binary_ref",
-          s"::djinni::c_api::Protobuf<${body.cpp.ns}>"
+          s"::djinni::c_api::Protobuf<${cppMarshal.fqTypename(expr)}>"
         )
       }
       case opaque: meta.MOpaque => {

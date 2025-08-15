@@ -121,24 +121,29 @@ ObjectArray *ObjectArray::make(size_t length) {
   return output;
 }
 
-Binary::Binary(uint8_t *data, size_t length, void *opaque,
-               Binary::Deallocator deallocator)
-    : _data(data), _length(length), _opaque(opaque), _deallocator(deallocator) {
-}
+Binary::Binary(uint8_t *data, size_t length) : _data(data), _length(length) {}
 
-Binary::~Binary() {
-  if (_deallocator) {
-    _deallocator(_data, _length, _opaque);
-  }
-}
+Binary::~Binary() = default;
 
 uint8_t *Binary::data() const { return _data; }
 
 size_t Binary::length() const { return _length; }
 
-Binary *Binary::make(uint8_t *data, size_t length, void *opaque,
-                     Binary::Deallocator deallocator) {
-  return new Binary(data, length, opaque, deallocator);
+BinaryWithDeallocator::BinaryWithDeallocator(
+    uint8_t *data, size_t length, void *opaque,
+    BinaryWithDeallocator::Deallocator deallocator)
+    : Binary(data, length), _opaque(opaque), _deallocator(deallocator) {}
+
+BinaryWithDeallocator::~BinaryWithDeallocator() {
+  if (_deallocator) {
+    _deallocator(data(), length(), _opaque);
+  }
+}
+
+BinaryWithDeallocator *
+BinaryWithDeallocator::make(uint8_t *data, size_t length, void *opaque,
+                            BinaryWithDeallocator::Deallocator deallocator) {
+  return new BinaryWithDeallocator(data, length, opaque, deallocator);
 }
 
 Number::Number(Number::Value value, Number::ValueType type)
