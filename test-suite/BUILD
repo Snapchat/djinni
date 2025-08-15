@@ -39,14 +39,6 @@ cc_library(
     srcs = glob(
         [
             "generated-src/c/*.cpp",
-            "handwritten-src/c/**/*.cpp",
-        ],
-        exclude = [
-            # "generated-src/c/RecordWithEmbeddedCppProto.cpp",
-            # "generated-src/c/RecordWithEmbeddedProto.cpp",
-            # "generated-src/c/record_with_duration_and_derivings.cpp",
-            # "generated-src/c/nested_outcome.cpp",
-            # "generated-src/c/proto_tests.cpp",
         ],
     ),
     hdrs = glob([
@@ -57,16 +49,25 @@ cc_library(
     ],
     deps = [
         ":djinni-tests-common",
-    ],
+        "@gtest",
+    ] + select({
+        "@platforms//os:macos": ["//support-lib:djinni-support-objc"],
+    }),
+    linkstatic = 1,
 )
 
 cc_test(
     name = "djinni-tests-c",
     linkstatic = 1,
     visibility = ["//visibility:public"],
+    srcs = glob(
+        [
+            "handwritten-src/c/tests/*.cpp",
+        ],
+    ),
     deps = [
         ":djinni-tests-c-lib",
-        # "@gtest//:gtest_main",
+        "@gtest//:gtest_main",
     ],
 )
 
