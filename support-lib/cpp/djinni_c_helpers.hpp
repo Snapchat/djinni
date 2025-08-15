@@ -397,6 +397,7 @@ class Outcome {
 public:
   static ::djinni::expected<T, E> toCpp(djinni_outcome_ref future);
   static djinni_outcome_ref fromCpp(::djinni::expected<T, E> &&outcome);
+  static djinni_outcome_ref fromCpp(const ::djinni::expected<T, E> &outcome);
 };
 
 template<class Rep, class Ratio>
@@ -404,6 +405,13 @@ class Duration {
 public:
   static std::chrono::duration<Rep, Ratio> toCpp(djinni_number_ref value);
   static djinni_number_ref fromCpp(const std::chrono::duration<Rep, Ratio> &value);
+};
+
+template<typename T>
+class Protobuf {
+public:
+  static T toCpp(djinni_binary_ref binary);
+  static djinni_binary_ref fromCpp(const T &proto);
 };
 
 
