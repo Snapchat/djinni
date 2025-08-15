@@ -1,4 +1,7 @@
 #include "assorted_primitives.h"
+#include "client_returned_record.h"
+#include "map_record.h"
+#include "primitive_list.h"
 #include "gtest/gtest.h"
 
 namespace djinni {
@@ -199,17 +202,152 @@ TEST(DjinniCAPI, supportsOptionalPrimitiveValues) {
                    .has_value);
 }
 
-TEST(DjinniCAPI, supportsRefCountedValues) {}
+TEST(DjinniCAPI, supportsRefCountedValues) {
+  auto content = CRef(djinni_string_create("Hello World", 11));
+  auto record =
+      CRef(testsuite_client_returned_record_create(0, content.value, nullptr));
+  auto returnedContent =
+      CRef(testsuite_client_returned_record_get_content(record.value));
+  ASSERT_EQ(std::string("Hello World"),
+            std::string(djinni_string_get_data(returnedContent.value)));
+}
 
-TEST(DjinniCAPI, supportsOptionalRefCountedvalues) {}
+TEST(DjinniCAPI, supportsOptionalRefCountedValues) {
+  auto content = CRef(djinni_string_create("Hello World", 11));
+  auto record =
+      CRef(testsuite_client_returned_record_create(0, content.value, nullptr));
+  auto returnedMisc =
+      CRef(testsuite_client_returned_record_get_misc(record.value));
 
-TEST(DjinniCAPI, supportsListOfPrimitiveValues) {}
+  ASSERT_TRUE(returnedMisc.value == nullptr);
+  testsuite_client_returned_record_set_misc(record.value, content.value);
 
-TEST(DjinniCAPI, supportsListOfOptionalPrimitiveValues) {}
+  auto returnedMisc2 =
+      CRef(testsuite_client_returned_record_get_misc(record.value));
+  ASSERT_EQ(std::string("Hello World"),
+            std::string(djinni_string_get_data(returnedMisc2.value)));
+}
 
-TEST(DjinniCAPI, supportsListOfRefCountedValues) {}
+TEST(DjinniCAPI, supportsListOfPrimitiveValues) {
+  auto list = CRef(djinni_array_create(2));
+  auto entry1 = CRef(djinni_number_int64_create(42));
+  auto entry2 = CRef(djinni_number_int64_create(10000));
+  djinni_array_set_value(list.value, 0, entry1.value);
+  djinni_array_set_value(list.value, 1, entry2.value);
 
-TEST(DjinniCAPI, supportsMap) {}
+  auto primitiveList =
+      CRef(testsuite_primitive_list_create(list.value, nullptr));
+
+  auto returnedList =
+      CRef(testsuite_primitive_list_get_list(primitiveList.value));
+
+  auto returnedLength = djinni_array_get_length(returnedList.value);
+
+  ASSERT_EQ(2, returnedLength);
+
+  auto returnedEntry1 = CRef(djinni_array_get_value(returnedList.value, 0));
+  auto returnedEntry2 = CRef(djinni_array_get_value(returnedList.value, 1));
+
+  ASSERT_EQ(42, djinni_number_get_int64(returnedEntry1.value));
+  ASSERT_EQ(10000, djinni_number_get_int64(returnedEntry2.value));
+}
+
+TEST(DjinniCAPI, supportsListOfOptionalPrimitiveValues) {
+  auto emptyList = CRef(djinni_array_create(0));
+  auto optionalList = CRef(djinni_array_create(2));
+  auto entry2 = CRef(djinni_number_int64_create(10000));
+  djinni_array_set_value(optionalList.value, 0, nullptr);
+  djinni_array_set_value(optionalList.value, 1, entry2.value);
+
+  auto primitiveList = CRef(
+      testsuite_primitive_list_create(emptyList.value, optionalList.value));
+
+  auto returnedList =
+      CRef(testsuite_primitive_list_get_optional_list(primitiveList.value));
+
+  auto returnedLength = djinni_array_get_length(returnedList.value);
+
+  ASSERT_EQ(2, returnedLength);
+
+  auto returnedEntry1 = CRef(djinni_array_get_value(returnedList.value, 0));
+  auto returnedEntry2 = CRef(djinni_array_get_value(returnedList.value, 1));
+
+  ASSERT_TRUE(returnedEntry1.value == nullptr);
+  ASSERT_EQ(10000, djinni_number_get_int64(returnedEntry2.value));
+}
+
+TEST(DjinniCAPI, supportsMap) {
+  auto map = CRef(djinni_keyval_array_create(2));
+  auto imap = CRef(djinni_keyval_array_create(1));
+
+  auto entry1Key = CRef(djinni_string_create("key1", 4));
+  auto entry1Value = CRef(djinni_number_int64_create(42));
+  auto entry2Key = CRef(djinni_string_create("key2", 4));
+  auto entry2Value = CRef(djinni_number_int64_create(1));
+
+  djinni_keyval_array_set_entry(map.value, 0, entry1Key.value,
+                                entry1Value.value);
+  djinni_keyval_array_set_entry(map.value, 1, entry2Key.value,
+                                entry2Value.value);
+
+  auto imapEntry1Key = CRef(djinni_number_int64_create(10));
+  auto imapEntry1Value = CRef(djinni_number_int64_create(20));
+  djinni_keyval_array_set_entry(imap.value, 0, imapEntry1Key.value,
+                                imapEntry1Value.value);
+
+  auto mapRecord = CRef(testsuite_map_record_create(map.value, imap.value));
+
+  auto collectedMap = CRef(testsuite_map_record_get_map(mapRecord.value));
+  auto collectedImap = CRef(testsuite_map_record_get_imap(mapRecord.value));
+
+  ASSERT_EQ(2, djinni_keyval_array_get_length(collectedMap.value));
+  ASSERT_EQ(1, djinni_keyval_array_get_length(collectedImap.value));
+
+  auto collectedEntry1Key =
+      CRef(djinni_keyval_array_get_key(collectedMap.value, 0));
+  auto collectedEntry1Value =
+      CRef(djinni_keyval_array_get_value(collectedMap.value, 0));
+  auto collectedEntry2Key =
+      CRef(djinni_keyval_array_get_key(collectedMap.value, 1));
+  auto collectedEntry2Value =
+      CRef(djinni_keyval_array_get_value(collectedMap.value, 1));
+
+  // Ordering is not guaranteed because the backing store used an
+  // std::unordered_map. This handles the case where the returned result is in
+  // the reverse order
+  if (djinni_number_get_int64(collectedEntry1Value.value) == 1) {
+    ASSERT_EQ(std::string("key2"),
+              std::string(djinni_string_get_data(collectedEntry1Key.value),
+                          djinni_string_get_length(collectedEntry1Key.value)));
+    ASSERT_EQ(1, djinni_number_get_int64(collectedEntry1Value.value));
+
+    ASSERT_EQ(std::string("key1"),
+              std::string(djinni_string_get_data(collectedEntry2Key.value),
+                          djinni_string_get_length(collectedEntry2Key.value)));
+    ASSERT_EQ(42, djinni_number_get_int64(collectedEntry2Value.value));
+  } else {
+
+    ASSERT_EQ(std::string("key1"),
+              std::string(djinni_string_get_data(collectedEntry1Key.value),
+                          djinni_string_get_length(collectedEntry1Key.value)));
+
+    ASSERT_EQ(42, djinni_number_get_int64(collectedEntry1Value.value));
+
+    ASSERT_EQ(std::string("key2"),
+              std::string(djinni_string_get_data(collectedEntry2Key.value),
+                          djinni_string_get_length(collectedEntry2Key.value)));
+
+    ASSERT_EQ(1, djinni_number_get_int64(collectedEntry2Value.value));
+  }
+
+  auto collectedImapKey =
+      CRef(djinni_keyval_array_get_key(collectedImap.value, 0));
+  auto collectedImapValue =
+      CRef(djinni_keyval_array_get_value(collectedImap.value, 0));
+
+  ASSERT_EQ(10, djinni_number_get_int64(collectedImapKey.value));
+  ASSERT_EQ(20, djinni_number_get_int64(collectedImapValue.value));
+}
 
 TEST(DjinniCAPI, supportsEnum) {}
 

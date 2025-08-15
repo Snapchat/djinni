@@ -90,7 +90,13 @@ void djinni_keyval_array_set_entry(djinni_keyval_array_ref keyval_array,
 }
 
 djinni_array_ref djinni_array_create(size_t length) {
-  return toC(ObjectArray::make(length));
+  if (length == 0) {
+      static auto *kEmptyArray = ObjectArray::make(length);
+      Object::retain(kEmptyArray);
+      return toC(kEmptyArray);
+  } else {
+      return toC(ObjectArray::make(length));
+  }
 }
 
 size_t djinni_array_get_length(djinni_array_ref array) {
