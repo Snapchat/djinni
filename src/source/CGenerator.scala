@@ -173,7 +173,81 @@ class CGenerator(spec: Spec) extends Generator(spec) {
   }
 
   private def isReservedIdentifier(ident: Ident): Boolean = {
-    return ident.name == "new" || ident.name == "proxy_class_new"
+    ident.name == "new" || ident.name == "proxy_class_new"
+  }
+
+  private def getConvertedParamName(resolvedField: ResolvedField): String = {
+    return resolvedField.field.ident.name + "_c"
+  }
+
+  private def getReturnNameCpp(name: String): String = {
+    return name + "_cpp"
+  }
+
+  private def writeProxyClass(w: IndentWriter, ident: Ident, methodDefsStructName: String, resolvedMethods: Seq[ResolvedMethod]): String = {
+    val baseProxyClassName = "Proxy_Parent"
+    w.wl(s"using ${baseProxyClassName} = ::djinni::Proxy<${methodDefsStructName}>;")
+    val cppClassName = spec.cppIdentStyle.ty(ident.name)
+    val proxyClassName = s"${cppClassName}_Proxy"
+    val baseClassName = withCppNs(cppClassName)
+    w.w(s"struct ${proxyClassName}: public ${baseProxyClassName}, public ${baseClassName} ")
+    w.bracedSemi {
+      w.wl(s"${proxyClassName}(::djinni::ProxyClass<${methodDefsStructName}> *proxyClass, void *opaque): ${baseProxyClassName}(proxyClass, opaque) {}")
+      w.wl
+      w.wl(s"~${proxyClassName}() override = default;")
+      w.wl
+
+      for (resolvedMethod <- resolvedMethods.filter(m => !m.method.static)) {
+        val returnType = if (resolvedMethod.retTypename != "void") cppMarshal.fqReturnType(resolvedMethod.method.ret) else "void"
+        w.w(s"${returnType} ${resolvedMethod.method.ident.name}(")
+        writeParamList(w, resolvedMethod.method.params.map(p => (cppMarshal.fqParamType(p.ty), p.ident.name)))
+        w.w(") ")
+        if (resolvedMethod.method.const) {
+          w.w("const ")
+        }
+        w.w("override")
+        w.braced {
+          for (param <- resolvedMethod.parameters) {
+            val resolvedExpr = cppMarshal.maybeMove(param.field.ident.name, param.field.ty)
+            w.wl(s"auto ${getConvertedParamName(param)} = ${param.translator.fromCppTranslatorFn(resolvedExpr)};")
+          }
+
+          val retValueName = "returnValue"
+          val needsReturnValue = resolvedMethod.retTypename != "void"
+          if (needsReturnValue) {
+            w.w(s"auto ${retValueName} = ")
+          }
+
+          w.w(s"${baseProxyClassName}::getProxyClass().methodDefs().${resolvedMethod.method.ident.name}(${baseProxyClassName}::getOpaque()")
+          if (resolvedMethod.parameters.nonEmpty) {
+            w.w(", ")
+            w.w(resolvedMethod.parameters.map(p => getConvertedParamName(p)).mkString(", "))
+          }
+          w.wl(");")
+
+          for (param <- resolvedMethod.parameters) {
+            if (param.translator.isRefType) {
+              w.wl(s"djinni_ref_release(${getConvertedParamName(param)});")
+            }
+          }
+
+          if (needsReturnValue) {
+            w.wl
+            w.wl(s"auto ${getReturnNameCpp(retValueName)} = ${resolvedMethod.returnType.get.toCppTranslatorFn(retValueName)};")
+            if (resolvedMethod.returnType.get.isRefType) {
+              w.wl(s"djinni_ref_release(${retValueName});")
+            }
+            w.wl(s"return ${getReturnNameCpp(retValueName)};")
+          }
+
+        }
+
+        w.wl
+      }
+    }
+    w.wl
+
+    return proxyClassName
   }
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface): Unit = {
@@ -194,9 +268,9 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     val prefix = resolveSymbolName(ident.name)
     val typeName = resolveSymbolTypeName(ident)
 
+    val proxyClassName = s"${resolveSymbolName(ident)}_proxy_class_ref"
+    val methodDefsStructName = s"${resolveSymbolName(ident)}_method_defs"
     writeCFilePair(origin, ident, typeResolver.publicImports.toSeq, typeResolver.privateImports.toSeq)((w: IndentWriter) => {
-      val methodDefsStructName = s"${resolveSymbolTypeName(ident)}_method_defs"
-      val proxyClassName = s"${typeName}_proxy_class"
       writeDoc(w, doc)
       w.wl(s"""typedef djinni_interface_ref ${typeName};""")
       w.wl(s"""typedef djinni_proxy_class_ref ${proxyClassName};""")
@@ -217,9 +291,9 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       }
       w.wl
 
-      w.wl(s"${proxyClassName} ${prefix}_proxy_class_new(const ${methodDefsStructName} *method_defs);")
+      w.wl(s"${proxyClassName} ${prefix}_proxy_class_new(const ${methodDefsStructName} *method_defs, djinni_opaque_deallocator opaque_deallocator);")
       w.wl
-      w.wl(s"${typeName} ${prefix}_new(${proxyClassName} *proxy_class, void *opaque);")
+      w.wl(s"${typeName} ${prefix}_new(${proxyClassName} proxy_class, void *opaque);")
       w.wl("")
 
       for (resolvedMethod <- resolvedMethods) {
@@ -238,6 +312,22 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       }
 
     }, (w: IndentWriter) => {
+      val proxyClassNameCpp = writeProxyClass(w, ident, methodDefsStructName, resolvedMethods)
+      w.w(s"${proxyClassName} ${prefix}_proxy_class_new(const ${methodDefsStructName} *method_defs, djinni_opaque_deallocator opaque_deallocator)")
+      w.braced {
+        w.wl(s"return ::djinni::c_api::ProxyClass<${methodDefsStructName}>::make(method_defs, opaque_deallocator);")
+      }
+      w.wl
+
+      w.w(s"${typeName} ${prefix}_new(${proxyClassName} proxy_class, void *opaque)")
+      w.braced {
+        w.wl(s"return ::djinni::c_api::Proxy<${proxyClassNameCpp}, ${methodDefsStructName}>::make(proxy_class, opaque);")
+      }
+      w.wl
+
+
+
+
       for (resolvedMethod <- resolvedMethods) {
         writeDoc(w, resolvedMethod.method.doc)
         w.w(s"${resolvedMethod.retTypename} ${prefix}_${resolvedMethod.resolvedName}(")

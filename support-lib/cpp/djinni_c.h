@@ -20,6 +20,7 @@ typedef djinni_ref djinni_interface_ref;
 typedef djinni_ref djinni_proxy_class_ref;
 
 typedef void (*djinni_binary_deallocator)(uint8_t *, size_t, void *);
+typedef void (*djinni_opaque_deallocator)(void *);
 
 void djinni_ref_retain(djinni_ref ref);
 void djinni_ref_release(djinni_ref ref);

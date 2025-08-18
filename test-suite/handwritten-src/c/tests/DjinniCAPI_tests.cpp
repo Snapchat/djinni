@@ -1,9 +1,11 @@
 #include "DataRefTest.h"
 #include "assorted_primitives.h"
+#include "client_interface.h"
 #include "client_returned_record.h"
 #include "enum_usage_record.h"
 #include "map_record.h"
 #include "primitive_list.h"
+#include "test_helpers.h"
 #include "gtest/gtest.h"
 #include <memory>
 
@@ -432,6 +434,62 @@ TEST(DjinniCAPI, supportsBinaryRef) {
   ASSERT_TRUE(dataHolder->deallocCalled);
 }
 
-TEST(DjinniCAPI, supportsInterface) {}
+static testsuite_client_returned_record_ref getRecord(void *opaque,
+                                                      int64_t recordId,
+                                                      djinni_string_ref content,
+                                                      djinni_string_ref misc) {
+  return testsuite_client_returned_record_new(recordId, content, misc);
+}
+
+TEST(DjinniCAPI, supportsInterface) {
+  testsuite_client_interface_method_defs methodDefs = {0};
+  methodDefs.get_record = &getRecord;
+
+  auto proxyClass =
+      CRef(testsuite_client_interface_proxy_class_new(&methodDefs, nullptr));
+  auto proxy = CRef(testsuite_client_interface_new(proxyClass.value, nullptr));
+
+  auto content = CRef(djinni_string_new("Hello World", 11));
+
+  auto record = CRef(testsuite_client_interface_get_record(
+      proxy.value, 42, content.value, nullptr));
+
+  ASSERT_EQ(42, testsuite_client_returned_record_get_record_id(record.value));
+  auto recordContent =
+      CRef(testsuite_client_returned_record_get_content(record.value));
+  ASSERT_EQ(std::string("Hello World"),
+            std::string(djinni_string_get_data(recordContent.value),
+                        djinni_string_get_length(recordContent.value)));
+
+    // // Should also work when passed to an interface taking C++
+    // testsuite_test_helpers_check_client_interface_ascii(proxy.value);
+    // testsuite_test_helpers_check_client_interface_nonascii(proxy.value);
+}
+
+static void opaqueDeallocator(void *opaque) {
+  ++(*reinterpret_cast<int *>(opaque));
+}
+
+TEST(DjinniCAPI, interfaceDeallocatesOpaque) {
+  int deallocateCount = 0;
+  testsuite_client_interface_method_defs methodDefs = {0};
+
+  auto proxyClass = testsuite_client_interface_proxy_class_new(
+      &methodDefs, &opaqueDeallocator);
+  auto proxy1 = testsuite_client_interface_new(proxyClass, &deallocateCount);
+  auto proxy2 = testsuite_client_interface_new(proxyClass, &deallocateCount);
+
+  djinni_ref_release(proxyClass);
+
+  ASSERT_EQ(0, deallocateCount);
+
+  djinni_ref_release(proxy1);
+
+  ASSERT_EQ(1, deallocateCount);
+
+  djinni_ref_release(proxy2);
+
+  ASSERT_EQ(2, deallocateCount);
+}
 
 } // namespace djinni

@@ -1,14 +1,13 @@
 package djinni
 
-import generatorTools.{DeclRef, ImportRef, Spec, q}
-
-import djinni.ast.{Ident, TypeDef, TypeRef}
-import djinni.meta.{MExpr, MOptional, MPrimitive, Meta}
-import djinni.writer.IndentWriter
+import ast.Ident
+import generatorTools.{ImportRef, Spec, q}
+import meta.{DEnum, MExpr, MPrimitive, Meta}
 
 import scala.collection.mutable
 
 class CTypeTranslator(val typename: String,
+                      val isRefType: Boolean,
                       val toCppTranslatorFn: (String) => String,
                       val fromCppTranslatorFn: (String) => String) {
 
@@ -34,8 +33,9 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     spec.cNamespace + str + "_ref"
   }
 
-  private def makeTranslator(typename: String, translator: String): CTypeTranslator = {
+  private def makeTranslator(typename: String, isRefType: Boolean, translator: String): CTypeTranslator = {
     new CTypeTranslator(typename,
+      isRefType,
       (p) => s"${translator}::toCpp(${p})",
       (p) => s"${translator}::fromCpp(${p})"
     )
@@ -55,9 +55,9 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
 
   private def isEnum(expr: MExpr): Boolean = {
     expr.base match {
-      case meta.MDef(name, numParams, defType, body) => {
+      case meta.MDef(_, _, _, body) => {
         body match {
-          case ast.Enum(options, flags) => true
+          case ast.Enum(_, _) => true
           case _ => false
         }
       }
@@ -67,6 +67,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
 
   private def makeNestedTranslator(inner: CTypeTranslator, typename: String, translator: String): CTypeTranslator = {
     new CTypeTranslator(typename,
+      true,
       (p) => {
         val innerToCpp = inner.toCppTranslatorFn("value")
         s"${translator}::toCpp(${p}, [](auto value) { return ${innerToCpp}; })"
@@ -87,6 +88,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     if (primitive != null && !asBoxed) {
       val typename = s"djinni_optional_${resolved.typename}"
       new CTypeTranslator(typename,
+        false,
         (p) => s"::djinni::c_api::Optional::toCppPrimitive<${cppOptionalTemplate}, ${typename}>(${resolved.toCppTranslatorFn(p)})",
         (p) => s"::djinni::c_api::Optional::fromCppPrimitive<${cppOptionalTemplate}, ${typename}>(${resolved.fromCppTranslatorFn(p)})"
       )
@@ -95,6 +97,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
       val toCppMethodName = if (sharedPtr) "toSharedPtrCpp" else "toCpp"
       val fromCppMethodName = if (sharedPtr) "fromSharedPtrCpp" else "fromCpp"
       new CTypeTranslator(resolved.typename,
+        true,
         (p) => {
           val innerToCpp = resolved.toCppTranslatorFn("value")
           s"::djinni::c_api::Optional::${toCppMethodName}<${cppOptionalTemplate}>(${p}, [](auto value) { return ${innerToCpp}; })"
@@ -121,6 +124,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     val cppTypeValue = cppMarshal.fqTypename(valueExpr)
 
     new CTypeTranslator("djinni_keyval_array_ref",
+      true,
       (p) => {
         val innerToCppKey = resolvedKey.toCppTranslatorFn("key")
         val innerToCppValue = resolvedValue.toCppTranslatorFn("value")
@@ -136,19 +140,19 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
 
   private def resolvePrimitive(cName: String, asBoxed: Boolean): CTypeTranslator = {
     if (asBoxed) {
-      new CTypeTranslator("djinni_number_ref", (p) => {
+      new CTypeTranslator("djinni_number_ref", true, (p) => {
         s"::djinni::c_api::Number::toCpp<${cName}>(${p})"
       },
         (p) => {
           s"::djinni::c_api::Number::fromCpp<${cName}>(${p})"
         })
     } else {
-      new CTypeTranslator(cName, p => p, p => p)
+      new CTypeTranslator(cName, false, p => p, p => p)
     }
   }
 
   private def updatePrivateImports(meta: Meta): Unit = {
-    for (r <- cppMarshal.hppReferences(meta, ident.name, false)) r match {
+    for (r <- cppMarshal.hppReferences(meta, ident.name, forwardDeclareOnly = false)) r match {
       case ImportRef(arg) => privateImports.add("#include " + arg)
       case _ =>
     }
@@ -166,18 +170,20 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     val typename = valueTypeName(name)
     if (asBoxed) {
       new CTypeTranslator("djinni_number_ref",
+        true,
         (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::toCppBoxed(${p})",
         (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::fromCppBoxed(${p})"
       )
     } else {
       new CTypeTranslator(typename,
+        false,
         (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::toCpp(${p})",
         (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::fromCpp(${p})"
       )
     }
   }
 
-  private def resolveExtern(expr: MExpr, c: meta.MExtern.C): CTypeTranslator = {
+  private def resolveExtern(expr: MExpr, defType: meta.DefType, c: meta.MExtern.C): CTypeTranslator = {
     updatePrivateImports(expr.base)
     addPublicImport(c.publicHeader)
     privateImports.add("#include " + cppMarshal.resolveExtCppHdr(c.privateHeader))
@@ -189,57 +195,63 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
       s"${c.translator}<${templateArgs}>"
     }
 
-    makeTranslator(c.typename, resolvedTranslator)
+    val isRefType = defType match {
+      case DEnum => false
+      case _ => true
+    }
+
+    makeTranslator(c.typename, isRefType, resolvedTranslator)
   }
 
   def resolve(expr: MExpr): CTypeTranslator = {
-    resolve(expr, false)
+    resolve(expr, asBoxed = false)
   }
 
   private def resolve(expr: MExpr, asBoxed: Boolean): CTypeTranslator = {
     expr.base match {
-      case meta.MParam(name) => {
+      case meta.MParam(_) => {
         throw new AssertionError("Unsupported MParam type")
       }
-      case meta.MDef(name, numParams, defType, body) => {
+      case meta.MDef(name, _, _, body) => {
         updatePrivateImports(expr.base)
         addPublicImportFromDef(name)
         val cppTypename = cppMarshal.fqTypename(name, body)
         body match {
-          case ast.Enum(options, flags) => resolveEnum(name, cppTypename, asBoxed)
-          case ast.Record(ext, fields, consts, derivingTypes) => makeTranslator(
+          case ast.Enum(_, _) => resolveEnum(name, cppTypename, asBoxed)
+          case ast.Record(_, _, _, _) => makeTranslator(
             ptrTypeName(name),
+            isRefType = true,
             s"::djinni::c_api::Record<${cppTypename}>"
           )
-          case ast.Interface(ext, methods, consts) => makeTranslator(
+          case ast.Interface(_, _, _) => makeTranslator(
             ptrTypeName(name),
+            isRefType = true,
             s"::djinni::c_api::Interface<${cppTypename}>"
           )
-          case ast.ProtobufMessage(cpp, java, objc, ts, swift) => throw new AssertionError("Unsupported")
+          case ast.ProtobufMessage(_, _, _, _, _) => throw new AssertionError("Unsupported")
         }
       }
-      case meta.MExtern(name, numParams, defType, body, _, _, _, _, _, _, _, _, _, _, c) => resolveExtern(expr, c)
-      case meta.MProtobuf(name, numParams, body) => {
+      case meta.MExtern(_, _, defType, _, _, _, _, _, _, _, _, _, _, _, c) => resolveExtern(expr, defType, c)
+      case meta.MProtobuf(_, _, _) =>
         updatePrivateImports(expr.base)
         makeTranslator(
           "djinni_binary_ref",
+          isRefType = true,
           s"::djinni::c_api::Protobuf<${cppMarshal.fqTypename(expr)}>"
         )
-      }
-      case opaque: meta.MOpaque => {
+      case opaque: meta.MOpaque =>
         opaque match {
-          case meta.MPrimitive(_idlName, jName, jniName, cName, jBoxed, jSig, objcName, objcBoxed) => resolvePrimitive(cName, asBoxed)
-          case meta.MString => makeTranslator("djinni_string_ref", "::djinni::c_api::String")
-          case meta.MDate => makeTranslator("djinni_date_ref", "::djinni::c_api::Date")
-          case meta.MBinary => makeTranslator("djinni_binary_ref", "::djinni::c_api::Binary")
+          case meta.MPrimitive(_, _, _, cName, _, _, _, _) => resolvePrimitive(cName, asBoxed)
+          case meta.MString => makeTranslator("djinni_string_ref", isRefType = true, "::djinni::c_api::String")
+          case meta.MDate => makeTranslator("djinni_date_ref", isRefType = true, "::djinni::c_api::Date")
+          case meta.MBinary => makeTranslator("djinni_binary_ref", isRefType = true, "::djinni::c_api::Binary")
           case meta.MOptional => resolveOptional(expr.args.head, asBoxed, expr)
           case meta.MList => resolveListLike(expr.args.head, "::djinni::c_api::List")
           case meta.MSet => resolveListLike(expr.args.head, "::djinni::c_api::Set")
           case meta.MMap => resolveMap(expr.args.head, expr.args(1))
           case meta.MArray => resolveListLike(expr.args.head, "::djinni::c_api::List")
-          case meta.MVoid => new CTypeTranslator("void", p => p, p => p)
+          case meta.MVoid => new CTypeTranslator("void", false, p => p, p => p)
         }
-      }
     }
   }
 

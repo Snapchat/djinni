@@ -130,14 +130,79 @@ private:
 
 template <typename T> class ProxyClass : public Object {
 public:
-  ProxyClass(const T &methodDefs) : _methodDefs(methodDefs) {}
+  using OpaqueDeallocator = void (*)(void *);
+  ProxyClass(const T &methodDefs, OpaqueDeallocator opaqueDeallocator)
+      : _methodDefs(methodDefs), _opaqueDeallocator(opaqueDeallocator) {}
   ~ProxyClass() override = default;
 
-  const T &methodDefs() const {
-    return _methodDefs;
+  const T &methodDefs() const { return _methodDefs; }
+  const OpaqueDeallocator &getOpaqueDeallocator() const {
+    return _opaqueDeallocator;
   }
+
 private:
   T _methodDefs;
+  OpaqueDeallocator _opaqueDeallocator;
+};
+
+template <typename T> class Proxy {
+public:
+  Proxy(ProxyClass<T> *proxyClass, void *opaque)
+      : _proxyClass(proxyClass), _opaque(opaque) {
+    Object::retain(_proxyClass);
+  }
+
+  ~Proxy() {
+    if (_proxyClass->getOpaqueDeallocator() != nullptr) {
+      _proxyClass->getOpaqueDeallocator()(_opaque);
+    }
+
+    Object::release(_proxyClass);
+  }
+
+  const ProxyClass<T> &getProxyClass() const { return *_proxyClass; }
+
+  void *getOpaque() const { return _opaque; }
+
+private:
+  ProxyClass<T> *_proxyClass;
+  void *_opaque;
+};
+
+template <typename T> class Ref {
+public:
+  struct AdoptRef {};
+
+  Ref(T ref, AdoptRef adoptRef) : _ref(ref) {}
+
+  Ref(T ref) : _ref(ref) { Object::retain(_ref); }
+
+  ~Ref() { Object::release(_ref); }
+
+  Ref &operator=(const Ref<T> &other) {
+    if (other != &this) {
+      auto old = _ref;
+      _ref = other._ref;
+
+      Object::retain(_ref);
+      Object::release(old);
+    }
+    return *this;
+  }
+
+  Ref &operator=(Ref<T> &&other) {
+    if (other != &this) {
+      auto old = _ref;
+      _ref = other._ref;
+      other._ref = nullptr;
+
+      Object::release(old);
+    }
+    return *this;
+  }
+
+private:
+  T _ref;
 };
 
 } // namespace djinni

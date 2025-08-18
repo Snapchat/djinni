@@ -16,44 +16,6 @@
 
 namespace djinni::c_api {
 
-template <typename T> class Ref {
-public:
-  struct AdoptRef {
-  };
-
-  Ref(T ref, AdoptRef adoptRef)
-      : _ref(ref) {
-  }
-
-  Ref(T ref) : _ref(ref) { djinni_ref_retain(_ref); }
-
-  ~Ref() { djinni_ref_release(_ref); }
-
-  Ref &operator=(const Ref<T> &other) {
-    if (other != &this) {
-      auto old = _ref;
-      _ref = other._ref;
-
-      djinni_ref_retain(_ref);
-      djinni_ref_release(old);
-    }
-    return *this;
-  }
-
-  Ref &operator=(Ref<T> &&other) {
-    if (other != &this) {
-      auto old = _ref;
-      _ref = other._ref;
-      other._ref = nullptr;
-
-      djinni_ref_release(old);
-    }
-    return *this;
-  }
-private:
-  T _ref;
-};
-
 class String {
 public:
   static djinni_string_ref fromCpp(std::string &&str);
@@ -392,10 +354,21 @@ public:
 
 template <typename T> class ProxyClass {
 public:
-  static djinni_interface_ref fromCpp(const T *methodDefs) {
-    Object *obj = new ProxyClass<T>(*methodDefs);
+  static djinni_proxy_class_ref
+  make(const T *methodDefs, djinni_opaque_deallocator opaqueDeallocator) {
+    Object *obj = new ::djinni::ProxyClass<T>(*methodDefs, opaqueDeallocator);
     return reinterpret_cast<djinni_proxy_class_ref>(obj);
   }
+};
+
+template<typename T, typename PT> class Proxy {
+public:
+static djinni_interface_ref make(djinni_proxy_class_ref proxyClassRef, void *opaque) {
+    auto *proxyClass = static_cast<::djinni::ProxyClass<PT> *>(reinterpret_cast<Object *>(proxyClassRef));
+
+    return ::djinni::c_api::Interface<T>::fromCpp(std::make_shared<T>(proxyClass, opaque));
+}
+
 };
 
 template <typename Cpp, typename C> class Enum {
