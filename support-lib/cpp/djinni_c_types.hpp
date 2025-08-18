@@ -128,4 +128,16 @@ private:
   std::shared_ptr<T> _data;
 };
 
+template <typename T> class ProxyClass : public Object {
+public:
+  ProxyClass(const T &methodDefs) : _methodDefs(methodDefs) {}
+  ~ProxyClass() override = default;
+
+  const T &methodDefs() const {
+    return _methodDefs;
+  }
+private:
+  T _methodDefs;
+};
+
 } // namespace djinni

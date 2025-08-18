@@ -1,20 +1,58 @@
 #pragma once
 
-#include "djinni_c.h"
-#include "djinni_c_types.hpp"
 #include "DataRef.hpp"
 #include "DataView.hpp"
 #include "Future.hpp"
+#include "djinni_c.h"
+#include "djinni_c_types.hpp"
 #include "expected.hpp"
 #include <atomic>
+#include <chrono>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
-#include <chrono>
 
 namespace djinni::c_api {
+
+template <typename T> class Ref {
+public:
+  struct AdoptRef {
+  };
+
+  Ref(T ref, AdoptRef adoptRef)
+      : _ref(ref) {
+  }
+
+  Ref(T ref) : _ref(ref) { djinni_ref_retain(_ref); }
+
+  ~Ref() { djinni_ref_release(_ref); }
+
+  Ref &operator=(const Ref<T> &other) {
+    if (other != &this) {
+      auto old = _ref;
+      _ref = other._ref;
+
+      djinni_ref_retain(_ref);
+      djinni_ref_release(old);
+    }
+    return *this;
+  }
+
+  Ref &operator=(Ref<T> &&other) {
+    if (other != &this) {
+      auto old = _ref;
+      _ref = other._ref;
+      other._ref = nullptr;
+
+      djinni_ref_release(old);
+    }
+    return *this;
+  }
+private:
+  T _ref;
+};
 
 class String {
 public:
@@ -94,11 +132,11 @@ public:
   }
 
   template <> djinni_number_ref fromCpp(float value) {
-    return djinni_number_double_create(value);
+    return djinni_number_double_new(value);
   }
 
   template <> djinni_number_ref fromCpp(double value) {
-    return djinni_number_double_create(value);
+    return djinni_number_double_new(value);
   }
 
   template <> float toCpp(djinni_number_ref value) {
@@ -111,7 +149,7 @@ public:
 
 private:
   template <typename T> static djinni_number_ref fromCppUnsignedInt(T value) {
-    return djinni_number_uint64_create(static_cast<uint64_t>(value));
+    return djinni_number_uint64_new(static_cast<uint64_t>(value));
   }
 
   template <typename T> static T toCppUnsignedInt(djinni_number_ref value) {
@@ -119,7 +157,7 @@ private:
   }
 
   template <typename T> static djinni_number_ref fromCppSignedInt(T value) {
-    return djinni_number_int64_create(static_cast<int64_t>(value));
+    return djinni_number_int64_new(static_cast<int64_t>(value));
   }
 
   template <typename T> static T toCppSignedInt(djinni_number_ref value) {
@@ -201,6 +239,7 @@ public:
       return convert(ptr);
     }
   }
+
 private:
 };
 
@@ -223,7 +262,7 @@ public:
 
   template <typename F>
   static djinni_array_ref fromCpp(const std::vector<T> &values, F &&convert) {
-    djinni_array_ref output = djinni_array_create(values.size());
+    djinni_array_ref output = djinni_array_new(values.size());
     size_t index = 0;
 
     for (const auto &value : values) {
@@ -256,7 +295,7 @@ public:
   template <typename F>
   static djinni_array_ref fromCpp(const std::unordered_set<T> &values,
                                   F &&convert) {
-    djinni_array_ref output = djinni_array_create(values.size());
+    djinni_array_ref output = djinni_array_new(values.size());
     size_t index = 0;
 
     for (const auto &value : values) {
@@ -293,7 +332,7 @@ public:
   template <typename F>
   static djinni_keyval_array_ref fromCpp(const std::unordered_map<K, V> &map,
                                          F &&convert) {
-    djinni_keyval_array_ref output = djinni_keyval_array_create(map.size());
+    djinni_keyval_array_ref output = djinni_keyval_array_new(map.size());
     size_t index = 0;
     for (const auto &it : map) {
       auto pair = convert(it.first, it.second);
@@ -351,6 +390,14 @@ public:
   }
 };
 
+template <typename T> class ProxyClass {
+public:
+  static djinni_interface_ref fromCpp(const T *methodDefs) {
+    Object *obj = new ProxyClass<T>(*methodDefs);
+    return reinterpret_cast<djinni_proxy_class_ref>(obj);
+  }
+};
+
 template <typename Cpp, typename C> class Enum {
 public:
   static Cpp toCpp(C value) { return static_cast<Cpp>(value); }
@@ -364,7 +411,6 @@ public:
     return Number::fromCpp(static_cast<int64_t>(value));
   }
 };
-
 
 class DataRef {
 public:
@@ -385,34 +431,30 @@ public:
   static djinni_binary_ref fromCpp(const std::vector<uint8_t> &binary);
 };
 
-template<typename T>
-class Future {
+template <typename T> class Future {
 public:
   static ::djinni::Future<T> toCpp(djinni_future_ref future);
   static djinni_future_ref fromCpp(::djinni::Future<T> &&future);
 };
 
-template<typename T, typename E>
-class Outcome {
+template <typename T, typename E> class Outcome {
 public:
   static ::djinni::expected<T, E> toCpp(djinni_outcome_ref future);
   static djinni_outcome_ref fromCpp(::djinni::expected<T, E> &&outcome);
   static djinni_outcome_ref fromCpp(const ::djinni::expected<T, E> &outcome);
 };
 
-template<class Rep, class Ratio>
-class Duration {
+template <class Rep, class Ratio> class Duration {
 public:
   static std::chrono::duration<Rep, Ratio> toCpp(djinni_number_ref value);
-  static djinni_number_ref fromCpp(const std::chrono::duration<Rep, Ratio> &value);
+  static djinni_number_ref
+  fromCpp(const std::chrono::duration<Rep, Ratio> &value);
 };
 
-template<typename T>
-class Protobuf {
+template <typename T> class Protobuf {
 public:
   static T toCpp(djinni_binary_ref binary);
   static djinni_binary_ref fromCpp(const T &proto);
 };
-
 
 } // namespace djinni::c_api

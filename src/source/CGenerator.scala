@@ -11,7 +11,9 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
   private class ResolvedField(val field: Field, val translator: CTypeTranslator)
 
-  private class ResolvedMethod(val method: Interface.Method, val parameters: Seq[ResolvedField], val returnType: Option[CTypeTranslator])
+  private class ResolvedMethod(val resolvedName: String, val method: Interface.Method, val parameters: Seq[ResolvedField], val returnType: Option[CTypeTranslator]) {
+    def retTypename: String = if (returnType.isDefined) returnType.get.typename else "void"
+  }
 
   private def resolveSymbolName(name: String): String = {
     return spec.cNamespace + name
@@ -120,7 +122,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       w.wl(s"""typedef djinni_record_ref ${typeName};""")
       w.wl
 
-      w.w(s"""${typeName} ${prefix}_create(""")
+      w.w(s"""${typeName} ${prefix}_new(""")
       writeParamListWithResolvedFields(w, resolvedFields)
       w.wl(");")
 
@@ -133,7 +135,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         w.wl
       }
     }, (w: IndentWriter) => {
-      w.w(s"""${typeName} ${prefix}_create(""")
+      w.w(s"""${typeName} ${prefix}_new(""")
       writeParamListWithResolvedFields(w, resolvedFields)
       w.wl(") ")
 
@@ -170,11 +172,16 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     })
   }
 
+  private def isReservedIdentifier(ident: Ident): Boolean = {
+    return ident.name == "new" || ident.name == "proxy_class_new"
+  }
+
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface): Unit = {
     val selfCpp = cppMarshal.fqTypename(ident, i)
     val typeResolver = new CTypeResolver(ident, spec, cppMarshal)
     val resolvedMethods = i.methods.map(m =>
       new ResolvedMethod(
+        if (isReservedIdentifier(m.ident)) m.ident.name + "_2" else m.ident.name,
         m,
         m.params.map(p =>
           new ResolvedField(
@@ -188,14 +195,36 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     val typeName = resolveSymbolTypeName(ident)
 
     writeCFilePair(origin, ident, typeResolver.publicImports.toSeq, typeResolver.privateImports.toSeq)((w: IndentWriter) => {
+      val methodDefsStructName = s"${resolveSymbolTypeName(ident)}_method_defs"
+      val proxyClassName = s"${typeName}_proxy_class"
       writeDoc(w, doc)
       w.wl(s"""typedef djinni_interface_ref ${typeName};""")
+      w.wl(s"""typedef djinni_proxy_class_ref ${proxyClassName};""")
       w.wl
+
+      w.wl(s"""typedef struct """)
+      w.bracedEnd(s" ${methodDefsStructName};") {
+
+        if (resolvedMethods.isEmpty) {
+          w.wl("void *reserved[1];")
+        } else {
+          for (resolvedMethod <- resolvedMethods) {
+            w.w(s"""${resolvedMethod.retTypename} (*${resolvedMethod.method.ident.name})(""")
+            writeDelimited(w, "void *" +: resolvedMethod.parameters.map(p => p.translator.typename), ", ")(s => w.w(s))
+            w.wl(");")
+          }
+        }
+      }
+      w.wl
+
+      w.wl(s"${proxyClassName} ${prefix}_proxy_class_new(const ${methodDefsStructName} *method_defs);")
+      w.wl
+      w.wl(s"${typeName} ${prefix}_new(${proxyClassName} *proxy_class, void *opaque);")
+      w.wl("")
 
       for (resolvedMethod <- resolvedMethods) {
         writeDoc(w, resolvedMethod.method.doc)
-        val retTypeName = if (resolvedMethod.returnType.isDefined) resolvedMethod.returnType.get.typename else "void"
-        w.w(s"${retTypeName} ${prefix}_${resolvedMethod.method.ident.name}(")
+        w.w(s"${resolvedMethod.retTypename} ${prefix}_${resolvedMethod.resolvedName}(")
 
         if (resolvedMethod.method.static) {
           writeParamList(w, resolvedMethod.parameters.map(p => (p.translator.typename, p.field.ident.name)))
@@ -211,8 +240,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     }, (w: IndentWriter) => {
       for (resolvedMethod <- resolvedMethods) {
         writeDoc(w, resolvedMethod.method.doc)
-        val retTypeName = if (resolvedMethod.returnType.isDefined) resolvedMethod.returnType.get.typename else "void"
-        w.w(s"${retTypeName} ${prefix}_${resolvedMethod.method.ident.name}(")
+        w.w(s"${resolvedMethod.retTypename} ${prefix}_${resolvedMethod.resolvedName}(")
 
         if (resolvedMethod.method.static) {
           writeParamList(w, resolvedMethod.parameters.map(p => (p.translator.typename, p.field.ident.name)))
@@ -222,7 +250,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
         w.wl(")")
         w.braced {
-          val needsReturnValue = (resolvedMethod.returnType.isDefined && resolvedMethod.returnType.get.typename != "void")
+          val needsReturnValue = resolvedMethod.retTypename != "void"
 
           if (needsReturnValue) {
             w.w(s"auto retValue = ")

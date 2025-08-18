@@ -13,7 +13,7 @@ void djinni_ref_retain(djinni_ref ref) { Object::retain(fromC<Object>(ref)); }
 
 void djinni_ref_release(djinni_ref ref) { Object::release(fromC<Object>(ref)); }
 
-djinni_string_ref djinni_string_create(const char *str, size_t length) {
+djinni_string_ref djinni_string_new(const char *str, size_t length) {
   return toC(String::make(str, length));
 }
 
@@ -25,9 +25,8 @@ size_t djinni_string_get_length(djinni_string_ref str) {
   return fromC<String>(str)->length();
 }
 
-djinni_binary_ref djinni_binary_create(uint8_t *data, size_t length,
-                                       void *opaque,
-                                       djinni_binary_deallocator deallocator) {
+djinni_binary_ref djinni_binary_new(uint8_t *data, size_t length, void *opaque,
+                                    djinni_binary_deallocator deallocator) {
   return toC(BinaryWithDeallocator::make(data, length, opaque, deallocator));
 }
 
@@ -40,8 +39,8 @@ djinni_binary_ref djinni_binary_create_with_bytes_copy(const uint8_t *data,
                                                        size_t length) {
   auto *mutableData = (uint8_t *)malloc(length);
   memcpy(mutableData, data, length);
-  return djinni_binary_create(mutableData, length, mutableData,
-                              &djinni_binary_malloc_release);
+  return djinni_binary_new(mutableData, length, mutableData,
+                           &djinni_binary_malloc_release);
 }
 
 uint8_t *djinni_binary_get_data(djinni_binary_ref binary) {
@@ -49,22 +48,22 @@ uint8_t *djinni_binary_get_data(djinni_binary_ref binary) {
 }
 
 size_t djinni_binary_get_length(djinni_binary_ref binary) {
-    return fromC<Binary>(binary)->length();
+  return fromC<Binary>(binary)->length();
 }
 
-djinni_number_ref djinni_number_int64_create(int64_t v) {
+djinni_number_ref djinni_number_int64_new(int64_t v) {
   Number::Value value;
   value.i = v;
   return toC(Number::make(value, Number::ValueType::SIGNED_INT));
 }
 
-djinni_number_ref djinni_number_uint64_create(uint64_t v) {
+djinni_number_ref djinni_number_uint64_new(uint64_t v) {
   Number::Value value;
   value.u = v;
   return toC(Number::make(value, Number::ValueType::UNSIGNED_INT));
 }
 
-djinni_number_ref djinni_number_double_create(double v) {
+djinni_number_ref djinni_number_double_new(double v) {
   Number::Value value;
   value.d = v;
   return toC(Number::make(value, Number::ValueType::DOUBLE));
@@ -82,7 +81,7 @@ double djinni_number_get_double(djinni_number_ref number) {
   return fromC<Number>(number)->toDouble();
 }
 
-djinni_keyval_array_ref djinni_keyval_array_create(size_t size) {
+djinni_keyval_array_ref djinni_keyval_array_new(size_t size) {
   auto *array = ObjectArray::make(size << 1);
   return toC(array);
 }
@@ -110,7 +109,7 @@ void djinni_keyval_array_set_entry(djinni_keyval_array_ref keyval_array,
   array->setObjectAtIndex((index << 1) + 1, fromC<Object>(value));
 }
 
-djinni_array_ref djinni_array_create(size_t length) {
+djinni_array_ref djinni_array_new(size_t length) {
   if (length == 0) {
     static auto *kEmptyArray = ObjectArray::make(length);
     Object::retain(kEmptyArray);
@@ -133,8 +132,8 @@ void djinni_array_set_value(djinni_array_ref array, size_t index,
   fromC<ObjectArray>(array)->setObjectAtIndex(index, fromC<Object>(value));
 }
 
-djinni_date_ref djinni_date_create(uint64_t epoch_time_ms) {
-  return djinni_number_uint64_create(epoch_time_ms);
+djinni_date_ref djinni_date_new(uint64_t epoch_time_ms) {
+  return djinni_number_uint64_new(epoch_time_ms);
 }
 
 uint64_t djinni_date_get_epoch(djinni_date_ref date) {

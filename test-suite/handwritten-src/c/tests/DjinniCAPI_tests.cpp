@@ -17,7 +17,7 @@ template <typename T> struct CRef {
 };
 
 TEST(DjinniCAPI, supportsPrimitiveValues) {
-  auto primitives = CRef(testsuite_assorted_primitives_create(
+  auto primitives = CRef(testsuite_assorted_primitives_new(
       true, 8, 4242, 3000000, 99999999999, 32.5f, 6482000.5,
       djinni_optional_bool_empty(), djinni_optional_int8_t_empty(),
       djinni_optional_int16_t_empty(), djinni_optional_int32_t_empty(),
@@ -62,7 +62,7 @@ TEST(DjinniCAPI, supportsPrimitiveValues) {
 }
 
 TEST(DjinniCAPI, supportsOptionalPrimitiveValues) {
-  auto primitives = CRef(testsuite_assorted_primitives_create(
+  auto primitives = CRef(testsuite_assorted_primitives_new(
       false, 0, 0, 0, 0, 0.0f, 0.0, djinni_optional_bool_make(true),
       djinni_optional_int8_t_make(8), djinni_optional_int16_t_make(16),
       djinni_optional_int32_t_make(4242), djinni_optional_int64_t_make(3000000),
@@ -206,9 +206,9 @@ TEST(DjinniCAPI, supportsOptionalPrimitiveValues) {
 }
 
 TEST(DjinniCAPI, supportsRefCountedValues) {
-  auto content = CRef(djinni_string_create("Hello World", 11));
+  auto content = CRef(djinni_string_new("Hello World", 11));
   auto record =
-      CRef(testsuite_client_returned_record_create(0, content.value, nullptr));
+      CRef(testsuite_client_returned_record_new(0, content.value, nullptr));
   auto returnedContent =
       CRef(testsuite_client_returned_record_get_content(record.value));
   ASSERT_EQ(std::string("Hello World"),
@@ -216,9 +216,9 @@ TEST(DjinniCAPI, supportsRefCountedValues) {
 }
 
 TEST(DjinniCAPI, supportsOptionalRefCountedValues) {
-  auto content = CRef(djinni_string_create("Hello World", 11));
+  auto content = CRef(djinni_string_new("Hello World", 11));
   auto record =
-      CRef(testsuite_client_returned_record_create(0, content.value, nullptr));
+      CRef(testsuite_client_returned_record_new(0, content.value, nullptr));
   auto returnedMisc =
       CRef(testsuite_client_returned_record_get_misc(record.value));
 
@@ -232,14 +232,13 @@ TEST(DjinniCAPI, supportsOptionalRefCountedValues) {
 }
 
 TEST(DjinniCAPI, supportsListOfPrimitiveValues) {
-  auto list = CRef(djinni_array_create(2));
-  auto entry1 = CRef(djinni_number_int64_create(42));
-  auto entry2 = CRef(djinni_number_int64_create(10000));
+  auto list = CRef(djinni_array_new(2));
+  auto entry1 = CRef(djinni_number_int64_new(42));
+  auto entry2 = CRef(djinni_number_int64_new(10000));
   djinni_array_set_value(list.value, 0, entry1.value);
   djinni_array_set_value(list.value, 1, entry2.value);
 
-  auto primitiveList =
-      CRef(testsuite_primitive_list_create(list.value, nullptr));
+  auto primitiveList = CRef(testsuite_primitive_list_new(list.value, nullptr));
 
   auto returnedList =
       CRef(testsuite_primitive_list_get_list(primitiveList.value));
@@ -256,14 +255,14 @@ TEST(DjinniCAPI, supportsListOfPrimitiveValues) {
 }
 
 TEST(DjinniCAPI, supportsListOfOptionalPrimitiveValues) {
-  auto emptyList = CRef(djinni_array_create(0));
-  auto optionalList = CRef(djinni_array_create(2));
-  auto entry2 = CRef(djinni_number_int64_create(10000));
+  auto emptyList = CRef(djinni_array_new(0));
+  auto optionalList = CRef(djinni_array_new(2));
+  auto entry2 = CRef(djinni_number_int64_new(10000));
   djinni_array_set_value(optionalList.value, 0, nullptr);
   djinni_array_set_value(optionalList.value, 1, entry2.value);
 
-  auto primitiveList = CRef(
-      testsuite_primitive_list_create(emptyList.value, optionalList.value));
+  auto primitiveList =
+      CRef(testsuite_primitive_list_new(emptyList.value, optionalList.value));
 
   auto returnedList =
       CRef(testsuite_primitive_list_get_optional_list(primitiveList.value));
@@ -280,25 +279,25 @@ TEST(DjinniCAPI, supportsListOfOptionalPrimitiveValues) {
 }
 
 TEST(DjinniCAPI, supportsMap) {
-  auto map = CRef(djinni_keyval_array_create(2));
-  auto imap = CRef(djinni_keyval_array_create(1));
+  auto map = CRef(djinni_keyval_array_new(2));
+  auto imap = CRef(djinni_keyval_array_new(1));
 
-  auto entry1Key = CRef(djinni_string_create("key1", 4));
-  auto entry1Value = CRef(djinni_number_int64_create(42));
-  auto entry2Key = CRef(djinni_string_create("key2", 4));
-  auto entry2Value = CRef(djinni_number_int64_create(1));
+  auto entry1Key = CRef(djinni_string_new("key1", 4));
+  auto entry1Value = CRef(djinni_number_int64_new(42));
+  auto entry2Key = CRef(djinni_string_new("key2", 4));
+  auto entry2Value = CRef(djinni_number_int64_new(1));
 
   djinni_keyval_array_set_entry(map.value, 0, entry1Key.value,
                                 entry1Value.value);
   djinni_keyval_array_set_entry(map.value, 1, entry2Key.value,
                                 entry2Value.value);
 
-  auto imapEntry1Key = CRef(djinni_number_int64_create(10));
-  auto imapEntry1Value = CRef(djinni_number_int64_create(20));
+  auto imapEntry1Key = CRef(djinni_number_int64_new(10));
+  auto imapEntry1Value = CRef(djinni_number_int64_new(20));
   djinni_keyval_array_set_entry(imap.value, 0, imapEntry1Key.value,
                                 imapEntry1Value.value);
 
-  auto mapRecord = CRef(testsuite_map_record_create(map.value, imap.value));
+  auto mapRecord = CRef(testsuite_map_record_new(map.value, imap.value));
 
   auto collectedMap = CRef(testsuite_map_record_get_map(mapRecord.value));
   auto collectedImap = CRef(testsuite_map_record_get_imap(mapRecord.value));
@@ -352,16 +351,16 @@ TEST(DjinniCAPI, supportsMap) {
 }
 
 TEST(DjinniCAPI, supportsEnum) {
-  auto optionalEnum = CRef(djinni_number_uint64_create(testsuite_color_VIOLET));
-  auto list = CRef(djinni_array_create(1));
-  auto listEntry = CRef(djinni_number_uint64_create(testsuite_color_ORANGE));
+  auto optionalEnum = CRef(djinni_number_uint64_new(testsuite_color_VIOLET));
+  auto list = CRef(djinni_array_new(1));
+  auto listEntry = CRef(djinni_number_uint64_new(testsuite_color_ORANGE));
   djinni_array_set_value(list.value, 0, listEntry.value);
 
-  auto map = CRef(djinni_keyval_array_create(0));
+  auto map = CRef(djinni_keyval_array_new(0));
 
-  auto record = CRef(testsuite_enum_usage_record_create(
-      testsuite_color_BLUE, optionalEnum.value, list.value, list.value,
-      map.value));
+  auto record = CRef(
+      testsuite_enum_usage_record_new(testsuite_color_BLUE, optionalEnum.value,
+                                      list.value, list.value, map.value));
 
   ASSERT_EQ(testsuite_color_BLUE,
             testsuite_enum_usage_record_get_e(record.value));
@@ -410,9 +409,9 @@ TEST(DjinniCAPI, supportsBinaryRef) {
   dataHolder->data[2] = 100;
 
   {
-    auto input = CRef(
-        djinni_binary_create(dataHolder->data.data(), dataHolder->data.size(),
-                             dataHolder.get(), &data_holder_free_callback));
+    auto input =
+        CRef(djinni_binary_new(dataHolder->data.data(), dataHolder->data.size(),
+                               dataHolder.get(), &data_holder_free_callback));
     auto received =
         CRef(testsuite_DataRefTest_sendDataView(ref.value, input.value));
 

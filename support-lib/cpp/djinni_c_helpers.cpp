@@ -48,11 +48,11 @@ private:
 };
 
 djinni_string_ref String::fromCpp(std::string &&str) {
-  return djinni_string_create(str.c_str(), str.length());
+  return djinni_string_new(str.c_str(), str.length());
 }
 
 djinni_string_ref String::fromCpp(const std::string &str) {
-  return djinni_string_create(str.c_str(), str.length());
+  return djinni_string_new(str.c_str(), str.length());
 }
 
 std::string String::toCpp(djinni_string_ref str) {
@@ -77,7 +77,7 @@ djinni_binary_ref DataRef::fromCpp(const ::djinni::DataRef &dataRef) {
 }
 
 djinni_binary_ref DataView::fromCpp(const ::djinni::DataView &dataRef) {
-  return djinni_binary_create(dataRef.buf(), dataRef.len(), nullptr, nullptr);
+  return djinni_binary_new(dataRef.buf(), dataRef.len(), nullptr, nullptr);
 }
 
 std::vector<uint8_t> Binary::toCpp(djinni_binary_ref binary) {
