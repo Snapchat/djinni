@@ -31,11 +31,14 @@ const char *djinni_string_get_data(djinni_string_ref str);
 
 size_t djinni_string_get_length(djinni_string_ref str);
 
-djinni_binary_ref djinni_binary_new(uint8_t *data, size_t length, void *opaque,
-                                    djinni_binary_deallocator deallocator);
+djinni_binary_ref djinni_binary_new(size_t length);
 
-djinni_binary_ref djinni_binary_create_with_bytes_copy(const uint8_t *data,
-                                                       size_t length);
+djinni_binary_ref
+djinni_binary_new_with_bytes(uint8_t *data, size_t length, void *opaque,
+                             djinni_binary_deallocator deallocator);
+
+djinni_binary_ref djinni_binary_new_with_bytes_copy(const uint8_t *data,
+                                                    size_t length);
 
 uint8_t *djinni_binary_get_data(djinni_binary_ref binary);
 size_t djinni_binary_get_length(djinni_binary_ref binary);

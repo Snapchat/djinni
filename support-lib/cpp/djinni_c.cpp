@@ -25,8 +25,9 @@ size_t djinni_string_get_length(djinni_string_ref str) {
   return fromC<String>(str)->length();
 }
 
-djinni_binary_ref djinni_binary_new(uint8_t *data, size_t length, void *opaque,
-                                    djinni_binary_deallocator deallocator) {
+djinni_binary_ref
+djinni_binary_new_with_bytes(uint8_t *data, size_t length, void *opaque,
+                             djinni_binary_deallocator deallocator) {
   return toC(BinaryWithDeallocator::make(data, length, opaque, deallocator));
 }
 
@@ -35,12 +36,18 @@ static void djinni_binary_malloc_release(uint8_t *data, size_t length,
   free(opaque);
 }
 
-djinni_binary_ref djinni_binary_create_with_bytes_copy(const uint8_t *data,
-                                                       size_t length) {
+djinni_binary_ref djinni_binary_new_with_bytes_copy(const uint8_t *data,
+                                                    size_t length) {
   auto *mutableData = (uint8_t *)malloc(length);
   memcpy(mutableData, data, length);
-  return djinni_binary_new(mutableData, length, mutableData,
-                           &djinni_binary_malloc_release);
+  return djinni_binary_new_with_bytes(mutableData, length, mutableData,
+                                      &djinni_binary_malloc_release);
+}
+
+djinni_binary_ref djinni_binary_new(size_t length) {
+  auto *mutableData = (uint8_t *)malloc(length);
+  return djinni_binary_new_with_bytes(mutableData, length, mutableData,
+                                      &djinni_binary_malloc_release);
 }
 
 uint8_t *djinni_binary_get_data(djinni_binary_ref binary) {

@@ -440,9 +440,17 @@ public:
 
 template <typename T, typename E> class Outcome {
 public:
-  static ::djinni::expected<T, E> toCpp(djinni_outcome_ref future);
-  static djinni_outcome_ref fromCpp(::djinni::expected<T, E> &&outcome);
-  static djinni_outcome_ref fromCpp(const ::djinni::expected<T, E> &outcome);
+  static ::djinni::expected<T, E> toCpp(djinni_outcome_ref future) {
+    std::abort();
+  }
+
+  static djinni_outcome_ref fromCpp(::djinni::expected<T, E> &&outcome) {
+    std::abort();
+  }
+
+  static djinni_outcome_ref fromCpp(const ::djinni::expected<T, E> &outcome) {
+    std::abort();
+  }
 };
 
 template <class Rep, class Ratio> class Duration {
@@ -454,8 +462,21 @@ public:
 
 template <typename T> class Protobuf {
 public:
-  static T toCpp(djinni_binary_ref binary);
-  static djinni_binary_ref fromCpp(const T &proto);
+  static T toCpp(djinni_binary_ref binary) {
+    T output;
+    output.ParseFromArray(djinni_binary_get_data(binary),
+                          djinni_binary_get_length(binary));
+    return output;
+  }
+
+  static djinni_binary_ref fromCpp(const T &proto) {
+    auto length = proto.ByteSizeLong();
+    auto output = djinni_binary_new(static_cast<size_t>(length));
+
+    proto.SerializeToArray(djinni_binary_get_data(output), length);
+
+    return output;
+  }
 };
 
 } // namespace djinni::c_api

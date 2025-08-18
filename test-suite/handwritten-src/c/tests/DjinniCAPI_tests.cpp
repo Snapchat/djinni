@@ -5,6 +5,8 @@
 #include "enum_usage_record.h"
 #include "map_record.h"
 #include "primitive_list.h"
+#include "proto/cpp/test.pb.h"
+#include "proto_tests.h"
 #include "test_helpers.h"
 #include "gtest/gtest.h"
 #include <memory>
@@ -412,7 +414,7 @@ TEST(DjinniCAPI, supportsBinaryRef) {
 
   {
     auto input =
-        CRef(djinni_binary_new(dataHolder->data.data(), dataHolder->data.size(),
+        CRef(djinni_binary_new_with_bytes(dataHolder->data.data(), dataHolder->data.size(),
                                dataHolder.get(), &data_holder_free_callback));
     auto received =
         CRef(testsuite_DataRefTest_sendDataView(ref.value, input.value));
@@ -429,7 +431,7 @@ TEST(DjinniCAPI, supportsBinaryRef) {
   // Create another one and send it.Because it's received as an actual DataRef,
   // the C++ will have retained the data ref and then release it to set the new
   // one
-  auto newInput = CRef(djinni_binary_create_with_bytes_copy(nullptr, 0));
+  auto newInput = CRef(djinni_binary_new_with_bytes_copy(nullptr, 0));
   testsuite_DataRefTest_sendData(ref.value, newInput.value);
   ASSERT_TRUE(dataHolder->deallocCalled);
 }
@@ -461,9 +463,9 @@ TEST(DjinniCAPI, supportsInterface) {
             std::string(djinni_string_get_data(recordContent.value),
                         djinni_string_get_length(recordContent.value)));
 
-    // Should also work when passed to an interface taking C++
-    testsuite_test_helpers_check_client_interface_ascii(proxy.value);
-    testsuite_test_helpers_check_client_interface_nonascii(proxy.value);
+  // Should also work when passed to an interface taking C++
+  testsuite_test_helpers_check_client_interface_ascii(proxy.value);
+  testsuite_test_helpers_check_client_interface_nonascii(proxy.value);
 }
 
 static void opaqueDeallocator(void *opaque) {
@@ -490,6 +492,35 @@ TEST(DjinniCAPI, interfaceDeallocatesOpaque) {
   djinni_ref_release(proxy2);
 
   ASSERT_EQ(2, deallocateCount);
+}
+
+TEST(DjinniCAPI, supportsProto) {
+  ::djinni::test::AddressBook x;
+  auto *p1 = x.add_people();
+  p1->set_id(1);
+  p1->set_name("Hello");
+  auto *p2 = x.add_people();
+  p2->set_id(2);
+  p2->set_name("World");
+
+  std::string pb;
+  x.SerializeToString(&pb);
+
+  auto pbBytes = CRef(djinni_binary_new_with_bytes_copy(
+      reinterpret_cast<const uint8_t *>(pb.data()), pb.size()));
+
+  auto vec = CRef(testsuite_proto_tests_protoToStrings(pbBytes.value));
+
+  ASSERT_EQ(2, djinni_array_get_length(vec.value));
+
+  auto retrievedName1 = CRef(djinni_array_get_value(vec.value, 0));
+  auto retrievedName2 = CRef(djinni_array_get_value(vec.value, 1));
+
+  ASSERT_EQ(std::string("Hello"),
+            std::string(djinni_string_get_data(retrievedName1.value)));
+
+  ASSERT_EQ(std::string("World"),
+            std::string(djinni_string_get_data(retrievedName2.value)));
 }
 
 } // namespace djinni

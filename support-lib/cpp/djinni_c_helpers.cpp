@@ -77,7 +77,7 @@ djinni_binary_ref DataRef::fromCpp(const ::djinni::DataRef &dataRef) {
 }
 
 djinni_binary_ref DataView::fromCpp(const ::djinni::DataView &dataRef) {
-  return djinni_binary_new(dataRef.buf(), dataRef.len(), nullptr, nullptr);
+  return djinni_binary_new_with_bytes(dataRef.buf(), dataRef.len(), nullptr, nullptr);
 }
 
 std::vector<uint8_t> Binary::toCpp(djinni_binary_ref binary) {
@@ -91,7 +91,7 @@ djinni_binary_ref Binary::fromCpp(std::vector<uint8_t> &&binary) {
 }
 
 djinni_binary_ref Binary::fromCpp(const std::vector<uint8_t> &binary) {
-  return djinni_binary_create_with_bytes_copy(binary.data(), binary.size());
+  return djinni_binary_new_with_bytes_copy(binary.data(), binary.size());
 }
 
 } // namespace djinni::c_api
