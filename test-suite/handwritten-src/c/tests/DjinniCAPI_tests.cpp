@@ -461,9 +461,9 @@ TEST(DjinniCAPI, supportsInterface) {
             std::string(djinni_string_get_data(recordContent.value),
                         djinni_string_get_length(recordContent.value)));
 
-    // // Should also work when passed to an interface taking C++
-    // testsuite_test_helpers_check_client_interface_ascii(proxy.value);
-    // testsuite_test_helpers_check_client_interface_nonascii(proxy.value);
+    // Should also work when passed to an interface taking C++
+    testsuite_test_helpers_check_client_interface_ascii(proxy.value);
+    testsuite_test_helpers_check_client_interface_nonascii(proxy.value);
 }
 
 static void opaqueDeallocator(void *opaque) {

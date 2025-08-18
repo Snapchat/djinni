@@ -14,6 +14,19 @@
 #include <unordered_set>
 #include <vector>
 
+namespace djinni {
+template <typename T> class FutureHolder : public Object {
+public:
+  FutureHolder(Future<T> future) : _future(std::move(future)) {}
+  ~FutureHolder() override = default;
+
+  Future<T> &getFuture() { return _future; }
+
+private:
+  Future<T> _future;
+};
+} // namespace djinni
+
 namespace djinni::c_api {
 
 class String {
@@ -361,14 +374,16 @@ public:
   }
 };
 
-template<typename T, typename PT> class Proxy {
+template <typename T, typename PT> class Proxy {
 public:
-static djinni_interface_ref make(djinni_proxy_class_ref proxyClassRef, void *opaque) {
-    auto *proxyClass = static_cast<::djinni::ProxyClass<PT> *>(reinterpret_cast<Object *>(proxyClassRef));
+  static djinni_interface_ref make(djinni_proxy_class_ref proxyClassRef,
+                                   void *opaque) {
+    auto *proxyClass = static_cast<::djinni::ProxyClass<PT> *>(
+        reinterpret_cast<Object *>(proxyClassRef));
 
-    return ::djinni::c_api::Interface<T>::fromCpp(std::make_shared<T>(proxyClass, opaque));
-}
-
+    return ::djinni::c_api::Interface<T>::fromCpp(
+        std::make_shared<T>(proxyClass, opaque));
+  }
 };
 
 template <typename Cpp, typename C> class Enum {
@@ -406,8 +421,21 @@ public:
 
 template <typename T> class Future {
 public:
-  static ::djinni::Future<T> toCpp(djinni_future_ref future);
-  static djinni_future_ref fromCpp(::djinni::Future<T> &&future);
+  static ::djinni::Future<T> toCpp(djinni_future_ref future) {
+    auto *futureHolder = static_cast<::djinni::FutureHolder<T> *>(
+        reinterpret_cast<Object *>(future));
+
+    // Any way to make this better?
+
+    return futureHolder->getFuture().then(
+        [](::djinni::Future<T> value) { return value.get(); });
+  }
+
+  static djinni_future_ref fromCpp(::djinni::Future<T> &&future) {
+    Object *futureHolder = new ::djinni::FutureHolder<T>(std::move(future));
+
+    return reinterpret_cast<djinni_future_ref>(futureHolder);
+  }
 };
 
 template <typename T, typename E> class Outcome {
