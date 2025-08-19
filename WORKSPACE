@@ -49,18 +49,18 @@ http_archive(
 )
 
 rules_kotlin_version = "legacy-1.3.0"
-# http_archive(
-#     name = "io_bazel_rules_kotlin",
-#     url = "https://github.com/bazelbuild/rules_kotlin/archive/{}.zip".format(rules_kotlin_version),
-#     type = "zip",
-#     strip_prefix = "rules_kotlin-{}".format(rules_kotlin_version),
-#     sha256 = "4fd769fb0db5d3c6240df8a9500515775101964eebdf85a3f9f0511130885fde",
-# )
+http_archive(
+    name = "io_bazel_rules_kotlin",
+    url = "https://github.com/bazelbuild/rules_kotlin/archive/{}.zip".format(rules_kotlin_version),
+    type = "zip",
+    strip_prefix = "rules_kotlin-{}".format(rules_kotlin_version),
+    sha256 = "4fd769fb0db5d3c6240df8a9500515775101964eebdf85a3f9f0511130885fde",
+)
 
 load("@build_bazel_apple_support//lib:repositories.bzl", "apple_support_dependencies")
 load("@build_bazel_rules_apple//apple:repositories.bzl", "apple_rules_dependencies")
 load("@build_bazel_rules_swift//swift:extras.bzl", "swift_rules_extra_dependencies")
-# load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kotlin_repositories", "kt_register_toolchains")
+load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kotlin_repositories", "kt_register_toolchains")
 
 load("@build_bazel_rules_swift//swift:repositories.bzl", "swift_rules_dependencies")
 
@@ -72,8 +72,8 @@ swift_rules_dependencies()
 
 swift_rules_extra_dependencies()
 
-# kotlin_repositories()
-# kt_register_toolchains()
+kotlin_repositories()
+kt_register_toolchains()
 
 emsdk_version = "3.1.8"
 
