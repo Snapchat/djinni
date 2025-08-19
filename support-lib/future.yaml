@@ -51,5 +51,5 @@ swiftxx:
 c:
   typename: 'djinni_future_ref'
   translator: '::djinni::c_api::Future'
-  public_header: '"djinni_c.h"'
+  public_header: '"$djinni_c.h"'
   private_header: '"$djinni_c_helpers.hpp"'

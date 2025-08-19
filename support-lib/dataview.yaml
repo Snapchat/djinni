@@ -48,5 +48,5 @@ swiftxx:
 c:
   typename: 'djinni_binary_ref'
   translator: '::djinni::c_api::DataView'
-  public_header: '"djinni_c.h"'
+  public_header: '"$djinni_c.h"'
   private_header: '"$djinni_c_helpers.hpp"'

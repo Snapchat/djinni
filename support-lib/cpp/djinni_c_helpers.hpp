@@ -143,11 +143,14 @@ private:
 class Optional {
 public:
   template <typename Opt, typename T> static T fromCppPrimitive(Opt value) {
-    T out = {0};
+    T out;
 
     if (value) {
       out.has_value = true;
       out.value = value.value();
+    } else {
+      out.has_value = false;
+      out.value = 0;
     }
 
     return out;

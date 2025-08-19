@@ -12,7 +12,7 @@
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
-  * 
+  *
   * This file has been modified by Snap, Inc.
   */
 
@@ -112,6 +112,7 @@ object Main {
     var composerIncludeCppPrefix: String = ""
     var composerBaseLibIncludePrefix: String = ""
     var cOutFolder: Option[File] = None
+    var cHeaderOutFolderOptional: Option[File] = None
     var cNamespace: String = ""
     var cBaseLibIncludePrefix: String = ""
     var cIncludePrefix: String = ""
@@ -309,6 +310,8 @@ object Main {
         .text("The output for the C files (Generated disabled if unspecified).")
       opt[String]("c-namespace").valueName("<namespace.").foreach(x => cNamespace = x)
         .text("The C namespace, used as function prefixes for generated functions")
+      opt[File]("c-header-out").valueName("<out-folder>").foreach(x => cHeaderOutFolderOptional = Some(x))
+        .text("The output folder for C header files (default: the same as --c-out).")
       opt[String]("c-base-lib-include-prefix").valueName("...").foreach(x => cBaseLibIncludePrefix = x)
         .text("The C base library's include path, relative to the C files.")
       opt[String]("c-include-prefix").valueName("...").foreach(x => cIncludePrefix = x)
@@ -373,6 +376,7 @@ object Main {
     }
 
     val cppHeaderOutFolder = if (cppHeaderOutFolderOptional.isDefined) cppHeaderOutFolderOptional else cppOutFolder
+    val cHeaderOutFolder = if (cHeaderOutFolderOptional.isDefined) cHeaderOutFolderOptional else cOutFolder
     val jniHeaderOutFolder = if (jniHeaderOutFolderOptional.isDefined) jniHeaderOutFolderOptional else jniOutFolder
     val jniClassIdentStyle = jniClassIdentStyleOptional.getOrElse(cppIdentStyle.ty)
     val jniBaseLibClassIdentStyle = jniBaseLibClassIdentStyleOptional.getOrElse(jniClassIdentStyle)
@@ -533,6 +537,7 @@ object Main {
       composerFileIdentStyle,
       composerTsOutFolder,
       cOutFolder,
+      cHeaderOutFolder,
       cNamespace,
       cBaseLibIncludePrefix,
       cIncludePrefix,

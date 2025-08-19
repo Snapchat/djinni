@@ -39,6 +39,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   val tsMarshal = new TsGenerator(spec, false)
   val swiftMarshal = new SwiftMarshal(spec)
   val swiftxxMarshal = new SwiftxxMarshal(spec)
+  val cMarshal = new CGenerator(spec)
 
   case class QuotedString(str: String) // For anything that migt require escaping
 
@@ -88,6 +89,11 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     }
     if (spec.swiftxxOutFolder.isDefined) {
       w.wl("swiftxx:").nested {write(w, swiftxx(td))}
+    }
+    if (spec.cOutFolder.isDefined) {
+      w.wl("c:").nested {
+        write(w, c(td))
+      }
     }
   }
 
@@ -226,6 +232,13 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   private def swiftxx(td: TypeDecl) = Map[String, Any](
     "translator" -> QuotedString(swiftxxMarshal.helperName(mexpr(td))),
     "header" -> QuotedString(swiftxxMarshal.include(td.ident))
+  )
+
+  private def c(td: TypeDecl) = Map[String, Any](
+    "typename" -> QuotedString(cMarshal.typename(td)),
+    "translator" -> QuotedString(cMarshal.helperName(td)),
+    "public_header" -> QuotedString(cMarshal.publicHeader(td)),
+    "private_header" -> QuotedString(cMarshal.privateHeader(td))
   )
 
   // TODO: there has to be a way to do all this without the MExpr/Meta conversions?

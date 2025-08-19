@@ -50,6 +50,6 @@ swiftxx:
 c:
   typename: 'djinni_outcome_ref'
   translator: '::djinni::c_api::Outcome'
-  public_header: '"djinni_c.h"'
+  public_header: '"$djinni_c.h"'
   private_header: '"$djinni_c_helpers.hpp"'
 

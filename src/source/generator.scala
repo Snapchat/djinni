@@ -114,6 +114,7 @@ package object generatorTools {
                    composerFileIdentStyle: IdentConverter,
                    composerTsOutFolder: Option[File],
                    cOutFolder: Option[File],
+                   cHeaderOutFolder: Option[File],
                    cNamespace: String,
                    cBaseLibIncludePrefix: String,
                    cIncludePrefix: String,
@@ -340,6 +341,7 @@ package object generatorTools {
       if (spec.cOutFolder.isDefined) {
         if (!spec.skipGeneration) {
           createFolder("C", spec.cOutFolder.get)
+          createFolder("C header", spec.cHeaderOutFolder.get)
         }
               new CGenerator(spec).generate(idl)
       }

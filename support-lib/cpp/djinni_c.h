@@ -80,10 +80,16 @@ uint64_t djinni_date_get_epoch(djinni_date_ref date);
                                                                                \
   inline djinni_optional_##__type__ djinni_optional_##__type__##_make(         \
       __type__ value) {                                                        \
-    return (djinni_optional_##__type__){.value = value, .has_value = true};    \
+    djinni_optional_##__type__ output;                                         \
+    output.value = value;                                                      \
+    output.has_value = true;                                                   \
+    return output;                                                             \
   }                                                                            \
   inline djinni_optional_##__type__ djinni_optional_##__type__##_empty() {     \
-    return (djinni_optional_##__type__){.value = 0, .has_value = false};       \
+    djinni_optional_##__type__ output;                                         \
+    output.value = 0;                                                          \
+    output.has_value = false;                                                  \
+    return output;                                                             \
   }
 
 DJINNI_OPTIONAL_PRIMITIVE(bool);

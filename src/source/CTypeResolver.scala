@@ -166,26 +166,27 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     addPublicImport(q(spec.cIncludePrefix + name + ".h"))
   }
 
-  private def resolveEnum(name: String, cppTypename: String, asBoxed: Boolean): CTypeTranslator = {
-    val typename = valueTypeName(name)
+  private def resolveEnum(name: String, body: ast.TypeDef, asBoxed: Boolean): CTypeTranslator = {
+    val translator = getTranslatorNameForType(name, body)
     if (asBoxed) {
       new CTypeTranslator("djinni_number_ref",
         true,
-        (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::toCppBoxed(${p})",
-        (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::fromCppBoxed(${p})"
+        (p) => s"${translator}::toCppBoxed(${p})",
+        (p) => s"${translator}::fromCppBoxed(${p})"
       )
     } else {
+      val typename = valueTypeName(name)
       new CTypeTranslator(typename,
         false,
-        (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::toCpp(${p})",
-        (p) => s"::djinni::c_api::Enum<${cppTypename}, ${typename}>::fromCpp(${p})"
+        (p) => s"${translator}::toCpp(${p})",
+        (p) => s"${translator}::fromCpp(${p})"
       )
     }
   }
 
   private def resolveExtern(expr: MExpr, defType: meta.DefType, c: meta.MExtern.C): CTypeTranslator = {
     updatePrivateImports(expr.base)
-    addPublicImport(c.publicHeader)
+    addPublicImport(cppMarshal.resolveExtCppHdr(c.publicHeader))
     privateImports.add("#include " + cppMarshal.resolveExtCppHdr(c.privateHeader))
 
     val resolvedTranslator: String = if (expr.args.isEmpty) {
@@ -203,6 +204,19 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     makeTranslator(c.typename, isRefType, resolvedTranslator)
   }
 
+  def getTranslatorNameForType(name: String, td: ast.TypeDef): String = {
+    val cppTypename = cppMarshal.fqTypename(name, td)
+     td match {
+      case ast.Enum(_, _) => {
+        val typename = valueTypeName(name)
+        s"::djinni::c_api::Enum<${cppTypename}, ${typename}>"
+      }
+      case ast.Record(_, _, _, _) => s"::djinni::c_api::Record<${cppTypename}>"
+      case ast.Interface(_, _, _) => s"::djinni::c_api::Interface<${cppTypename}>"
+      case ast.ProtobufMessage(_, _, _, _, _) => throw new AssertionError("Unsupported")
+    }
+  }
+
   def resolve(expr: MExpr): CTypeTranslator = {
     resolve(expr, asBoxed = false)
   }
@@ -215,20 +229,13 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
       case meta.MDef(name, _, _, body) => {
         updatePrivateImports(expr.base)
         addPublicImportFromDef(name)
-        val cppTypename = cppMarshal.fqTypename(name, body)
         body match {
-          case ast.Enum(_, _) => resolveEnum(name, cppTypename, asBoxed)
-          case ast.Record(_, _, _, _) => makeTranslator(
+          case ast.Enum(_, _) => resolveEnum(name, body, asBoxed)
+          case _ => makeTranslator(
             ptrTypeName(name),
             isRefType = true,
-            s"::djinni::c_api::Record<${cppTypename}>"
+            getTranslatorNameForType(name, body)
           )
-          case ast.Interface(_, _, _) => makeTranslator(
-            ptrTypeName(name),
-            isRefType = true,
-            s"::djinni::c_api::Interface<${cppTypename}>"
-          )
-          case ast.ProtobufMessage(_, _, _, _, _) => throw new AssertionError("Unsupported")
         }
       }
       case meta.MExtern(_, _, defType, _, _, _, _, _, _, _, _, _, _, _, c) => resolveExtern(expr, defType, c)
