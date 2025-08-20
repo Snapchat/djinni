@@ -3,6 +3,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 typedef void *djinni_ref;
 
 typedef djinni_ref djinni_string_ref;
@@ -96,3 +100,7 @@ DJINNI_OPTIONAL_PRIMITIVE(int32_t);
 DJINNI_OPTIONAL_PRIMITIVE(int64_t);
 DJINNI_OPTIONAL_PRIMITIVE(float);
 DJINNI_OPTIONAL_PRIMITIVE(double);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus

@@ -102,7 +102,8 @@ object MExtern {
                 typename: String,
                 publicHeader: String,
                 privateHeader: String,
-                  translator: String
+                  translator: String,
+                ignoreTypeParams: Boolean
               )
 }
 case class MProtobuf(name: String, override val numParams: Int, body: ProtobufMessage) extends Meta

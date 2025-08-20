@@ -8,6 +8,7 @@
 #include "proto/cpp/test.pb.h"
 #include "proto_tests.h"
 #include "test_helpers.h"
+#include "test_outcome.h"
 #include "gtest/gtest.h"
 #include <memory>
 
@@ -413,9 +414,9 @@ TEST(DjinniCAPI, supportsBinaryRef) {
   dataHolder->data[2] = 100;
 
   {
-    auto input =
-        CRef(djinni_binary_new_with_bytes(dataHolder->data.data(), dataHolder->data.size(),
-                               dataHolder.get(), &data_holder_free_callback));
+    auto input = CRef(djinni_binary_new_with_bytes(
+        dataHolder->data.data(), dataHolder->data.size(), dataHolder.get(),
+        &data_holder_free_callback));
     auto received =
         CRef(testsuite_DataRefTest_sendDataView(ref.value, input.value));
 
@@ -521,6 +522,27 @@ TEST(DjinniCAPI, supportsProto) {
 
   ASSERT_EQ(std::string("World"),
             std::string(djinni_string_get_data(retrievedName2.value)));
+}
+
+TEST(DjinniCAPI, supportsOutcome) {
+  auto result = CRef(testsuite_test_outcome_getSuccessOutcome());
+
+  ASSERT_TRUE(djinni_outcome_is_success(result.value));
+  ASSERT_FALSE(djinni_outcome_is_error(result.value));
+
+  auto value = CRef(djinni_outcome_get_value(result.value));
+
+  ASSERT_EQ(std::string("hello"),
+            std::string(djinni_string_get_data(value.value)));
+
+  auto failure = CRef(testsuite_test_outcome_getErrorOutcome());
+
+  ASSERT_FALSE(djinni_outcome_is_success(failure.value));
+  ASSERT_TRUE(djinni_outcome_is_error(failure.value));
+
+  auto error = CRef(djinni_outcome_get_error(failure.value));
+
+  ASSERT_EQ(42, djinni_number_get_int64(error.value));
 }
 
 } // namespace djinni

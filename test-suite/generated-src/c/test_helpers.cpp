@@ -183,25 +183,25 @@ djinni_binary_ref testsuite_test_helpers_id_binary(djinni_binary_ref b)
 djinni_future_ref testsuite_test_helpers_get_async_result()
 {
     auto retValue = ::testsuite::TestHelpers::get_async_result();
-    return ::djinni::c_api::FutureTranslator<int32_t>::fromCpp(std::move(retValue));
+    return ::djinni::c_api::FutureTranslator<int32_t>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(std::forward<decltype(value)>(value)); });
 }
 
 djinni_future_ref testsuite_test_helpers_future_roundtrip(djinni_future_ref f)
 {
-    auto retValue = ::testsuite::TestHelpers::future_roundtrip(::djinni::c_api::FutureTranslator<int32_t>::toCpp(f));
-    return ::djinni::c_api::FutureTranslator<std::string>::fromCpp(std::move(retValue));
+    auto retValue = ::testsuite::TestHelpers::future_roundtrip(::djinni::c_api::FutureTranslator<int32_t>::toCpp(f, [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int32_t>(std::forward<decltype(value)>(value)); }));
+    return ::djinni::c_api::FutureTranslator<std::string>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
 }
 
 djinni_future_ref testsuite_test_helpers_async_early_throw()
 {
     auto retValue = ::testsuite::TestHelpers::async_early_throw();
-    return ::djinni::c_api::FutureTranslator<int32_t>::fromCpp(std::move(retValue));
+    return ::djinni::c_api::FutureTranslator<int32_t>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(std::forward<decltype(value)>(value)); });
 }
 
 djinni_future_ref testsuite_test_helpers_void_async_method(djinni_future_ref f)
 {
-    auto retValue = ::testsuite::TestHelpers::void_async_method(::djinni::c_api::FutureTranslator<void>::toCpp(f));
-    return ::djinni::c_api::FutureTranslator<void>::fromCpp(std::move(retValue));
+    auto retValue = ::testsuite::TestHelpers::void_async_method(::djinni::c_api::FutureTranslator<void>::toCpp(f, [](auto&& value) { return std::forward<decltype(value)>(value); }));
+    return ::djinni::c_api::FutureTranslator<void>::fromCpp(std::move(retValue), [](auto&& value) { return std::forward<decltype(value)>(value); });
 }
 
 /**
@@ -210,27 +210,27 @@ djinni_future_ref testsuite_test_helpers_void_async_method(djinni_future_ref f)
  */
 djinni_future_ref testsuite_test_helpers_add_one_if_present(djinni_future_ref f)
 {
-    auto retValue = ::testsuite::TestHelpers::add_one_if_present(::djinni::c_api::FutureTranslator<std::experimental::optional<int32_t>>::toCpp(f));
-    return ::djinni::c_api::FutureTranslator<std::experimental::optional<int32_t>>::fromCpp(std::move(retValue));
+    auto retValue = ::testsuite::TestHelpers::add_one_if_present(::djinni::c_api::FutureTranslator<std::experimental::optional<int32_t>>::toCpp(f, [](auto&& value) { return ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<int32_t>>(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int32_t>(std::forward<decltype(value)>(value)); }); }));
+    return ::djinni::c_api::FutureTranslator<std::experimental::optional<int32_t>>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<int32_t>>(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(std::forward<decltype(value)>(value)); }); });
 }
 
 /** try-catches the future f, and accesses the error message, and returns as a string. */
 djinni_future_ref testsuite_test_helpers_return_exception_string(djinni_future_ref f)
 {
-    auto retValue = ::testsuite::TestHelpers::return_exception_string(::djinni::c_api::FutureTranslator<int32_t>::toCpp(f));
-    return ::djinni::c_api::FutureTranslator<std::string>::fromCpp(std::move(retValue));
+    auto retValue = ::testsuite::TestHelpers::return_exception_string(::djinni::c_api::FutureTranslator<int32_t>::toCpp(f, [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int32_t>(std::forward<decltype(value)>(value)); }));
+    return ::djinni::c_api::FutureTranslator<std::string>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
 }
 
 djinni_future_ref testsuite_test_helpers_check_async_interface(testsuite_async_interface_ref i)
 {
     auto retValue = ::testsuite::TestHelpers::check_async_interface(::djinni::c_api::InterfaceTranslator<::testsuite::AsyncInterface>::toCpp(i));
-    return ::djinni::c_api::FutureTranslator<std::string>::fromCpp(std::move(retValue));
+    return ::djinni::c_api::FutureTranslator<std::string>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
 }
 
 djinni_future_ref testsuite_test_helpers_check_async_composition(testsuite_async_interface_ref i)
 {
     auto retValue = ::testsuite::TestHelpers::check_async_composition(::djinni::c_api::InterfaceTranslator<::testsuite::AsyncInterface>::toCpp(i));
-    return ::djinni::c_api::FutureTranslator<std::string>::fromCpp(std::move(retValue));
+    return ::djinni::c_api::FutureTranslator<std::string>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
 }
 
 djinni_array_ref testsuite_test_helpers_get_optional_list()

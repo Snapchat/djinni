@@ -341,7 +341,8 @@ object YamlGenerator {
       getOptionalField(td, "c", "typename"),
       getOptionalField(td, "c", "public_header"),
       getOptionalField(td, "c", "private_header"),
-      getOptionalField(td, "c", "translator")
+      getOptionalField(td, "c", "translator"),
+      getOptionalField(td, "c", "ignore_type_params", false)
   )
   )
 

@@ -310,13 +310,12 @@ public:
 template <typename T> class RecordTranslator {
 public:
   template <typename... Args> static djinni_record_ref make(Args &&...args) {
-    Object *obj = new RecordHolder<T>(T(std::forward<Args>(args)...));
-    return reinterpret_cast<djinni_record_ref>(obj);
+    auto *obj = new RecordHolder<T>(T(std::forward<Args>(args)...));
+    return toC(obj);
   }
 
   static T &toCpp(djinni_record_ref ref) {
-    auto *record =
-        static_cast<RecordHolder<T> *>(reinterpret_cast<Object *>(ref));
+    auto *record = fromC<RecordHolder<T>>(ref);
     if (record == nullptr) {
       std::abort();
     }
@@ -329,15 +328,14 @@ public:
   static djinni_record_ref fromCpp(const T &value) { return make(value); }
 
   static void release(djinni_record_ref ptr) {
-    Object::release(reinterpret_cast<Object *>(ptr));
+    Object::release(fromC<Object>(ptr));
   }
 };
 
 template <typename T> class InterfaceTranslator {
 public:
   static const std::shared_ptr<T> &toCpp(djinni_interface_ref ref) {
-    auto *i =
-        static_cast<InterfaceHolder<T> *>(reinterpret_cast<Object *>(ref));
+    auto *i = fromC<InterfaceHolder<T>>(ref);
     if (i == nullptr) {
       std::abort();
     }
@@ -347,7 +345,7 @@ public:
 
   static djinni_interface_ref fromCpp(std::shared_ptr<T> value) {
     Object *obj = new InterfaceHolder<T>(std::move(value));
-    return reinterpret_cast<djinni_interface_ref>(obj);
+    return toC(obj);
   }
 };
 
@@ -355,14 +353,14 @@ template <typename T, typename PT> class ProxyTranslator {
 public:
   static djinni_proxy_class_ref
   makeClass(const PT *methodDefs, djinni_opaque_deallocator opaqueDeallocator) {
-    Object *obj = new ::djinni::ProxyClass<PT>(*methodDefs, opaqueDeallocator);
-    return reinterpret_cast<djinni_proxy_class_ref>(obj);
+    auto *proxyClass =
+        new ::djinni::ProxyClass<PT>(*methodDefs, opaqueDeallocator);
+    return toC(proxyClass);
   }
 
   static djinni_interface_ref make(djinni_proxy_class_ref proxyClassRef,
                                    void *opaque) {
-    auto *proxyClass = static_cast<::djinni::ProxyClass<PT> *>(
-        reinterpret_cast<Object *>(proxyClassRef));
+    auto *proxyClass = fromC<::djinni::ProxyClass<PT>>(proxyClassRef);
 
     return ::djinni::c_api::InterfaceTranslator<T>::fromCpp(
         std::make_shared<T>(proxyClass, opaque));

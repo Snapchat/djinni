@@ -168,4 +168,12 @@ private:
   void *_opaque;
 };
 
+inline void *toC(Object *obj) {
+  return reinterpret_cast<void *>(obj);
+}
+
+template <typename T> static T *fromC(void *ref) {
+  return static_cast<T *>(reinterpret_cast<Object *>(ref));
+}
+
 } // namespace djinni

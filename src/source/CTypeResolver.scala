@@ -71,17 +71,22 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     }
   }
 
-  private def makeNestedTranslator(inner: CTypeTranslator, typename: String, toCppTranslator: String, fromCppTranslator: String): CTypeTranslator = {
+  private def makeNestedTranslatorFunctionPairs(inner: CTypeTranslator): (String, String) = {
     val innerValueParamName = s"std::forward<decltype(value)>(value)"
+    val innerToCpp = inner.toCppTranslatorFn(innerValueParamName)
+    val innerFromCpp = inner.fromCppTranslatorFn(innerValueParamName)
+    (s"[](auto&& value) { return ${innerToCpp}; }", s"[](auto&& value) { return ${innerFromCpp}; }")
+  }
+
+  private def makeNestedTranslator(inner: CTypeTranslator, typename: String, toCppTranslator: String, fromCppTranslator: String): CTypeTranslator = {
+    val (toCppFn, fromCppFn) = makeNestedTranslatorFunctionPairs(inner)
     new CTypeTranslator(typename,
       true,
       (p) => {
-        val innerToCpp = inner.toCppTranslatorFn(innerValueParamName)
-        s"${toCppTranslator}(${p}, [](auto&& value) { return ${innerToCpp}; })"
+        s"${toCppTranslator}(${p}, ${toCppFn})"
       },
       (p) => {
-        val innerFromCpp = inner.fromCppTranslatorFn(innerValueParamName)
-        s"$fromCppTranslator(${p}, [](auto&& value) { return ${innerFromCpp}; })"
+        s"$fromCppTranslator(${p}, ${fromCppFn})"
       }
     )
   }
@@ -193,13 +198,28 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     addPublicImport(cppMarshal.resolveExtCppHdr(c.publicHeader))
     privateImports.add("#include " + cppMarshal.resolveExtCppHdr(c.privateHeader))
 
-    val resolvedTranslator: String = if (expr.args.isEmpty) {
-      c.translator
-    } else {
-      // Resolve to get the includes
-      expr.args.foreach(a => resolve(a))
+    if (expr.args.nonEmpty) {
+      val argsTranslators = expr.args.map(a => resolve(a, asBoxed = true))
       val templateArgs = expr.args.map(a => cppMarshal.fqTypename(a)).mkString(", ")
-      s"${c.translator}<${templateArgs}>"
+      val translator = s"${c.translator}<${templateArgs}>"
+
+      if (c.ignoreTypeParams) {
+        return new CTypeTranslator(c.typename,
+          true,
+          (p) => s"${translator}::toCpp(${p})",
+          (p) => s"${translator}::fromCpp(${p})"
+        )
+      } else {
+        val translatorFnPairs = argsTranslators.map(t => makeNestedTranslatorFunctionPairs(t))
+        val toCppFns = translatorFnPairs.map(p => p._1).mkString(", ")
+        val fromCppFns = translatorFnPairs.map(p => p._2).mkString(", ")
+
+        return new CTypeTranslator(c.typename,
+          true,
+          (p) => s"${translator}::toCpp(${p}, ${toCppFns})",
+          (p) => s"${translator}::fromCpp(${p}, ${fromCppFns})"
+        )
+      }
     }
 
     val isEnum = defType match {
@@ -208,9 +228,9 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     }
 
     if (isEnum) {
-      doResolveEnum(c.typename, resolvedTranslator, asBoxed)
+      doResolveEnum(c.typename, c.translator, asBoxed)
     } else {
-      makeTranslator(c.typename, isRefType = true, resolvedTranslator)
+      makeTranslator(c.typename, isRefType = true, c.translator)
     }
   }
 

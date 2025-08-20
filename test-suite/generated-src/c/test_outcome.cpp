@@ -27,24 +27,24 @@ testsuite_test_outcome_ref testsuite_test_outcome_new(testsuite_test_outcome_pro
 djinni_outcome_ref testsuite_test_outcome_getSuccessOutcome()
 {
     auto retValue = ::testsuite::TestOutcome::getSuccessOutcome();
-    return ::djinni::c_api::OutcomeTranslator<std::string, int32_t>::fromCpp(std::move(retValue));
+    return ::djinni::c_api::OutcomeTranslator<std::string, int32_t>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); }, [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(std::forward<decltype(value)>(value)); });
 }
 
 djinni_outcome_ref testsuite_test_outcome_getErrorOutcome()
 {
     auto retValue = ::testsuite::TestOutcome::getErrorOutcome();
-    return ::djinni::c_api::OutcomeTranslator<std::string, int32_t>::fromCpp(std::move(retValue));
+    return ::djinni::c_api::OutcomeTranslator<std::string, int32_t>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); }, [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(std::forward<decltype(value)>(value)); });
 }
 
 djinni_string_ref testsuite_test_outcome_putSuccessOutcome(djinni_outcome_ref x)
 {
-    auto retValue = ::testsuite::TestOutcome::putSuccessOutcome(::djinni::c_api::OutcomeTranslator<std::string, int32_t>::toCpp(x));
+    auto retValue = ::testsuite::TestOutcome::putSuccessOutcome(::djinni::c_api::OutcomeTranslator<std::string, int32_t>::toCpp(x, [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); }, [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int32_t>(std::forward<decltype(value)>(value)); }));
     return ::djinni::c_api::StringTranslator::fromCpp(std::move(retValue));
 }
 
 int32_t testsuite_test_outcome_putErrorOutcome(djinni_outcome_ref x)
 {
-    auto retValue = ::testsuite::TestOutcome::putErrorOutcome(::djinni::c_api::OutcomeTranslator<std::string, int32_t>::toCpp(x));
+    auto retValue = ::testsuite::TestOutcome::putErrorOutcome(::djinni::c_api::OutcomeTranslator<std::string, int32_t>::toCpp(x, [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); }, [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int32_t>(std::forward<decltype(value)>(value)); }));
     return std::move(retValue);
 }
 

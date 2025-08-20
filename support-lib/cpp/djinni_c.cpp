@@ -3,12 +3,6 @@
 
 using namespace djinni;
 
-static djinni_ref toC(Object *obj) { return reinterpret_cast<djinni_ref>(obj); }
-
-template <typename T> static T *fromC(djinni_ref ref) {
-  return static_cast<T *>(reinterpret_cast<Object *>(ref));
-}
-
 void djinni_ref_retain(djinni_ref ref) { Object::retain(fromC<Object>(ref)); }
 
 void djinni_ref_release(djinni_ref ref) { Object::release(fromC<Object>(ref)); }

@@ -102,7 +102,7 @@ djinni_binary_ref testsuite_proto_tests_stringToOptionalProto(djinni_string_ref 
 djinni_outcome_ref testsuite_proto_tests_stringToProtoOutcome(djinni_string_ref x)
 {
     auto retValue = ::testsuite::ProtoTests::stringToProtoOutcome(::djinni::c_api::StringTranslator::toCpp(x));
-    return ::djinni::c_api::OutcomeTranslator<::djinni::test::Person, int32_t>::fromCpp(std::move(retValue));
+    return ::djinni::c_api::OutcomeTranslator<::djinni::test::Person, int32_t>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::ProtobufTranslator<::djinni::test::Person>::fromCpp(std::forward<decltype(value)>(value)); }, [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(std::forward<decltype(value)>(value)); });
 }
 
 

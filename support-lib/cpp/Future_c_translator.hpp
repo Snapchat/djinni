@@ -21,7 +21,8 @@ namespace djinni::c_api {
 
 template <typename T> class FutureTranslator {
 public:
-  static ::djinni::Future<T> toCpp(djinni_future_ref future) {
+  template <typename F>
+  static ::djinni::Future<T> toCpp(djinni_future_ref future, F &&toCpp) {
     auto *futureHolder = static_cast<::djinni::FutureHolder<T> *>(
         reinterpret_cast<Object *>(future));
 
@@ -31,7 +32,8 @@ public:
         [](::djinni::Future<T> value) { return value.get(); });
   }
 
-  static djinni_future_ref fromCpp(::djinni::Future<T> &&future) {
+  template <typename F>
+  static djinni_future_ref fromCpp(::djinni::Future<T> &&future, F &&fromCpp) {
     Object *futureHolder = new ::djinni::FutureHolder<T>(std::move(future));
 
     return reinterpret_cast<djinni_future_ref>(futureHolder);

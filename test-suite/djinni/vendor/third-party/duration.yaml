@@ -50,6 +50,7 @@ c:
   translator: '::djinni::c_api::DurationTranslator'
   public_header: '"djinni_c.h"'
   private_header: '"$duration_c_translator.hpp"'
+  ignore_type_params: true
 ---
 name: h
 typedef: 'record'
