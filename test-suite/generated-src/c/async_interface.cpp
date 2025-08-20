@@ -26,11 +26,11 @@ struct AsyncInterface_Proxy: public Proxy_Parent, public ::testsuite::AsyncInter
 };
 
 testsuite_async_interface_proxy_class_ref testsuite_async_interface_proxy_class_new(const testsuite_async_interface_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<AsyncInterface_Proxy, testsuite_async_interface_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_async_interface_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_async_interface_ref testsuite_async_interface_new(testsuite_async_interface_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<AsyncInterface_Proxy, testsuite_async_interface_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_async_interface_method_defs>::make<AsyncInterface_Proxy, ::testsuite::AsyncInterface>(proxy_class, opaque);
 }
 
 djinni_future_ref testsuite_async_interface_future_roundtrip(testsuite_async_interface_ref instance, djinni_future_ref f)

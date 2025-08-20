@@ -22,11 +22,11 @@ struct ReturnTwo_Proxy: public Proxy_Parent, public ::testsuite::ReturnTwo  {
 };
 
 testsuite_return_two_proxy_class_ref testsuite_return_two_proxy_class_new(const testsuite_return_two_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<ReturnTwo_Proxy, testsuite_return_two_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_return_two_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_return_two_ref testsuite_return_two_new(testsuite_return_two_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<ReturnTwo_Proxy, testsuite_return_two_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_return_two_method_defs>::make<ReturnTwo_Proxy, ::testsuite::ReturnTwo>(proxy_class, opaque);
 }
 
 testsuite_return_two_ref testsuite_return_two_get_instance()

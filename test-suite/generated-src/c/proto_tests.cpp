@@ -20,11 +20,11 @@ struct ProtoTests_Proxy: public Proxy_Parent, public ::testsuite::ProtoTests  {
 };
 
 testsuite_proto_tests_proxy_class_ref testsuite_proto_tests_proxy_class_new(const testsuite_proto_tests_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<ProtoTests_Proxy, testsuite_proto_tests_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_proto_tests_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_proto_tests_ref testsuite_proto_tests_new(testsuite_proto_tests_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<ProtoTests_Proxy, testsuite_proto_tests_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_proto_tests_method_defs>::make<ProtoTests_Proxy, ::testsuite::ProtoTests>(proxy_class, opaque);
 }
 
 djinni_array_ref testsuite_proto_tests_protoToStrings(djinni_binary_ref x)

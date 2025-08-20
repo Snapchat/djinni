@@ -43,11 +43,11 @@ struct ReverseClientInterface_Proxy: public Proxy_Parent, public ::testsuite::Re
 };
 
 testsuite_reverse_client_interface_proxy_class_ref testsuite_reverse_client_interface_proxy_class_new(const testsuite_reverse_client_interface_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<ReverseClientInterface_Proxy, testsuite_reverse_client_interface_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_reverse_client_interface_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_reverse_client_interface_ref testsuite_reverse_client_interface_new(testsuite_reverse_client_interface_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<ReverseClientInterface_Proxy, testsuite_reverse_client_interface_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_reverse_client_interface_method_defs>::make<ReverseClientInterface_Proxy, ::testsuite::ReverseClientInterface>(proxy_class, opaque);
 }
 
 djinni_string_ref testsuite_reverse_client_interface_return_str(testsuite_reverse_client_interface_ref instance)

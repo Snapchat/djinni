@@ -18,11 +18,11 @@ struct SecondListener_Proxy: public Proxy_Parent, public ::testsuite::SecondList
 };
 
 testsuite_second_listener_proxy_class_ref testsuite_second_listener_proxy_class_new(const testsuite_second_listener_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<SecondListener_Proxy, testsuite_second_listener_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_second_listener_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_second_listener_ref testsuite_second_listener_new(testsuite_second_listener_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<SecondListener_Proxy, testsuite_second_listener_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_second_listener_method_defs>::make<SecondListener_Proxy, ::testsuite::SecondListener>(proxy_class, opaque);
 }
 
 void testsuite_second_listener_second(testsuite_second_listener_ref instance)

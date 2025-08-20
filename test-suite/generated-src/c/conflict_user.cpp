@@ -32,11 +32,11 @@ struct ConflictUser_Proxy: public Proxy_Parent, public ::testsuite::ConflictUser
 };
 
 testsuite_conflict_user_proxy_class_ref testsuite_conflict_user_proxy_class_new(const testsuite_conflict_user_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<ConflictUser_Proxy, testsuite_conflict_user_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_conflict_user_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_conflict_user_ref testsuite_conflict_user_new(testsuite_conflict_user_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<ConflictUser_Proxy, testsuite_conflict_user_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_conflict_user_method_defs>::make<ConflictUser_Proxy, ::testsuite::ConflictUser>(proxy_class, opaque);
 }
 
 testsuite_Conflict_ref testsuite_conflict_user_Conflict(testsuite_conflict_user_ref instance)

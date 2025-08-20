@@ -23,11 +23,11 @@ struct ListenerCaller_Proxy: public Proxy_Parent, public ::testsuite::ListenerCa
 };
 
 testsuite_listener_caller_proxy_class_ref testsuite_listener_caller_proxy_class_new(const testsuite_listener_caller_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<ListenerCaller_Proxy, testsuite_listener_caller_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_listener_caller_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_listener_caller_ref testsuite_listener_caller_new(testsuite_listener_caller_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<ListenerCaller_Proxy, testsuite_listener_caller_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_listener_caller_method_defs>::make<ListenerCaller_Proxy, ::testsuite::ListenerCaller>(proxy_class, opaque);
 }
 
 testsuite_listener_caller_ref testsuite_listener_caller_init(testsuite_first_listener_ref first_l, testsuite_second_listener_ref second_l)

@@ -15,11 +15,11 @@ struct TestArray_Proxy: public Proxy_Parent, public ::testsuite::TestArray  {
 };
 
 testsuite_test_array_proxy_class_ref testsuite_test_array_proxy_class_new(const testsuite_test_array_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<TestArray_Proxy, testsuite_test_array_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_test_array_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_test_array_ref testsuite_test_array_new(testsuite_test_array_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<TestArray_Proxy, testsuite_test_array_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_test_array_method_defs>::make<TestArray_Proxy, ::testsuite::TestArray>(proxy_class, opaque);
 }
 
 djinni_array_ref testsuite_test_array_testStringArray(djinni_array_ref a)

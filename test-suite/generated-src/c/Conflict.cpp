@@ -14,11 +14,11 @@ struct Conflict_Proxy: public Proxy_Parent, public ::testsuite::Conflict  {
 };
 
 testsuite_Conflict_proxy_class_ref testsuite_Conflict_proxy_class_new(const testsuite_Conflict_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<Conflict_Proxy, testsuite_Conflict_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_Conflict_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_Conflict_ref testsuite_Conflict_new(testsuite_Conflict_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<Conflict_Proxy, testsuite_Conflict_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_Conflict_method_defs>::make<Conflict_Proxy, ::testsuite::Conflict>(proxy_class, opaque);
 }
 
 

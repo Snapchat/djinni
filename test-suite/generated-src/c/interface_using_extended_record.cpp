@@ -25,11 +25,11 @@ struct InterfaceUsingExtendedRecord_Proxy: public Proxy_Parent, public ::testsui
 };
 
 testsuite_interface_using_extended_record_proxy_class_ref testsuite_interface_using_extended_record_proxy_class_new(const testsuite_interface_using_extended_record_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<InterfaceUsingExtendedRecord_Proxy, testsuite_interface_using_extended_record_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_interface_using_extended_record_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_interface_using_extended_record_ref testsuite_interface_using_extended_record_new(testsuite_interface_using_extended_record_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<InterfaceUsingExtendedRecord_Proxy, testsuite_interface_using_extended_record_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_interface_using_extended_record_method_defs>::make<InterfaceUsingExtendedRecord_Proxy, ::testsuite::InterfaceUsingExtendedRecord>(proxy_class, opaque);
 }
 
 testsuite_extended_record_ref testsuite_interface_using_extended_record_meth(testsuite_interface_using_extended_record_ref instance, testsuite_extended_record_ref er)

@@ -14,11 +14,11 @@ struct ConstantInterfaceWithEnum_Proxy: public Proxy_Parent, public ::testsuite:
 };
 
 testsuite_constant_interface_with_enum_proxy_class_ref testsuite_constant_interface_with_enum_proxy_class_new(const testsuite_constant_interface_with_enum_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<ConstantInterfaceWithEnum_Proxy, testsuite_constant_interface_with_enum_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_constant_interface_with_enum_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_constant_interface_with_enum_ref testsuite_constant_interface_with_enum_new(testsuite_constant_interface_with_enum_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<ConstantInterfaceWithEnum_Proxy, testsuite_constant_interface_with_enum_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_constant_interface_with_enum_method_defs>::make<ConstantInterfaceWithEnum_Proxy, ::testsuite::ConstantInterfaceWithEnum>(proxy_class, opaque);
 }
 
 

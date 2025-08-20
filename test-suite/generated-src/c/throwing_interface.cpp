@@ -18,11 +18,11 @@ struct ThrowingInterface_Proxy: public Proxy_Parent, public ::testsuite::Throwin
 };
 
 testsuite_throwing_interface_proxy_class_ref testsuite_throwing_interface_proxy_class_new(const testsuite_throwing_interface_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<ThrowingInterface_Proxy, testsuite_throwing_interface_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_throwing_interface_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_throwing_interface_ref testsuite_throwing_interface_new(testsuite_throwing_interface_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<ThrowingInterface_Proxy, testsuite_throwing_interface_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_throwing_interface_method_defs>::make<ThrowingInterface_Proxy, ::testsuite::ThrowingInterface>(proxy_class, opaque);
 }
 
 void testsuite_throwing_interface_throw_exception(testsuite_throwing_interface_ref instance)

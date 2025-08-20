@@ -16,11 +16,11 @@ struct FlagRoundtrip_Proxy: public Proxy_Parent, public ::testsuite::FlagRoundtr
 };
 
 testsuite_flag_roundtrip_proxy_class_ref testsuite_flag_roundtrip_proxy_class_new(const testsuite_flag_roundtrip_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<FlagRoundtrip_Proxy, testsuite_flag_roundtrip_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_flag_roundtrip_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_flag_roundtrip_ref testsuite_flag_roundtrip_new(testsuite_flag_roundtrip_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<FlagRoundtrip_Proxy, testsuite_flag_roundtrip_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_flag_roundtrip_method_defs>::make<FlagRoundtrip_Proxy, ::testsuite::FlagRoundtrip>(proxy_class, opaque);
 }
 
 testsuite_access_flags testsuite_flag_roundtrip_roundtrip_access(testsuite_access_flags flag)

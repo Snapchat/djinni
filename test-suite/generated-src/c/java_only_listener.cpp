@@ -14,11 +14,11 @@ struct JavaOnlyListener_Proxy: public Proxy_Parent, public ::testsuite::JavaOnly
 };
 
 testsuite_java_only_listener_proxy_class_ref testsuite_java_only_listener_proxy_class_new(const testsuite_java_only_listener_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<JavaOnlyListener_Proxy, testsuite_java_only_listener_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_java_only_listener_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_java_only_listener_ref testsuite_java_only_listener_new(testsuite_java_only_listener_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<JavaOnlyListener_Proxy, testsuite_java_only_listener_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_java_only_listener_method_defs>::make<JavaOnlyListener_Proxy, ::testsuite::JavaOnlyListener>(proxy_class, opaque);
 }
 
 

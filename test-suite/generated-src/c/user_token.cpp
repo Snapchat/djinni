@@ -22,11 +22,11 @@ struct UserToken_Proxy: public Proxy_Parent, public ::testsuite::UserToken  {
 };
 
 testsuite_user_token_proxy_class_ref testsuite_user_token_proxy_class_new(const testsuite_user_token_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<UserToken_Proxy, testsuite_user_token_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_user_token_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_user_token_ref testsuite_user_token_new(testsuite_user_token_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<UserToken_Proxy, testsuite_user_token_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_user_token_method_defs>::make<UserToken_Proxy, ::testsuite::UserToken>(proxy_class, opaque);
 }
 
 djinni_string_ref testsuite_user_token_whoami(testsuite_user_token_ref instance)

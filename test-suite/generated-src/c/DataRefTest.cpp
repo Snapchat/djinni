@@ -81,11 +81,11 @@ struct DataRefTest_Proxy: public Proxy_Parent, public ::testsuite::DataRefTest  
 };
 
 testsuite_DataRefTest_proxy_class_ref testsuite_DataRefTest_proxy_class_new(const testsuite_DataRefTest_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<DataRefTest_Proxy, testsuite_DataRefTest_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::ProxyTranslator<testsuite_DataRefTest_method_defs>::makeClass(method_defs, opaque_deallocator);
 }
 
 testsuite_DataRefTest_ref testsuite_DataRefTest_new(testsuite_DataRefTest_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<DataRefTest_Proxy, testsuite_DataRefTest_method_defs>::make(proxy_class, opaque);
+    return ::djinni::c_api::ProxyTranslator<testsuite_DataRefTest_method_defs>::make<DataRefTest_Proxy, ::testsuite::DataRefTest>(proxy_class, opaque);
 }
 
 void testsuite_DataRefTest_sendData(testsuite_DataRefTest_ref instance, djinni_binary_ref data)
