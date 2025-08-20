@@ -1,8 +1,7 @@
 #pragma once
 
 #include <atomic>
-#include <chrono>
-#include <string>
+#include <memory>
 
 namespace djinni {
 
@@ -167,42 +166,6 @@ public:
 private:
   ProxyClass<T> *_proxyClass;
   void *_opaque;
-};
-
-template <typename T> class Ref {
-public:
-  struct AdoptRef {};
-
-  Ref(T ref, AdoptRef adoptRef) : _ref(ref) {}
-
-  Ref(T ref) : _ref(ref) { Object::retain(_ref); }
-
-  ~Ref() { Object::release(_ref); }
-
-  Ref &operator=(const Ref<T> &other) {
-    if (other != &this) {
-      auto old = _ref;
-      _ref = other._ref;
-
-      Object::retain(_ref);
-      Object::release(old);
-    }
-    return *this;
-  }
-
-  Ref &operator=(Ref<T> &&other) {
-    if (other != &this) {
-      auto old = _ref;
-      _ref = other._ref;
-      other._ref = nullptr;
-
-      Object::release(old);
-    }
-    return *this;
-  }
-
-private:
-  T _ref;
 };
 
 } // namespace djinni

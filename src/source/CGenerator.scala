@@ -86,7 +86,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
     writeCFile(origin, ident, "cpp", (w: IndentWriter) => {
       w.wl(s"""#include ${publicHeader(ident)}""")
-      w.wl("#include " + q(spec.cppBaseLibIncludePrefix + "djinni_c_helpers.hpp"))
+      w.wl("#include " + q(spec.cppBaseLibIncludePrefix + "djinni_c_translators.hpp"))
       privateIncludes.foreach(w.wl)
 
       w.wl
@@ -163,7 +163,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       w.wl(") ")
 
       w.braced {
-        w.w(s"""return ::djinni::c_api::Record<${selfCpp}>::make(""")
+        w.w(s"""return ::djinni::c_api::RecordTranslator<${selfCpp}>::make(""")
 
         writeDelimited(w, resolvedFields, ", ")(t => {
           w.w(t.translator.toCppTranslatorFn(t.field.ident.name))
@@ -174,7 +174,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
       w.wl
 
-      val toCppExpr = s"::djinni::c_api::Record<${selfCpp}>::toCpp(instance)"
+      val toCppExpr = s"::djinni::c_api::RecordTranslator<${selfCpp}>::toCpp(instance)"
       for (resolvedField <- resolvedFields) {
         val fieldName = resolvedField.field.ident.name
         val fieldTypename = resolvedField.translator.typename
@@ -338,13 +338,13 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       val proxyClassNameCpp = writeProxyClass(w, ident, methodDefsStructName, resolvedMethods)
       w.w(s"${proxyClassName} ${prefix}_proxy_class_new(const ${methodDefsStructName} *method_defs, djinni_opaque_deallocator opaque_deallocator)")
       w.braced {
-        w.wl(s"return ::djinni::c_api::ProxyClass<${methodDefsStructName}>::make(method_defs, opaque_deallocator);")
+        w.wl(s"return ::djinni::c_api::ProxyTranslator<${proxyClassNameCpp}, ${methodDefsStructName}>::makeClass(method_defs, opaque_deallocator);")
       }
       w.wl
 
       w.w(s"${typeName} ${prefix}_new(${proxyClassName} proxy_class, void *opaque)")
       w.braced {
-        w.wl(s"return ::djinni::c_api::Proxy<${proxyClassNameCpp}, ${methodDefsStructName}>::make(proxy_class, opaque);")
+        w.wl(s"return ::djinni::c_api::ProxyTranslator<${proxyClassNameCpp}, ${methodDefsStructName}>::make(proxy_class, opaque);")
       }
       w.wl
 
@@ -372,7 +372,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
           if (resolvedMethod.method.static) {
             w.w(s"""${selfCpp}::${resolvedMethod.method.ident.name}(""")
           } else {
-            w.w(s"""::djinni::c_api::Interface<${selfCpp}>::toCpp(instance)->${resolvedMethod.method.ident.name}(""")
+            w.w(s"""::djinni::c_api::InterfaceTranslator<${selfCpp}>::toCpp(instance)->${resolvedMethod.method.ident.name}(""")
           }
 
           writeDelimited(w, resolvedMethod.parameters, ", ")(p => {

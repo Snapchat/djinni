@@ -4,7 +4,7 @@
 #pragma once
 
 #include "djinni_c.h"
-#include "djinni_c.h"
+#include "Future_c.h"
 
 #ifdef __cplusplus
 extern "C" {

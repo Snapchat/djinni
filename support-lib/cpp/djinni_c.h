@@ -12,9 +12,6 @@ typedef djinni_ref djinni_array_ref;
 typedef djinni_ref djinni_keyval_array_ref;
 typedef djinni_ref djinni_date_ref;
 
-typedef djinni_ref djinni_outcome_ref;
-typedef djinni_ref djinni_future_ref;
-
 typedef djinni_ref djinni_record_ref;
 typedef djinni_ref djinni_interface_ref;
 typedef djinni_ref djinni_proxy_class_ref;

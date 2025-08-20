@@ -4,9 +4,9 @@
 #pragma once
 
 #include "djinni_c.h"
+#include "Outcome_c.h"
 #include "RecordWithEmbeddedCppProto.h"
 #include "RecordWithEmbeddedProto.h"
-#include "djinni_c.h"
 
 #ifdef __cplusplus
 extern "C" {

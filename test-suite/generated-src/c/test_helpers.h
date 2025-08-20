@@ -4,11 +4,11 @@
 #pragma once
 
 #include "djinni_c.h"
+#include "Future_c.h"
 #include "assorted_primitives.h"
 #include "async_interface.h"
 #include "client_interface.h"
 #include "color.h"
-#include "djinni_c.h"
 #include "map_list_record.h"
 #include "nested_collection.h"
 #include "primitive_list.h"

@@ -96,8 +96,8 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
       val typename = s"djinni_optional_${resolved.typename}"
       new CTypeTranslator(typename,
         false,
-        (p) => s"::djinni::c_api::Optional::toCppPrimitive<${cppOptionalTemplate}, ${typename}>(${resolved.toCppTranslatorFn(p)})",
-        (p) => s"::djinni::c_api::Optional::fromCppPrimitive<${cppOptionalTemplate}, ${typename}>(${resolved.fromCppTranslatorFn(p)})"
+        (p) => s"::djinni::c_api::OptionalTranslator::toCppPrimitive<${cppOptionalTemplate}, ${typename}>(${resolved.toCppTranslatorFn(p)})",
+        (p) => s"::djinni::c_api::OptionalTranslator::fromCppPrimitive<${cppOptionalTemplate}, ${typename}>(${resolved.fromCppTranslatorFn(p)})"
       )
     } else {
       val sharedPtr = cppMarshal.bySharedPtr(expr)
@@ -105,8 +105,8 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
       val fromCppMethodName = if (sharedPtr) "fromSharedPtrCpp" else "fromCpp"
       makeNestedTranslator(resolved,
         resolved.typename,
-        s"::djinni::c_api::Optional::${toCppMethodName}<${cppOptionalTemplate}>",
-        s"::djinni::c_api::Optional::${fromCppMethodName}<${cppOptionalTemplate}>")
+        s"::djinni::c_api::OptionalTranslator::${toCppMethodName}<${cppOptionalTemplate}>",
+        s"::djinni::c_api::OptionalTranslator::${fromCppMethodName}<${cppOptionalTemplate}>")
     }
   }
 
@@ -128,12 +128,12 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
       (p) => {
         val innerToCppKey = resolvedKey.toCppTranslatorFn("key")
         val innerToCppValue = resolvedValue.toCppTranslatorFn("value")
-        s"::djinni::c_api::Map<${cppTypeKey}, ${cppTypeValue}>::toCpp(${p}, [](auto key, auto value) { return std::make_pair(${innerToCppKey}, ${innerToCppValue}); })"
+        s"::djinni::c_api::MapTranslator<${cppTypeKey}, ${cppTypeValue}>::toCpp(${p}, [](auto key, auto value) { return std::make_pair(${innerToCppKey}, ${innerToCppValue}); })"
       },
       (p) => {
         val innerFromCppKey = resolvedKey.fromCppTranslatorFn("key")
         val innerFromCppValue = resolvedValue.fromCppTranslatorFn("value")
-        s"::djinni::c_api::Map<${cppTypeKey}, ${cppTypeValue}>::fromCpp(${p}, [](auto key, auto value) { return std::make_pair(${innerFromCppKey}, ${innerFromCppValue}); })"
+        s"::djinni::c_api::MapTranslator<${cppTypeKey}, ${cppTypeValue}>::fromCpp(${p}, [](auto key, auto value) { return std::make_pair(${innerFromCppKey}, ${innerFromCppValue}); })"
       })
 
   }
@@ -141,10 +141,10 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
   private def resolvePrimitive(cName: String, asBoxed: Boolean): CTypeTranslator = {
     if (asBoxed) {
       new CTypeTranslator("djinni_number_ref", true, (p) => {
-        s"::djinni::c_api::Number::toCpp<${cName}>(${p})"
+        s"::djinni::c_api::NumberTranslator::toCpp<${cName}>(${p})"
       },
         (p) => {
-          s"::djinni::c_api::Number::fromCpp<${cName}>(${p})"
+          s"::djinni::c_api::NumberTranslator::fromCpp<${cName}>(${p})"
         })
     } else {
       new CTypeTranslator(cName, false, p => p, p => p)
@@ -219,10 +219,10 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
      td match {
       case ast.Enum(_, _) => {
         val typename = valueTypeName(name)
-        s"::djinni::c_api::Enum<${cppTypename}, ${typename}>"
+        s"::djinni::c_api::EnumTranslator<${cppTypename}, ${typename}>"
       }
-      case ast.Record(_, _, _, _) => s"::djinni::c_api::Record<${cppTypename}>"
-      case ast.Interface(_, _, _) => s"::djinni::c_api::Interface<${cppTypename}>"
+      case ast.Record(_, _, _, _) => s"::djinni::c_api::RecordTranslator<${cppTypename}>"
+      case ast.Interface(_, _, _) => s"::djinni::c_api::InterfaceTranslator<${cppTypename}>"
       case ast.ProtobufMessage(_, _, _, _, _) => throw new AssertionError("Unsupported")
     }
   }
@@ -254,19 +254,19 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
         makeTranslator(
           "djinni_binary_ref",
           isRefType = true,
-          s"::djinni::c_api::Protobuf<${cppMarshal.fqTypename(expr)}>"
+          s"::djinni::c_api::ProtobufTranslator<${cppMarshal.fqTypename(expr)}>"
         )
       case opaque: meta.MOpaque =>
         opaque match {
           case meta.MPrimitive(_, _, _, cName, _, _, _, _) => resolvePrimitive(cName, asBoxed)
-          case meta.MString => makeTranslator("djinni_string_ref", isRefType = true, "::djinni::c_api::String")
-          case meta.MDate => makeTranslator("djinni_date_ref", isRefType = true, "::djinni::c_api::Date")
-          case meta.MBinary => makeTranslator("djinni_binary_ref", isRefType = true, "::djinni::c_api::Binary")
+          case meta.MString => makeTranslator("djinni_string_ref", isRefType = true, "::djinni::c_api::StringTranslator")
+          case meta.MDate => makeTranslator("djinni_date_ref", isRefType = true, "::djinni::c_api::DateTranslator")
+          case meta.MBinary => makeTranslator("djinni_binary_ref", isRefType = true, "::djinni::c_api::BinaryTranslator")
           case meta.MOptional => resolveOptional(expr.args.head, asBoxed, expr)
-          case meta.MList => resolveListLike(expr.args.head, "::djinni::c_api::List")
-          case meta.MSet => resolveListLike(expr.args.head, "::djinni::c_api::Set")
+          case meta.MList => resolveListLike(expr.args.head, "::djinni::c_api::ListTranslator")
+          case meta.MSet => resolveListLike(expr.args.head, "::djinni::c_api::SetTranslator")
           case meta.MMap => resolveMap(expr.args.head, expr.args(1))
-          case meta.MArray => resolveListLike(expr.args.head, "::djinni::c_api::List")
+          case meta.MArray => resolveListLike(expr.args.head, "::djinni::c_api::ListTranslator")
           case meta.MVoid => new CTypeTranslator("void", false, p => p, p => p)
         }
     }

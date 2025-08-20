@@ -50,6 +50,6 @@ swiftxx:
   header: '"$Future_swift.hpp"'
 c:
   typename: 'djinni_future_ref'
-  translator: '::djinni::c_api::Future'
-  public_header: '"$djinni_c.h"'
-  private_header: '"$djinni_c_helpers.hpp"'
+  translator: '::djinni::c_api::FutureTranslator'
+  public_header: '"$Future_c.h"'
+  private_header: '"$Future_c_translator.hpp"'

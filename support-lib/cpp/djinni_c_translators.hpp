@@ -1,11 +1,7 @@
 #pragma once
 
-#include "DataRef.hpp"
-#include "DataView.hpp"
-#include "Future.hpp"
 #include "djinni_c.h"
 #include "djinni_c_types.hpp"
-#include "expected.hpp"
 #include <atomic>
 #include <chrono>
 #include <memory>
@@ -14,36 +10,23 @@
 #include <unordered_set>
 #include <vector>
 
-namespace djinni {
-template <typename T> class FutureHolder : public Object {
-public:
-  FutureHolder(Future<T> future) : _future(std::move(future)) {}
-  ~FutureHolder() override = default;
-
-  Future<T> &getFuture() { return _future; }
-
-private:
-  Future<T> _future;
-};
-} // namespace djinni
-
 namespace djinni::c_api {
 
-class String {
+class StringTranslator {
 public:
   static djinni_string_ref fromCpp(std::string &&str);
   static djinni_string_ref fromCpp(const std::string &str);
   static std::string toCpp(djinni_string_ref str);
 };
 
-class Date {
+class DateTranslator {
 public:
   static djinni_date_ref
   fromCpp(const std::chrono::system_clock::time_point &date);
   static std::chrono::system_clock::time_point toCpp(djinni_date_ref date);
 };
 
-class Number {
+class NumberTranslator {
 public:
   template <typename T> static djinni_number_ref fromCpp(T value) = delete;
   template <typename T> static T toCpp(djinni_number_ref value) = delete;
@@ -140,7 +123,7 @@ private:
   }
 };
 
-class Optional {
+class OptionalTranslator {
 public:
   template <typename Opt, typename T> static T fromCppPrimitive(Opt value) {
     T out;
@@ -221,7 +204,7 @@ public:
 private:
 };
 
-template <typename T> class List {
+template <typename T> class ListTranslator {
 public:
   template <typename F>
   static std::vector<T> toCpp(djinni_array_ref value, F &&convert) {
@@ -253,7 +236,7 @@ public:
   }
 };
 
-template <typename T> class Set {
+template <typename T> class SetTranslator {
 public:
   template <typename F>
   static std::unordered_set<T> toCpp(djinni_array_ref value, F &&convert) {
@@ -286,7 +269,7 @@ public:
   }
 };
 
-template <typename K, typename V> class Map {
+template <typename K, typename V> class MapTranslator {
 public:
   template <typename F>
   static std::unordered_map<K, V> toCpp(djinni_keyval_array_ref key_values,
@@ -324,7 +307,7 @@ public:
   }
 };
 
-template <typename T> class Record {
+template <typename T> class RecordTranslator {
 public:
   template <typename... Args> static djinni_record_ref make(Args &&...args) {
     Object *obj = new RecordHolder<T>(T(std::forward<Args>(args)...));
@@ -350,7 +333,7 @@ public:
   }
 };
 
-template <typename T> class Interface {
+template <typename T> class InterfaceTranslator {
 public:
   static const std::shared_ptr<T> &toCpp(djinni_interface_ref ref) {
     auto *i =
@@ -368,28 +351,25 @@ public:
   }
 };
 
-template <typename T> class ProxyClass {
+template <typename T, typename PT> class ProxyTranslator {
 public:
   static djinni_proxy_class_ref
-  make(const T *methodDefs, djinni_opaque_deallocator opaqueDeallocator) {
-    Object *obj = new ::djinni::ProxyClass<T>(*methodDefs, opaqueDeallocator);
+  makeClass(const PT *methodDefs, djinni_opaque_deallocator opaqueDeallocator) {
+    Object *obj = new ::djinni::ProxyClass<PT>(*methodDefs, opaqueDeallocator);
     return reinterpret_cast<djinni_proxy_class_ref>(obj);
   }
-};
 
-template <typename T, typename PT> class Proxy {
-public:
   static djinni_interface_ref make(djinni_proxy_class_ref proxyClassRef,
                                    void *opaque) {
     auto *proxyClass = static_cast<::djinni::ProxyClass<PT> *>(
         reinterpret_cast<Object *>(proxyClassRef));
 
-    return ::djinni::c_api::Interface<T>::fromCpp(
+    return ::djinni::c_api::InterfaceTranslator<T>::fromCpp(
         std::make_shared<T>(proxyClass, opaque));
   }
 };
 
-template <typename Cpp, typename C> class Enum {
+template <typename Cpp, typename C> class EnumTranslator {
 public:
   static Cpp toCpp(C value) { return static_cast<Cpp>(value); }
   static C fromCpp(Cpp value) { return static_cast<C>(value); }
@@ -399,71 +379,18 @@ public:
   }
 
   static djinni_number_ref fromCppBoxed(Cpp value) {
-    return Number::fromCpp(static_cast<int64_t>(value));
+    return NumberTranslator::fromCpp(static_cast<int64_t>(value));
   }
 };
 
-class DataRef {
-public:
-  static ::djinni::DataRef toCpp(djinni_binary_ref binary);
-  static djinni_binary_ref fromCpp(const ::djinni::DataRef &dataRef);
-};
-
-class DataView {
-public:
-  static ::djinni::DataView toCpp(djinni_binary_ref binary);
-  static djinni_binary_ref fromCpp(const ::djinni::DataView &dataRef);
-};
-
-class Binary {
+class BinaryTranslator {
 public:
   static std::vector<uint8_t> toCpp(djinni_binary_ref binary);
   static djinni_binary_ref fromCpp(std::vector<uint8_t> &&binary);
   static djinni_binary_ref fromCpp(const std::vector<uint8_t> &binary);
 };
 
-template <typename T> class Future {
-public:
-  static ::djinni::Future<T> toCpp(djinni_future_ref future) {
-    auto *futureHolder = static_cast<::djinni::FutureHolder<T> *>(
-        reinterpret_cast<Object *>(future));
-
-    // Any way to make this better?
-
-    return futureHolder->getFuture().then(
-        [](::djinni::Future<T> value) { return value.get(); });
-  }
-
-  static djinni_future_ref fromCpp(::djinni::Future<T> &&future) {
-    Object *futureHolder = new ::djinni::FutureHolder<T>(std::move(future));
-
-    return reinterpret_cast<djinni_future_ref>(futureHolder);
-  }
-};
-
-template <typename T, typename E> class Outcome {
-public:
-  static ::djinni::expected<T, E> toCpp(djinni_outcome_ref future) {
-    std::abort();
-  }
-
-  static djinni_outcome_ref fromCpp(::djinni::expected<T, E> &&outcome) {
-    std::abort();
-  }
-
-  static djinni_outcome_ref fromCpp(const ::djinni::expected<T, E> &outcome) {
-    std::abort();
-  }
-};
-
-template <class Rep, class Ratio> class Duration {
-public:
-  static std::chrono::duration<Rep, Ratio> toCpp(djinni_number_ref value);
-  static djinni_number_ref
-  fromCpp(const std::chrono::duration<Rep, Ratio> &value);
-};
-
-template <typename T> class Protobuf {
+template <typename T> class ProtobufTranslator {
 public:
   static T toCpp(djinni_binary_ref binary) {
     T output;
