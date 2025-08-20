@@ -499,6 +499,10 @@ export interface UserToken {
     whoami(): string;
 }
 
+/**
+ * This is a test
+ * my dude!
+ */
 export enum Color {
     RED = 0,
     ORANGE = 1,
@@ -571,6 +575,7 @@ export interface CppException_statics {
 
 export interface /*record*/ PrimitiveList {
     list: Array<bigint>;
+    optionalList?: Array<bigint | undefined>;
 }
 
 export interface /*record*/ MapRecord {

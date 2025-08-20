@@ -8,11 +8,12 @@ namespace djinni_generated {
 djinni::swift::AnyValue NativePrimitiveList::fromCpp(const ::testsuite::PrimitiveList& c) {
     auto ret = std::make_shared<djinni::swift::CompositeValue>();
     ret->addValue(::djinni::swift::List<::djinni::swift::I64>::fromCpp(c.list));
+    ret->addValue(::djinni::swift::Optional<std::experimental::optional, ::djinni::swift::List<::djinni::swift::Optional<std::experimental::optional, ::djinni::swift::I64>>>::fromCpp(c.optional_list));
     return {ret};
 }
 ::testsuite::PrimitiveList NativePrimitiveList::toCpp(const djinni::swift::AnyValue& s) {
     auto p = std::get<djinni::swift::CompositeValuePtr>(s);
-    return ::testsuite::PrimitiveList(::djinni::swift::List<::djinni::swift::I64>::toCpp(p->getValue(0)));
+    return ::testsuite::PrimitiveList(::djinni::swift::List<::djinni::swift::I64>::toCpp(p->getValue(0)), ::djinni::swift::Optional<std::experimental::optional, ::djinni::swift::List<::djinni::swift::Optional<std::experimental::optional, ::djinni::swift::I64>>>::toCpp(p->getValue(1)));
 }
 
 } // namespace djinni_generated

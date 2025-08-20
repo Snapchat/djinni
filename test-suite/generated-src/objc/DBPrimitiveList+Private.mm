@@ -11,12 +11,14 @@ namespace djinni_generated {
 auto PrimitiveList::toCpp(ObjcType obj) -> CppType
 {
     assert(obj);
-    return {::djinni::List<::djinni::I64>::toCpp(obj.list)};
+    return {::djinni::List<::djinni::I64>::toCpp(obj.list),
+            ::djinni::Optional<std::experimental::optional, ::djinni::List<::djinni::Optional<std::experimental::optional, ::djinni::I64>>>::toCpp(obj.optionalList)};
 }
 
 auto PrimitiveList::fromCpp(const CppType& cpp) -> ObjcType
 {
-    return [[DBPrimitiveList alloc] initWithList:(::djinni::List<::djinni::I64>::fromCpp(cpp.list))];
+    return [[DBPrimitiveList alloc] initWithList:(::djinni::List<::djinni::I64>::fromCpp(cpp.list))
+                                    optionalList:(::djinni::Optional<std::experimental::optional, ::djinni::List<::djinni::Optional<std::experimental::optional, ::djinni::I64>>>::fromCpp(cpp.optional_list))];
 }
 
 } // namespace djinni_generated

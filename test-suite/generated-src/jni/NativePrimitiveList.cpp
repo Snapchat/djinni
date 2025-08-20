@@ -13,16 +13,18 @@ NativePrimitiveList::~NativePrimitiveList() = default;
 auto NativePrimitiveList::fromCpp(JNIEnv* jniEnv, const CppType& c) -> ::djinni::LocalRef<JniType> {
     const auto& data = ::djinni::JniClass<NativePrimitiveList>::get();
     auto r = ::djinni::LocalRef<JniType>{jniEnv->NewObject(data.clazz.get(), data.jconstructor,
-                                                           ::djinni::get(::djinni::List<::djinni::I64>::fromCpp(jniEnv, c.list)))};
+                                                           ::djinni::get(::djinni::List<::djinni::I64>::fromCpp(jniEnv, c.list)),
+                                                           ::djinni::get(::djinni::Optional<std::experimental::optional, ::djinni::List<::djinni::Optional<std::experimental::optional, ::djinni::I64>>>::fromCpp(jniEnv, c.optional_list)))};
     ::djinni::jniExceptionCheck(jniEnv);
     return r;
 }
 
 auto NativePrimitiveList::toCpp(JNIEnv* jniEnv, JniType j) -> CppType {
-    ::djinni::JniLocalScope jscope(jniEnv, 2);
+    ::djinni::JniLocalScope jscope(jniEnv, 3);
     assert(j != nullptr);
     const auto& data = ::djinni::JniClass<NativePrimitiveList>::get();
-    return {::djinni::List<::djinni::I64>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mList))};
+    return {::djinni::List<::djinni::I64>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mList)),
+            ::djinni::Optional<std::experimental::optional, ::djinni::List<::djinni::Optional<std::experimental::optional, ::djinni::I64>>>::toCpp(jniEnv, jniEnv->GetObjectField(j, data.field_mOptionalList))};
 }
 
 } // namespace djinni_generated

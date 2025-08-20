@@ -61,20 +61,27 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
           case _ => false
         }
       }
+      case meta.MExtern(_, _, defType, _, _, _, _, _, _, _, _, _, _, _, _) => {
+        defType match {
+          case DEnum => true
+          case _ => false
+        }
+      }
       case _ => false
     }
   }
 
-  private def makeNestedTranslator(inner: CTypeTranslator, typename: String, translator: String): CTypeTranslator = {
+  private def makeNestedTranslator(inner: CTypeTranslator, typename: String, toCppTranslator: String, fromCppTranslator: String): CTypeTranslator = {
+    val innerValueParamName = s"std::forward<decltype(value)>(value)"
     new CTypeTranslator(typename,
       true,
       (p) => {
-        val innerToCpp = inner.toCppTranslatorFn("value")
-        s"${translator}::toCpp(${p}, [](auto value) { return ${innerToCpp}; })"
+        val innerToCpp = inner.toCppTranslatorFn(innerValueParamName)
+        s"${toCppTranslator}(${p}, [](auto&& value) { return ${innerToCpp}; })"
       },
       (p) => {
-        val innerFromCpp = inner.fromCppTranslatorFn("value")
-        s"$translator::fromCpp(${p}, [](auto value) { return ${innerFromCpp}; })"
+        val innerFromCpp = inner.fromCppTranslatorFn(innerValueParamName)
+        s"$fromCppTranslator(${p}, [](auto&& value) { return ${innerFromCpp}; })"
       }
     )
   }
@@ -96,17 +103,10 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
       val sharedPtr = cppMarshal.bySharedPtr(expr)
       val toCppMethodName = if (sharedPtr) "toSharedPtrCpp" else "toCpp"
       val fromCppMethodName = if (sharedPtr) "fromSharedPtrCpp" else "fromCpp"
-      new CTypeTranslator(resolved.typename,
-        true,
-        (p) => {
-          val innerToCpp = resolved.toCppTranslatorFn("value")
-          s"::djinni::c_api::Optional::${toCppMethodName}<${cppOptionalTemplate}>(${p}, [](auto value) { return ${innerToCpp}; })"
-        },
-        (p) => {
-          val innerFromCpp = resolved.fromCppTranslatorFn("value")
-          s"::djinni::c_api::Optional::${fromCppMethodName}<${cppOptionalTemplate}>(${p}, [](auto value) { return ${innerFromCpp}; })"
-        }
-      )
+      makeNestedTranslator(resolved,
+        resolved.typename,
+        s"::djinni::c_api::Optional::${toCppMethodName}<${cppOptionalTemplate}>",
+        s"::djinni::c_api::Optional::${fromCppMethodName}<${cppOptionalTemplate}>")
     }
   }
 
@@ -114,7 +114,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     val resolved = resolve(expr, true)
 
     val cppType = cppMarshal.fqTypename(expr)
-    makeNestedTranslator(resolved, "djinni_array_ref", translator + s"<${cppType}>")
+    makeNestedTranslator(resolved, "djinni_array_ref", s"$translator<${cppType}>::toCpp", s"$translator<${cppType}>::fromCpp")
   }
 
   private def resolveMap(keyExpr: MExpr, valueExpr: MExpr): CTypeTranslator = {
@@ -168,6 +168,11 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
 
   private def resolveEnum(name: String, body: ast.TypeDef, asBoxed: Boolean): CTypeTranslator = {
     val translator = getTranslatorNameForType(name, body)
+    val typename = valueTypeName(name)
+    doResolveEnum(typename, translator, asBoxed)
+  }
+
+  private def doResolveEnum(typename: String, translator: String, asBoxed: Boolean): CTypeTranslator = {
     if (asBoxed) {
       new CTypeTranslator("djinni_number_ref",
         true,
@@ -175,7 +180,6 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
         (p) => s"${translator}::fromCppBoxed(${p})"
       )
     } else {
-      val typename = valueTypeName(name)
       new CTypeTranslator(typename,
         false,
         (p) => s"${translator}::toCpp(${p})",
@@ -184,7 +188,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     }
   }
 
-  private def resolveExtern(expr: MExpr, defType: meta.DefType, c: meta.MExtern.C): CTypeTranslator = {
+  private def resolveExtern(expr: MExpr, defType: meta.DefType, c: meta.MExtern.C, asBoxed: Boolean): CTypeTranslator = {
     updatePrivateImports(expr.base)
     addPublicImport(cppMarshal.resolveExtCppHdr(c.publicHeader))
     privateImports.add("#include " + cppMarshal.resolveExtCppHdr(c.privateHeader))
@@ -192,16 +196,22 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     val resolvedTranslator: String = if (expr.args.isEmpty) {
       c.translator
     } else {
+      // Resolve to get the includes
+      expr.args.foreach(a => resolve(a))
       val templateArgs = expr.args.map(a => cppMarshal.fqTypename(a)).mkString(", ")
       s"${c.translator}<${templateArgs}>"
     }
 
-    val isRefType = defType match {
-      case DEnum => false
-      case _ => true
+    val isEnum = defType match {
+      case DEnum => true
+      case _ => false
     }
 
-    makeTranslator(c.typename, isRefType, resolvedTranslator)
+    if (isEnum) {
+      doResolveEnum(c.typename, resolvedTranslator, asBoxed)
+    } else {
+      makeTranslator(c.typename, isRefType = true, resolvedTranslator)
+    }
   }
 
   def getTranslatorNameForType(name: String, td: ast.TypeDef): String = {
@@ -238,7 +248,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
           )
         }
       }
-      case meta.MExtern(_, _, defType, _, _, _, _, _, _, _, _, _, _, _, c) => resolveExtern(expr, defType, c)
+      case meta.MExtern(_, _, defType, _, _, _, _, _, _, _, _, _, _, _, c) => resolveExtern(expr, defType, c, asBoxed)
       case meta.MProtobuf(_, _, _) =>
         updatePrivateImports(expr.base)
         makeTranslator(

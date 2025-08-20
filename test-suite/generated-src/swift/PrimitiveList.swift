@@ -5,9 +5,11 @@ import Foundation
 
 public struct PrimitiveList {
     public var list: Array<Int64>
+    public var optionalList: Optional<Array<Optional<Int64>>>
 
-    public init(list: Array<Int64>)
+    public init(list: Array<Int64>, optionalList: Optional<Array<Optional<Int64>>>)
     {
         self.list = list
+        self.optionalList = optionalList
     }
 }
