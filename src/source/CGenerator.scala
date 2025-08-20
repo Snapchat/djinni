@@ -338,13 +338,13 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       val proxyClassNameCpp = writeProxyClass(w, ident, methodDefsStructName, resolvedMethods)
       w.w(s"${proxyClassName} ${prefix}_proxy_class_new(const ${methodDefsStructName} *method_defs, djinni_opaque_deallocator opaque_deallocator)")
       w.braced {
-        w.wl(s"return ::djinni::c_api::ProxyTranslator<${proxyClassNameCpp}, ${methodDefsStructName}>::makeClass(method_defs, opaque_deallocator);")
+        w.wl(s"return ::djinni::c_api::ProxyTranslator<${methodDefsStructName}>::makeClass(method_defs, opaque_deallocator);")
       }
       w.wl
 
       w.w(s"${typeName} ${prefix}_new(${proxyClassName} proxy_class, void *opaque)")
       w.braced {
-        w.wl(s"return ::djinni::c_api::ProxyTranslator<${proxyClassNameCpp}, ${methodDefsStructName}>::make(proxy_class, opaque);")
+        w.wl(s"return ::djinni::c_api::ProxyTranslator<${methodDefsStructName}>::make<${proxyClassNameCpp}, ${selfCpp}>(proxy_class, opaque);")
       }
       w.wl
 

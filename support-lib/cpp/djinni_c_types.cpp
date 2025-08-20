@@ -1,4 +1,5 @@
 #include "djinni_c_types.hpp"
+#include <cstdio>
 
 namespace djinni {
 
@@ -185,6 +186,12 @@ double Number::toDouble() const {
 
 Number *Number::make(Number::Value value, Number::ValueType type) {
   return new Number(value, type);
+}
+
+void crashForInvalidCast(const char *str) {
+  std::fprintf(stderr, "Attempting to cast an invalid pointer to type: %s!",
+               str);
+  std::abort();
 }
 
 } // namespace djinni

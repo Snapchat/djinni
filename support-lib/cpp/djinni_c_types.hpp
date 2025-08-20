@@ -3,6 +3,14 @@
 #include <atomic>
 #include <memory>
 
+#ifndef DJINNI_CHECKED_C_API
+#if DEBUG
+#define DJINNI_CHECKED_C_API 1
+#else
+#define DJINNI_CHECKED_C_API 0
+#endif
+#endif
+
 namespace djinni {
 
 class Object {
@@ -168,12 +176,31 @@ private:
   void *_opaque;
 };
 
-inline void *toC(Object *obj) {
-  return reinterpret_cast<void *>(obj);
+inline void *toC(Object *obj) { return reinterpret_cast<void *>(obj); }
+
+void crashForInvalidCast(const char *str);
+
+template <typename T>
+static void onInvalidCast() {
+  crashForInvalidCast(typeid(T).name());
 }
 
+#if DJINNI_CHECKED_C_API
+template <typename T> static T *fromC(void *ref) {
+  if (ref == nullptr) {
+    return nullptr;
+  }
+  auto *ptr = dynamic_cast<T *>(reinterpret_cast<Object *>(ref));
+  if (ptr == nullptr) {
+      onInvalidCast<T>();
+  }
+
+  return ptr;
+}
+#else
 template <typename T> static T *fromC(void *ref) {
   return static_cast<T *>(reinterpret_cast<Object *>(ref));
 }
+#endif
 
 } // namespace djinni

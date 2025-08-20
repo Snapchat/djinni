@@ -349,7 +349,7 @@ public:
   }
 };
 
-template <typename T, typename PT> class ProxyTranslator {
+template <typename PT> class ProxyTranslator {
 public:
   static djinni_proxy_class_ref
   makeClass(const PT *methodDefs, djinni_opaque_deallocator opaqueDeallocator) {
@@ -358,12 +358,13 @@ public:
     return toC(proxyClass);
   }
 
+  template <typename P, typename T>
   static djinni_interface_ref make(djinni_proxy_class_ref proxyClassRef,
                                    void *opaque) {
     auto *proxyClass = fromC<::djinni::ProxyClass<PT>>(proxyClassRef);
 
     return ::djinni::c_api::InterfaceTranslator<T>::fromCpp(
-        std::make_shared<T>(proxyClass, opaque));
+        std::make_shared<P>(proxyClass, opaque));
   }
 };
 
