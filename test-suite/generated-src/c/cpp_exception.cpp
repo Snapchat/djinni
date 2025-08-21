@@ -6,70 +6,36 @@
 #include "cpp_exception.hpp"
 #include <memory>
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_cpp_exception_method_defs>;
-struct CppException_Proxy: public Proxy_Parent, public ::testsuite::CppException  {
-    CppException_Proxy(::djinni::ProxyClass<testsuite_cpp_exception_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~CppException_Proxy() override = default;
-
-    int32_t throw_an_exception() override {
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().throw_an_exception(Proxy_Parent::getOpaque());
-
-        auto returnValue_cpp = returnValue;
-        return returnValue_cpp;
-    }
-
-    int32_t call_throwing_interface(const /*not-null*/ std::shared_ptr<::testsuite::ThrowingInterface> & cb) override {
-        auto cb_c = ::djinni::c_api::InterfaceTranslator<::testsuite::ThrowingInterface>::fromCpp(cb);
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().call_throwing_interface(Proxy_Parent::getOpaque(), cb_c);
-        djinni_ref_release(cb_c);
-
-        auto returnValue_cpp = returnValue;
-        return returnValue_cpp;
-    }
-
-    std::string call_throwing_and_catch(const /*not-null*/ std::shared_ptr<::testsuite::ThrowingInterface> & cb) override {
-        auto cb_c = ::djinni::c_api::InterfaceTranslator<::testsuite::ThrowingInterface>::fromCpp(cb);
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().call_throwing_and_catch(Proxy_Parent::getOpaque(), cb_c);
-        djinni_ref_release(cb_c);
-
-        auto returnValue_cpp = ::djinni::c_api::StringTranslator::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-};
-
-testsuite_cpp_exception_proxy_class_ref testsuite_cpp_exception_proxy_class_new(const testsuite_cpp_exception_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_cpp_exception_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_cpp_exception_ref testsuite_cpp_exception_new(testsuite_cpp_exception_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_cpp_exception_method_defs>::make<CppException_Proxy, ::testsuite::CppException>(proxy_class, opaque);
-}
-
 int32_t testsuite_cpp_exception_throw_an_exception(testsuite_cpp_exception_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::CppException>::toCpp(instance)->throw_an_exception();
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(int32_t)
 }
 
 int32_t testsuite_cpp_exception_call_throwing_interface(testsuite_cpp_exception_ref instance, testsuite_throwing_interface_ref cb)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::CppException>::toCpp(instance)->call_throwing_interface(::djinni::c_api::InterfaceTranslator<::testsuite::ThrowingInterface>::toCpp(cb));
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(int32_t)
 }
 
 djinni_string_ref testsuite_cpp_exception_call_throwing_and_catch(testsuite_cpp_exception_ref instance, testsuite_throwing_interface_ref cb)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::CppException>::toCpp(instance)->call_throwing_and_catch(::djinni::c_api::InterfaceTranslator<::testsuite::ThrowingInterface>::toCpp(cb));
     return ::djinni::c_api::StringTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_string_ref)
 }
 
 testsuite_cpp_exception_ref testsuite_cpp_exception_get()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::CppException::get();
     return ::djinni::c_api::InterfaceTranslator<::testsuite::CppException>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_cpp_exception_ref)
 }
 
 

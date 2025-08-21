@@ -6,39 +6,20 @@
 #include "return_one.hpp"
 #include <memory>
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_return_one_method_defs>;
-struct ReturnOne_Proxy: public Proxy_Parent, public ::testsuite::ReturnOne  {
-    ReturnOne_Proxy(::djinni::ProxyClass<testsuite_return_one_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~ReturnOne_Proxy() override = default;
-
-    int8_t return_one() override {
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().return_one(Proxy_Parent::getOpaque());
-
-        auto returnValue_cpp = returnValue;
-        return returnValue_cpp;
-    }
-
-};
-
-testsuite_return_one_proxy_class_ref testsuite_return_one_proxy_class_new(const testsuite_return_one_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_return_one_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_return_one_ref testsuite_return_one_new(testsuite_return_one_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_return_one_method_defs>::make<ReturnOne_Proxy, ::testsuite::ReturnOne>(proxy_class, opaque);
-}
-
 testsuite_return_one_ref testsuite_return_one_get_instance()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::ReturnOne::get_instance();
     return ::djinni::c_api::InterfaceTranslator<::testsuite::ReturnOne>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_return_one_ref)
 }
 
 int8_t testsuite_return_one_return_one(testsuite_return_one_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::ReturnOne>::toCpp(instance)->return_one();
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(int8_t)
 }
 
 

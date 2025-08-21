@@ -11,20 +11,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_enum_usage_interface_ref;
-typedef djinni_proxy_class_ref testsuite_enum_usage_interface_proxy_class_ref;
-
-typedef struct 
-{
-    testsuite_color (*e)(void *, testsuite_color);
-    djinni_number_ref (*o)(void *, djinni_number_ref);
-    djinni_array_ref (*l)(void *, djinni_array_ref);
-    djinni_array_ref (*s)(void *, djinni_array_ref);
-    djinni_keyval_array_ref (*m)(void *, djinni_keyval_array_ref);
-} testsuite_enum_usage_interface_method_defs;
-
-testsuite_enum_usage_interface_proxy_class_ref testsuite_enum_usage_interface_proxy_class_new(const testsuite_enum_usage_interface_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_enum_usage_interface_ref testsuite_enum_usage_interface_new(testsuite_enum_usage_interface_proxy_class_ref proxy_class, void *opaque);
 
 testsuite_color testsuite_enum_usage_interface_e(testsuite_enum_usage_interface_ref instance, testsuite_color e);
 

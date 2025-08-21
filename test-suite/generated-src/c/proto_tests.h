@@ -13,28 +13,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_proto_tests_ref;
-typedef djinni_proxy_class_ref testsuite_proto_tests_proxy_class_ref;
-
-typedef struct 
-{
-    djinni_array_ref (*protoToStrings)(void *, djinni_binary_ref);
-    djinni_binary_ref (*stringsToProto)(void *, djinni_array_ref);
-    djinni_string_ref (*embeddedProtoToString)(void *, testsuite_RecordWithEmbeddedProto_ref);
-    testsuite_RecordWithEmbeddedProto_ref (*stringToEmbeddedProto)(void *, djinni_string_ref);
-    djinni_string_ref (*cppProtoToString)(void *, djinni_binary_ref);
-    djinni_binary_ref (*stringToCppProto)(void *, djinni_string_ref);
-    djinni_string_ref (*embeddedCppProtoToString)(void *, testsuite_RecordWithEmbeddedCppProto_ref);
-    testsuite_RecordWithEmbeddedCppProto_ref (*stringToEmbeddedCppProto)(void *, djinni_string_ref);
-    djinni_array_ref (*protoListToStrings)(void *, djinni_array_ref);
-    djinni_array_ref (*stringsToProtoList)(void *, djinni_array_ref);
-    djinni_string_ref (*optionalProtoToString)(void *, djinni_binary_ref);
-    djinni_binary_ref (*stringToOptionalProto)(void *, djinni_string_ref);
-    djinni_outcome_ref (*stringToProtoOutcome)(void *, djinni_string_ref);
-} testsuite_proto_tests_method_defs;
-
-testsuite_proto_tests_proxy_class_ref testsuite_proto_tests_proxy_class_new(const testsuite_proto_tests_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_proto_tests_ref testsuite_proto_tests_new(testsuite_proto_tests_proxy_class_ref proxy_class, void *opaque);
 
 djinni_array_ref testsuite_proto_tests_protoToStrings(djinni_binary_ref x);
 

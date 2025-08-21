@@ -11,19 +11,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_reverse_client_interface_ref;
-typedef djinni_proxy_class_ref testsuite_reverse_client_interface_proxy_class_ref;
-
-typedef struct 
-{
-    djinni_string_ref (*return_str)(void *);
-    djinni_string_ref (*meth_taking_interface)(void *, testsuite_reverse_client_interface_ref);
-    djinni_string_ref (*meth_taking_optional_interface)(void *, testsuite_reverse_client_interface_ref);
-    testsuite_reverse_client_interface_ref (*create)(void *);
-} testsuite_reverse_client_interface_method_defs;
-
-testsuite_reverse_client_interface_proxy_class_ref testsuite_reverse_client_interface_proxy_class_new(const testsuite_reverse_client_interface_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_reverse_client_interface_ref testsuite_reverse_client_interface_new(testsuite_reverse_client_interface_proxy_class_ref proxy_class, void *opaque);
 
 djinni_string_ref testsuite_reverse_client_interface_return_str(testsuite_reverse_client_interface_ref instance);
 

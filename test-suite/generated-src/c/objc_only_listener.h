@@ -10,16 +10,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_objc_only_listener_ref;
-typedef djinni_proxy_class_ref testsuite_objc_only_listener_proxy_class_ref;
-
-typedef struct 
-{
-    void *reserved[1];
-} testsuite_objc_only_listener_method_defs;
-
-testsuite_objc_only_listener_proxy_class_ref testsuite_objc_only_listener_proxy_class_new(const testsuite_objc_only_listener_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_objc_only_listener_ref testsuite_objc_only_listener_new(testsuite_objc_only_listener_proxy_class_ref proxy_class, void *opaque);
 
 #ifdef __cplusplus
 } // extern "C"

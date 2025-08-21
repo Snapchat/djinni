@@ -10,16 +10,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_throwing_interface_ref;
-typedef djinni_proxy_class_ref testsuite_throwing_interface_proxy_class_ref;
-
-typedef struct 
-{
-    void (*throw_exception)(void *);
-} testsuite_throwing_interface_method_defs;
-
-testsuite_throwing_interface_proxy_class_ref testsuite_throwing_interface_proxy_class_new(const testsuite_throwing_interface_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_throwing_interface_ref testsuite_throwing_interface_new(testsuite_throwing_interface_proxy_class_ref proxy_class, void *opaque);
 
 void testsuite_throwing_interface_throw_exception(testsuite_throwing_interface_ref instance);
 

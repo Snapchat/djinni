@@ -5,29 +5,11 @@
 #include "djinni_c_translators.hpp"
 #include "first_listener.hpp"
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_first_listener_method_defs>;
-struct FirstListener_Proxy: public Proxy_Parent, public ::testsuite::FirstListener  {
-    FirstListener_Proxy(::djinni::ProxyClass<testsuite_first_listener_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~FirstListener_Proxy() override = default;
-
-    void first() override {
-        Proxy_Parent::getProxyClass().methodDefs().first(Proxy_Parent::getOpaque());
-    }
-
-};
-
-testsuite_first_listener_proxy_class_ref testsuite_first_listener_proxy_class_new(const testsuite_first_listener_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_first_listener_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_first_listener_ref testsuite_first_listener_new(testsuite_first_listener_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_first_listener_method_defs>::make<FirstListener_Proxy, ::testsuite::FirstListener>(proxy_class, opaque);
-}
-
 void testsuite_first_listener_first(testsuite_first_listener_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::djinni::c_api::InterfaceTranslator<::testsuite::FirstListener>::toCpp(instance)->first();
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 

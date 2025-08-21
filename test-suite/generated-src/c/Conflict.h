@@ -14,16 +14,6 @@ extern "C" {
  * See the comments about scopeSymbols in CppMarshal.scala for more info.
  */
 typedef djinni_interface_ref testsuite_Conflict_ref;
-typedef djinni_proxy_class_ref testsuite_Conflict_proxy_class_ref;
-
-typedef struct 
-{
-    void *reserved[1];
-} testsuite_Conflict_method_defs;
-
-testsuite_Conflict_proxy_class_ref testsuite_Conflict_proxy_class_new(const testsuite_Conflict_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_Conflict_ref testsuite_Conflict_new(testsuite_Conflict_proxy_class_ref proxy_class, void *opaque);
 
 #ifdef __cplusplus
 } // extern "C"

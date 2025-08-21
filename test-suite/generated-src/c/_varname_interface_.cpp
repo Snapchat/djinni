@@ -7,42 +7,6 @@
 #include "_varname_record_.hpp"
 #include <memory>
 
-using Proxy_Parent = ::djinni::Proxy<testsuite__varname_interface__method_defs>;
-struct VarnameInterface_Proxy: public Proxy_Parent, public ::testsuite::VarnameInterface  {
-    VarnameInterface_Proxy(::djinni::ProxyClass<testsuite__varname_interface__method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~VarnameInterface_Proxy() override = default;
-
-    ::testsuite::VarnameRecord _rmethod_(const ::testsuite::VarnameRecord & _r_arg_) override {
-        auto _r_arg__c = ::djinni::c_api::RecordTranslator<::testsuite::VarnameRecord>::fromCpp(_r_arg_);
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs()._rmethod_(Proxy_Parent::getOpaque(), _r_arg__c);
-        djinni_ref_release(_r_arg__c);
-
-        auto returnValue_cpp = ::djinni::c_api::RecordTranslator<::testsuite::VarnameRecord>::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-    /*not-null*/ std::shared_ptr<::testsuite::VarnameInterface> _imethod_(const /*not-null*/ std::shared_ptr<::testsuite::VarnameInterface> & _i_arg_) override {
-        auto _i_arg__c = ::djinni::c_api::InterfaceTranslator<::testsuite::VarnameInterface>::fromCpp(_i_arg_);
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs()._imethod_(Proxy_Parent::getOpaque(), _i_arg__c);
-        djinni_ref_release(_i_arg__c);
-
-        auto returnValue_cpp = ::djinni::c_api::InterfaceTranslator<::testsuite::VarnameInterface>::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-};
-
-testsuite__varname_interface__proxy_class_ref testsuite__varname_interface__proxy_class_new(const testsuite__varname_interface__method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite__varname_interface__method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite__varname_interface__ref testsuite__varname_interface__new(testsuite__varname_interface__proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite__varname_interface__method_defs>::make<VarnameInterface_Proxy, ::testsuite::VarnameInterface>(proxy_class, opaque);
-}
-
 /**
  * We should also rewrite parameter names in docstrings.
  * _r_arg_ should be rewritten.
@@ -50,14 +14,18 @@ testsuite__varname_interface__ref testsuite__varname_interface__new(testsuite__v
  */
 testsuite__varname_record__ref testsuite__varname_interface___rmethod_(testsuite__varname_interface__ref instance, testsuite__varname_record__ref _r_arg_)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::VarnameInterface>::toCpp(instance)->_rmethod_(::djinni::c_api::RecordTranslator<::testsuite::VarnameRecord>::toCpp(_r_arg_));
     return ::djinni::c_api::RecordTranslator<::testsuite::VarnameRecord>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite__varname_record__ref)
 }
 
 testsuite__varname_interface__ref testsuite__varname_interface___imethod_(testsuite__varname_interface__ref instance, testsuite__varname_interface__ref _i_arg_)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::VarnameInterface>::toCpp(instance)->_imethod_(::djinni::c_api::InterfaceTranslator<::testsuite::VarnameInterface>::toCpp(_i_arg_));
     return ::djinni::c_api::InterfaceTranslator<::testsuite::VarnameInterface>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite__varname_interface__ref)
 }
 
 

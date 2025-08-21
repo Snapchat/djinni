@@ -11,16 +11,6 @@ extern "C" {
 
 /** Used for ObjC multiple inheritance tests */
 typedef djinni_interface_ref testsuite_second_listener_ref;
-typedef djinni_proxy_class_ref testsuite_second_listener_proxy_class_ref;
-
-typedef struct 
-{
-    void (*second)(void *);
-} testsuite_second_listener_method_defs;
-
-testsuite_second_listener_proxy_class_ref testsuite_second_listener_proxy_class_new(const testsuite_second_listener_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_second_listener_ref testsuite_second_listener_new(testsuite_second_listener_proxy_class_ref proxy_class, void *opaque);
 
 void testsuite_second_listener_second(testsuite_second_listener_ref instance);
 

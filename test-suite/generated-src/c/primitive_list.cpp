@@ -7,27 +7,27 @@
 
 testsuite_primitive_list_ref testsuite_primitive_list_new(djinni_array_ref list, djinni_array_ref optional_list) 
 {
-    return ::djinni::c_api::RecordTranslator<::testsuite::PrimitiveList>::make(::djinni::c_api::ListTranslator<int64_t>::toCpp(list, [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int64_t>(std::forward<decltype(value)>(value)); }), ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<std::vector<std::experimental::optional<int64_t>>>>(optional_list, [](auto&& value) { return ::djinni::c_api::ListTranslator<std::experimental::optional<int64_t>>::toCpp(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<int64_t>>(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int64_t>(std::forward<decltype(value)>(value)); }); }); }));
+    return ::djinni::c_api::RecordTranslator<::testsuite::PrimitiveList>::make(::djinni::c_api::ListTranslator<::djinni::c_api::Int64Translator>::toCpp(list), ::djinni::c_api::OptionalTranslator<std::experimental::optional<std::vector<std::experimental::optional<int64_t>>>, ::djinni::c_api::ListTranslator<::djinni::c_api::OptionalTranslator<std::experimental::optional<int64_t>, ::djinni::c_api::Int64Translator>>>::toCpp(optional_list));
 }
 
 djinni_array_ref testsuite_primitive_list_get_list(testsuite_primitive_list_ref instance)
 {
-    return ::djinni::c_api::ListTranslator<int64_t>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::PrimitiveList>::toCpp(instance).list, [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int64_t>(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::ListTranslator<::djinni::c_api::Int64Translator>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::PrimitiveList>::toCpp(instance).list);
 }
 
 void testsuite_primitive_list_set_list(testsuite_primitive_list_ref instance, djinni_array_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::PrimitiveList>::toCpp(instance).list = ::djinni::c_api::ListTranslator<int64_t>::toCpp(value, [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int64_t>(std::forward<decltype(value)>(value)); });
+    ::djinni::c_api::RecordTranslator<::testsuite::PrimitiveList>::toCpp(instance).list = ::djinni::c_api::ListTranslator<::djinni::c_api::Int64Translator>::toCpp(value);
 }
 
 djinni_array_ref testsuite_primitive_list_get_optional_list(testsuite_primitive_list_ref instance)
 {
-    return ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<std::vector<std::experimental::optional<int64_t>>>>(::djinni::c_api::RecordTranslator<::testsuite::PrimitiveList>::toCpp(instance).optional_list, [](auto&& value) { return ::djinni::c_api::ListTranslator<std::experimental::optional<int64_t>>::fromCpp(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<int64_t>>(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int64_t>(std::forward<decltype(value)>(value)); }); }); });
+    return ::djinni::c_api::OptionalTranslator<std::experimental::optional<std::vector<std::experimental::optional<int64_t>>>, ::djinni::c_api::ListTranslator<::djinni::c_api::OptionalTranslator<std::experimental::optional<int64_t>, ::djinni::c_api::Int64Translator>>>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::PrimitiveList>::toCpp(instance).optional_list);
 }
 
 void testsuite_primitive_list_set_optional_list(testsuite_primitive_list_ref instance, djinni_array_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::PrimitiveList>::toCpp(instance).optional_list = ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<std::vector<std::experimental::optional<int64_t>>>>(value, [](auto&& value) { return ::djinni::c_api::ListTranslator<std::experimental::optional<int64_t>>::toCpp(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<int64_t>>(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int64_t>(std::forward<decltype(value)>(value)); }); }); });
+    ::djinni::c_api::RecordTranslator<::testsuite::PrimitiveList>::toCpp(instance).optional_list = ::djinni::c_api::OptionalTranslator<std::experimental::optional<std::vector<std::experimental::optional<int64_t>>>, ::djinni::c_api::ListTranslator<::djinni::c_api::OptionalTranslator<std::experimental::optional<int64_t>, ::djinni::c_api::Int64Translator>>>::toCpp(value);
 }
 
 

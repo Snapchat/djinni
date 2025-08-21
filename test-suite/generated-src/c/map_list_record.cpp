@@ -7,17 +7,17 @@
 
 testsuite_map_list_record_ref testsuite_map_list_record_new(djinni_array_ref map_list) 
 {
-    return ::djinni::c_api::RecordTranslator<::testsuite::MapListRecord>::make(::djinni::c_api::ListTranslator<std::unordered_map<std::string, int64_t>>::toCpp(map_list, [](auto&& value) { return ::djinni::c_api::MapTranslator<std::string, int64_t>::toCpp(std::forward<decltype(value)>(value), [](auto key, auto value) { return std::make_pair(::djinni::c_api::StringTranslator::toCpp(key), ::djinni::c_api::NumberTranslator::toCpp<int64_t>(value)); }); }));
+    return ::djinni::c_api::RecordTranslator<::testsuite::MapListRecord>::make(::djinni::c_api::ListTranslator<::djinni::c_api::MapTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::Int64Translator>>::toCpp(map_list));
 }
 
 djinni_array_ref testsuite_map_list_record_get_map_list(testsuite_map_list_record_ref instance)
 {
-    return ::djinni::c_api::ListTranslator<std::unordered_map<std::string, int64_t>>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::MapListRecord>::toCpp(instance).map_list, [](auto&& value) { return ::djinni::c_api::MapTranslator<std::string, int64_t>::fromCpp(std::forward<decltype(value)>(value), [](auto key, auto value) { return std::make_pair(::djinni::c_api::StringTranslator::fromCpp(key), ::djinni::c_api::NumberTranslator::fromCpp<int64_t>(value)); }); });
+    return ::djinni::c_api::ListTranslator<::djinni::c_api::MapTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::Int64Translator>>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::MapListRecord>::toCpp(instance).map_list);
 }
 
 void testsuite_map_list_record_set_map_list(testsuite_map_list_record_ref instance, djinni_array_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::MapListRecord>::toCpp(instance).map_list = ::djinni::c_api::ListTranslator<std::unordered_map<std::string, int64_t>>::toCpp(value, [](auto&& value) { return ::djinni::c_api::MapTranslator<std::string, int64_t>::toCpp(std::forward<decltype(value)>(value), [](auto key, auto value) { return std::make_pair(::djinni::c_api::StringTranslator::toCpp(key), ::djinni::c_api::NumberTranslator::toCpp<int64_t>(value)); }); });
+    ::djinni::c_api::RecordTranslator<::testsuite::MapListRecord>::toCpp(instance).map_list = ::djinni::c_api::ListTranslator<::djinni::c_api::MapTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::Int64Translator>>::toCpp(value);
 }
 
 

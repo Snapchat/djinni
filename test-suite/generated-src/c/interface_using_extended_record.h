@@ -11,16 +11,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_interface_using_extended_record_ref;
-typedef djinni_proxy_class_ref testsuite_interface_using_extended_record_proxy_class_ref;
-
-typedef struct 
-{
-    testsuite_extended_record_ref (*meth)(void *, testsuite_extended_record_ref);
-} testsuite_interface_using_extended_record_method_defs;
-
-testsuite_interface_using_extended_record_proxy_class_ref testsuite_interface_using_extended_record_proxy_class_new(const testsuite_interface_using_extended_record_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_interface_using_extended_record_ref testsuite_interface_using_extended_record_new(testsuite_interface_using_extended_record_proxy_class_ref proxy_class, void *opaque);
 
 testsuite_extended_record_ref testsuite_interface_using_extended_record_meth(testsuite_interface_using_extended_record_ref instance, testsuite_extended_record_ref er);
 

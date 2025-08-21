@@ -12,19 +12,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_cpp_exception_ref;
-typedef djinni_proxy_class_ref testsuite_cpp_exception_proxy_class_ref;
-
-typedef struct 
-{
-    int32_t (*throw_an_exception)(void *);
-    int32_t (*call_throwing_interface)(void *, testsuite_throwing_interface_ref);
-    djinni_string_ref (*call_throwing_and_catch)(void *, testsuite_throwing_interface_ref);
-    testsuite_cpp_exception_ref (*get)(void *);
-} testsuite_cpp_exception_method_defs;
-
-testsuite_cpp_exception_proxy_class_ref testsuite_cpp_exception_proxy_class_new(const testsuite_cpp_exception_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_cpp_exception_ref testsuite_cpp_exception_new(testsuite_cpp_exception_proxy_class_ref proxy_class, void *opaque);
 
 int32_t testsuite_cpp_exception_throw_an_exception(testsuite_cpp_exception_ref instance);
 

@@ -7,17 +7,17 @@
 
 testsuite_nested_collection_ref testsuite_nested_collection_new(djinni_array_ref set_list) 
 {
-    return ::djinni::c_api::RecordTranslator<::testsuite::NestedCollection>::make(::djinni::c_api::ListTranslator<std::unordered_set<std::string>>::toCpp(set_list, [](auto&& value) { return ::djinni::c_api::SetTranslator<std::string>::toCpp(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); }); }));
+    return ::djinni::c_api::RecordTranslator<::testsuite::NestedCollection>::make(::djinni::c_api::ListTranslator<::djinni::c_api::SetTranslator<::djinni::c_api::StringTranslator>>::toCpp(set_list));
 }
 
 djinni_array_ref testsuite_nested_collection_get_set_list(testsuite_nested_collection_ref instance)
 {
-    return ::djinni::c_api::ListTranslator<std::unordered_set<std::string>>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::NestedCollection>::toCpp(instance).set_list, [](auto&& value) { return ::djinni::c_api::SetTranslator<std::string>::fromCpp(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); }); });
+    return ::djinni::c_api::ListTranslator<::djinni::c_api::SetTranslator<::djinni::c_api::StringTranslator>>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::NestedCollection>::toCpp(instance).set_list);
 }
 
 void testsuite_nested_collection_set_set_list(testsuite_nested_collection_ref instance, djinni_array_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::NestedCollection>::toCpp(instance).set_list = ::djinni::c_api::ListTranslator<std::unordered_set<std::string>>::toCpp(value, [](auto&& value) { return ::djinni::c_api::SetTranslator<std::string>::toCpp(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); }); });
+    ::djinni::c_api::RecordTranslator<::testsuite::NestedCollection>::toCpp(instance).set_list = ::djinni::c_api::ListTranslator<::djinni::c_api::SetTranslator<::djinni::c_api::StringTranslator>>::toCpp(value);
 }
 
 

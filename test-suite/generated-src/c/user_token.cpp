@@ -12,27 +12,26 @@ struct UserToken_Proxy: public Proxy_Parent, public ::testsuite::UserToken  {
     ~UserToken_Proxy() override = default;
 
     std::string whoami() override {
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().whoami(Proxy_Parent::getOpaque());
-
-        auto returnValue_cpp = ::djinni::c_api::StringTranslator::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
+        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent::getProxyClass().methodDefs().whoami(Proxy_Parent::getOpaque()));
+        return ::djinni::c_api::StringTranslator::toCpp(returnValue.get());
     }
 
 };
 
 testsuite_user_token_proxy_class_ref testsuite_user_token_proxy_class_new(const testsuite_user_token_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_user_token_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::InterfaceTranslator<::testsuite::UserToken>::makeProxyClass<testsuite_user_token_method_defs>(method_defs, opaque_deallocator);
 }
 
 testsuite_user_token_ref testsuite_user_token_new(testsuite_user_token_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_user_token_method_defs>::make<UserToken_Proxy, ::testsuite::UserToken>(proxy_class, opaque);
+    return ::djinni::c_api::InterfaceTranslator<::testsuite::UserToken>::makeProxy<testsuite_user_token_method_defs, UserToken_Proxy>(proxy_class, opaque);
 }
 
 djinni_string_ref testsuite_user_token_whoami(testsuite_user_token_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::UserToken>::toCpp(instance)->whoami();
     return ::djinni::c_api::StringTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_string_ref)
 }
 
 

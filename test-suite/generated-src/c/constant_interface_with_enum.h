@@ -11,16 +11,6 @@ extern "C" {
 
 /** Interface containing enum constant */
 typedef djinni_interface_ref testsuite_constant_interface_with_enum_ref;
-typedef djinni_proxy_class_ref testsuite_constant_interface_with_enum_proxy_class_ref;
-
-typedef struct 
-{
-    void *reserved[1];
-} testsuite_constant_interface_with_enum_method_defs;
-
-testsuite_constant_interface_with_enum_proxy_class_ref testsuite_constant_interface_with_enum_proxy_class_new(const testsuite_constant_interface_with_enum_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_constant_interface_with_enum_ref testsuite_constant_interface_with_enum_new(testsuite_constant_interface_with_enum_proxy_class_ref proxy_class, void *opaque);
 
 #ifdef __cplusplus
 } // extern "C"

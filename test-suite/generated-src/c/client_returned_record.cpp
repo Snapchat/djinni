@@ -7,7 +7,7 @@
 
 testsuite_client_returned_record_ref testsuite_client_returned_record_new(int64_t record_id, djinni_string_ref content, djinni_string_ref misc) 
 {
-    return ::djinni::c_api::RecordTranslator<::testsuite::ClientReturnedRecord>::make(record_id, ::djinni::c_api::StringTranslator::toCpp(content), ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<std::string>>(misc, [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); }));
+    return ::djinni::c_api::RecordTranslator<::testsuite::ClientReturnedRecord>::make(record_id, ::djinni::c_api::StringTranslator::toCpp(content), ::djinni::c_api::OptionalTranslator<std::experimental::optional<std::string>, ::djinni::c_api::StringTranslator>::toCpp(misc));
 }
 
 int64_t testsuite_client_returned_record_get_record_id(testsuite_client_returned_record_ref instance)
@@ -32,12 +32,12 @@ void testsuite_client_returned_record_set_content(testsuite_client_returned_reco
 
 djinni_string_ref testsuite_client_returned_record_get_misc(testsuite_client_returned_record_ref instance)
 {
-    return ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<std::string>>(::djinni::c_api::RecordTranslator<::testsuite::ClientReturnedRecord>::toCpp(instance).misc, [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::OptionalTranslator<std::experimental::optional<std::string>, ::djinni::c_api::StringTranslator>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::ClientReturnedRecord>::toCpp(instance).misc);
 }
 
 void testsuite_client_returned_record_set_misc(testsuite_client_returned_record_ref instance, djinni_string_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::ClientReturnedRecord>::toCpp(instance).misc = ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<std::string>>(value, [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); });
+    ::djinni::c_api::RecordTranslator<::testsuite::ClientReturnedRecord>::toCpp(instance).misc = ::djinni::c_api::OptionalTranslator<std::experimental::optional<std::string>, ::djinni::c_api::StringTranslator>::toCpp(value);
 }
 
 

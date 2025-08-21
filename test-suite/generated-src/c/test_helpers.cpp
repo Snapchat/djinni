@@ -14,27 +14,13 @@
 #include "test_helpers.hpp"
 #include <memory>
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_test_helpers_method_defs>;
-struct TestHelpers_Proxy: public Proxy_Parent, public ::testsuite::TestHelpers  {
-    TestHelpers_Proxy(::djinni::ProxyClass<testsuite_test_helpers_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~TestHelpers_Proxy() override = default;
-
-};
-
-testsuite_test_helpers_proxy_class_ref testsuite_test_helpers_proxy_class_new(const testsuite_test_helpers_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_test_helpers_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_test_helpers_ref testsuite_test_helpers_new(testsuite_test_helpers_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_test_helpers_method_defs>::make<TestHelpers_Proxy, ::testsuite::TestHelpers>(proxy_class, opaque);
-}
-
 /** Method with documentation */
 testsuite_set_record_ref testsuite_test_helpers_get_set_record()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::get_set_record();
     return ::djinni::c_api::RecordTranslator<::testsuite::SetRecord>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_set_record_ref)
 }
 
 /**
@@ -44,164 +30,220 @@ testsuite_set_record_ref testsuite_test_helpers_get_set_record()
  */
 bool testsuite_test_helpers_check_set_record(testsuite_set_record_ref rec)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::check_set_record(::djinni::c_api::RecordTranslator<::testsuite::SetRecord>::toCpp(rec));
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(bool)
 }
 
 testsuite_primitive_list_ref testsuite_test_helpers_get_primitive_list()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::get_primitive_list();
     return ::djinni::c_api::RecordTranslator<::testsuite::PrimitiveList>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_primitive_list_ref)
 }
 
 bool testsuite_test_helpers_check_primitive_list(testsuite_primitive_list_ref pl)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::check_primitive_list(::djinni::c_api::RecordTranslator<::testsuite::PrimitiveList>::toCpp(pl));
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(bool)
 }
 
 testsuite_nested_collection_ref testsuite_test_helpers_get_nested_collection()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::get_nested_collection();
     return ::djinni::c_api::RecordTranslator<::testsuite::NestedCollection>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_nested_collection_ref)
 }
 
 bool testsuite_test_helpers_check_nested_collection(testsuite_nested_collection_ref nc)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::check_nested_collection(::djinni::c_api::RecordTranslator<::testsuite::NestedCollection>::toCpp(nc));
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(bool)
 }
 
 djinni_keyval_array_ref testsuite_test_helpers_get_map()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::get_map();
-    return ::djinni::c_api::MapTranslator<std::string, int64_t>::fromCpp(std::move(retValue), [](auto key, auto value) { return std::make_pair(::djinni::c_api::StringTranslator::fromCpp(key), ::djinni::c_api::NumberTranslator::fromCpp<int64_t>(value)); });
+    return ::djinni::c_api::MapTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::Int64Translator>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_keyval_array_ref)
 }
 
 bool testsuite_test_helpers_check_map(djinni_keyval_array_ref m)
 {
-    auto retValue = ::testsuite::TestHelpers::check_map(::djinni::c_api::MapTranslator<std::string, int64_t>::toCpp(m, [](auto key, auto value) { return std::make_pair(::djinni::c_api::StringTranslator::toCpp(key), ::djinni::c_api::NumberTranslator::toCpp<int64_t>(value)); }));
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::TestHelpers::check_map(::djinni::c_api::MapTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::Int64Translator>::toCpp(m));
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(bool)
 }
 
 djinni_keyval_array_ref testsuite_test_helpers_get_empty_map()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::get_empty_map();
-    return ::djinni::c_api::MapTranslator<std::string, int64_t>::fromCpp(std::move(retValue), [](auto key, auto value) { return std::make_pair(::djinni::c_api::StringTranslator::fromCpp(key), ::djinni::c_api::NumberTranslator::fromCpp<int64_t>(value)); });
+    return ::djinni::c_api::MapTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::Int64Translator>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_keyval_array_ref)
 }
 
 bool testsuite_test_helpers_check_empty_map(djinni_keyval_array_ref m)
 {
-    auto retValue = ::testsuite::TestHelpers::check_empty_map(::djinni::c_api::MapTranslator<std::string, int64_t>::toCpp(m, [](auto key, auto value) { return std::make_pair(::djinni::c_api::StringTranslator::toCpp(key), ::djinni::c_api::NumberTranslator::toCpp<int64_t>(value)); }));
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::TestHelpers::check_empty_map(::djinni::c_api::MapTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::Int64Translator>::toCpp(m));
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(bool)
 }
 
 testsuite_map_list_record_ref testsuite_test_helpers_get_map_list_record()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::get_map_list_record();
     return ::djinni::c_api::RecordTranslator<::testsuite::MapListRecord>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_map_list_record_ref)
 }
 
 bool testsuite_test_helpers_check_map_list_record(testsuite_map_list_record_ref m)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::check_map_list_record(::djinni::c_api::RecordTranslator<::testsuite::MapListRecord>::toCpp(m));
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(bool)
 }
 
 void testsuite_test_helpers_check_client_interface_ascii(testsuite_client_interface_ref i)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::testsuite::TestHelpers::check_client_interface_ascii(::djinni::c_api::InterfaceTranslator<::testsuite::ClientInterface>::toCpp(i));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 void testsuite_test_helpers_check_client_interface_nonascii(testsuite_client_interface_ref i)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::testsuite::TestHelpers::check_client_interface_nonascii(::djinni::c_api::InterfaceTranslator<::testsuite::ClientInterface>::toCpp(i));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 void testsuite_test_helpers_check_client_interface_args(testsuite_client_interface_ref i)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::testsuite::TestHelpers::check_client_interface_args(::djinni::c_api::InterfaceTranslator<::testsuite::ClientInterface>::toCpp(i));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 void testsuite_test_helpers_check_enum_map(djinni_keyval_array_ref m)
 {
-    ::testsuite::TestHelpers::check_enum_map(::djinni::c_api::MapTranslator<::testsuite::color, std::string>::toCpp(m, [](auto key, auto value) { return std::make_pair(::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(key), ::djinni::c_api::StringTranslator::toCpp(value)); }));
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    ::testsuite::TestHelpers::check_enum_map(::djinni::c_api::MapTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>, ::djinni::c_api::StringTranslator>::toCpp(m));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 void testsuite_test_helpers_check_enum(testsuite_color c)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::testsuite::TestHelpers::check_enum(::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCpp(c));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 testsuite_user_token_ref testsuite_test_helpers_token_id(testsuite_user_token_ref t)
 {
-    auto retValue = ::testsuite::TestHelpers::token_id(::djinni::c_api::OptionalTranslator::toSharedPtrCpp</*nullable*/ std::shared_ptr<::testsuite::UserToken>>(t, [](auto&& value) { return ::djinni::c_api::InterfaceTranslator<::testsuite::UserToken>::toCpp(std::forward<decltype(value)>(value)); }));
-    return ::djinni::c_api::OptionalTranslator::fromSharedPtrCpp</*nullable*/ std::shared_ptr<::testsuite::UserToken>>(std::move(retValue), [](auto&& value) { return ::djinni::c_api::InterfaceTranslator<::testsuite::UserToken>::fromCpp(std::forward<decltype(value)>(value)); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::TestHelpers::token_id(::djinni::c_api::OptionalPtrTranslator<::djinni::c_api::InterfaceTranslator<::testsuite::UserToken>>::toCpp(t));
+    return ::djinni::c_api::OptionalPtrTranslator<::djinni::c_api::InterfaceTranslator<::testsuite::UserToken>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_user_token_ref)
 }
 
 testsuite_user_token_ref testsuite_test_helpers_create_cpp_token()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::create_cpp_token();
     return ::djinni::c_api::InterfaceTranslator<::testsuite::UserToken>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_user_token_ref)
 }
 
 void testsuite_test_helpers_check_cpp_token(testsuite_user_token_ref t)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::testsuite::TestHelpers::check_cpp_token(::djinni::c_api::InterfaceTranslator<::testsuite::UserToken>::toCpp(t));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 int64_t testsuite_test_helpers_cpp_token_id(testsuite_user_token_ref t)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::cpp_token_id(::djinni::c_api::InterfaceTranslator<::testsuite::UserToken>::toCpp(t));
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(int64_t)
 }
 
 void testsuite_test_helpers_check_token_type(testsuite_user_token_ref t, djinni_string_ref type)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::testsuite::TestHelpers::check_token_type(::djinni::c_api::InterfaceTranslator<::testsuite::UserToken>::toCpp(t), ::djinni::c_api::StringTranslator::toCpp(type));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
-djinni_optional_int32_t testsuite_test_helpers_return_none()
+djinni_optional_int32 testsuite_test_helpers_return_none()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::return_none();
-    return ::djinni::c_api::OptionalTranslator::fromCppPrimitive<std::experimental::optional<int32_t>, djinni_optional_int32_t>(std::move(retValue));
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int32_t>, djinni_optional_int32>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_optional_int32)
 }
 
 /** Ensures that we generate integer translation code */
 testsuite_assorted_primitives_ref testsuite_test_helpers_assorted_primitives_id(testsuite_assorted_primitives_ref i)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::assorted_primitives_id(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(i));
     return ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_assorted_primitives_ref)
 }
 
 djinni_binary_ref testsuite_test_helpers_id_binary(djinni_binary_ref b)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::id_binary(::djinni::c_api::BinaryTranslator::toCpp(b));
     return ::djinni::c_api::BinaryTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_binary_ref)
 }
 
 djinni_future_ref testsuite_test_helpers_get_async_result()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::get_async_result();
-    return ::djinni::c_api::FutureTranslator<int32_t>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::FutureTranslator<::djinni::c_api::Int32Translator>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_future_ref)
 }
 
 djinni_future_ref testsuite_test_helpers_future_roundtrip(djinni_future_ref f)
 {
-    auto retValue = ::testsuite::TestHelpers::future_roundtrip(::djinni::c_api::FutureTranslator<int32_t>::toCpp(f, [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int32_t>(std::forward<decltype(value)>(value)); }));
-    return ::djinni::c_api::FutureTranslator<std::string>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::TestHelpers::future_roundtrip(::djinni::c_api::FutureTranslator<::djinni::c_api::Int32Translator>::toCpp(f));
+    return ::djinni::c_api::FutureTranslator<::djinni::c_api::StringTranslator>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_future_ref)
 }
 
 djinni_future_ref testsuite_test_helpers_async_early_throw()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::async_early_throw();
-    return ::djinni::c_api::FutureTranslator<int32_t>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::FutureTranslator<::djinni::c_api::Int32Translator>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_future_ref)
 }
 
 djinni_future_ref testsuite_test_helpers_void_async_method(djinni_future_ref f)
 {
-    auto retValue = ::testsuite::TestHelpers::void_async_method(::djinni::c_api::FutureTranslator<void>::toCpp(f, [](auto&& value) { return std::forward<decltype(value)>(value); }));
-    return ::djinni::c_api::FutureTranslator<void>::fromCpp(std::move(retValue), [](auto&& value) { return std::forward<decltype(value)>(value); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::TestHelpers::void_async_method(::djinni::c_api::FutureTranslator<::djinni::c_api::VoidTranslator>::toCpp(f));
+    return ::djinni::c_api::FutureTranslator<::djinni::c_api::VoidTranslator>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_future_ref)
 }
 
 /**
@@ -210,63 +252,83 @@ djinni_future_ref testsuite_test_helpers_void_async_method(djinni_future_ref f)
  */
 djinni_future_ref testsuite_test_helpers_add_one_if_present(djinni_future_ref f)
 {
-    auto retValue = ::testsuite::TestHelpers::add_one_if_present(::djinni::c_api::FutureTranslator<std::experimental::optional<int32_t>>::toCpp(f, [](auto&& value) { return ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<int32_t>>(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int32_t>(std::forward<decltype(value)>(value)); }); }));
-    return ::djinni::c_api::FutureTranslator<std::experimental::optional<int32_t>>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<int32_t>>(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(std::forward<decltype(value)>(value)); }); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::TestHelpers::add_one_if_present(::djinni::c_api::FutureTranslator<::djinni::c_api::OptionalTranslator<std::experimental::optional<int32_t>, ::djinni::c_api::Int32Translator>>::toCpp(f));
+    return ::djinni::c_api::FutureTranslator<::djinni::c_api::OptionalTranslator<std::experimental::optional<int32_t>, ::djinni::c_api::Int32Translator>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_future_ref)
 }
 
 /** try-catches the future f, and accesses the error message, and returns as a string. */
 djinni_future_ref testsuite_test_helpers_return_exception_string(djinni_future_ref f)
 {
-    auto retValue = ::testsuite::TestHelpers::return_exception_string(::djinni::c_api::FutureTranslator<int32_t>::toCpp(f, [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int32_t>(std::forward<decltype(value)>(value)); }));
-    return ::djinni::c_api::FutureTranslator<std::string>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::TestHelpers::return_exception_string(::djinni::c_api::FutureTranslator<::djinni::c_api::Int32Translator>::toCpp(f));
+    return ::djinni::c_api::FutureTranslator<::djinni::c_api::StringTranslator>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_future_ref)
 }
 
 djinni_future_ref testsuite_test_helpers_check_async_interface(testsuite_async_interface_ref i)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::check_async_interface(::djinni::c_api::InterfaceTranslator<::testsuite::AsyncInterface>::toCpp(i));
-    return ::djinni::c_api::FutureTranslator<std::string>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::FutureTranslator<::djinni::c_api::StringTranslator>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_future_ref)
 }
 
 djinni_future_ref testsuite_test_helpers_check_async_composition(testsuite_async_interface_ref i)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::check_async_composition(::djinni::c_api::InterfaceTranslator<::testsuite::AsyncInterface>::toCpp(i));
-    return ::djinni::c_api::FutureTranslator<std::string>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::FutureTranslator<::djinni::c_api::StringTranslator>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_future_ref)
 }
 
 djinni_array_ref testsuite_test_helpers_get_optional_list()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::get_optional_list();
-    return ::djinni::c_api::ListTranslator<std::experimental::optional<std::string>>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<std::string>>(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); }); });
+    return ::djinni::c_api::ListTranslator<::djinni::c_api::OptionalTranslator<std::experimental::optional<std::string>, ::djinni::c_api::StringTranslator>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_array_ref)
 }
 
 bool testsuite_test_helpers_check_optional_list(djinni_array_ref ol)
 {
-    auto retValue = ::testsuite::TestHelpers::check_optional_list(::djinni::c_api::ListTranslator<std::experimental::optional<std::string>>::toCpp(ol, [](auto&& value) { return ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<std::string>>(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); }); }));
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::TestHelpers::check_optional_list(::djinni::c_api::ListTranslator<::djinni::c_api::OptionalTranslator<std::experimental::optional<std::string>, ::djinni::c_api::StringTranslator>>::toCpp(ol));
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(bool)
 }
 
 djinni_array_ref testsuite_test_helpers_get_optional_set()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::get_optional_set();
-    return ::djinni::c_api::SetTranslator<std::experimental::optional<std::string>>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<std::string>>(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); }); });
+    return ::djinni::c_api::SetTranslator<::djinni::c_api::OptionalTranslator<std::experimental::optional<std::string>, ::djinni::c_api::StringTranslator>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_array_ref)
 }
 
 bool testsuite_test_helpers_check_optional_set(djinni_array_ref os)
 {
-    auto retValue = ::testsuite::TestHelpers::check_optional_set(::djinni::c_api::SetTranslator<std::experimental::optional<std::string>>::toCpp(os, [](auto&& value) { return ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<std::string>>(std::forward<decltype(value)>(value), [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); }); }));
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::TestHelpers::check_optional_set(::djinni::c_api::SetTranslator<::djinni::c_api::OptionalTranslator<std::experimental::optional<std::string>, ::djinni::c_api::StringTranslator>>::toCpp(os));
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(bool)
 }
 
 djinni_keyval_array_ref testsuite_test_helpers_get_optional_map()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::TestHelpers::get_optional_map();
-    return ::djinni::c_api::MapTranslator<std::experimental::optional<std::string>, std::experimental::optional<std::string>>::fromCpp(std::move(retValue), [](auto key, auto value) { return std::make_pair(::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<std::string>>(key, [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); }), ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<std::string>>(value, [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); })); });
+    return ::djinni::c_api::MapTranslator<::djinni::c_api::OptionalTranslator<std::experimental::optional<std::string>, ::djinni::c_api::StringTranslator>, ::djinni::c_api::OptionalTranslator<std::experimental::optional<std::string>, ::djinni::c_api::StringTranslator>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_keyval_array_ref)
 }
 
 bool testsuite_test_helpers_check_optional_map(djinni_keyval_array_ref om)
 {
-    auto retValue = ::testsuite::TestHelpers::check_optional_map(::djinni::c_api::MapTranslator<std::experimental::optional<std::string>, std::experimental::optional<std::string>>::toCpp(om, [](auto key, auto value) { return std::make_pair(::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<std::string>>(key, [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); }), ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<std::string>>(value, [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); })); }));
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::TestHelpers::check_optional_map(::djinni::c_api::MapTranslator<::djinni::c_api::OptionalTranslator<std::experimental::optional<std::string>, ::djinni::c_api::StringTranslator>, ::djinni::c_api::OptionalTranslator<std::experimental::optional<std::string>, ::djinni::c_api::StringTranslator>>::toCpp(om));
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(bool)
 }
 
 

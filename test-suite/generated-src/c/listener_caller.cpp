@@ -6,44 +6,26 @@
 #include "listener_caller.hpp"
 #include <memory>
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_listener_caller_method_defs>;
-struct ListenerCaller_Proxy: public Proxy_Parent, public ::testsuite::ListenerCaller  {
-    ListenerCaller_Proxy(::djinni::ProxyClass<testsuite_listener_caller_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~ListenerCaller_Proxy() override = default;
-
-    void callFirst() override {
-        Proxy_Parent::getProxyClass().methodDefs().callFirst(Proxy_Parent::getOpaque());
-    }
-
-    void callSecond() override {
-        Proxy_Parent::getProxyClass().methodDefs().callSecond(Proxy_Parent::getOpaque());
-    }
-
-};
-
-testsuite_listener_caller_proxy_class_ref testsuite_listener_caller_proxy_class_new(const testsuite_listener_caller_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_listener_caller_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_listener_caller_ref testsuite_listener_caller_new(testsuite_listener_caller_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_listener_caller_method_defs>::make<ListenerCaller_Proxy, ::testsuite::ListenerCaller>(proxy_class, opaque);
-}
-
 testsuite_listener_caller_ref testsuite_listener_caller_init(testsuite_first_listener_ref first_l, testsuite_second_listener_ref second_l)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::ListenerCaller::init(::djinni::c_api::InterfaceTranslator<::testsuite::FirstListener>::toCpp(first_l), ::djinni::c_api::InterfaceTranslator<::testsuite::SecondListener>::toCpp(second_l));
     return ::djinni::c_api::InterfaceTranslator<::testsuite::ListenerCaller>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_listener_caller_ref)
 }
 
 void testsuite_listener_caller_callFirst(testsuite_listener_caller_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::djinni::c_api::InterfaceTranslator<::testsuite::ListenerCaller>::toCpp(instance)->callFirst();
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 void testsuite_listener_caller_callSecond(testsuite_listener_caller_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::djinni::c_api::InterfaceTranslator<::testsuite::ListenerCaller>::toCpp(instance)->callSecond();
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 

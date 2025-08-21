@@ -7,27 +7,27 @@
 
 testsuite_map_record_ref testsuite_map_record_new(djinni_keyval_array_ref map, djinni_keyval_array_ref imap) 
 {
-    return ::djinni::c_api::RecordTranslator<::testsuite::MapRecord>::make(::djinni::c_api::MapTranslator<std::string, int64_t>::toCpp(map, [](auto key, auto value) { return std::make_pair(::djinni::c_api::StringTranslator::toCpp(key), ::djinni::c_api::NumberTranslator::toCpp<int64_t>(value)); }), ::djinni::c_api::MapTranslator<int32_t, int32_t>::toCpp(imap, [](auto key, auto value) { return std::make_pair(::djinni::c_api::NumberTranslator::toCpp<int32_t>(key), ::djinni::c_api::NumberTranslator::toCpp<int32_t>(value)); }));
+    return ::djinni::c_api::RecordTranslator<::testsuite::MapRecord>::make(::djinni::c_api::MapTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::Int64Translator>::toCpp(map), ::djinni::c_api::MapTranslator<::djinni::c_api::Int32Translator, ::djinni::c_api::Int32Translator>::toCpp(imap));
 }
 
 djinni_keyval_array_ref testsuite_map_record_get_map(testsuite_map_record_ref instance)
 {
-    return ::djinni::c_api::MapTranslator<std::string, int64_t>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::MapRecord>::toCpp(instance).map, [](auto key, auto value) { return std::make_pair(::djinni::c_api::StringTranslator::fromCpp(key), ::djinni::c_api::NumberTranslator::fromCpp<int64_t>(value)); });
+    return ::djinni::c_api::MapTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::Int64Translator>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::MapRecord>::toCpp(instance).map);
 }
 
 void testsuite_map_record_set_map(testsuite_map_record_ref instance, djinni_keyval_array_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::MapRecord>::toCpp(instance).map = ::djinni::c_api::MapTranslator<std::string, int64_t>::toCpp(value, [](auto key, auto value) { return std::make_pair(::djinni::c_api::StringTranslator::toCpp(key), ::djinni::c_api::NumberTranslator::toCpp<int64_t>(value)); });
+    ::djinni::c_api::RecordTranslator<::testsuite::MapRecord>::toCpp(instance).map = ::djinni::c_api::MapTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::Int64Translator>::toCpp(value);
 }
 
 djinni_keyval_array_ref testsuite_map_record_get_imap(testsuite_map_record_ref instance)
 {
-    return ::djinni::c_api::MapTranslator<int32_t, int32_t>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::MapRecord>::toCpp(instance).imap, [](auto key, auto value) { return std::make_pair(::djinni::c_api::NumberTranslator::fromCpp<int32_t>(key), ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(value)); });
+    return ::djinni::c_api::MapTranslator<::djinni::c_api::Int32Translator, ::djinni::c_api::Int32Translator>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::MapRecord>::toCpp(instance).imap);
 }
 
 void testsuite_map_record_set_imap(testsuite_map_record_ref instance, djinni_keyval_array_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::MapRecord>::toCpp(instance).imap = ::djinni::c_api::MapTranslator<int32_t, int32_t>::toCpp(value, [](auto key, auto value) { return std::make_pair(::djinni::c_api::NumberTranslator::toCpp<int32_t>(key), ::djinni::c_api::NumberTranslator::toCpp<int32_t>(value)); });
+    ::djinni::c_api::RecordTranslator<::testsuite::MapRecord>::toCpp(instance).imap = ::djinni::c_api::MapTranslator<::djinni::c_api::Int32Translator, ::djinni::c_api::Int32Translator>::toCpp(value);
 }
 
 

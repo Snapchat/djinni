@@ -25,54 +25,6 @@ extern "C" {
  *   Indented third line of multi-line documentation.)
  */
 typedef djinni_interface_ref testsuite_test_helpers_ref;
-typedef djinni_proxy_class_ref testsuite_test_helpers_proxy_class_ref;
-
-typedef struct 
-{
-    testsuite_set_record_ref (*get_set_record)(void *);
-    bool (*check_set_record)(void *, testsuite_set_record_ref);
-    testsuite_primitive_list_ref (*get_primitive_list)(void *);
-    bool (*check_primitive_list)(void *, testsuite_primitive_list_ref);
-    testsuite_nested_collection_ref (*get_nested_collection)(void *);
-    bool (*check_nested_collection)(void *, testsuite_nested_collection_ref);
-    djinni_keyval_array_ref (*get_map)(void *);
-    bool (*check_map)(void *, djinni_keyval_array_ref);
-    djinni_keyval_array_ref (*get_empty_map)(void *);
-    bool (*check_empty_map)(void *, djinni_keyval_array_ref);
-    testsuite_map_list_record_ref (*get_map_list_record)(void *);
-    bool (*check_map_list_record)(void *, testsuite_map_list_record_ref);
-    void (*check_client_interface_ascii)(void *, testsuite_client_interface_ref);
-    void (*check_client_interface_nonascii)(void *, testsuite_client_interface_ref);
-    void (*check_client_interface_args)(void *, testsuite_client_interface_ref);
-    void (*check_enum_map)(void *, djinni_keyval_array_ref);
-    void (*check_enum)(void *, testsuite_color);
-    testsuite_user_token_ref (*token_id)(void *, testsuite_user_token_ref);
-    testsuite_user_token_ref (*create_cpp_token)(void *);
-    void (*check_cpp_token)(void *, testsuite_user_token_ref);
-    int64_t (*cpp_token_id)(void *, testsuite_user_token_ref);
-    void (*check_token_type)(void *, testsuite_user_token_ref, djinni_string_ref);
-    djinni_optional_int32_t (*return_none)(void *);
-    testsuite_assorted_primitives_ref (*assorted_primitives_id)(void *, testsuite_assorted_primitives_ref);
-    djinni_binary_ref (*id_binary)(void *, djinni_binary_ref);
-    djinni_future_ref (*get_async_result)(void *);
-    djinni_future_ref (*future_roundtrip)(void *, djinni_future_ref);
-    djinni_future_ref (*async_early_throw)(void *);
-    djinni_future_ref (*void_async_method)(void *, djinni_future_ref);
-    djinni_future_ref (*add_one_if_present)(void *, djinni_future_ref);
-    djinni_future_ref (*return_exception_string)(void *, djinni_future_ref);
-    djinni_future_ref (*check_async_interface)(void *, testsuite_async_interface_ref);
-    djinni_future_ref (*check_async_composition)(void *, testsuite_async_interface_ref);
-    djinni_array_ref (*get_optional_list)(void *);
-    bool (*check_optional_list)(void *, djinni_array_ref);
-    djinni_array_ref (*get_optional_set)(void *);
-    bool (*check_optional_set)(void *, djinni_array_ref);
-    djinni_keyval_array_ref (*get_optional_map)(void *);
-    bool (*check_optional_map)(void *, djinni_keyval_array_ref);
-} testsuite_test_helpers_method_defs;
-
-testsuite_test_helpers_proxy_class_ref testsuite_test_helpers_proxy_class_new(const testsuite_test_helpers_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_test_helpers_ref testsuite_test_helpers_new(testsuite_test_helpers_proxy_class_ref proxy_class, void *opaque);
 
 /** Method with documentation */
 testsuite_set_record_ref testsuite_test_helpers_get_set_record();
@@ -124,7 +76,7 @@ int64_t testsuite_test_helpers_cpp_token_id(testsuite_user_token_ref t);
 
 void testsuite_test_helpers_check_token_type(testsuite_user_token_ref t, djinni_string_ref type);
 
-djinni_optional_int32_t testsuite_test_helpers_return_none();
+djinni_optional_int32 testsuite_test_helpers_return_none();
 
 /** Ensures that we generate integer translation code */
 testsuite_assorted_primitives_ref testsuite_test_helpers_assorted_primitives_id(testsuite_assorted_primitives_ref i);

@@ -6,70 +6,34 @@
 #include "uses_single_language_listeners.hpp"
 #include <memory>
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_uses_single_language_listeners_method_defs>;
-struct UsesSingleLanguageListeners_Proxy: public Proxy_Parent, public ::testsuite::UsesSingleLanguageListeners  {
-    UsesSingleLanguageListeners_Proxy(::djinni::ProxyClass<testsuite_uses_single_language_listeners_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~UsesSingleLanguageListeners_Proxy() override = default;
-
-    void callForObjC(const /*not-null*/ std::shared_ptr<::testsuite::ObjcOnlyListener> & l) override {
-        auto l_c = ::djinni::c_api::InterfaceTranslator<::testsuite::ObjcOnlyListener>::fromCpp(l);
-        Proxy_Parent::getProxyClass().methodDefs().callForObjC(Proxy_Parent::getOpaque(), l_c);
-        djinni_ref_release(l_c);
-    }
-
-    /*not-null*/ std::shared_ptr<::testsuite::ObjcOnlyListener> returnForObjC() override {
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().returnForObjC(Proxy_Parent::getOpaque());
-
-        auto returnValue_cpp = ::djinni::c_api::InterfaceTranslator<::testsuite::ObjcOnlyListener>::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-    void callForJava(const /*not-null*/ std::shared_ptr<::testsuite::JavaOnlyListener> & l) override {
-        auto l_c = ::djinni::c_api::InterfaceTranslator<::testsuite::JavaOnlyListener>::fromCpp(l);
-        Proxy_Parent::getProxyClass().methodDefs().callForJava(Proxy_Parent::getOpaque(), l_c);
-        djinni_ref_release(l_c);
-    }
-
-    /*not-null*/ std::shared_ptr<::testsuite::JavaOnlyListener> returnForJava() override {
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().returnForJava(Proxy_Parent::getOpaque());
-
-        auto returnValue_cpp = ::djinni::c_api::InterfaceTranslator<::testsuite::JavaOnlyListener>::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-};
-
-testsuite_uses_single_language_listeners_proxy_class_ref testsuite_uses_single_language_listeners_proxy_class_new(const testsuite_uses_single_language_listeners_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_uses_single_language_listeners_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_uses_single_language_listeners_ref testsuite_uses_single_language_listeners_new(testsuite_uses_single_language_listeners_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_uses_single_language_listeners_method_defs>::make<UsesSingleLanguageListeners_Proxy, ::testsuite::UsesSingleLanguageListeners>(proxy_class, opaque);
-}
-
 void testsuite_uses_single_language_listeners_callForObjC(testsuite_uses_single_language_listeners_ref instance, testsuite_objc_only_listener_ref l)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::djinni::c_api::InterfaceTranslator<::testsuite::UsesSingleLanguageListeners>::toCpp(instance)->callForObjC(::djinni::c_api::InterfaceTranslator<::testsuite::ObjcOnlyListener>::toCpp(l));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 testsuite_objc_only_listener_ref testsuite_uses_single_language_listeners_returnForObjC(testsuite_uses_single_language_listeners_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::UsesSingleLanguageListeners>::toCpp(instance)->returnForObjC();
     return ::djinni::c_api::InterfaceTranslator<::testsuite::ObjcOnlyListener>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_objc_only_listener_ref)
 }
 
 void testsuite_uses_single_language_listeners_callForJava(testsuite_uses_single_language_listeners_ref instance, testsuite_java_only_listener_ref l)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::djinni::c_api::InterfaceTranslator<::testsuite::UsesSingleLanguageListeners>::toCpp(instance)->callForJava(::djinni::c_api::InterfaceTranslator<::testsuite::JavaOnlyListener>::toCpp(l));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 testsuite_java_only_listener_ref testsuite_uses_single_language_listeners_returnForJava(testsuite_uses_single_language_listeners_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::UsesSingleLanguageListeners>::toCpp(instance)->returnForJava();
     return ::djinni::c_api::InterfaceTranslator<::testsuite::JavaOnlyListener>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_java_only_listener_ref)
 }
 
 

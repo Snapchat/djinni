@@ -19,18 +19,6 @@ extern "C" {
  * comparison.
  */
 typedef djinni_interface_ref testsuite_listener_caller_ref;
-typedef djinni_proxy_class_ref testsuite_listener_caller_proxy_class_ref;
-
-typedef struct 
-{
-    testsuite_listener_caller_ref (*init)(void *, testsuite_first_listener_ref, testsuite_second_listener_ref);
-    void (*callFirst)(void *);
-    void (*callSecond)(void *);
-} testsuite_listener_caller_method_defs;
-
-testsuite_listener_caller_proxy_class_ref testsuite_listener_caller_proxy_class_new(const testsuite_listener_caller_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_listener_caller_ref testsuite_listener_caller_new(testsuite_listener_caller_proxy_class_ref proxy_class, void *opaque);
 
 testsuite_listener_caller_ref testsuite_listener_caller_init(testsuite_first_listener_ref first_l, testsuite_second_listener_ref second_l);
 

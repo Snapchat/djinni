@@ -5,29 +5,11 @@
 #include "djinni_c_translators.hpp"
 #include "throwing_interface.hpp"
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_throwing_interface_method_defs>;
-struct ThrowingInterface_Proxy: public Proxy_Parent, public ::testsuite::ThrowingInterface  {
-    ThrowingInterface_Proxy(::djinni::ProxyClass<testsuite_throwing_interface_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~ThrowingInterface_Proxy() override = default;
-
-    void throw_exception() override {
-        Proxy_Parent::getProxyClass().methodDefs().throw_exception(Proxy_Parent::getOpaque());
-    }
-
-};
-
-testsuite_throwing_interface_proxy_class_ref testsuite_throwing_interface_proxy_class_new(const testsuite_throwing_interface_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_throwing_interface_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_throwing_interface_ref testsuite_throwing_interface_new(testsuite_throwing_interface_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_throwing_interface_method_defs>::make<ThrowingInterface_Proxy, ::testsuite::ThrowingInterface>(proxy_class, opaque);
-}
-
 void testsuite_throwing_interface_throw_exception(testsuite_throwing_interface_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::djinni::c_api::InterfaceTranslator<::testsuite::ThrowingInterface>::toCpp(instance)->throw_exception();
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 

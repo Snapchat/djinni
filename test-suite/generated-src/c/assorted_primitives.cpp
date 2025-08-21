@@ -5,9 +5,9 @@
 #include "djinni_c_translators.hpp"
 #include "assorted_primitives.hpp"
 
-testsuite_assorted_primitives_ref testsuite_assorted_primitives_new(bool b, int8_t eight, int16_t sixteen, int32_t thirtytwo, int64_t sixtyfour, float fthirtytwo, double fsixtyfour, djinni_optional_bool o_b, djinni_optional_int8_t o_eight, djinni_optional_int16_t o_sixteen, djinni_optional_int32_t o_thirtytwo, djinni_optional_int64_t o_sixtyfour, djinni_optional_float o_fthirtytwo, djinni_optional_double o_fsixtyfour) 
+testsuite_assorted_primitives_ref testsuite_assorted_primitives_new(bool b, int8_t eight, int16_t sixteen, int32_t thirtytwo, int64_t sixtyfour, float fthirtytwo, double fsixtyfour, djinni_optional_bool o_b, djinni_optional_int8 o_eight, djinni_optional_int16 o_sixteen, djinni_optional_int32 o_thirtytwo, djinni_optional_int64 o_sixtyfour, djinni_optional_float o_fthirtytwo, djinni_optional_double o_fsixtyfour) 
 {
-    return ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::make(b, eight, sixteen, thirtytwo, sixtyfour, fthirtytwo, fsixtyfour, ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<bool>, djinni_optional_bool>(o_b), ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<int8_t>, djinni_optional_int8_t>(o_eight), ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<int16_t>, djinni_optional_int16_t>(o_sixteen), ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<int32_t>, djinni_optional_int32_t>(o_thirtytwo), ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<int64_t>, djinni_optional_int64_t>(o_sixtyfour), ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<float>, djinni_optional_float>(o_fthirtytwo), ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<double>, djinni_optional_double>(o_fsixtyfour));
+    return ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::make(b, eight, sixteen, thirtytwo, sixtyfour, fthirtytwo, fsixtyfour, ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<bool>, djinni_optional_bool>::toCpp(o_b), ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int8_t>, djinni_optional_int8>::toCpp(o_eight), ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int16_t>, djinni_optional_int16>::toCpp(o_sixteen), ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int32_t>, djinni_optional_int32>::toCpp(o_thirtytwo), ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int64_t>, djinni_optional_int64>::toCpp(o_sixtyfour), ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<float>, djinni_optional_float>::toCpp(o_fthirtytwo), ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<double>, djinni_optional_double>::toCpp(o_fsixtyfour));
 }
 
 bool testsuite_assorted_primitives_get_b(testsuite_assorted_primitives_ref instance)
@@ -82,72 +82,72 @@ void testsuite_assorted_primitives_set_fsixtyfour(testsuite_assorted_primitives_
 
 djinni_optional_bool testsuite_assorted_primitives_get_o_b(testsuite_assorted_primitives_ref instance)
 {
-    return ::djinni::c_api::OptionalTranslator::fromCppPrimitive<std::experimental::optional<bool>, djinni_optional_bool>(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_b);
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<bool>, djinni_optional_bool>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_b);
 }
 
 void testsuite_assorted_primitives_set_o_b(testsuite_assorted_primitives_ref instance, djinni_optional_bool value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_b = ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<bool>, djinni_optional_bool>(value);
+    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_b = ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<bool>, djinni_optional_bool>::toCpp(value);
 }
 
-djinni_optional_int8_t testsuite_assorted_primitives_get_o_eight(testsuite_assorted_primitives_ref instance)
+djinni_optional_int8 testsuite_assorted_primitives_get_o_eight(testsuite_assorted_primitives_ref instance)
 {
-    return ::djinni::c_api::OptionalTranslator::fromCppPrimitive<std::experimental::optional<int8_t>, djinni_optional_int8_t>(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_eight);
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int8_t>, djinni_optional_int8>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_eight);
 }
 
-void testsuite_assorted_primitives_set_o_eight(testsuite_assorted_primitives_ref instance, djinni_optional_int8_t value)
+void testsuite_assorted_primitives_set_o_eight(testsuite_assorted_primitives_ref instance, djinni_optional_int8 value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_eight = ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<int8_t>, djinni_optional_int8_t>(value);
+    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_eight = ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int8_t>, djinni_optional_int8>::toCpp(value);
 }
 
-djinni_optional_int16_t testsuite_assorted_primitives_get_o_sixteen(testsuite_assorted_primitives_ref instance)
+djinni_optional_int16 testsuite_assorted_primitives_get_o_sixteen(testsuite_assorted_primitives_ref instance)
 {
-    return ::djinni::c_api::OptionalTranslator::fromCppPrimitive<std::experimental::optional<int16_t>, djinni_optional_int16_t>(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_sixteen);
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int16_t>, djinni_optional_int16>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_sixteen);
 }
 
-void testsuite_assorted_primitives_set_o_sixteen(testsuite_assorted_primitives_ref instance, djinni_optional_int16_t value)
+void testsuite_assorted_primitives_set_o_sixteen(testsuite_assorted_primitives_ref instance, djinni_optional_int16 value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_sixteen = ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<int16_t>, djinni_optional_int16_t>(value);
+    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_sixteen = ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int16_t>, djinni_optional_int16>::toCpp(value);
 }
 
-djinni_optional_int32_t testsuite_assorted_primitives_get_o_thirtytwo(testsuite_assorted_primitives_ref instance)
+djinni_optional_int32 testsuite_assorted_primitives_get_o_thirtytwo(testsuite_assorted_primitives_ref instance)
 {
-    return ::djinni::c_api::OptionalTranslator::fromCppPrimitive<std::experimental::optional<int32_t>, djinni_optional_int32_t>(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_thirtytwo);
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int32_t>, djinni_optional_int32>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_thirtytwo);
 }
 
-void testsuite_assorted_primitives_set_o_thirtytwo(testsuite_assorted_primitives_ref instance, djinni_optional_int32_t value)
+void testsuite_assorted_primitives_set_o_thirtytwo(testsuite_assorted_primitives_ref instance, djinni_optional_int32 value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_thirtytwo = ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<int32_t>, djinni_optional_int32_t>(value);
+    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_thirtytwo = ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int32_t>, djinni_optional_int32>::toCpp(value);
 }
 
-djinni_optional_int64_t testsuite_assorted_primitives_get_o_sixtyfour(testsuite_assorted_primitives_ref instance)
+djinni_optional_int64 testsuite_assorted_primitives_get_o_sixtyfour(testsuite_assorted_primitives_ref instance)
 {
-    return ::djinni::c_api::OptionalTranslator::fromCppPrimitive<std::experimental::optional<int64_t>, djinni_optional_int64_t>(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_sixtyfour);
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int64_t>, djinni_optional_int64>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_sixtyfour);
 }
 
-void testsuite_assorted_primitives_set_o_sixtyfour(testsuite_assorted_primitives_ref instance, djinni_optional_int64_t value)
+void testsuite_assorted_primitives_set_o_sixtyfour(testsuite_assorted_primitives_ref instance, djinni_optional_int64 value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_sixtyfour = ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<int64_t>, djinni_optional_int64_t>(value);
+    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_sixtyfour = ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int64_t>, djinni_optional_int64>::toCpp(value);
 }
 
 djinni_optional_float testsuite_assorted_primitives_get_o_fthirtytwo(testsuite_assorted_primitives_ref instance)
 {
-    return ::djinni::c_api::OptionalTranslator::fromCppPrimitive<std::experimental::optional<float>, djinni_optional_float>(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_fthirtytwo);
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<float>, djinni_optional_float>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_fthirtytwo);
 }
 
 void testsuite_assorted_primitives_set_o_fthirtytwo(testsuite_assorted_primitives_ref instance, djinni_optional_float value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_fthirtytwo = ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<float>, djinni_optional_float>(value);
+    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_fthirtytwo = ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<float>, djinni_optional_float>::toCpp(value);
 }
 
 djinni_optional_double testsuite_assorted_primitives_get_o_fsixtyfour(testsuite_assorted_primitives_ref instance)
 {
-    return ::djinni::c_api::OptionalTranslator::fromCppPrimitive<std::experimental::optional<double>, djinni_optional_double>(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_fsixtyfour);
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<double>, djinni_optional_double>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_fsixtyfour);
 }
 
 void testsuite_assorted_primitives_set_o_fsixtyfour(testsuite_assorted_primitives_ref instance, djinni_optional_double value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_fsixtyfour = ::djinni::c_api::OptionalTranslator::toCppPrimitive<std::experimental::optional<double>, djinni_optional_double>(value);
+    ::djinni::c_api::RecordTranslator<::testsuite::AssortedPrimitives>::toCpp(instance).o_fsixtyfour = ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<double>, djinni_optional_double>::toCpp(value);
 }
 
 

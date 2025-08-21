@@ -6,49 +6,20 @@
 #include "conflict_user.hpp"
 #include <memory>
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_conflict_user_method_defs>;
-struct ConflictUser_Proxy: public Proxy_Parent, public ::testsuite::ConflictUser  {
-    ConflictUser_Proxy(::djinni::ProxyClass<testsuite_conflict_user_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~ConflictUser_Proxy() override = default;
-
-    /*not-null*/ std::shared_ptr<::testsuite::Conflict> Conflict() override {
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().Conflict(Proxy_Parent::getOpaque());
-
-        auto returnValue_cpp = ::djinni::c_api::InterfaceTranslator<::testsuite::Conflict>::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-    bool conflict_arg(const std::vector</*not-null*/ std::shared_ptr<::testsuite::Conflict>> & cs) override {
-        auto cs_c = ::djinni::c_api::ListTranslator</*not-null*/ std::shared_ptr<::testsuite::Conflict>>::fromCpp(cs, [](auto&& value) { return ::djinni::c_api::InterfaceTranslator<::testsuite::Conflict>::fromCpp(std::forward<decltype(value)>(value)); });
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().conflict_arg(Proxy_Parent::getOpaque(), cs_c);
-        djinni_ref_release(cs_c);
-
-        auto returnValue_cpp = returnValue;
-        return returnValue_cpp;
-    }
-
-};
-
-testsuite_conflict_user_proxy_class_ref testsuite_conflict_user_proxy_class_new(const testsuite_conflict_user_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_conflict_user_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_conflict_user_ref testsuite_conflict_user_new(testsuite_conflict_user_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_conflict_user_method_defs>::make<ConflictUser_Proxy, ::testsuite::ConflictUser>(proxy_class, opaque);
-}
-
 testsuite_Conflict_ref testsuite_conflict_user_Conflict(testsuite_conflict_user_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::ConflictUser>::toCpp(instance)->Conflict();
     return ::djinni::c_api::InterfaceTranslator<::testsuite::Conflict>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_Conflict_ref)
 }
 
 bool testsuite_conflict_user_conflict_arg(testsuite_conflict_user_ref instance, djinni_array_ref cs)
 {
-    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::ConflictUser>::toCpp(instance)->conflict_arg(::djinni::c_api::ListTranslator</*not-null*/ std::shared_ptr<::testsuite::Conflict>>::toCpp(cs, [](auto&& value) { return ::djinni::c_api::InterfaceTranslator<::testsuite::Conflict>::toCpp(std::forward<decltype(value)>(value)); }));
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::ConflictUser>::toCpp(instance)->conflict_arg(::djinni::c_api::ListTranslator<::djinni::c_api::InterfaceTranslator<::testsuite::Conflict>>::toCpp(cs));
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(bool)
 }
 
 

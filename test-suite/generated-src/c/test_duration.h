@@ -11,35 +11,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_test_duration_ref;
-typedef djinni_proxy_class_ref testsuite_test_duration_proxy_class_ref;
-
-typedef struct 
-{
-    djinni_string_ref (*hoursString)(void *, djinni_number_ref);
-    djinni_string_ref (*minutesString)(void *, djinni_number_ref);
-    djinni_string_ref (*secondsString)(void *, djinni_number_ref);
-    djinni_string_ref (*millisString)(void *, djinni_number_ref);
-    djinni_string_ref (*microsString)(void *, djinni_number_ref);
-    djinni_string_ref (*nanosString)(void *, djinni_number_ref);
-    djinni_number_ref (*hours)(void *, int32_t);
-    djinni_number_ref (*minutes)(void *, int32_t);
-    djinni_number_ref (*seconds)(void *, int32_t);
-    djinni_number_ref (*millis)(void *, int32_t);
-    djinni_number_ref (*micros)(void *, int32_t);
-    djinni_number_ref (*nanos)(void *, int32_t);
-    djinni_number_ref (*hoursf)(void *, double);
-    djinni_number_ref (*minutesf)(void *, double);
-    djinni_number_ref (*secondsf)(void *, double);
-    djinni_number_ref (*millisf)(void *, double);
-    djinni_number_ref (*microsf)(void *, double);
-    djinni_number_ref (*nanosf)(void *, double);
-    djinni_number_ref (*box)(void *, int64_t);
-    int64_t (*unbox)(void *, djinni_number_ref);
-} testsuite_test_duration_method_defs;
-
-testsuite_test_duration_proxy_class_ref testsuite_test_duration_proxy_class_new(const testsuite_test_duration_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_test_duration_ref testsuite_test_duration_new(testsuite_test_duration_proxy_class_ref proxy_class, void *opaque);
 
 djinni_string_ref testsuite_test_duration_hoursString(djinni_number_ref dt);
 

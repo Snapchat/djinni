@@ -5,29 +5,15 @@
 #include "djinni_c_translators.hpp"
 #include "test_static_method_language.hpp"
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_test_static_method_language_method_defs>;
-struct TestStaticMethodLanguage_Proxy: public Proxy_Parent, public ::testsuite::TestStaticMethodLanguage  {
-    TestStaticMethodLanguage_Proxy(::djinni::ProxyClass<testsuite_test_static_method_language_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~TestStaticMethodLanguage_Proxy() override = default;
-
-};
-
-testsuite_test_static_method_language_proxy_class_ref testsuite_test_static_method_language_proxy_class_new(const testsuite_test_static_method_language_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_test_static_method_language_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_test_static_method_language_ref testsuite_test_static_method_language_new(testsuite_test_static_method_language_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_test_static_method_language_method_defs>::make<TestStaticMethodLanguage_Proxy, ::testsuite::TestStaticMethodLanguage>(proxy_class, opaque);
-}
-
 /**
  * callable only from c++. platform code should compile and link even without
  * c++ providing the implementation.
  */
 void testsuite_test_static_method_language_test_method()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::testsuite::TestStaticMethodLanguage::test_method();
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 

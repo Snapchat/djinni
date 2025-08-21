@@ -5,20 +5,4 @@
 #include "djinni_c_translators.hpp"
 #include "Conflict.hpp"
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_Conflict_method_defs>;
-struct Conflict_Proxy: public Proxy_Parent, public ::testsuite::Conflict  {
-    Conflict_Proxy(::djinni::ProxyClass<testsuite_Conflict_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~Conflict_Proxy() override = default;
-
-};
-
-testsuite_Conflict_proxy_class_ref testsuite_Conflict_proxy_class_new(const testsuite_Conflict_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_Conflict_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_Conflict_ref testsuite_Conflict_new(testsuite_Conflict_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_Conflict_method_defs>::make<Conflict_Proxy, ::testsuite::Conflict>(proxy_class, opaque);
-}
-
 

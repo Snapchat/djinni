@@ -7,44 +7,36 @@
 #include "empty_flags.hpp"
 #include "flag_roundtrip.hpp"
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_flag_roundtrip_method_defs>;
-struct FlagRoundtrip_Proxy: public Proxy_Parent, public ::testsuite::FlagRoundtrip  {
-    FlagRoundtrip_Proxy(::djinni::ProxyClass<testsuite_flag_roundtrip_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~FlagRoundtrip_Proxy() override = default;
-
-};
-
-testsuite_flag_roundtrip_proxy_class_ref testsuite_flag_roundtrip_proxy_class_new(const testsuite_flag_roundtrip_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_flag_roundtrip_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_flag_roundtrip_ref testsuite_flag_roundtrip_new(testsuite_flag_roundtrip_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_flag_roundtrip_method_defs>::make<FlagRoundtrip_Proxy, ::testsuite::FlagRoundtrip>(proxy_class, opaque);
-}
-
 testsuite_access_flags testsuite_flag_roundtrip_roundtrip_access(testsuite_access_flags flag)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::FlagRoundtrip::roundtrip_access(::djinni::c_api::EnumTranslator<::testsuite::access_flags, testsuite_access_flags>::toCpp(flag));
     return ::djinni::c_api::EnumTranslator<::testsuite::access_flags, testsuite_access_flags>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_access_flags)
 }
 
 testsuite_empty_flags testsuite_flag_roundtrip_roundtrip_empty(testsuite_empty_flags flag)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::FlagRoundtrip::roundtrip_empty(::djinni::c_api::EnumTranslator<::testsuite::empty_flags, testsuite_empty_flags>::toCpp(flag));
     return ::djinni::c_api::EnumTranslator<::testsuite::empty_flags, testsuite_empty_flags>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_empty_flags)
 }
 
 djinni_number_ref testsuite_flag_roundtrip_roundtrip_access_boxed(djinni_number_ref flag)
 {
-    auto retValue = ::testsuite::FlagRoundtrip::roundtrip_access_boxed(::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<::testsuite::access_flags>>(flag, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::access_flags, testsuite_access_flags>::toCppBoxed(std::forward<decltype(value)>(value)); }));
-    return ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<::testsuite::access_flags>>(std::move(retValue), [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::access_flags, testsuite_access_flags>::fromCppBoxed(std::forward<decltype(value)>(value)); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::FlagRoundtrip::roundtrip_access_boxed(::djinni::c_api::OptionalTranslator<std::experimental::optional<::testsuite::access_flags>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::access_flags>>::toCpp(flag));
+    return ::djinni::c_api::OptionalTranslator<std::experimental::optional<::testsuite::access_flags>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::access_flags>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_number_ref)
 }
 
 djinni_number_ref testsuite_flag_roundtrip_roundtrip_empty_boxed(djinni_number_ref flag)
 {
-    auto retValue = ::testsuite::FlagRoundtrip::roundtrip_empty_boxed(::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<::testsuite::empty_flags>>(flag, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::empty_flags, testsuite_empty_flags>::toCppBoxed(std::forward<decltype(value)>(value)); }));
-    return ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<::testsuite::empty_flags>>(std::move(retValue), [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::empty_flags, testsuite_empty_flags>::fromCppBoxed(std::forward<decltype(value)>(value)); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::FlagRoundtrip::roundtrip_empty_boxed(::djinni::c_api::OptionalTranslator<std::experimental::optional<::testsuite::empty_flags>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::empty_flags>>::toCpp(flag));
+    return ::djinni::c_api::OptionalTranslator<std::experimental::optional<::testsuite::empty_flags>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::empty_flags>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_number_ref)
 }
 
 

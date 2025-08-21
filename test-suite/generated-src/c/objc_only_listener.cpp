@@ -5,20 +5,4 @@
 #include "djinni_c_translators.hpp"
 #include "objc_only_listener.hpp"
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_objc_only_listener_method_defs>;
-struct ObjcOnlyListener_Proxy: public Proxy_Parent, public ::testsuite::ObjcOnlyListener  {
-    ObjcOnlyListener_Proxy(::djinni::ProxyClass<testsuite_objc_only_listener_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~ObjcOnlyListener_Proxy() override = default;
-
-};
-
-testsuite_objc_only_listener_proxy_class_ref testsuite_objc_only_listener_proxy_class_new(const testsuite_objc_only_listener_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_objc_only_listener_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_objc_only_listener_ref testsuite_objc_only_listener_new(testsuite_objc_only_listener_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_objc_only_listener_method_defs>::make<ObjcOnlyListener_Proxy, ::testsuite::ObjcOnlyListener>(proxy_class, opaque);
-}
-
 

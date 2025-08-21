@@ -7,27 +7,27 @@
 
 testsuite_set_record_ref testsuite_set_record_new(djinni_array_ref set, djinni_array_ref iset) 
 {
-    return ::djinni::c_api::RecordTranslator<::testsuite::SetRecord>::make(::djinni::c_api::SetTranslator<std::string>::toCpp(set, [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); }), ::djinni::c_api::SetTranslator<int32_t>::toCpp(iset, [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int32_t>(std::forward<decltype(value)>(value)); }));
+    return ::djinni::c_api::RecordTranslator<::testsuite::SetRecord>::make(::djinni::c_api::SetTranslator<::djinni::c_api::StringTranslator>::toCpp(set), ::djinni::c_api::SetTranslator<::djinni::c_api::Int32Translator>::toCpp(iset));
 }
 
 djinni_array_ref testsuite_set_record_get_set(testsuite_set_record_ref instance)
 {
-    return ::djinni::c_api::SetTranslator<std::string>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::SetRecord>::toCpp(instance).set, [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::SetTranslator<::djinni::c_api::StringTranslator>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::SetRecord>::toCpp(instance).set);
 }
 
 void testsuite_set_record_set_set(testsuite_set_record_ref instance, djinni_array_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::SetRecord>::toCpp(instance).set = ::djinni::c_api::SetTranslator<std::string>::toCpp(value, [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); });
+    ::djinni::c_api::RecordTranslator<::testsuite::SetRecord>::toCpp(instance).set = ::djinni::c_api::SetTranslator<::djinni::c_api::StringTranslator>::toCpp(value);
 }
 
 djinni_array_ref testsuite_set_record_get_iset(testsuite_set_record_ref instance)
 {
-    return ::djinni::c_api::SetTranslator<int32_t>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::SetRecord>::toCpp(instance).iset, [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::SetTranslator<::djinni::c_api::Int32Translator>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::SetRecord>::toCpp(instance).iset);
 }
 
 void testsuite_set_record_set_iset(testsuite_set_record_ref instance, djinni_array_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::SetRecord>::toCpp(instance).iset = ::djinni::c_api::SetTranslator<int32_t>::toCpp(value, [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int32_t>(std::forward<decltype(value)>(value)); });
+    ::djinni::c_api::RecordTranslator<::testsuite::SetRecord>::toCpp(instance).iset = ::djinni::c_api::SetTranslator<::djinni::c_api::Int32Translator>::toCpp(value);
 }
 
 

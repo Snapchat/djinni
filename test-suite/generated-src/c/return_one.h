@@ -12,17 +12,6 @@ extern "C" {
 
 /** Used for C++ multiple inheritance tests */
 typedef djinni_interface_ref testsuite_return_one_ref;
-typedef djinni_proxy_class_ref testsuite_return_one_proxy_class_ref;
-
-typedef struct 
-{
-    testsuite_return_one_ref (*get_instance)(void *);
-    int8_t (*return_one)(void *);
-} testsuite_return_one_method_defs;
-
-testsuite_return_one_proxy_class_ref testsuite_return_one_proxy_class_new(const testsuite_return_one_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_return_one_ref testsuite_return_one_new(testsuite_return_one_proxy_class_ref proxy_class, void *opaque);
 
 testsuite_return_one_ref testsuite_return_one_get_instance();
 

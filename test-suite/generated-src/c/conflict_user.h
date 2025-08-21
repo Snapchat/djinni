@@ -11,17 +11,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_conflict_user_ref;
-typedef djinni_proxy_class_ref testsuite_conflict_user_proxy_class_ref;
-
-typedef struct 
-{
-    testsuite_Conflict_ref (*Conflict)(void *);
-    bool (*conflict_arg)(void *, djinni_array_ref);
-} testsuite_conflict_user_method_defs;
-
-testsuite_conflict_user_proxy_class_ref testsuite_conflict_user_proxy_class_new(const testsuite_conflict_user_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_conflict_user_ref testsuite_conflict_user_new(testsuite_conflict_user_proxy_class_ref proxy_class, void *opaque);
 
 testsuite_Conflict_ref testsuite_conflict_user_Conflict(testsuite_conflict_user_ref instance);
 

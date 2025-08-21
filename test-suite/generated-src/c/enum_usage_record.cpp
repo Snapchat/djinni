@@ -8,7 +8,7 @@
 
 testsuite_enum_usage_record_ref testsuite_enum_usage_record_new(testsuite_color e, djinni_number_ref o, djinni_array_ref l, djinni_array_ref s, djinni_keyval_array_ref m) 
 {
-    return ::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::make(::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCpp(e), ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<::testsuite::color>>(o, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(std::forward<decltype(value)>(value)); }), ::djinni::c_api::ListTranslator<::testsuite::color>::toCpp(l, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(std::forward<decltype(value)>(value)); }), ::djinni::c_api::SetTranslator<::testsuite::color>::toCpp(s, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(std::forward<decltype(value)>(value)); }), ::djinni::c_api::MapTranslator<::testsuite::color, ::testsuite::color>::toCpp(m, [](auto key, auto value) { return std::make_pair(::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(key), ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(value)); }));
+    return ::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::make(::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCpp(e), ::djinni::c_api::OptionalTranslator<std::experimental::optional<::testsuite::color>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::toCpp(o), ::djinni::c_api::ListTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::toCpp(l), ::djinni::c_api::SetTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::toCpp(s), ::djinni::c_api::MapTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::toCpp(m));
 }
 
 testsuite_color testsuite_enum_usage_record_get_e(testsuite_enum_usage_record_ref instance)
@@ -23,42 +23,42 @@ void testsuite_enum_usage_record_set_e(testsuite_enum_usage_record_ref instance,
 
 djinni_number_ref testsuite_enum_usage_record_get_o(testsuite_enum_usage_record_ref instance)
 {
-    return ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<::testsuite::color>>(::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).o, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::OptionalTranslator<std::experimental::optional<::testsuite::color>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).o);
 }
 
 void testsuite_enum_usage_record_set_o(testsuite_enum_usage_record_ref instance, djinni_number_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).o = ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<::testsuite::color>>(value, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(std::forward<decltype(value)>(value)); });
+    ::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).o = ::djinni::c_api::OptionalTranslator<std::experimental::optional<::testsuite::color>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::toCpp(value);
 }
 
 djinni_array_ref testsuite_enum_usage_record_get_l(testsuite_enum_usage_record_ref instance)
 {
-    return ::djinni::c_api::ListTranslator<::testsuite::color>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).l, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::ListTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).l);
 }
 
 void testsuite_enum_usage_record_set_l(testsuite_enum_usage_record_ref instance, djinni_array_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).l = ::djinni::c_api::ListTranslator<::testsuite::color>::toCpp(value, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(std::forward<decltype(value)>(value)); });
+    ::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).l = ::djinni::c_api::ListTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::toCpp(value);
 }
 
 djinni_array_ref testsuite_enum_usage_record_get_s(testsuite_enum_usage_record_ref instance)
 {
-    return ::djinni::c_api::SetTranslator<::testsuite::color>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).s, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::SetTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).s);
 }
 
 void testsuite_enum_usage_record_set_s(testsuite_enum_usage_record_ref instance, djinni_array_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).s = ::djinni::c_api::SetTranslator<::testsuite::color>::toCpp(value, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(std::forward<decltype(value)>(value)); });
+    ::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).s = ::djinni::c_api::SetTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::toCpp(value);
 }
 
 djinni_keyval_array_ref testsuite_enum_usage_record_get_m(testsuite_enum_usage_record_ref instance)
 {
-    return ::djinni::c_api::MapTranslator<::testsuite::color, ::testsuite::color>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).m, [](auto key, auto value) { return std::make_pair(::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(key), ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(value)); });
+    return ::djinni::c_api::MapTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).m);
 }
 
 void testsuite_enum_usage_record_set_m(testsuite_enum_usage_record_ref instance, djinni_keyval_array_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).m = ::djinni::c_api::MapTranslator<::testsuite::color, ::testsuite::color>::toCpp(value, [](auto key, auto value) { return std::make_pair(::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(key), ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(value)); });
+    ::djinni::c_api::RecordTranslator<::testsuite::EnumUsageRecord>::toCpp(instance).m = ::djinni::c_api::MapTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::toCpp(value);
 }
 
 

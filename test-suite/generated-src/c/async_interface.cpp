@@ -14,29 +14,27 @@ struct AsyncInterface_Proxy: public Proxy_Parent, public ::testsuite::AsyncInter
     ~AsyncInterface_Proxy() override = default;
 
     ::djinni::Future<std::string> future_roundtrip(::djinni::Future<int32_t> f) override {
-        auto f_c = ::djinni::c_api::FutureTranslator<int32_t>::fromCpp(std::move(f), [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(std::forward<decltype(value)>(value)); });
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().future_roundtrip(Proxy_Parent::getOpaque(), f_c);
-        djinni_ref_release(f_c);
-
-        auto returnValue_cpp = ::djinni::c_api::FutureTranslator<std::string>::toCpp(returnValue, [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); });
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
+        auto f_c = ::djinni::c_api::Ref(::djinni::c_api::FutureTranslator<::djinni::c_api::Int32Translator>::fromCpp(std::move(f)));
+        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent::getProxyClass().methodDefs().future_roundtrip(Proxy_Parent::getOpaque(), f_c.get()));
+        return ::djinni::c_api::FutureTranslator<::djinni::c_api::StringTranslator>::toCpp(returnValue.get());
     }
 
 };
 
 testsuite_async_interface_proxy_class_ref testsuite_async_interface_proxy_class_new(const testsuite_async_interface_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_async_interface_method_defs>::makeClass(method_defs, opaque_deallocator);
+    return ::djinni::c_api::InterfaceTranslator<::testsuite::AsyncInterface>::makeProxyClass<testsuite_async_interface_method_defs>(method_defs, opaque_deallocator);
 }
 
 testsuite_async_interface_ref testsuite_async_interface_new(testsuite_async_interface_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_async_interface_method_defs>::make<AsyncInterface_Proxy, ::testsuite::AsyncInterface>(proxy_class, opaque);
+    return ::djinni::c_api::InterfaceTranslator<::testsuite::AsyncInterface>::makeProxy<testsuite_async_interface_method_defs, AsyncInterface_Proxy>(proxy_class, opaque);
 }
 
 djinni_future_ref testsuite_async_interface_future_roundtrip(testsuite_async_interface_ref instance, djinni_future_ref f)
 {
-    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::AsyncInterface>::toCpp(instance)->future_roundtrip(::djinni::c_api::FutureTranslator<int32_t>::toCpp(f, [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int32_t>(std::forward<decltype(value)>(value)); }));
-    return ::djinni::c_api::FutureTranslator<std::string>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::AsyncInterface>::toCpp(instance)->future_roundtrip(::djinni::c_api::FutureTranslator<::djinni::c_api::Int32Translator>::toCpp(f));
+    return ::djinni::c_api::FutureTranslator<::djinni::c_api::StringTranslator>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_future_ref)
 }
 
 

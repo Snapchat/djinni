@@ -16,19 +16,6 @@ extern "C" {
  * on references to interfaces they don't need.
  */
 typedef djinni_interface_ref testsuite_uses_single_language_listeners_ref;
-typedef djinni_proxy_class_ref testsuite_uses_single_language_listeners_proxy_class_ref;
-
-typedef struct 
-{
-    void (*callForObjC)(void *, testsuite_objc_only_listener_ref);
-    testsuite_objc_only_listener_ref (*returnForObjC)(void *);
-    void (*callForJava)(void *, testsuite_java_only_listener_ref);
-    testsuite_java_only_listener_ref (*returnForJava)(void *);
-} testsuite_uses_single_language_listeners_method_defs;
-
-testsuite_uses_single_language_listeners_proxy_class_ref testsuite_uses_single_language_listeners_proxy_class_new(const testsuite_uses_single_language_listeners_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_uses_single_language_listeners_ref testsuite_uses_single_language_listeners_new(testsuite_uses_single_language_listeners_proxy_class_ref proxy_class, void *opaque);
 
 void testsuite_uses_single_language_listeners_callForObjC(testsuite_uses_single_language_listeners_ref instance, testsuite_objc_only_listener_ref l);
 

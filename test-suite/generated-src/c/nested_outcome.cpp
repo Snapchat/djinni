@@ -9,17 +9,17 @@
 
 testsuite_nested_outcome_ref testsuite_nested_outcome_new(djinni_outcome_ref o) 
 {
-    return ::djinni::c_api::RecordTranslator<::testsuite::NestedOutcome>::make(::djinni::c_api::OutcomeTranslator<int32_t, std::string>::toCpp(o, [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int32_t>(std::forward<decltype(value)>(value)); }, [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); }));
+    return ::djinni::c_api::RecordTranslator<::testsuite::NestedOutcome>::make(::djinni::c_api::OutcomeTranslator<::djinni::c_api::Int32Translator, ::djinni::c_api::StringTranslator>::toCpp(o));
 }
 
 djinni_outcome_ref testsuite_nested_outcome_get_o(testsuite_nested_outcome_ref instance)
 {
-    return ::djinni::c_api::OutcomeTranslator<int32_t, std::string>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::NestedOutcome>::toCpp(instance).o, [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(std::forward<decltype(value)>(value)); }, [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::OutcomeTranslator<::djinni::c_api::Int32Translator, ::djinni::c_api::StringTranslator>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::NestedOutcome>::toCpp(instance).o);
 }
 
 void testsuite_nested_outcome_set_o(testsuite_nested_outcome_ref instance, djinni_outcome_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::NestedOutcome>::toCpp(instance).o = ::djinni::c_api::OutcomeTranslator<int32_t, std::string>::toCpp(value, [](auto&& value) { return ::djinni::c_api::NumberTranslator::toCpp<int32_t>(std::forward<decltype(value)>(value)); }, [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); });
+    ::djinni::c_api::RecordTranslator<::testsuite::NestedOutcome>::toCpp(instance).o = ::djinni::c_api::OutcomeTranslator<::djinni::c_api::Int32Translator, ::djinni::c_api::StringTranslator>::toCpp(value);
 }
 
 

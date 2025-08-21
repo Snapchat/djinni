@@ -12,17 +12,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite__varname_interface__ref;
-typedef djinni_proxy_class_ref testsuite__varname_interface__proxy_class_ref;
-
-typedef struct 
-{
-    testsuite__varname_record__ref (*_rmethod_)(void *, testsuite__varname_record__ref);
-    testsuite__varname_interface__ref (*_imethod_)(void *, testsuite__varname_interface__ref);
-} testsuite__varname_interface__method_defs;
-
-testsuite__varname_interface__proxy_class_ref testsuite__varname_interface__proxy_class_new(const testsuite__varname_interface__method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite__varname_interface__ref testsuite__varname_interface__new(testsuite__varname_interface__proxy_class_ref proxy_class, void *opaque);
 
 /**
  * We should also rewrite parameter names in docstrings.

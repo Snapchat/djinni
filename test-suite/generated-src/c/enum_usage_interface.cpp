@@ -6,98 +6,44 @@
 #include "color.hpp"
 #include "enum_usage_interface.hpp"
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_enum_usage_interface_method_defs>;
-struct EnumUsageInterface_Proxy: public Proxy_Parent, public ::testsuite::EnumUsageInterface  {
-    EnumUsageInterface_Proxy(::djinni::ProxyClass<testsuite_enum_usage_interface_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~EnumUsageInterface_Proxy() override = default;
-
-    ::testsuite::color e(::testsuite::color e) override {
-        auto e_c = ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCpp(e);
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().e(Proxy_Parent::getOpaque(), e_c);
-
-        auto returnValue_cpp = ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCpp(returnValue);
-        return returnValue_cpp;
-    }
-
-    std::experimental::optional<::testsuite::color> o(std::experimental::optional<::testsuite::color> o) override {
-        auto o_c = ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<::testsuite::color>>(o, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(std::forward<decltype(value)>(value)); });
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().o(Proxy_Parent::getOpaque(), o_c);
-        djinni_ref_release(o_c);
-
-        auto returnValue_cpp = ::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<::testsuite::color>>(returnValue, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(std::forward<decltype(value)>(value)); });
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-    std::vector<::testsuite::color> l(const std::vector<::testsuite::color> & l) override {
-        auto l_c = ::djinni::c_api::ListTranslator<::testsuite::color>::fromCpp(l, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(std::forward<decltype(value)>(value)); });
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().l(Proxy_Parent::getOpaque(), l_c);
-        djinni_ref_release(l_c);
-
-        auto returnValue_cpp = ::djinni::c_api::ListTranslator<::testsuite::color>::toCpp(returnValue, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(std::forward<decltype(value)>(value)); });
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-    std::unordered_set<::testsuite::color> s(const std::unordered_set<::testsuite::color> & s) override {
-        auto s_c = ::djinni::c_api::SetTranslator<::testsuite::color>::fromCpp(s, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(std::forward<decltype(value)>(value)); });
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().s(Proxy_Parent::getOpaque(), s_c);
-        djinni_ref_release(s_c);
-
-        auto returnValue_cpp = ::djinni::c_api::SetTranslator<::testsuite::color>::toCpp(returnValue, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(std::forward<decltype(value)>(value)); });
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-    std::unordered_map<::testsuite::color, ::testsuite::color> m(const std::unordered_map<::testsuite::color, ::testsuite::color> & m) override {
-        auto m_c = ::djinni::c_api::MapTranslator<::testsuite::color, ::testsuite::color>::fromCpp(m, [](auto key, auto value) { return std::make_pair(::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(key), ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(value)); });
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().m(Proxy_Parent::getOpaque(), m_c);
-        djinni_ref_release(m_c);
-
-        auto returnValue_cpp = ::djinni::c_api::MapTranslator<::testsuite::color, ::testsuite::color>::toCpp(returnValue, [](auto key, auto value) { return std::make_pair(::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(key), ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(value)); });
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-};
-
-testsuite_enum_usage_interface_proxy_class_ref testsuite_enum_usage_interface_proxy_class_new(const testsuite_enum_usage_interface_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_enum_usage_interface_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_enum_usage_interface_ref testsuite_enum_usage_interface_new(testsuite_enum_usage_interface_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_enum_usage_interface_method_defs>::make<EnumUsageInterface_Proxy, ::testsuite::EnumUsageInterface>(proxy_class, opaque);
-}
-
 testsuite_color testsuite_enum_usage_interface_e(testsuite_enum_usage_interface_ref instance, testsuite_color e)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::EnumUsageInterface>::toCpp(instance)->e(::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCpp(e));
     return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_color)
 }
 
 djinni_number_ref testsuite_enum_usage_interface_o(testsuite_enum_usage_interface_ref instance, djinni_number_ref o)
 {
-    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::EnumUsageInterface>::toCpp(instance)->o(::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<::testsuite::color>>(o, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(std::forward<decltype(value)>(value)); }));
-    return ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<::testsuite::color>>(std::move(retValue), [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(std::forward<decltype(value)>(value)); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::EnumUsageInterface>::toCpp(instance)->o(::djinni::c_api::OptionalTranslator<std::experimental::optional<::testsuite::color>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::toCpp(o));
+    return ::djinni::c_api::OptionalTranslator<std::experimental::optional<::testsuite::color>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_number_ref)
 }
 
 djinni_array_ref testsuite_enum_usage_interface_l(testsuite_enum_usage_interface_ref instance, djinni_array_ref l)
 {
-    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::EnumUsageInterface>::toCpp(instance)->l(::djinni::c_api::ListTranslator<::testsuite::color>::toCpp(l, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(std::forward<decltype(value)>(value)); }));
-    return ::djinni::c_api::ListTranslator<::testsuite::color>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(std::forward<decltype(value)>(value)); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::EnumUsageInterface>::toCpp(instance)->l(::djinni::c_api::ListTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::toCpp(l));
+    return ::djinni::c_api::ListTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_array_ref)
 }
 
 djinni_array_ref testsuite_enum_usage_interface_s(testsuite_enum_usage_interface_ref instance, djinni_array_ref s)
 {
-    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::EnumUsageInterface>::toCpp(instance)->s(::djinni::c_api::SetTranslator<::testsuite::color>::toCpp(s, [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(std::forward<decltype(value)>(value)); }));
-    return ::djinni::c_api::SetTranslator<::testsuite::color>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(std::forward<decltype(value)>(value)); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::EnumUsageInterface>::toCpp(instance)->s(::djinni::c_api::SetTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::toCpp(s));
+    return ::djinni::c_api::SetTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_array_ref)
 }
 
 djinni_keyval_array_ref testsuite_enum_usage_interface_m(testsuite_enum_usage_interface_ref instance, djinni_keyval_array_ref m)
 {
-    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::EnumUsageInterface>::toCpp(instance)->m(::djinni::c_api::MapTranslator<::testsuite::color, ::testsuite::color>::toCpp(m, [](auto key, auto value) { return std::make_pair(::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(key), ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::toCppBoxed(value)); }));
-    return ::djinni::c_api::MapTranslator<::testsuite::color, ::testsuite::color>::fromCpp(std::move(retValue), [](auto key, auto value) { return std::make_pair(::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(key), ::djinni::c_api::EnumTranslator<::testsuite::color, testsuite_color>::fromCppBoxed(value)); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::EnumUsageInterface>::toCpp(instance)->m(::djinni::c_api::MapTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::toCpp(m));
+    return ::djinni::c_api::MapTranslator<::djinni::c_api::BoxedEnumTranslator<::testsuite::color>, ::djinni::c_api::BoxedEnumTranslator<::testsuite::color>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_keyval_array_ref)
 }
 
 

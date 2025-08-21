@@ -12,24 +12,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_DataRefTest_ref;
-typedef djinni_proxy_class_ref testsuite_DataRefTest_proxy_class_ref;
-
-typedef struct 
-{
-    void (*sendData)(void *, djinni_binary_ref);
-    djinni_binary_ref (*retriveAsBin)(void *);
-    void (*sendMutableData)(void *, djinni_binary_ref);
-    djinni_binary_ref (*generateData)(void *);
-    djinni_binary_ref (*dataFromVec)(void *);
-    djinni_binary_ref (*dataFromStr)(void *);
-    djinni_binary_ref (*sendDataView)(void *, djinni_binary_ref);
-    djinni_binary_ref (*recvDataView)(void *);
-    testsuite_DataRefTest_ref (*create)(void *);
-} testsuite_DataRefTest_method_defs;
-
-testsuite_DataRefTest_proxy_class_ref testsuite_DataRefTest_proxy_class_new(const testsuite_DataRefTest_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_DataRefTest_ref testsuite_DataRefTest_new(testsuite_DataRefTest_proxy_class_ref proxy_class, void *opaque);
 
 void testsuite_DataRefTest_sendData(testsuite_DataRefTest_ref instance, djinni_binary_ref data);
 

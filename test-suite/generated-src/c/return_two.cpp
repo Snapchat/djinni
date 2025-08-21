@@ -6,39 +6,20 @@
 #include "return_two.hpp"
 #include <memory>
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_return_two_method_defs>;
-struct ReturnTwo_Proxy: public Proxy_Parent, public ::testsuite::ReturnTwo  {
-    ReturnTwo_Proxy(::djinni::ProxyClass<testsuite_return_two_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~ReturnTwo_Proxy() override = default;
-
-    int8_t return_two() override {
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().return_two(Proxy_Parent::getOpaque());
-
-        auto returnValue_cpp = returnValue;
-        return returnValue_cpp;
-    }
-
-};
-
-testsuite_return_two_proxy_class_ref testsuite_return_two_proxy_class_new(const testsuite_return_two_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_return_two_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_return_two_ref testsuite_return_two_new(testsuite_return_two_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_return_two_method_defs>::make<ReturnTwo_Proxy, ::testsuite::ReturnTwo>(proxy_class, opaque);
-}
-
 testsuite_return_two_ref testsuite_return_two_get_instance()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::ReturnTwo::get_instance();
     return ::djinni::c_api::InterfaceTranslator<::testsuite::ReturnTwo>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_return_two_ref)
 }
 
 int8_t testsuite_return_two_return_two(testsuite_return_two_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::ReturnTwo>::toCpp(instance)->return_two();
     return std::move(retValue);
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(int8_t)
 }
 
 

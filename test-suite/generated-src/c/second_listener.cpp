@@ -5,29 +5,11 @@
 #include "djinni_c_translators.hpp"
 #include "second_listener.hpp"
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_second_listener_method_defs>;
-struct SecondListener_Proxy: public Proxy_Parent, public ::testsuite::SecondListener  {
-    SecondListener_Proxy(::djinni::ProxyClass<testsuite_second_listener_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~SecondListener_Proxy() override = default;
-
-    void second() override {
-        Proxy_Parent::getProxyClass().methodDefs().second(Proxy_Parent::getOpaque());
-    }
-
-};
-
-testsuite_second_listener_proxy_class_ref testsuite_second_listener_proxy_class_new(const testsuite_second_listener_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_second_listener_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_second_listener_ref testsuite_second_listener_new(testsuite_second_listener_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_second_listener_method_defs>::make<SecondListener_Proxy, ::testsuite::SecondListener>(proxy_class, opaque);
-}
-
 void testsuite_second_listener_second(testsuite_second_listener_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::djinni::c_api::InterfaceTranslator<::testsuite::SecondListener>::toCpp(instance)->second();
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 

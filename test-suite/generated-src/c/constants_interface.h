@@ -11,16 +11,6 @@ extern "C" {
 
 /** Interface containing constants */
 typedef djinni_interface_ref testsuite_constants_interface_ref;
-typedef djinni_proxy_class_ref testsuite_constants_interface_proxy_class_ref;
-
-typedef struct 
-{
-    void (*dummy)(void *);
-} testsuite_constants_interface_method_defs;
-
-testsuite_constants_interface_proxy_class_ref testsuite_constants_interface_proxy_class_new(const testsuite_constants_interface_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_constants_interface_ref testsuite_constants_interface_new(testsuite_constants_interface_proxy_class_ref proxy_class, void *opaque);
 
 /**
  * No support for null optional constants

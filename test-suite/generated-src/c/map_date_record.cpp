@@ -9,17 +9,17 @@
 
 testsuite_map_date_record_ref testsuite_map_date_record_new(djinni_keyval_array_ref dates_by_id) 
 {
-    return ::djinni::c_api::RecordTranslator<::testsuite::MapDateRecord>::make(::djinni::c_api::MapTranslator<std::string, std::chrono::system_clock::time_point>::toCpp(dates_by_id, [](auto key, auto value) { return std::make_pair(::djinni::c_api::StringTranslator::toCpp(key), ::djinni::c_api::DateTranslator::toCpp(value)); }));
+    return ::djinni::c_api::RecordTranslator<::testsuite::MapDateRecord>::make(::djinni::c_api::MapTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::DateTranslator>::toCpp(dates_by_id));
 }
 
 djinni_keyval_array_ref testsuite_map_date_record_get_dates_by_id(testsuite_map_date_record_ref instance)
 {
-    return ::djinni::c_api::MapTranslator<std::string, std::chrono::system_clock::time_point>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::MapDateRecord>::toCpp(instance).dates_by_id, [](auto key, auto value) { return std::make_pair(::djinni::c_api::StringTranslator::fromCpp(key), ::djinni::c_api::DateTranslator::fromCpp(value)); });
+    return ::djinni::c_api::MapTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::DateTranslator>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::MapDateRecord>::toCpp(instance).dates_by_id);
 }
 
 void testsuite_map_date_record_set_dates_by_id(testsuite_map_date_record_ref instance, djinni_keyval_array_ref value)
 {
-    ::djinni::c_api::RecordTranslator<::testsuite::MapDateRecord>::toCpp(instance).dates_by_id = ::djinni::c_api::MapTranslator<std::string, std::chrono::system_clock::time_point>::toCpp(value, [](auto key, auto value) { return std::make_pair(::djinni::c_api::StringTranslator::toCpp(key), ::djinni::c_api::DateTranslator::toCpp(value)); });
+    ::djinni::c_api::RecordTranslator<::testsuite::MapDateRecord>::toCpp(instance).dates_by_id = ::djinni::c_api::MapTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::DateTranslator>::toCpp(value);
 }
 
 

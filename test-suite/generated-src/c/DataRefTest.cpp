@@ -10,134 +10,74 @@
 #include "DataView_c_translator.hpp"
 #include <memory>
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_DataRefTest_method_defs>;
-struct DataRefTest_Proxy: public Proxy_Parent, public ::testsuite::DataRefTest  {
-    DataRefTest_Proxy(::djinni::ProxyClass<testsuite_DataRefTest_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~DataRefTest_Proxy() override = default;
-
-    void sendData(const ::djinni::DataRef & data) override {
-        auto data_c = ::djinni::c_api::DataRefTranslator::fromCpp(data);
-        Proxy_Parent::getProxyClass().methodDefs().sendData(Proxy_Parent::getOpaque(), data_c);
-        djinni_ref_release(data_c);
-    }
-
-    std::vector<uint8_t> retriveAsBin() override {
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().retriveAsBin(Proxy_Parent::getOpaque());
-
-        auto returnValue_cpp = ::djinni::c_api::BinaryTranslator::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-    void sendMutableData(const ::djinni::DataRef & data) override {
-        auto data_c = ::djinni::c_api::DataRefTranslator::fromCpp(data);
-        Proxy_Parent::getProxyClass().methodDefs().sendMutableData(Proxy_Parent::getOpaque(), data_c);
-        djinni_ref_release(data_c);
-    }
-
-    ::djinni::DataRef generateData() override {
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().generateData(Proxy_Parent::getOpaque());
-
-        auto returnValue_cpp = ::djinni::c_api::DataRefTranslator::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-    ::djinni::DataRef dataFromVec() override {
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().dataFromVec(Proxy_Parent::getOpaque());
-
-        auto returnValue_cpp = ::djinni::c_api::DataRefTranslator::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-    ::djinni::DataRef dataFromStr() override {
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().dataFromStr(Proxy_Parent::getOpaque());
-
-        auto returnValue_cpp = ::djinni::c_api::DataRefTranslator::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-    std::vector<uint8_t> sendDataView(const ::djinni::DataView & data) override {
-        auto data_c = ::djinni::c_api::DataViewTranslator::fromCpp(data);
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().sendDataView(Proxy_Parent::getOpaque(), data_c);
-        djinni_ref_release(data_c);
-
-        auto returnValue_cpp = ::djinni::c_api::BinaryTranslator::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-    ::djinni::DataView recvDataView() override {
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().recvDataView(Proxy_Parent::getOpaque());
-
-        auto returnValue_cpp = ::djinni::c_api::DataViewTranslator::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-};
-
-testsuite_DataRefTest_proxy_class_ref testsuite_DataRefTest_proxy_class_new(const testsuite_DataRefTest_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_DataRefTest_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_DataRefTest_ref testsuite_DataRefTest_new(testsuite_DataRefTest_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_DataRefTest_method_defs>::make<DataRefTest_Proxy, ::testsuite::DataRefTest>(proxy_class, opaque);
-}
-
 void testsuite_DataRefTest_sendData(testsuite_DataRefTest_ref instance, djinni_binary_ref data)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::djinni::c_api::InterfaceTranslator<::testsuite::DataRefTest>::toCpp(instance)->sendData(::djinni::c_api::DataRefTranslator::toCpp(data));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 djinni_binary_ref testsuite_DataRefTest_retriveAsBin(testsuite_DataRefTest_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::DataRefTest>::toCpp(instance)->retriveAsBin();
     return ::djinni::c_api::BinaryTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_binary_ref)
 }
 
 void testsuite_DataRefTest_sendMutableData(testsuite_DataRefTest_ref instance, djinni_binary_ref data)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::djinni::c_api::InterfaceTranslator<::testsuite::DataRefTest>::toCpp(instance)->sendMutableData(::djinni::c_api::DataRefTranslator::toCpp(data));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 djinni_binary_ref testsuite_DataRefTest_generateData(testsuite_DataRefTest_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::DataRefTest>::toCpp(instance)->generateData();
     return ::djinni::c_api::DataRefTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_binary_ref)
 }
 
 djinni_binary_ref testsuite_DataRefTest_dataFromVec(testsuite_DataRefTest_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::DataRefTest>::toCpp(instance)->dataFromVec();
     return ::djinni::c_api::DataRefTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_binary_ref)
 }
 
 djinni_binary_ref testsuite_DataRefTest_dataFromStr(testsuite_DataRefTest_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::DataRefTest>::toCpp(instance)->dataFromStr();
     return ::djinni::c_api::DataRefTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_binary_ref)
 }
 
 djinni_binary_ref testsuite_DataRefTest_sendDataView(testsuite_DataRefTest_ref instance, djinni_binary_ref data)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::DataRefTest>::toCpp(instance)->sendDataView(::djinni::c_api::DataViewTranslator::toCpp(data));
     return ::djinni::c_api::BinaryTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_binary_ref)
 }
 
 djinni_binary_ref testsuite_DataRefTest_recvDataView(testsuite_DataRefTest_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::DataRefTest>::toCpp(instance)->recvDataView();
     return ::djinni::c_api::DataViewTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_binary_ref)
 }
 
 testsuite_DataRefTest_ref testsuite_DataRefTest_create()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::DataRefTest::create();
     return ::djinni::c_api::InterfaceTranslator<::testsuite::DataRefTest>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_DataRefTest_ref)
 }
 
 

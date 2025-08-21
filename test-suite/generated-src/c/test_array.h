@@ -11,19 +11,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_test_array_ref;
-typedef djinni_proxy_class_ref testsuite_test_array_proxy_class_ref;
-
-typedef struct 
-{
-    djinni_array_ref (*testStringArray)(void *, djinni_array_ref);
-    djinni_array_ref (*testIntArray)(void *, djinni_array_ref);
-    djinni_array_ref (*testRecordArray)(void *, djinni_array_ref);
-    djinni_array_ref (*testArrayOfArray)(void *, djinni_array_ref);
-} testsuite_test_array_method_defs;
-
-testsuite_test_array_proxy_class_ref testsuite_test_array_proxy_class_new(const testsuite_test_array_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_test_array_ref testsuite_test_array_new(testsuite_test_array_proxy_class_ref proxy_class, void *opaque);
 
 djinni_array_ref testsuite_test_array_testStringArray(djinni_array_ref a);
 

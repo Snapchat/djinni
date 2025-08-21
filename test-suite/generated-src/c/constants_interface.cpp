@@ -5,26 +5,6 @@
 #include "djinni_c_translators.hpp"
 #include "constants_interface.hpp"
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_constants_interface_method_defs>;
-struct ConstantsInterface_Proxy: public Proxy_Parent, public ::testsuite::ConstantsInterface  {
-    ConstantsInterface_Proxy(::djinni::ProxyClass<testsuite_constants_interface_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~ConstantsInterface_Proxy() override = default;
-
-    void dummy() override {
-        Proxy_Parent::getProxyClass().methodDefs().dummy(Proxy_Parent::getOpaque());
-    }
-
-};
-
-testsuite_constants_interface_proxy_class_ref testsuite_constants_interface_proxy_class_new(const testsuite_constants_interface_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_constants_interface_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_constants_interface_ref testsuite_constants_interface_new(testsuite_constants_interface_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_constants_interface_method_defs>::make<ConstantsInterface_Proxy, ::testsuite::ConstantsInterface>(proxy_class, opaque);
-}
-
 /**
  * No support for null optional constants
  * No support for optional constant records
@@ -32,7 +12,9 @@ testsuite_constants_interface_ref testsuite_constants_interface_new(testsuite_co
  */
 void testsuite_constants_interface_dummy(testsuite_constants_interface_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     ::djinni::c_api::InterfaceTranslator<::testsuite::ConstantsInterface>::toCpp(instance)->dummy();
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(void)
 }
 
 

@@ -6,72 +6,36 @@
 #include "reverse_client_interface.hpp"
 #include <memory>
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_reverse_client_interface_method_defs>;
-struct ReverseClientInterface_Proxy: public Proxy_Parent, public ::testsuite::ReverseClientInterface  {
-    ReverseClientInterface_Proxy(::djinni::ProxyClass<testsuite_reverse_client_interface_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~ReverseClientInterface_Proxy() override = default;
-
-    std::string return_str() const override {
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().return_str(Proxy_Parent::getOpaque());
-
-        auto returnValue_cpp = ::djinni::c_api::StringTranslator::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-    std::string meth_taking_interface(const /*not-null*/ std::shared_ptr<::testsuite::ReverseClientInterface> & i) override {
-        auto i_c = ::djinni::c_api::InterfaceTranslator<::testsuite::ReverseClientInterface>::fromCpp(i);
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().meth_taking_interface(Proxy_Parent::getOpaque(), i_c);
-        djinni_ref_release(i_c);
-
-        auto returnValue_cpp = ::djinni::c_api::StringTranslator::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-    std::string meth_taking_optional_interface(const /*nullable*/ std::shared_ptr<::testsuite::ReverseClientInterface> & i) override {
-        auto i_c = ::djinni::c_api::OptionalTranslator::fromSharedPtrCpp</*nullable*/ std::shared_ptr<::testsuite::ReverseClientInterface>>(i, [](auto&& value) { return ::djinni::c_api::InterfaceTranslator<::testsuite::ReverseClientInterface>::fromCpp(std::forward<decltype(value)>(value)); });
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().meth_taking_optional_interface(Proxy_Parent::getOpaque(), i_c);
-        djinni_ref_release(i_c);
-
-        auto returnValue_cpp = ::djinni::c_api::StringTranslator::toCpp(returnValue);
-        djinni_ref_release(returnValue);
-        return returnValue_cpp;
-    }
-
-};
-
-testsuite_reverse_client_interface_proxy_class_ref testsuite_reverse_client_interface_proxy_class_new(const testsuite_reverse_client_interface_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_reverse_client_interface_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_reverse_client_interface_ref testsuite_reverse_client_interface_new(testsuite_reverse_client_interface_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_reverse_client_interface_method_defs>::make<ReverseClientInterface_Proxy, ::testsuite::ReverseClientInterface>(proxy_class, opaque);
-}
-
 djinni_string_ref testsuite_reverse_client_interface_return_str(testsuite_reverse_client_interface_ref instance)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::ReverseClientInterface>::toCpp(instance)->return_str();
     return ::djinni::c_api::StringTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_string_ref)
 }
 
 djinni_string_ref testsuite_reverse_client_interface_meth_taking_interface(testsuite_reverse_client_interface_ref instance, testsuite_reverse_client_interface_ref i)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::ReverseClientInterface>::toCpp(instance)->meth_taking_interface(::djinni::c_api::InterfaceTranslator<::testsuite::ReverseClientInterface>::toCpp(i));
     return ::djinni::c_api::StringTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_string_ref)
 }
 
 djinni_string_ref testsuite_reverse_client_interface_meth_taking_optional_interface(testsuite_reverse_client_interface_ref instance, testsuite_reverse_client_interface_ref i)
 {
-    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::ReverseClientInterface>::toCpp(instance)->meth_taking_optional_interface(::djinni::c_api::OptionalTranslator::toSharedPtrCpp</*nullable*/ std::shared_ptr<::testsuite::ReverseClientInterface>>(i, [](auto&& value) { return ::djinni::c_api::InterfaceTranslator<::testsuite::ReverseClientInterface>::toCpp(std::forward<decltype(value)>(value)); }));
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::ReverseClientInterface>::toCpp(instance)->meth_taking_optional_interface(::djinni::c_api::OptionalPtrTranslator<::djinni::c_api::InterfaceTranslator<::testsuite::ReverseClientInterface>>::toCpp(i));
     return ::djinni::c_api::StringTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_string_ref)
 }
 
 testsuite_reverse_client_interface_ref testsuite_reverse_client_interface_create()
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::ReverseClientInterface::create();
     return ::djinni::c_api::InterfaceTranslator<::testsuite::ReverseClientInterface>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_reverse_client_interface_ref)
 }
 
 

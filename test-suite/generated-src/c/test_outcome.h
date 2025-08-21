@@ -12,23 +12,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_test_outcome_ref;
-typedef djinni_proxy_class_ref testsuite_test_outcome_proxy_class_ref;
-
-typedef struct 
-{
-    djinni_outcome_ref (*getSuccessOutcome)(void *);
-    djinni_outcome_ref (*getErrorOutcome)(void *);
-    djinni_string_ref (*putSuccessOutcome)(void *, djinni_outcome_ref);
-    int32_t (*putErrorOutcome)(void *, djinni_outcome_ref);
-    testsuite_nested_outcome_ref (*getNestedSuccessOutcome)(void *);
-    testsuite_nested_outcome_ref (*getNestedErrorOutcome)(void *);
-    int32_t (*putNestedSuccessOutcome)(void *, testsuite_nested_outcome_ref);
-    djinni_string_ref (*putNestedErrorOutcome)(void *, testsuite_nested_outcome_ref);
-} testsuite_test_outcome_method_defs;
-
-testsuite_test_outcome_proxy_class_ref testsuite_test_outcome_proxy_class_new(const testsuite_test_outcome_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_test_outcome_ref testsuite_test_outcome_new(testsuite_test_outcome_proxy_class_ref proxy_class, void *opaque);
 
 djinni_outcome_ref testsuite_test_outcome_getSuccessOutcome();
 

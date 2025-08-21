@@ -11,98 +11,108 @@
 #include "proto/cpp/test2.pb.h"
 #include "proto_tests.hpp"
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_proto_tests_method_defs>;
-struct ProtoTests_Proxy: public Proxy_Parent, public ::testsuite::ProtoTests  {
-    ProtoTests_Proxy(::djinni::ProxyClass<testsuite_proto_tests_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
-
-    ~ProtoTests_Proxy() override = default;
-
-};
-
-testsuite_proto_tests_proxy_class_ref testsuite_proto_tests_proxy_class_new(const testsuite_proto_tests_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_proto_tests_method_defs>::makeClass(method_defs, opaque_deallocator);
-}
-
-testsuite_proto_tests_ref testsuite_proto_tests_new(testsuite_proto_tests_proxy_class_ref proxy_class, void *opaque) {
-    return ::djinni::c_api::ProxyTranslator<testsuite_proto_tests_method_defs>::make<ProtoTests_Proxy, ::testsuite::ProtoTests>(proxy_class, opaque);
-}
-
 djinni_array_ref testsuite_proto_tests_protoToStrings(djinni_binary_ref x)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::ProtoTests::protoToStrings(::djinni::c_api::ProtobufTranslator<::djinni::test::AddressBook>::toCpp(x));
-    return ::djinni::c_api::ListTranslator<std::string>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::ListTranslator<::djinni::c_api::StringTranslator>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_array_ref)
 }
 
 djinni_binary_ref testsuite_proto_tests_stringsToProto(djinni_array_ref x)
 {
-    auto retValue = ::testsuite::ProtoTests::stringsToProto(::djinni::c_api::ListTranslator<std::string>::toCpp(x, [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); }));
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::ProtoTests::stringsToProto(::djinni::c_api::ListTranslator<::djinni::c_api::StringTranslator>::toCpp(x));
     return ::djinni::c_api::ProtobufTranslator<::djinni::test::AddressBook>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_binary_ref)
 }
 
 djinni_string_ref testsuite_proto_tests_embeddedProtoToString(testsuite_RecordWithEmbeddedProto_ref x)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::ProtoTests::embeddedProtoToString(::djinni::c_api::RecordTranslator<::testsuite::RecordWithEmbeddedProto>::toCpp(x));
     return ::djinni::c_api::StringTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_string_ref)
 }
 
 testsuite_RecordWithEmbeddedProto_ref testsuite_proto_tests_stringToEmbeddedProto(djinni_string_ref x)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::ProtoTests::stringToEmbeddedProto(::djinni::c_api::StringTranslator::toCpp(x));
     return ::djinni::c_api::RecordTranslator<::testsuite::RecordWithEmbeddedProto>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_RecordWithEmbeddedProto_ref)
 }
 
 djinni_string_ref testsuite_proto_tests_cppProtoToString(djinni_binary_ref x)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::ProtoTests::cppProtoToString(::djinni::c_api::ProtobufTranslator<::djinni::test2::PersistingState>::toCpp(x));
     return ::djinni::c_api::StringTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_string_ref)
 }
 
 djinni_binary_ref testsuite_proto_tests_stringToCppProto(djinni_string_ref x)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::ProtoTests::stringToCppProto(::djinni::c_api::StringTranslator::toCpp(x));
     return ::djinni::c_api::ProtobufTranslator<::djinni::test2::PersistingState>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_binary_ref)
 }
 
 djinni_string_ref testsuite_proto_tests_embeddedCppProtoToString(testsuite_RecordWithEmbeddedCppProto_ref x)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::ProtoTests::embeddedCppProtoToString(::djinni::c_api::RecordTranslator<::testsuite::RecordWithEmbeddedCppProto>::toCpp(x));
     return ::djinni::c_api::StringTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_string_ref)
 }
 
 testsuite_RecordWithEmbeddedCppProto_ref testsuite_proto_tests_stringToEmbeddedCppProto(djinni_string_ref x)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::ProtoTests::stringToEmbeddedCppProto(::djinni::c_api::StringTranslator::toCpp(x));
     return ::djinni::c_api::RecordTranslator<::testsuite::RecordWithEmbeddedCppProto>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(testsuite_RecordWithEmbeddedCppProto_ref)
 }
 
 djinni_array_ref testsuite_proto_tests_protoListToStrings(djinni_array_ref x)
 {
-    auto retValue = ::testsuite::ProtoTests::protoListToStrings(::djinni::c_api::ListTranslator<::djinni::test::Person>::toCpp(x, [](auto&& value) { return ::djinni::c_api::ProtobufTranslator<::djinni::test::Person>::toCpp(std::forward<decltype(value)>(value)); }));
-    return ::djinni::c_api::ListTranslator<std::string>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::StringTranslator::fromCpp(std::forward<decltype(value)>(value)); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::ProtoTests::protoListToStrings(::djinni::c_api::ListTranslator<::djinni::c_api::ProtobufTranslator<::djinni::test::Person>>::toCpp(x));
+    return ::djinni::c_api::ListTranslator<::djinni::c_api::StringTranslator>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_array_ref)
 }
 
 djinni_array_ref testsuite_proto_tests_stringsToProtoList(djinni_array_ref x)
 {
-    auto retValue = ::testsuite::ProtoTests::stringsToProtoList(::djinni::c_api::ListTranslator<std::string>::toCpp(x, [](auto&& value) { return ::djinni::c_api::StringTranslator::toCpp(std::forward<decltype(value)>(value)); }));
-    return ::djinni::c_api::ListTranslator<::djinni::test::Person>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::ProtobufTranslator<::djinni::test::Person>::fromCpp(std::forward<decltype(value)>(value)); });
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::ProtoTests::stringsToProtoList(::djinni::c_api::ListTranslator<::djinni::c_api::StringTranslator>::toCpp(x));
+    return ::djinni::c_api::ListTranslator<::djinni::c_api::ProtobufTranslator<::djinni::test::Person>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_array_ref)
 }
 
 djinni_string_ref testsuite_proto_tests_optionalProtoToString(djinni_binary_ref x)
 {
-    auto retValue = ::testsuite::ProtoTests::optionalProtoToString(::djinni::c_api::OptionalTranslator::toCpp<std::experimental::optional<::djinni::test::Person>>(x, [](auto&& value) { return ::djinni::c_api::ProtobufTranslator<::djinni::test::Person>::toCpp(std::forward<decltype(value)>(value)); }));
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::ProtoTests::optionalProtoToString(::djinni::c_api::OptionalTranslator<std::experimental::optional<::djinni::test::Person>, ::djinni::c_api::ProtobufTranslator<::djinni::test::Person>>::toCpp(x));
     return ::djinni::c_api::StringTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_string_ref)
 }
 
 djinni_binary_ref testsuite_proto_tests_stringToOptionalProto(djinni_string_ref x)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::ProtoTests::stringToOptionalProto(::djinni::c_api::StringTranslator::toCpp(x));
-    return ::djinni::c_api::OptionalTranslator::fromCpp<std::experimental::optional<::djinni::test::Person>>(std::move(retValue), [](auto&& value) { return ::djinni::c_api::ProtobufTranslator<::djinni::test::Person>::fromCpp(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::OptionalTranslator<std::experimental::optional<::djinni::test::Person>, ::djinni::c_api::ProtobufTranslator<::djinni::test::Person>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_binary_ref)
 }
 
 djinni_outcome_ref testsuite_proto_tests_stringToProtoOutcome(djinni_string_ref x)
 {
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
     auto retValue = ::testsuite::ProtoTests::stringToProtoOutcome(::djinni::c_api::StringTranslator::toCpp(x));
-    return ::djinni::c_api::OutcomeTranslator<::djinni::test::Person, int32_t>::fromCpp(std::move(retValue), [](auto&& value) { return ::djinni::c_api::ProtobufTranslator<::djinni::test::Person>::fromCpp(std::forward<decltype(value)>(value)); }, [](auto&& value) { return ::djinni::c_api::NumberTranslator::fromCpp<int32_t>(std::forward<decltype(value)>(value)); });
+    return ::djinni::c_api::OutcomeTranslator<::djinni::c_api::ProtobufTranslator<::djinni::test::Person>, ::djinni::c_api::Int32Translator>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_outcome_ref)
 }
 
 

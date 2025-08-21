@@ -12,19 +12,6 @@ extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_flag_roundtrip_ref;
-typedef djinni_proxy_class_ref testsuite_flag_roundtrip_proxy_class_ref;
-
-typedef struct 
-{
-    testsuite_access_flags (*roundtrip_access)(void *, testsuite_access_flags);
-    testsuite_empty_flags (*roundtrip_empty)(void *, testsuite_empty_flags);
-    djinni_number_ref (*roundtrip_access_boxed)(void *, djinni_number_ref);
-    djinni_number_ref (*roundtrip_empty_boxed)(void *, djinni_number_ref);
-} testsuite_flag_roundtrip_method_defs;
-
-testsuite_flag_roundtrip_proxy_class_ref testsuite_flag_roundtrip_proxy_class_new(const testsuite_flag_roundtrip_method_defs *method_defs, djinni_opaque_deallocator opaque_deallocator);
-
-testsuite_flag_roundtrip_ref testsuite_flag_roundtrip_new(testsuite_flag_roundtrip_proxy_class_ref proxy_class, void *opaque);
 
 testsuite_access_flags testsuite_flag_roundtrip_roundtrip_access(testsuite_access_flags flag);
 
