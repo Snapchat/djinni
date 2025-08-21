@@ -1,8 +1,8 @@
 #pragma once
 
 #include "djinni_c.h"
-#include "djinni_c_types.hpp"
 #include "djinni_c_ref.hpp"
+#include "djinni_c_types.hpp"
 #include <atomic>
 #include <chrono>
 #include <memory>
@@ -391,5 +391,17 @@ template <typename T> struct ProtobufTranslator {
     return output;
   }
 };
+
+template <typename T> T getNullValue() { return T{}; }
+
+#define DJINNI_HANDLE_EXCEPTION_PROLOGUE try {
+#define DJINNI_HANDLE_EXCEPTION_EPILOGUE(__ret_type__)                         \
+  }                                                                            \
+  catch (const std::exception &exc) {                                          \
+    djinni_exception_notify(exc.what());                                       \
+    if constexpr (!std::is_void_v<__ret_type__>) {                             \
+      return ::djinni::c_api::getNullValue<__ret_type__>();                    \
+    }                                                                          \
+  }
 
 } // namespace djinni::c_api

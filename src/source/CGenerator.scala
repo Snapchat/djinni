@@ -373,7 +373,8 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
         w.wl(")")
         w.braced {
-          val needsReturnValue = resolvedMethod.retTypename != "void"
+          w.wl("DJINNI_HANDLE_EXCEPTION_PROLOGUE")
+              val needsReturnValue = resolvedMethod.retTypename != "void"
 
           if (needsReturnValue) {
             w.w(s"auto retValue = ")
@@ -395,6 +396,9 @@ class CGenerator(spec: Spec) extends Generator(spec) {
           if (needsReturnValue) {
             w.wl(s"""return ${resolvedMethod.returnType.get.fromCpp("std::move(retValue)")};""")
           }
+
+          w.wl(s"DJINNI_HANDLE_EXCEPTION_EPILOGUE(${resolvedMethod.retTypename})")
+
         }
 
         w.wl

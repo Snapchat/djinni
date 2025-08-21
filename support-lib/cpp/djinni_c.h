@@ -23,6 +23,8 @@ typedef djinni_ref djinni_proxy_class_ref;
 typedef void (*djinni_binary_deallocator)(uint8_t *, size_t, void *);
 typedef void (*djinni_opaque_deallocator)(void *);
 
+typedef void (*djinni_exception_handler)(void *, const char *);
+
 void djinni_ref_retain(djinni_ref ref);
 void djinni_ref_release(djinni_ref ref);
 
@@ -73,33 +75,39 @@ void djinni_array_set_value(djinni_array_ref array, size_t index,
 djinni_date_ref djinni_date_new(uint64_t epoch_time_ms);
 uint64_t djinni_date_get_epoch(djinni_date_ref date);
 
-#define DJINNI_OPTIONAL_PRIMITIVE(__type__)                                    \
+void djinni_exception_handler_push(void *opaque,
+                                   djinni_exception_handler handler);
+void djinni_exception_handler_pop();
+
+void djinni_exception_notify(const char *error);
+
+#define DJINNI_OPTIONAL_PRIMITIVE(__name__, __type__)                          \
   typedef struct {                                                             \
     __type__ value;                                                            \
     bool has_value;                                                            \
-  } djinni_optional_##__type__;                                                \
+  } djinni_optional_##__name__;                                                \
                                                                                \
-  inline djinni_optional_##__type__ djinni_optional_##__type__##_make(         \
+  inline djinni_optional_##__name__ djinni_optional_##__name__##_make(         \
       __type__ value) {                                                        \
-    djinni_optional_##__type__ output;                                         \
+    djinni_optional_##__name__ output;                                         \
     output.value = value;                                                      \
     output.has_value = true;                                                   \
     return output;                                                             \
   }                                                                            \
-  inline djinni_optional_##__type__ djinni_optional_##__type__##_empty() {     \
-    djinni_optional_##__type__ output;                                         \
+  inline djinni_optional_##__name__ djinni_optional_##__name__##_empty() {     \
+    djinni_optional_##__name__ output;                                         \
     output.value = 0;                                                          \
     output.has_value = false;                                                  \
     return output;                                                             \
   }
 
-DJINNI_OPTIONAL_PRIMITIVE(bool);
-DJINNI_OPTIONAL_PRIMITIVE(int8_t);
-DJINNI_OPTIONAL_PRIMITIVE(int16_t);
-DJINNI_OPTIONAL_PRIMITIVE(int32_t);
-DJINNI_OPTIONAL_PRIMITIVE(int64_t);
-DJINNI_OPTIONAL_PRIMITIVE(float);
-DJINNI_OPTIONAL_PRIMITIVE(double);
+DJINNI_OPTIONAL_PRIMITIVE(bool, bool);
+DJINNI_OPTIONAL_PRIMITIVE(int8, int8_t);
+DJINNI_OPTIONAL_PRIMITIVE(int16, int16_t);
+DJINNI_OPTIONAL_PRIMITIVE(int32, int32_t);
+DJINNI_OPTIONAL_PRIMITIVE(int64, int64_t);
+DJINNI_OPTIONAL_PRIMITIVE(float, float);
+DJINNI_OPTIONAL_PRIMITIVE(double, double);
 
 #ifdef __cplusplus
 } // extern "C"

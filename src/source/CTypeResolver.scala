@@ -82,7 +82,8 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     val cppOptionalTemplate = cppMarshal.fqTypename(parent)
 
     if (primitive != null && !asBoxed) {
-      val typename = s"djinni_optional_${resolved.typename}"
+      val resolvedTypename = if (resolved.typename.endsWith("_t")) resolved.typename.substring(0, resolved.typename.length - 2) else resolved.typename
+      val typename = s"djinni_optional_${resolvedTypename}"
 
       new CTypeTranslator(
         typename,

@@ -1,5 +1,6 @@
 #include "djinni_c.h"
 #include "djinni_c_types.hpp"
+#include <vector>
 
 using namespace djinni;
 
@@ -139,4 +140,58 @@ djinni_date_ref djinni_date_new(uint64_t epoch_time_ms) {
 
 uint64_t djinni_date_get_epoch(djinni_date_ref date) {
   return djinni_number_get_uint64(date);
+}
+
+namespace djinni::c_api {
+
+struct ExceptionHandler {
+  void *opaque;
+  djinni_exception_handler handler;
+
+  ExceptionHandler(void *opaque, djinni_exception_handler handler)
+      : opaque(opaque), handler(handler) {}
+
+  static void push(void *opaque, djinni_exception_handler handler) {
+    exceptionHandlers.emplace_back(opaque, handler);
+  }
+
+  static void pop() {
+    if (exceptionHandlers.empty()) {
+      std::fprintf(stderr, "Unbalanced djinni_exception_handler_push and "
+                           "djinni_exception_handler_pop calls");
+      std::abort();
+    }
+
+    exceptionHandlers.pop_back();
+  }
+
+  static void notify(const char *error) {
+    if (exceptionHandlers.empty()) {
+      std::fprintf(stderr,
+                   "No exception handler registered with "
+                   "djinni_exception_handler_push to handle error: %s",
+                   error);
+      std::abort();
+    }
+
+    auto handler = exceptionHandlers.back();
+    handler.handler(handler.opaque, error);
+  }
+
+private:
+  static thread_local std::vector<ExceptionHandler> exceptionHandlers;
+};
+
+thread_local std::vector<ExceptionHandler> ExceptionHandler::exceptionHandlers;
+
+} // namespace djinni::c_api
+
+void djinni_exception_handler_push(void *opaque,
+                                   djinni_exception_handler handler) {
+  djinni::c_api::ExceptionHandler::push(opaque, handler);
+}
+void djinni_exception_handler_pop() { djinni::c_api::ExceptionHandler::pop(); }
+
+void djinni_exception_notify(const char *error) {
+  djinni::c_api::ExceptionHandler::notify(error);
 }

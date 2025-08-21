@@ -25,9 +25,9 @@ template <typename T> struct CRef {
 TEST(DjinniCAPI, supportsPrimitiveValues) {
   auto primitives = CRef(testsuite_assorted_primitives_new(
       true, 8, 4242, 3000000, 99999999999, 32.5f, 6482000.5,
-      djinni_optional_bool_empty(), djinni_optional_int8_t_empty(),
-      djinni_optional_int16_t_empty(), djinni_optional_int32_t_empty(),
-      djinni_optional_int64_t_empty(), djinni_optional_float_empty(),
+      djinni_optional_bool_empty(), djinni_optional_int8_empty(),
+      djinni_optional_int16_empty(), djinni_optional_int32_empty(),
+      djinni_optional_int64_empty(), djinni_optional_float_empty(),
       djinni_optional_double_empty()));
 
   ASSERT_TRUE(testsuite_assorted_primitives_get_b(primitives.value));
@@ -70,8 +70,8 @@ TEST(DjinniCAPI, supportsPrimitiveValues) {
 TEST(DjinniCAPI, supportsOptionalPrimitiveValues) {
   auto primitives = CRef(testsuite_assorted_primitives_new(
       false, 0, 0, 0, 0, 0.0f, 0.0, djinni_optional_bool_make(true),
-      djinni_optional_int8_t_make(8), djinni_optional_int16_t_make(16),
-      djinni_optional_int32_t_make(4242), djinni_optional_int64_t_make(3000000),
+      djinni_optional_int8_make(8), djinni_optional_int16_make(16),
+      djinni_optional_int32_make(4242), djinni_optional_int64_make(3000000),
       djinni_optional_float_make(32.5f),
       djinni_optional_double_make(6482000.5)));
 
@@ -98,14 +98,14 @@ TEST(DjinniCAPI, supportsOptionalPrimitiveValues) {
             testsuite_assorted_primitives_get_o_eight(primitives.value).value);
 
   testsuite_assorted_primitives_set_o_eight(primitives.value,
-                                            djinni_optional_int8_t_make(16));
+                                            djinni_optional_int8_make(16));
   ASSERT_TRUE(
       testsuite_assorted_primitives_get_o_eight(primitives.value).has_value);
   ASSERT_EQ(16,
             testsuite_assorted_primitives_get_o_eight(primitives.value).value);
 
   testsuite_assorted_primitives_set_o_eight(primitives.value,
-                                            djinni_optional_int8_t_empty());
+                                            djinni_optional_int8_empty());
   ASSERT_FALSE(
       testsuite_assorted_primitives_get_o_eight(primitives.value).has_value);
   ASSERT_EQ(0,
@@ -117,8 +117,8 @@ TEST(DjinniCAPI, supportsOptionalPrimitiveValues) {
   ASSERT_EQ(
       16, testsuite_assorted_primitives_get_o_sixteen(primitives.value).value);
 
-  testsuite_assorted_primitives_set_o_sixteen(
-      primitives.value, djinni_optional_int16_t_make(4343));
+  testsuite_assorted_primitives_set_o_sixteen(primitives.value,
+                                              djinni_optional_int16_make(4343));
   ASSERT_TRUE(
       testsuite_assorted_primitives_get_o_sixteen(primitives.value).has_value);
   ASSERT_EQ(
@@ -126,7 +126,7 @@ TEST(DjinniCAPI, supportsOptionalPrimitiveValues) {
       testsuite_assorted_primitives_get_o_sixteen(primitives.value).value);
 
   testsuite_assorted_primitives_set_o_sixteen(primitives.value,
-                                              djinni_optional_int16_t_empty());
+                                              djinni_optional_int16_empty());
   ASSERT_FALSE(
       testsuite_assorted_primitives_get_o_sixteen(primitives.value).has_value);
 
@@ -138,15 +138,15 @@ TEST(DjinniCAPI, supportsOptionalPrimitiveValues) {
       testsuite_assorted_primitives_get_o_thirtytwo(primitives.value).value);
 
   testsuite_assorted_primitives_set_o_thirtytwo(
-      primitives.value, djinni_optional_int32_t_make(6000000));
+      primitives.value, djinni_optional_int32_make(6000000));
   ASSERT_TRUE(testsuite_assorted_primitives_get_o_thirtytwo(primitives.value)
                   .has_value);
   ASSERT_EQ(
       6000000,
       testsuite_assorted_primitives_get_o_thirtytwo(primitives.value).value);
 
-  testsuite_assorted_primitives_set_o_thirtytwo(
-      primitives.value, djinni_optional_int32_t_empty());
+  testsuite_assorted_primitives_set_o_thirtytwo(primitives.value,
+                                                djinni_optional_int32_empty());
   ASSERT_FALSE(testsuite_assorted_primitives_get_o_thirtytwo(primitives.value)
                    .has_value);
 
@@ -158,15 +158,15 @@ TEST(DjinniCAPI, supportsOptionalPrimitiveValues) {
       testsuite_assorted_primitives_get_o_sixtyfour(primitives.value).value);
 
   testsuite_assorted_primitives_set_o_sixtyfour(
-      primitives.value, djinni_optional_int64_t_make(999999999990));
+      primitives.value, djinni_optional_int64_make(999999999990));
   ASSERT_TRUE(testsuite_assorted_primitives_get_o_sixtyfour(primitives.value)
                   .has_value);
   ASSERT_EQ(
       999999999990,
       testsuite_assorted_primitives_get_o_sixtyfour(primitives.value).value);
 
-  testsuite_assorted_primitives_set_o_sixtyfour(
-      primitives.value, djinni_optional_int64_t_empty());
+  testsuite_assorted_primitives_set_o_sixtyfour(primitives.value,
+                                                djinni_optional_int64_empty());
   ASSERT_FALSE(testsuite_assorted_primitives_get_o_sixtyfour(primitives.value)
                    .has_value);
 
@@ -544,6 +544,20 @@ TEST(DjinniCAPI, supportsOutcome) {
   auto error = CRef(djinni_outcome_get_error(failure.value));
 
   ASSERT_EQ(42, djinni_number_get_int64(error.value));
+}
+
+static void handleException(void *opaque, const char *message) {
+  *reinterpret_cast<std::string *>(opaque) = std::string(message);
+}
+
+TEST(DjinniCAPI, canCatchExceptions) {
+  std::string errorMessage;
+
+  djinni_exception_handler_push(&errorMessage, &handleException);
+  auto result = CRef(testsuite_test_helpers_async_early_throw());
+  djinni_exception_handler_pop();
+
+  ASSERT_EQ(std::string("error"), errorMessage);
 }
 
 static void futureIntCallback(void *opaque, djinni_ref value,
