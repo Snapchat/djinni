@@ -166,7 +166,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         w.w(s"""return ::djinni::c_api::RecordTranslator<${selfCpp}>::make(""")
 
         writeDelimited(w, resolvedFields, ", ")(t => {
-          w.w(t.translator.toCppTranslatorFn(t.field.ident.name))
+          w.w(t.translator.toCpp(t.field.ident.name))
         })
 
         w.wl(");")
@@ -181,12 +181,12 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         w.wl(s"""${fieldTypename} ${prefix}_get_${fieldName}(${typeName} instance)""")
         w.braced {
           val param = s"${toCppExpr}.${idCpp.field(resolvedField.field.ident)}"
-          w.wl(s"return ${resolvedField.translator.fromCppTranslatorFn(param)};")
+          w.wl(s"return ${resolvedField.translator.fromCpp(param)};")
         }
         w.wl
         w.wl(s"""void ${prefix}_set_${fieldName}(${typeName} instance, ${fieldTypename} value)""")
         w.braced {
-          val toCppValue = resolvedField.translator.toCppTranslatorFn("value")
+          val toCppValue = resolvedField.translator.toCpp("value")
           w.wl(s"${toCppExpr}.${idCpp.field(resolvedField.field.ident)} = ${toCppValue};")
         }
         w.wl
@@ -232,7 +232,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         w.braced {
           for (param <- resolvedMethod.parameters) {
             val resolvedExpr = cppMarshal.maybeMove(param.field.ident.name, param.field.ty)
-            w.wl(s"auto ${getConvertedParamName(param)} = ${param.translator.fromCppTranslatorFn(resolvedExpr)};")
+            w.wl(s"auto ${getConvertedParamName(param)} = ${param.translator.fromCpp(resolvedExpr)};")
           }
 
           val retValueName = "returnValue"
@@ -256,7 +256,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
           if (needsReturnValue) {
             w.wl
-            w.wl(s"auto ${getReturnNameCpp(retValueName)} = ${resolvedMethod.returnType.get.toCppTranslatorFn(retValueName)};")
+            w.wl(s"auto ${getReturnNameCpp(retValueName)} = ${resolvedMethod.returnType.get.toCpp(retValueName)};")
             if (resolvedMethod.returnType.get.isRefType) {
               w.wl(s"djinni_ref_release(${retValueName});")
             }
@@ -380,14 +380,14 @@ class CGenerator(spec: Spec) extends Generator(spec) {
           }
 
           writeDelimited(w, resolvedMethod.parameters, ", ")(p => {
-            w.w(p.translator.toCppTranslatorFn(p.field.ident.name))
+            w.w(p.translator.toCpp(p.field.ident.name))
           })
 
           w.w(")")
 
           w.wl(";")
           if (needsReturnValue) {
-            w.wl(s"""return ${resolvedMethod.returnType.get.fromCppTranslatorFn("std::move(retValue)")};""")
+            w.wl(s"""return ${resolvedMethod.returnType.get.fromCpp("std::move(retValue)")};""")
           }
         }
 

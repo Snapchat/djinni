@@ -12,121 +12,87 @@
 
 namespace djinni::c_api {
 
-class StringTranslator {
-public:
-  static djinni_string_ref fromCpp(std::string &&str);
-  static djinni_string_ref fromCpp(const std::string &str);
-  static std::string toCpp(djinni_string_ref str);
+struct VoidTranslator {
+  using CppType = void;
+  using CType = void;
+
+  static CType fromCpp() {}
+  static CppType toCpp() {}
 };
 
-class DateTranslator {
-public:
-  static djinni_date_ref
-  fromCpp(const std::chrono::system_clock::time_point &date);
-  static std::chrono::system_clock::time_point toCpp(djinni_date_ref date);
+struct StringTranslator {
+  using CppType = std::string;
+  using CType = djinni_string_ref;
+
+  static CType fromCpp(CppType &&str);
+  static CType fromCpp(const CppType &str);
+  static CppType toCpp(CType str);
 };
 
-class NumberTranslator {
-public:
-  template <typename T> static djinni_number_ref fromCpp(T value) = delete;
-  template <typename T> static T toCpp(djinni_number_ref value) = delete;
+struct DateTranslator {
+  using CppType = std::chrono::system_clock::time_point;
+  using CType = djinni_date_ref;
+  static CType fromCpp(const CppType &date);
+  static CppType toCpp(CType date);
+};
 
-  template <> djinni_number_ref fromCpp(uint8_t value) {
-    return fromCppUnsignedInt(value);
-  }
-  template <> djinni_number_ref fromCpp(uint16_t value) {
-    return fromCppUnsignedInt(value);
-  }
-  template <> djinni_number_ref fromCpp(uint32_t value) {
-    return fromCppUnsignedInt(value);
-  }
-  template <> djinni_number_ref fromCpp(uint64_t value) {
-    return fromCppUnsignedInt(value);
-  }
-  template <> djinni_number_ref fromCpp(bool value) {
-    return fromCppUnsignedInt(value);
-  }
+template <typename T> struct UIntTranslator {
+  using CppType = T;
+  using CType = djinni_number_ref;
 
-  template <> uint8_t toCpp(djinni_number_ref value) {
-    return toCppUnsignedInt<uint8_t>(value);
-  }
-  template <> uint16_t toCpp(djinni_number_ref value) {
-    return toCppUnsignedInt<uint16_t>(value);
-  }
-  template <> uint32_t toCpp(djinni_number_ref value) {
-    return toCppUnsignedInt<uint32_t>(value);
-  }
-  template <> uint64_t toCpp(djinni_number_ref value) {
-    return toCppUnsignedInt<uint64_t>(value);
-  }
-  template <> bool toCpp(djinni_number_ref value) {
-    return toCppUnsignedInt<bool>(value);
-  }
-
-  template <> djinni_number_ref fromCpp(int8_t value) {
-    return fromCppSignedInt(value);
-  }
-  template <> djinni_number_ref fromCpp(int16_t value) {
-    return fromCppSignedInt(value);
-  }
-  template <> djinni_number_ref fromCpp(int32_t value) {
-    return fromCppSignedInt(value);
-  }
-  template <> djinni_number_ref fromCpp(int64_t value) {
-    return fromCppSignedInt(value);
-  }
-
-  template <> int8_t toCpp(djinni_number_ref value) {
-    return toCppSignedInt<int8_t>(value);
-  }
-  template <> int16_t toCpp(djinni_number_ref value) {
-    return toCppSignedInt<int16_t>(value);
-  }
-  template <> int32_t toCpp(djinni_number_ref value) {
-    return toCppSignedInt<int32_t>(value);
-  }
-  template <> int64_t toCpp(djinni_number_ref value) {
-    return toCppSignedInt<int64_t>(value);
-  }
-
-  template <> djinni_number_ref fromCpp(float value) {
-    return djinni_number_double_new(value);
-  }
-
-  template <> djinni_number_ref fromCpp(double value) {
-    return djinni_number_double_new(value);
-  }
-
-  template <> float toCpp(djinni_number_ref value) {
-    return static_cast<float>(djinni_number_get_double(value));
-  }
-
-  template <> double toCpp(djinni_number_ref value) {
-    return djinni_number_get_double(value);
-  }
-
-private:
-  template <typename T> static djinni_number_ref fromCppUnsignedInt(T value) {
+  static CType fromCpp(CppType value) {
     return djinni_number_uint64_new(static_cast<uint64_t>(value));
   }
-
-  template <typename T> static T toCppUnsignedInt(djinni_number_ref value) {
+  static CppType toCpp(CType value) {
     return static_cast<T>(djinni_number_get_uint64(value));
   }
+};
 
-  template <typename T> static djinni_number_ref fromCppSignedInt(T value) {
+template <typename T> struct SignedIntTranslator {
+  using CppType = T;
+  using CType = djinni_number_ref;
+
+  static CType fromCpp(CppType value) {
     return djinni_number_int64_new(static_cast<int64_t>(value));
   }
 
-  template <typename T> static T toCppSignedInt(djinni_number_ref value) {
+  static CppType toCpp(CType value) {
     return static_cast<T>(djinni_number_get_int64(value));
   }
 };
 
-class OptionalTranslator {
-public:
-  template <typename Opt, typename T> static T fromCppPrimitive(Opt value) {
-    T out;
+template <typename T> struct FloatingPointTranslator {
+  using CppType = T;
+  using CType = djinni_number_ref;
+
+  static CType fromCpp(CppType value) {
+    return djinni_number_double_new(static_cast<double>(value));
+  }
+
+  static CppType toCpp(CType value) {
+    return static_cast<T>(djinni_number_get_double(value));
+  }
+};
+
+struct UInt8Translator : public UIntTranslator<uint8_t> {};
+struct UInt16Translator : public UIntTranslator<uint16_t> {};
+struct UInt32Translator : public UIntTranslator<uint32_t> {};
+struct UInt64Translator : public UIntTranslator<uint64_t> {};
+
+struct Int8Translator : public SignedIntTranslator<int8_t> {};
+struct Int16Translator : public SignedIntTranslator<int16_t> {};
+struct Int32Translator : public SignedIntTranslator<int32_t> {};
+struct Int64Translator : public SignedIntTranslator<int64_t> {};
+
+struct FloatTranslator : public FloatingPointTranslator<float> {};
+struct DoubleTranslator : public FloatingPointTranslator<float> {};
+
+template <typename CppOpt, typename COpt> struct PrimitiveOptionalTranslator {
+  using CppType = CppOpt;
+  using CType = COpt;
+
+  static CType fromCpp(CppType value) {
+    CType out;
 
     if (value) {
       out.has_value = true;
@@ -139,95 +105,97 @@ public:
     return out;
   }
 
-  template <typename Opt, typename T> static Opt toCppPrimitive(T value) {
+  static CppType toCpp(CType value) {
     if (value.has_value) {
-      return Opt(value.value);
+      return CppType(value.value);
     } else {
-      return Opt();
+      return CppType();
     }
   }
-
-  template <typename T, typename F>
-  static djinni_ref fromSharedPtrCpp(const T &value, F &&convert) {
-    if (value == nullptr) {
-      return nullptr;
-    } else {
-      return convert(value);
-    }
-  }
-
-  template <typename T, typename F>
-  static djinni_ref fromSharedPtrCpp(T &&value, F &&convert) {
-    if (value == nullptr) {
-      return nullptr;
-    } else {
-      return convert(std::move(value));
-    }
-  }
-
-  template <typename Opt, typename F>
-  static djinni_ref fromCpp(const Opt &value, F &&convert) {
-    if (!value) {
-      return nullptr;
-    } else {
-      return convert(value.value());
-    }
-  }
-
-  template <typename Opt, typename F>
-  static djinni_ref fromCpp(Opt &&value, F &&convert) {
-    if (!value) {
-      return nullptr;
-    } else {
-      return convert(std::move(value.value()));
-    }
-  }
-
-  template <typename Opt, typename F>
-  static Opt toCpp(djinni_ref ptr, F &&convert) {
-    if (ptr == nullptr) {
-      return Opt();
-    } else {
-      return Opt(convert(ptr));
-    }
-  }
-
-  template <typename T, typename F>
-  static T toSharedPtrCpp(djinni_ref ptr, F &&convert) {
-    if (ptr == nullptr) {
-      return T();
-    } else {
-      return convert(ptr);
-    }
-  }
-
-private:
 };
 
-template <typename T> class ListTranslator {
-public:
-  template <typename F>
-  static std::vector<T> toCpp(djinni_array_ref value, F &&convert) {
-    std::vector<T> output;
+template <typename Opt, typename Tr> struct OptionalTranslator {
+  using CppType = Opt;
+  using CType = djinni_ref;
+
+  static CType fromCpp(const CppType &value) {
+    if (!value) {
+      return nullptr;
+    } else {
+      return Tr::fromCpp(value.value());
+    }
+  }
+
+  static CType fromCpp(CppType &&value) {
+    if (!value) {
+      return nullptr;
+    } else {
+      return Tr::fromCpp(std::move(value.value()));
+    }
+  }
+
+  static CppType toCpp(djinni_ref ptr) {
+    if (ptr == nullptr) {
+      return CppType();
+    } else {
+      return CppType(Tr::toCpp(ptr));
+    }
+  }
+};
+
+template <typename Tr> struct OptionalPtrTranslator {
+  using CppType = typename Tr::CppType;
+  using CType = djinni_ref;
+
+  static CType fromCpp(const CppType &value) {
+    if (value == nullptr) {
+      return nullptr;
+    } else {
+      return Tr::fromCpp(value);
+    }
+  }
+
+  static CType fromCpp(CppType &&value) {
+    if (value == nullptr) {
+      return nullptr;
+    } else {
+      return Tr::fromCpp(std::move(value));
+    }
+  }
+
+  static CppType toCpp(CType value) {
+    if (value == nullptr) {
+      return nullptr;
+    } else {
+      return Tr::toCpp(value);
+    }
+  }
+};
+
+template <typename Tr> struct ListTranslator {
+  using CppType = std::vector<typename Tr::CppType>;
+  using CType = djinni_array_ref;
+
+  static CppType toCpp(CType value) {
+    CppType output;
     auto length = djinni_array_get_length(value);
     output.reserve(length);
 
     for (size_t i = 0; i < length; i++) {
       auto item = djinni_array_get_value(value, i);
-      output.emplace_back(convert(item));
+      output.emplace_back(Tr::toCpp(item));
       djinni_ref_release(item);
     }
 
     return output;
   }
 
-  template <typename F>
-  static djinni_array_ref fromCpp(const std::vector<T> &values, F &&convert) {
+  static CType fromCpp(const CppType &values) {
     djinni_array_ref output = djinni_array_new(values.size());
     size_t index = 0;
 
     for (const auto &value : values) {
-      auto converted = convert(value);
+      auto converted = Tr::fromCpp(value);
       djinni_array_set_value(output, index++, converted);
       djinni_ref_release(converted);
     }
@@ -236,31 +204,30 @@ public:
   }
 };
 
-template <typename T> class SetTranslator {
-public:
-  template <typename F>
-  static std::unordered_set<T> toCpp(djinni_array_ref value, F &&convert) {
-    std::unordered_set<T> output;
+template <typename Tr> struct SetTranslator {
+  using CppType = std::unordered_set<typename Tr::CppType>;
+  using CType = djinni_array_ref;
+
+  static CppType toCpp(CType value) {
+    CppType output;
     auto length = djinni_array_get_length(value);
     output.reserve(length);
 
     for (size_t i = 0; i < length; i++) {
       auto item = djinni_array_get_value(value, i);
-      output.emplace(convert(item));
+      output.emplace(Tr::toCpp(item));
       djinni_ref_release(item);
     }
 
     return output;
   }
 
-  template <typename F>
-  static djinni_array_ref fromCpp(const std::unordered_set<T> &values,
-                                  F &&convert) {
+  static CType fromCpp(const CppType &values) {
     djinni_array_ref output = djinni_array_new(values.size());
     size_t index = 0;
 
     for (const auto &value : values) {
-      auto converted = convert(value);
+      auto converted = Tr::fromCpp(value);
       djinni_array_set_value(output, index++, converted);
       djinni_ref_release(converted);
     }
@@ -269,20 +236,20 @@ public:
   }
 };
 
-template <typename K, typename V> class MapTranslator {
-public:
-  template <typename F>
-  static std::unordered_map<K, V> toCpp(djinni_keyval_array_ref key_values,
-                                        F &&convert) {
-    std::unordered_map<K, V> output;
+template <typename TrK, typename TrV> struct MapTranslator {
+  using CppType =
+      std::unordered_map<typename TrK::CppType, typename TrV::CppType>;
+  using CType = djinni_keyval_array_ref;
+
+  static CppType toCpp(djinni_keyval_array_ref key_values) {
+    CppType output;
     auto length = djinni_keyval_array_get_length(key_values);
     output.reserve(length);
 
     for (size_t i = 0; i < length; i++) {
       auto key = djinni_keyval_array_get_key(key_values, i);
       auto value = djinni_keyval_array_get_value(key_values, i);
-      auto pair = convert(key, value);
-      output.try_emplace(std::move(pair.first), std::move(pair.second));
+      output.try_emplace(TrK::toCpp(key), TrV::toCpp(value));
       djinni_ref_release(key);
       djinni_ref_release(value);
     }
@@ -290,31 +257,32 @@ public:
     return output;
   }
 
-  template <typename F>
-  static djinni_keyval_array_ref fromCpp(const std::unordered_map<K, V> &map,
-                                         F &&convert) {
+  static CType fromCpp(const CppType &map) {
     djinni_keyval_array_ref output = djinni_keyval_array_new(map.size());
     size_t index = 0;
     for (const auto &it : map) {
-      auto pair = convert(it.first, it.second);
+      auto key = TrK::fromCpp(it.first);
+      auto value = TrV::fromCpp(it.second);
 
-      djinni_keyval_array_set_entry(output, index++, pair.first, pair.second);
+      djinni_keyval_array_set_entry(output, index++, key, value);
 
-      djinni_ref_release(pair.first);
-      djinni_ref_release(pair.second);
+      djinni_ref_release(key);
+      djinni_ref_release(value);
     }
     return output;
   }
 };
 
-template <typename T> class RecordTranslator {
-public:
+template <typename T> struct RecordTranslator {
+  using CppType = T;
+  using CType = djinni_record_ref;
+
   template <typename... Args> static djinni_record_ref make(Args &&...args) {
     auto *obj = new RecordHolder<T>(T(std::forward<Args>(args)...));
     return toC(obj);
   }
 
-  static T &toCpp(djinni_record_ref ref) {
+  static CppType &toCpp(djinni_record_ref ref) {
     auto *record = fromC<RecordHolder<T>>(ref);
     if (record == nullptr) {
       std::abort();
@@ -323,18 +291,16 @@ public:
     return record->data();
   }
 
-  static djinni_record_ref fromCpp(T &&value) { return make(std::move(value)); }
+  static CType fromCpp(CppType &&value) { return make(std::move(value)); }
 
-  static djinni_record_ref fromCpp(const T &value) { return make(value); }
-
-  static void release(djinni_record_ref ptr) {
-    Object::release(fromC<Object>(ptr));
-  }
+  static CType fromCpp(const CppType &value) { return make(value); }
 };
 
-template <typename T> class InterfaceTranslator {
-public:
-  static const std::shared_ptr<T> &toCpp(djinni_interface_ref ref) {
+template <typename T> struct InterfaceTranslator {
+  using CppType = std::shared_ptr<T>;
+  using CType = djinni_interface_ref;
+
+  static const CppType &toCpp(CType ref) {
     auto *i = fromC<InterfaceHolder<T>>(ref);
     if (i == nullptr) {
       std::abort();
@@ -343,7 +309,7 @@ public:
     return i->data();
   }
 
-  static djinni_interface_ref fromCpp(std::shared_ptr<T> value) {
+  static CType fromCpp(CppType value) {
     Object *obj = new InterfaceHolder<T>(std::move(value));
     return toC(obj);
   }
@@ -366,37 +332,56 @@ public:
   }
 };
 
-template <typename Cpp, typename C> class EnumTranslator {
-public:
-  static Cpp toCpp(C value) { return static_cast<Cpp>(value); }
-  static C fromCpp(Cpp value) { return static_cast<C>(value); }
+template <typename Cpp, typename C> struct EnumTranslator {
+  using CppType = Cpp;
+  using CType = C;
+
+  static CppType toCpp(CType value) { return static_cast<CppType>(value); }
+  static CType fromCpp(CppType value) { return static_cast<CType>(value); }
 
   static Cpp toCppBoxed(djinni_number_ref value) {
     return static_cast<Cpp>(djinni_number_get_int64(value));
   }
 
   static djinni_number_ref fromCppBoxed(Cpp value) {
-    return NumberTranslator::fromCpp(static_cast<int64_t>(value));
+    return djinni_number_int64_new(static_cast<int64_t>(value));
   }
 };
 
-class BinaryTranslator {
-public:
-  static std::vector<uint8_t> toCpp(djinni_binary_ref binary);
-  static djinni_binary_ref fromCpp(std::vector<uint8_t> &&binary);
-  static djinni_binary_ref fromCpp(const std::vector<uint8_t> &binary);
+template <typename Cpp> struct BoxedEnumTranslator {
+  using CppType = Cpp;
+  using CType = djinni_number_ref;
+
+  static CppType toCpp(CType value) {
+    return static_cast<CppType>(djinni_number_get_int64(value));
+  }
+
+  static CType fromCpp(CppType value) {
+    return djinni_number_int64_new(static_cast<int64_t>(value));
+  }
 };
 
-template <typename T> class ProtobufTranslator {
-public:
-  static T toCpp(djinni_binary_ref binary) {
-    T output;
+struct BinaryTranslator {
+  using CppType = std::vector<uint8_t>;
+  using CType = djinni_binary_ref;
+
+  static CppType toCpp(CType binary);
+  static CType fromCpp(CppType &&binary);
+  static CType fromCpp(const CppType &binary);
+};
+
+template <typename T> struct ProtobufTranslator {
+  using CppType = T;
+  using CType = djinni_binary_ref;
+
+  static CppType toCpp(CType binary) {
+    CppType output;
     output.ParseFromArray(djinni_binary_get_data(binary),
                           djinni_binary_get_length(binary));
     return output;
   }
 
-  static djinni_binary_ref fromCpp(const T &proto) {
+  static CType fromCpp(const CppType &proto) {
     auto length = proto.ByteSizeLong();
     auto output = djinni_binary_new(static_cast<size_t>(length));
 

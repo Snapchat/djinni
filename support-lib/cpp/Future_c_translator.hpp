@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Future.hpp"
-#include "djinni_c.h"
 #include "djinni_c_types.hpp"
+#include "future_c.h"
 
 namespace djinni {
 template <typename T> class FutureHolder : public Object {
@@ -19,24 +19,24 @@ private:
 
 namespace djinni::c_api {
 
-template <typename T> class FutureTranslator {
-public:
-  template <typename F>
-  static ::djinni::Future<T> toCpp(djinni_future_ref future, F &&toCpp) {
-    auto *futureHolder = static_cast<::djinni::FutureHolder<T> *>(
-        reinterpret_cast<Object *>(future));
+template <typename Tr> struct FutureTranslator {
+  using CppType = ::djinni::Future<typename Tr::CppType>;
+  using CType = djinni_future_ref;
+
+  static CppType toCpp(CType future) {
+    auto *futureHolder =
+        fromC<::djinni::FutureHolder<typename Tr::CppType>>(future);
 
     // Any way to make this better?
 
     return futureHolder->getFuture().then(
-        [](::djinni::Future<T> value) { return value.get(); });
+        [](CppType value) { return value.get(); });
   }
 
-  template <typename F>
-  static djinni_future_ref fromCpp(::djinni::Future<T> &&future, F &&fromCpp) {
-    Object *futureHolder = new ::djinni::FutureHolder<T>(std::move(future));
+  static CType fromCpp(CppType &&future) {
+    auto *futureHolder = new ::djinni::FutureHolder<typename Tr::CppType>(std::move(future));
 
-    return reinterpret_cast<djinni_future_ref>(futureHolder);
+    return toC(futureHolder);
   }
 };
 
