@@ -347,24 +347,22 @@ public:
     Object *obj = new InterfaceHolder<T>(std::move(value));
     return toC(obj);
   }
-};
 
-template <typename PT> class ProxyTranslator {
-public:
+  template <typename PT>
   static djinni_proxy_class_ref
-  makeClass(const PT *methodDefs, djinni_opaque_deallocator opaqueDeallocator) {
+  makeProxyClass(const PT *methodDefs,
+                 djinni_opaque_deallocator opaqueDeallocator) {
     auto *proxyClass =
         new ::djinni::ProxyClass<PT>(*methodDefs, opaqueDeallocator);
     return toC(proxyClass);
   }
 
-  template <typename P, typename T>
-  static djinni_interface_ref make(djinni_proxy_class_ref proxyClassRef,
-                                   void *opaque) {
+  template <typename PT, typename P>
+  static djinni_interface_ref makeProxy(djinni_proxy_class_ref proxyClassRef,
+                                        void *opaque) {
     auto *proxyClass = fromC<::djinni::ProxyClass<PT>>(proxyClassRef);
 
-    return ::djinni::c_api::InterfaceTranslator<T>::fromCpp(
-        std::make_shared<P>(proxyClass, opaque));
+    return fromCpp(std::make_shared<P>(proxyClass, opaque));
   }
 };
 
