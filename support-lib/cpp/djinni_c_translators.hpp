@@ -2,6 +2,7 @@
 
 #include "djinni_c.h"
 #include "djinni_c_types.hpp"
+#include "djinni_c_ref.hpp"
 #include <atomic>
 #include <chrono>
 #include <memory>

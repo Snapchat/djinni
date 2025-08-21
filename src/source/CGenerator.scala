@@ -203,10 +203,6 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     return resolvedField.field.ident.name + "_c"
   }
 
-  private def getReturnNameCpp(name: String): String = {
-    return name + "_cpp"
-  }
-
   private def writeProxyClass(w: IndentWriter, ident: Ident, methodDefsStructName: String, resolvedMethods: Seq[ResolvedMethod]): String = {
     val baseProxyClassName = "Proxy_Parent"
     w.wl(s"using ${baseProxyClassName} = ::djinni::Proxy<${methodDefsStructName}>;")
@@ -232,35 +228,45 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         w.braced {
           for (param <- resolvedMethod.parameters) {
             val resolvedExpr = cppMarshal.maybeMove(param.field.ident.name, param.field.ty)
-            w.wl(s"auto ${getConvertedParamName(param)} = ${param.translator.fromCpp(resolvedExpr)};")
+
+            if (param.translator.isRefType) {
+              w.wl(s"auto ${getConvertedParamName(param)} = ::djinni::c_api::Ref(${param.translator.fromCpp(resolvedExpr)});")
+            } else {
+              w.wl(s"auto ${getConvertedParamName(param)} = ${param.translator.fromCpp(resolvedExpr)};")
+            }
           }
 
           val retValueName = "returnValue"
           val needsReturnValue = resolvedMethod.retTypename != "void"
           if (needsReturnValue) {
             w.w(s"auto ${retValueName} = ")
+
+            if (resolvedMethod.returnType.get.isRefType) {
+              w.w("::djinni::c_api::Ref(")
+            }
           }
 
           w.w(s"${baseProxyClassName}::getProxyClass().methodDefs().${resolvedMethod.method.ident.name}(${baseProxyClassName}::getOpaque()")
           if (resolvedMethod.parameters.nonEmpty) {
             w.w(", ")
-            w.w(resolvedMethod.parameters.map(p => getConvertedParamName(p)).mkString(", "))
-          }
-          w.wl(");")
-
-          for (param <- resolvedMethod.parameters) {
-            if (param.translator.isRefType) {
-              w.wl(s"djinni_ref_release(${getConvertedParamName(param)});")
-            }
+            w.w(resolvedMethod.parameters.map(p => if (p.translator.isRefType) getConvertedParamName(p) + ".get()" else getConvertedParamName(p)).mkString(", "))
           }
 
           if (needsReturnValue) {
-            w.wl
-            w.wl(s"auto ${getReturnNameCpp(retValueName)} = ${resolvedMethod.returnType.get.toCpp(retValueName)};")
             if (resolvedMethod.returnType.get.isRefType) {
-              w.wl(s"djinni_ref_release(${retValueName});")
+              w.w("));")
+            } else {
+              w.wl(");")
             }
-            w.wl(s"return ${getReturnNameCpp(retValueName)};")
+            w.wl
+
+            if (resolvedMethod.returnType.get.isRefType) {
+              w.wl(s"return ${resolvedMethod.returnType.get.toCpp(retValueName + ".get()")};")
+            } else {
+              w.wl(s"return ${resolvedMethod.returnType.get.toCpp(retValueName)};")
+            }
+          } else {
+            w.wl(");")
           }
 
         }
