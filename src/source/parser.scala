@@ -105,6 +105,7 @@ private object IdlParser extends RegexParsers {
           foundObjc = true
           foundJavascript = true
           foundSwift = true
+          foundC = true
         }
         case "c" => {
           if (foundCpp) return err("Found multiple \"c\" modifiers.")

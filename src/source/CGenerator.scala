@@ -296,28 +296,33 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     writeCFilePair(origin, ident, typeResolver.publicImports.toSeq, typeResolver.privateImports.toSeq)((w: IndentWriter) => {
       writeDoc(w, doc)
       w.wl(s"""typedef djinni_interface_ref ${typeName};""")
-      w.wl(s"""typedef djinni_proxy_class_ref ${proxyClassName};""")
-      w.wl
 
-      w.wl(s"""typedef struct """)
-      w.bracedEnd(s" ${methodDefsStructName};") {
+      if (i.ext.cc) {
+        w.wl(s"""typedef djinni_proxy_class_ref ${proxyClassName};""")
+        w.wl
 
-        if (resolvedMethods.isEmpty) {
-          w.wl("void *reserved[1];")
-        } else {
-          for (resolvedMethod <- resolvedMethods) {
-            w.w(s"""${resolvedMethod.retTypename} (*${resolvedMethod.method.ident.name})(""")
-            writeDelimited(w, "void *" +: resolvedMethod.parameters.map(p => p.translator.typename), ", ")(s => w.w(s))
-            w.wl(");")
+        w.wl(s"""typedef struct """)
+        w.bracedEnd(s" ${methodDefsStructName};") {
+
+          if (resolvedMethods.isEmpty) {
+            w.wl("void *reserved[1];")
+          } else {
+            for (resolvedMethod <- resolvedMethods) {
+              w.w(s"""${resolvedMethod.retTypename} (*${resolvedMethod.method.ident.name})(""")
+              writeDelimited(w, "void *" +: resolvedMethod.parameters.map(p => p.translator.typename), ", ")(s => w.w(s))
+              w.wl(");")
+            }
           }
         }
-      }
-      w.wl
+        w.wl
 
-      w.wl(s"${proxyClassName} ${prefix}_proxy_class_new(const ${methodDefsStructName} *method_defs, djinni_opaque_deallocator opaque_deallocator);")
-      w.wl
-      w.wl(s"${typeName} ${prefix}_new(${proxyClassName} proxy_class, void *opaque);")
-      w.wl("")
+        w.wl(s"${proxyClassName} ${prefix}_proxy_class_new(const ${methodDefsStructName} *method_defs, djinni_opaque_deallocator opaque_deallocator);")
+        w.wl
+        w.wl(s"${typeName} ${prefix}_new(${proxyClassName} proxy_class, void *opaque);")
+        w.wl("")
+      } else {
+        w.wl
+      }
 
       for (resolvedMethod <- resolvedMethods) {
         writeDoc(w, resolvedMethod.method.doc)
@@ -335,21 +340,20 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       }
 
     }, (w: IndentWriter) => {
-      val proxyClassNameCpp = writeProxyClass(w, ident, methodDefsStructName, resolvedMethods)
-      w.w(s"${proxyClassName} ${prefix}_proxy_class_new(const ${methodDefsStructName} *method_defs, djinni_opaque_deallocator opaque_deallocator)")
-      w.braced {
-        w.wl(s"return ::djinni::c_api::ProxyTranslator<${methodDefsStructName}>::makeClass(method_defs, opaque_deallocator);")
+      if (i.ext.cc) {
+        val proxyClassNameCpp = writeProxyClass(w, ident, methodDefsStructName, resolvedMethods)
+        w.w(s"${proxyClassName} ${prefix}_proxy_class_new(const ${methodDefsStructName} *method_defs, djinni_opaque_deallocator opaque_deallocator)")
+        w.braced {
+          w.wl(s"return ::djinni::c_api::ProxyTranslator<${methodDefsStructName}>::makeClass(method_defs, opaque_deallocator);")
+        }
+        w.wl
+
+        w.w(s"${typeName} ${prefix}_new(${proxyClassName} proxy_class, void *opaque)")
+        w.braced {
+          w.wl(s"return ::djinni::c_api::ProxyTranslator<${methodDefsStructName}>::make<${proxyClassNameCpp}, ${selfCpp}>(proxy_class, opaque);")
+        }
+        w.wl
       }
-      w.wl
-
-      w.w(s"${typeName} ${prefix}_new(${proxyClassName} proxy_class, void *opaque)")
-      w.braced {
-        w.wl(s"return ::djinni::c_api::ProxyTranslator<${methodDefsStructName}>::make<${proxyClassNameCpp}, ${selfCpp}>(proxy_class, opaque);")
-      }
-      w.wl
-
-
-
 
       for (resolvedMethod <- resolvedMethods) {
         writeDoc(w, resolvedMethod.method.doc)
