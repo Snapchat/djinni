@@ -23,7 +23,7 @@ typedef djinni_ref djinni_proxy_class_ref;
 typedef void (*djinni_binary_deallocator)(uint8_t *, size_t, void *);
 typedef void (*djinni_opaque_deallocator)(void *);
 
-typedef void (*djinni_exception_handler)(void *, const char *);
+typedef void (*djinni_exception_callback)(void *, const char *);
 
 void djinni_ref_retain(djinni_ref ref);
 void djinni_ref_release(djinni_ref ref);
@@ -75,8 +75,13 @@ void djinni_array_set_value(djinni_array_ref array, size_t index,
 djinni_date_ref djinni_date_new(uint64_t epoch_time_ms);
 uint64_t djinni_date_get_epoch(djinni_date_ref date);
 
-void djinni_exception_handler_push(void *opaque,
-                                   djinni_exception_handler handler);
+typedef struct {
+    void *opaque;
+    djinni_exception_callback callback;
+    void *__reserved__;
+} djinni_exception_handler;
+
+void djinni_exception_handler_push(djinni_exception_handler *handler);
 void djinni_exception_handler_pop();
 
 void djinni_exception_notify(const char *error);

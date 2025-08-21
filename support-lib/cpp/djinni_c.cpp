@@ -1,6 +1,6 @@
 #include "djinni_c.h"
 #include "djinni_c_types.hpp"
-#include <vector>
+#include <cstdio>
 
 using namespace djinni;
 
@@ -151,22 +151,27 @@ struct ExceptionHandler {
   ExceptionHandler(void *opaque, djinni_exception_handler handler)
       : opaque(opaque), handler(handler) {}
 
-  static void push(void *opaque, djinni_exception_handler handler) {
-    exceptionHandlers.emplace_back(opaque, handler);
+  static void push(djinni_exception_handler *handler) {
+    auto &handlerPtr = getHandlerPtr();
+    handler->__reserved__ = handlerPtr;
+    handlerPtr = handler;
   }
 
   static void pop() {
-    if (exceptionHandlers.empty()) {
+    auto &handlerPtr = getHandlerPtr();
+    if (handlerPtr == nullptr) {
       std::fprintf(stderr, "Unbalanced djinni_exception_handler_push and "
                            "djinni_exception_handler_pop calls");
       std::abort();
     }
 
-    exceptionHandlers.pop_back();
+    handlerPtr =
+        reinterpret_cast<djinni_exception_handler *>(handlerPtr->__reserved__);
   }
 
   static void notify(const char *error) {
-    if (exceptionHandlers.empty()) {
+    auto *handler = getHandlerPtr();
+    if (handler == nullptr) {
       std::fprintf(stderr,
                    "No exception handler registered with "
                    "djinni_exception_handler_push to handle error: %s",
@@ -174,21 +179,20 @@ struct ExceptionHandler {
       std::abort();
     }
 
-    auto handler = exceptionHandlers.back();
-    handler.handler(handler.opaque, error);
+    handler->callback(handler->opaque, error);
   }
 
 private:
-  static thread_local std::vector<ExceptionHandler> exceptionHandlers;
+  static djinni_exception_handler *&getHandlerPtr() {
+    thread_local djinni_exception_handler *kHandler = nullptr;
+    return kHandler;
+  }
 };
-
-thread_local std::vector<ExceptionHandler> ExceptionHandler::exceptionHandlers;
 
 } // namespace djinni::c_api
 
-void djinni_exception_handler_push(void *opaque,
-                                   djinni_exception_handler handler) {
-  djinni::c_api::ExceptionHandler::push(opaque, handler);
+void djinni_exception_handler_push(djinni_exception_handler *handler) {
+  djinni::c_api::ExceptionHandler::push(handler);
 }
 void djinni_exception_handler_pop() { djinni::c_api::ExceptionHandler::pop(); }
 

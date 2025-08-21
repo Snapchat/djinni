@@ -553,11 +553,45 @@ static void handleException(void *opaque, const char *message) {
 TEST(DjinniCAPI, canCatchExceptions) {
   std::string errorMessage;
 
-  djinni_exception_handler_push(&errorMessage, &handleException);
+  djinni_exception_handler handler;
+  handler.opaque = &errorMessage;
+  handler.callback = &handleException;
+
+  djinni_exception_handler_push(&handler);
   auto result = CRef(testsuite_test_helpers_async_early_throw());
   djinni_exception_handler_pop();
 
   ASSERT_EQ(std::string("error"), errorMessage);
+}
+
+TEST(DjinniCAPI, supportsNestedExceptionHandler) {
+
+  std::string errorMessage;
+  std::string errorMessageInner;
+
+  djinni_exception_handler handler;
+  handler.opaque = &errorMessage;
+  handler.callback = &handleException;
+
+  djinni_exception_handler_push(&handler);
+  {
+    djinni_exception_handler nestedHandler;
+    nestedHandler.opaque = &errorMessageInner;
+    nestedHandler.callback = &handleException;
+    djinni_exception_handler_push(&nestedHandler);
+    auto result = CRef(testsuite_test_helpers_async_early_throw());
+
+    djinni_exception_handler_pop();
+
+    ASSERT_EQ(std::string(""), errorMessage);
+    ASSERT_EQ(std::string("error"), errorMessageInner);
+  }
+
+  auto result = CRef(testsuite_test_helpers_async_early_throw());
+  ASSERT_EQ(std::string("error"), errorMessage);
+  ASSERT_EQ(std::string("error"), errorMessageInner);
+
+  djinni_exception_handler_pop();
 }
 
 static void futureIntCallback(void *opaque, djinni_ref value,
