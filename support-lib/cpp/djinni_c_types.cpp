@@ -8,26 +8,25 @@ constexpr size_t alignUp(size_t size, size_t alignment) {
 }
 
 template <typename T, typename ValueType> struct ArrayAllocator {
-  template <typename... Args> T *allocate(size_t size, Args &&...args) {
-    std::allocator<uint8_t> allocator;
-
+  template <typename... Args> static T *allocate(size_t size, Args &&...args) {
     auto allocSize =
         alignUp(sizeof(T), alignof(ValueType)) + (sizeof(ValueType) * size);
 
-    auto *arrayRegion = allocator.allocate(allocSize);
+    auto *arrayRegion = ::operator new(allocSize);
 
     new (arrayRegion)(T)(std::forward<Args>(args)...);
 
     return reinterpret_cast<T *>(arrayRegion);
   }
 
-  constexpr inline ValueType *getContainerStartPtr(T *object) {
+  constexpr inline static ValueType *getContainerStartPtr(T *object) {
     return reinterpret_cast<ValueType *>(
         reinterpret_cast<uint8_t *>(object) +
         alignUp(sizeof(T), alignof(ValueType)));
   }
 
-  constexpr inline const ValueType *getContainerStartPtr(const T *object) {
+  constexpr inline static const ValueType *
+  getContainerStartPtr(const T *object) {
     return reinterpret_cast<const ValueType *>(
         reinterpret_cast<const uint8_t *>(object) +
         alignUp(sizeof(T), alignof(ValueType)));
@@ -64,16 +63,14 @@ String::String(size_t length) : _length(length) {}
 String::~String() = default;
 
 const char *String::data() const {
-  StringAllocator allocator;
-  return allocator.getContainerStartPtr(this);
+  return StringAllocator::getContainerStartPtr(this);
 }
 
 size_t String::String::length() const { return _length; }
 
 String *String::make(const char *str, size_t length) {
-  StringAllocator allocator;
-  auto *output = allocator.allocate(length, length);
-  auto *data = allocator.getContainerStartPtr(output);
+  auto *output = StringAllocator::allocate(length, length);
+  auto *data = StringAllocator::getContainerStartPtr(output);
   for (size_t i = 0; i < length; i++) {
     data[i] = str[i];
   }
@@ -87,8 +84,7 @@ using ObjectArrayAllocator = ArrayAllocator<ObjectArray, Object *>;
 ObjectArray::ObjectArray(size_t length) : _length(length) {}
 
 ObjectArray::~ObjectArray() {
-  ObjectArrayAllocator allocator;
-  auto **data = allocator.getContainerStartPtr(this);
+  auto **data = ObjectArrayAllocator::getContainerStartPtr(this);
   for (size_t i = 0; i < _length; i++) {
     Object::release(data[i]);
   }
@@ -97,16 +93,14 @@ ObjectArray::~ObjectArray() {
 size_t ObjectArray::length() const { return _length; }
 
 Object *ObjectArray::getObjectAtIndex(size_t index) const {
-  ObjectArrayAllocator allocator;
-  Object *const *data = allocator.getContainerStartPtr(this);
+  Object *const *data = ObjectArrayAllocator::getContainerStartPtr(this);
   auto *object = data[index];
   Object::retain(object);
   return object;
 }
 
 void ObjectArray::setObjectAtIndex(size_t index, Object *object) {
-  ObjectArrayAllocator allocator;
-  Object **data = allocator.getContainerStartPtr(this);
+  Object **data = ObjectArrayAllocator::getContainerStartPtr(this);
 
   Object::retain(object);
   Object::release(data[index]);
@@ -114,10 +108,9 @@ void ObjectArray::setObjectAtIndex(size_t index, Object *object) {
 }
 
 ObjectArray *ObjectArray::make(size_t length) {
-  ObjectArrayAllocator allocator;
-  auto *output = allocator.allocate(length, length);
+  auto *output = ObjectArrayAllocator::allocate(length, length);
 
-  std::memset(allocator.getContainerStartPtr(output), 0, length);
+  std::memset(ObjectArrayAllocator::getContainerStartPtr(output), 0, length);
 
   return output;
 }
