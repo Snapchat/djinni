@@ -114,8 +114,8 @@ template <typename CppOpt, typename COpt> struct PrimitiveOptionalTranslator {
   }
 };
 
-template <typename Opt, typename Tr> struct OptionalTranslator {
-  using CppType = Opt;
+template <typename CppOpt, typename Tr> struct OptionalTranslator {
+  using CppType = CppOpt;
   using CType = djinni_ref;
 
   static CType fromCpp(const CppType &value) {

@@ -1,4 +1,5 @@
 #include "DataRefTest.h"
+#include "Future.hpp"
 #include "assorted_primitives.h"
 #include "client_interface.h"
 #include "client_returned_record.h"
@@ -543,6 +544,111 @@ TEST(DjinniCAPI, supportsOutcome) {
   auto error = CRef(djinni_outcome_get_error(failure.value));
 
   ASSERT_EQ(42, djinni_number_get_int64(error.value));
+}
+
+static void futureIntCallback(void *opaque, djinni_ref value,
+                              djinni_ref error) {
+  auto result = djinni_number_get_int64(value);
+  reinterpret_cast<::djinni::Promise<int> *>(opaque)->setValue(
+      static_cast<int>(result));
+}
+
+TEST(DjinniCAPI, supportsFuture) {
+  auto future = CRef(testsuite_test_helpers_get_async_result());
+
+  ::djinni::Promise<int> promise;
+
+  djinni_future_on_complete(future.value, reinterpret_cast<void *>(&promise),
+                            nullptr, &futureIntCallback);
+
+  auto cppFuture = promise.getFuture();
+  auto result = cppFuture.get();
+
+  ASSERT_EQ(42, result);
+}
+
+struct FutureCallbackResult {
+  djinni_ref value = nullptr;
+  djinni_string_ref error = nullptr;
+  bool completed = false;
+
+  ~FutureCallbackResult() {
+    djinni_ref_release(value);
+    djinni_ref_release(error);
+  }
+};
+
+static void futureCallback(void *opaque, djinni_ref value, djinni_ref error) {
+  auto result = reinterpret_cast<FutureCallbackResult *>(opaque);
+  result->value = value;
+  result->error = error;
+  result->completed = true;
+  djinni_ref_retain(value);
+  djinni_ref_retain(error);
+}
+
+TEST(DjinniCAPI, supportsFutureCreatedFromC) {
+  auto promise = CRef(djinni_promise_new());
+  auto future = CRef(djinni_promise_get_future(promise.value));
+
+  auto newFuture = CRef(testsuite_test_helpers_future_roundtrip(future.value));
+
+  FutureCallbackResult result;
+  djinni_future_on_complete(newFuture.value, &result, nullptr, &futureCallback);
+
+  ASSERT_FALSE(result.completed);
+  ASSERT_FALSE(result.value != nullptr);
+
+  auto intResult = CRef(djinni_number_int64_new(42));
+
+  djinni_promise_resolve(promise.value, intResult.value);
+
+  ASSERT_TRUE(result.completed);
+  ASSERT_TRUE(result.value != nullptr);
+
+  ASSERT_EQ(std::string("42"),
+            std::string(djinni_string_get_data(result.value)));
+}
+
+TEST(DjinniCAPI, supportsVoidFuture) {
+  auto promise = CRef(djinni_promise_new());
+  auto future = CRef(djinni_promise_get_future(promise.value));
+
+  auto newFuture = CRef(testsuite_test_helpers_void_async_method(future.value));
+
+  FutureCallbackResult result;
+  djinni_future_on_complete(newFuture.value, &result, nullptr, &futureCallback);
+
+  ASSERT_FALSE(result.completed);
+
+  djinni_promise_resolve(promise.value, nullptr);
+
+  ASSERT_TRUE(result.completed);
+  ASSERT_TRUE(result.value == nullptr);
+  ASSERT_TRUE(result.error == nullptr);
+}
+
+TEST(DjinniCAPI, supportsPropagatingErrorInFuture) {
+  auto promise = CRef(djinni_promise_new());
+  auto future = CRef(djinni_promise_get_future(promise.value));
+
+  auto newFuture = CRef(testsuite_test_helpers_void_async_method(future.value));
+
+  FutureCallbackResult result;
+  djinni_future_on_complete(newFuture.value, &result, nullptr, &futureCallback);
+
+  ASSERT_FALSE(result.completed);
+
+  auto errorString = CRef(djinni_string_new("Error", 5));
+
+  djinni_promise_reject(promise.value, errorString.value);
+
+  ASSERT_TRUE(result.completed);
+  ASSERT_TRUE(result.value == nullptr);
+  ASSERT_TRUE(result.error != nullptr);
+
+  ASSERT_EQ(std::string("Error"),
+            std::string(djinni_string_get_data(result.error)));
 }
 
 } // namespace djinni

@@ -1,42 +1,78 @@
 #pragma once
 
 #include "Future.hpp"
+#include "djinni_c_ref.hpp"
 #include "djinni_c_types.hpp"
 #include "future_c.h"
 
-namespace djinni {
-template <typename T> class FutureHolder : public Object {
-public:
-  FutureHolder(Future<T> future) : _future(std::move(future)) {}
-  ~FutureHolder() override = default;
+namespace djinni::c_api {
 
-  Future<T> &getFuture() { return _future; }
+class FutureException : public std::exception {
+public:
+  FutureException(djinni_string_ref error);
+  ~FutureException() override;
+
+  const char *what() const noexcept override;
 
 private:
-  Future<T> _future;
+  Ref<djinni_string_ref> _error;
 };
-} // namespace djinni
-
-namespace djinni::c_api {
 
 template <typename Tr> struct FutureTranslator {
   using CppType = ::djinni::Future<typename Tr::CppType>;
   using CType = djinni_future_ref;
 
+  static void deallocatePromise(void *opaque) {
+    delete reinterpret_cast<::djinni::Promise<typename Tr::CppType> *>(opaque);
+  }
+
+  static void promiseCallback(void *opaque, djinni_ref value,
+                              djinni_string_ref error) {
+    auto *promise =
+        reinterpret_cast<::djinni::Promise<typename Tr::CppType> *>(opaque);
+
+    if (error) {
+      promise->setException(FutureException(error));
+    } else {
+      if constexpr (std::is_void_v<typename Tr::CppType>) {
+        promise->setValue();
+      } else {
+        promise->setValue(Tr::toCpp(value));
+      }
+    }
+  }
+
   static CppType toCpp(CType future) {
-    auto *futureHolder =
-        fromC<::djinni::FutureHolder<typename Tr::CppType>>(future);
+    auto promise = new ::djinni::Promise<typename Tr::CppType>();
 
-    // Any way to make this better?
+    djinni_future_on_complete(future, promise, &deallocatePromise,
+                              &promiseCallback);
 
-    return futureHolder->getFuture().then(
-        [](CppType value) { return value.get(); });
+    return promise->getFuture();
   }
 
   static CType fromCpp(CppType &&future) {
-    auto *futureHolder = new ::djinni::FutureHolder<typename Tr::CppType>(std::move(future));
+    auto promise = Ref(djinni_promise_new());
 
-    return toC(futureHolder);
+    auto outputFuture = djinni_promise_get_future(promise.get());
+    future.then([promise = std::move(promise)](auto future) {
+      try {
+        if constexpr (std::is_void_v<typename Tr::CppType>) {
+          future.get();
+          djinni_promise_resolve(promise.get(), nullptr);
+        } else {
+          auto convertedResult = Ref(Tr::fromCpp(future.get()));
+          djinni_promise_resolve(promise.get(), convertedResult.get());
+        }
+
+      } catch (const std::exception &exc) {
+        const auto *what = exc.what();
+        auto errorMessage = Ref(djinni_string_new(what, strlen(what)));
+        djinni_promise_reject(promise.get(), errorMessage.get());
+      }
+    });
+
+    return outputFuture;
   }
 };
 
