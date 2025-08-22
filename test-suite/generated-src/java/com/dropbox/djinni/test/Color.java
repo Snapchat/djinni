@@ -6,10 +6,7 @@ package com.dropbox.djinni.test;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
-/**
- * This is a test
- * my dude!
- */
+/** This is a test */
 public enum Color {
     RED,
     ORANGE,

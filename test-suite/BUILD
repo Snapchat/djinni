@@ -1,4 +1,4 @@
-# load("@build_bazel_rules_apple//apple:macos.bzl", "macos_unit_test")
+load("@build_bazel_rules_apple//apple:macos.bzl", "macos_unit_test")
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library", "swift_test")
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "objc_library")
@@ -179,16 +179,15 @@ java_test(
     ],
 )
 
-# Uncomment before merging. This rule causes issues for me.
-# macos_unit_test(
-#     name = "djinni-objc-tests",
-#     minimum_os_version = "10.10",
-#     deps = [
-#         "djinni-tests-objc",
-#         "djinni-tests-objcxx",
-#         "djinni-tests-objc-proto",
-#     ],
-# )
+macos_unit_test(
+    name = "djinni-objc-tests",
+    minimum_os_version = "10.10",
+    deps = [
+        "djinni-tests-objc",
+        "djinni-tests-objcxx",
+        "djinni-tests-objc-proto",
+    ],
+)
 
 EMSCRIPTEN_LINKOPTS = [
     "--bind",  # Compiles the source code using the Embind bindings to connect C/C++ and JavaScript

@@ -9,10 +9,7 @@
 extern "C" {
 #endif // __cplusplus
 
-/**
- * This is a test
- * my dude!
- */
+/** This is a test */
 enum testsuite_color {
     testsuite_color_RED = 0,
     testsuite_color_ORANGE = 1,

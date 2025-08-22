@@ -499,10 +499,7 @@ export interface UserToken {
     whoami(): string;
 }
 
-/**
- * This is a test
- * my dude!
- */
+/** This is a test */
 export enum Color {
     RED = 0,
     ORANGE = 1,
