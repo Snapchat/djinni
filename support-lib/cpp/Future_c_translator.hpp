@@ -3,7 +3,7 @@
 #include "Future.hpp"
 #include "djinni_c_ref.hpp"
 #include "djinni_c_types.hpp"
-#include "future_c.h"
+#include "Future_c.h"
 
 namespace djinni::c_api {
 
