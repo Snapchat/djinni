@@ -1,14 +1,16 @@
 #pragma once
 
-#include "djinni_c.h"
 #include "DataRef.hpp"
+#include "djinni_c.h"
 
 namespace djinni::c_api {
 
-class DataRefTranslator {
-public:
-  static ::djinni::DataRef toCpp(djinni_binary_ref binary);
-  static djinni_binary_ref fromCpp(const ::djinni::DataRef &dataRef);
+struct DataRefTranslator {
+  using CppType = ::djinni::DataRef;
+  using CType = djinni_binary_ref;
+
+  static CppType toCpp(CType binary);
+  static CType fromCpp(const CppType &dataRef);
 };
 
-}
+} // namespace djinni::c_api
