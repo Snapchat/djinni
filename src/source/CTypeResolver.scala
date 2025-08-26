@@ -169,7 +169,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     }
   }
 
-  private def resolveExtern(expr: MExpr, defType: meta.DefType, c: meta.MExtern.C, asBoxed: Boolean): CTypeTranslator = {
+  private def resolveExtern(expr: MExpr, defType: meta.DefType, cpp: meta.MExtern.Cpp, c: meta.MExtern.C, asBoxed: Boolean): CTypeTranslator = {
     updatePrivateImports(expr.base)
     addPublicImport(cppMarshal.resolveExtCppHdr(c.publicHeader))
     privateImports.add("#include " + cppMarshal.resolveExtCppHdr(c.privateHeader))
@@ -197,7 +197,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
     }
 
     if (isEnum) {
-      doResolveEnum(c.typename, c.translator, asBoxed)
+      doResolveEnum(c.typename, cpp.typename, asBoxed)
     } else {
       new CTypeTranslator(c.typename, true, c.translator)
     }
@@ -233,7 +233,7 @@ class CTypeResolver(val ident: Ident, val spec: Spec, val cppMarshal: CppMarshal
           case _ => new CTypeTranslator(ptrTypeName(name), true, getTranslatorNameForType(name, body))
         }
       }
-      case meta.MExtern(_, _, defType, _, _, _, _, _, _, _, _, _, _, _, c) => resolveExtern(expr, defType, c, asBoxed)
+      case meta.MExtern(_, _, defType, _, cpp, _, _, _, _, _, _, _, _, _, c) => resolveExtern(expr, defType, cpp, c, asBoxed)
       case meta.MProtobuf(_, _, _) =>
         updatePrivateImports(expr.base)
         new CTypeTranslator(
