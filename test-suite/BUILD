@@ -103,8 +103,7 @@ objc_library(
     ]),
     copts = [
         "-ObjC++",
-        "-std=c++17",
-        "-fcoroutines-ts",
+        "-std=c++20",
     ],
     includes = [
         "generated-src/objc",
