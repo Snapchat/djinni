@@ -44,3 +44,8 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Date'
   header: '"djinni_support.hpp"'
+c:
+  typename: 'djinni_date_ref'
+  translator: '::djinni::c_api::DateTranslator'
+  public_header: '"djinni_c.h"'
+  private_header: '"$djinni_c_translators.hpp"'

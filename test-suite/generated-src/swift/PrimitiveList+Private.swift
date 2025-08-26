@@ -12,12 +12,14 @@ public enum PrimitiveListMarshaller: DjinniSupport.Marshaller {
     public static func fromCpp(_ c: djinni.swift.AnyValue) -> SwiftType {
         return withUnsafePointer(to: c) { p in
             let list = ListMarshaller<I64Marshaller>.fromCpp(djinni.swift.getMember(p, 0))
-            return SwiftType(list: list)
+            let optionalList = OptionalMarshaller<ListMarshaller<OptionalMarshaller<I64Marshaller>>>.fromCpp(djinni.swift.getMember(p, 1))
+            return SwiftType(list: list, optionalList: optionalList)
         }
     }
     public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue {
         var ret = djinni.swift.makeCompositeValue()
         djinni.swift.addMember(&ret, ListMarshaller<I64Marshaller>.toCpp(s.list))
+        djinni.swift.addMember(&ret, OptionalMarshaller<ListMarshaller<OptionalMarshaller<I64Marshaller>>>.toCpp(s.optionalList))
         return ret
     }
 }

@@ -113,6 +113,11 @@ package object generatorTools {
                    composerClassIdentStyle: IdentConverter,
                    composerFileIdentStyle: IdentConverter,
                    composerTsOutFolder: Option[File],
+                   cOutFolder: Option[File],
+                   cHeaderOutFolder: Option[File],
+                   cNamespace: String,
+                   cBaseLibIncludePrefix: String,
+                   cIncludePrefix: String,
                    swiftOutFolder: Option[File],
                    swiftIdentStyle: SwiftIdentStyle,
                    swiftModule: String,
@@ -333,6 +338,13 @@ package object generatorTools {
         }
         new ComposerGenerator(spec).generate(idl)
       }
+      if (spec.cOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("C", spec.cOutFolder.get)
+          createFolder("C header", spec.cHeaderOutFolder.get)
+        }
+              new CGenerator(spec).generate(idl)
+      }
       if (spec.tsOutFolder.isDefined) {
         if (!spec.skipGeneration) {
           createFolder("TypeScript", spec.tsOutFolder.get)
@@ -480,13 +492,20 @@ abstract class Generator(spec: Spec)
 
   def generate(idl: Seq[TypeDecl]) {
     val decls = idl.collect { case itd: InternTypeDecl => itd }
-    for (td <- decls) td.body match {
-      case e: Enum =>
-        assert(td.params.isEmpty)
-        generateEnum(td.origin, td.ident, td.doc, e)
-      case r: Record => generateRecord(td.origin, td.ident, td.doc, td.params, r)
-      case i: Interface => generateInterface(td.origin, td.ident, td.doc, td.params, i)
-      case p: ProtobufMessage => // never need to generate files for protobuf types
+    for (td <- decls) {
+      try {
+        td.body match {
+          case e: Enum =>
+            assert(td.params.isEmpty)
+            generateEnum(td.origin, td.ident, td.doc, e)
+          case r: Record => generateRecord(td.origin, td.ident, td.doc, td.params, r)
+          case i: Interface => generateInterface(td.origin, td.ident, td.doc, td.params, i)
+          case p: ProtobufMessage => // never need to generate files for protobuf types
+        }
+      } catch {
+        case t: Throwable => throw new RuntimeException("Failed to process " + td.ident.name, t)
+      }
+
     }
     generateModule(decls.filter(td => td.body.isInstanceOf[Interface]))
   }

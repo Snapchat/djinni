@@ -12,9 +12,19 @@ public class PrimitiveList {
 
     /*package*/ ArrayList<Long> mList;
 
+    /*package*/ /*optional*/ ArrayList<Long> mOptionalList;
+
+    public PrimitiveList(
+            @Nonnull ArrayList<Long> list,
+            @CheckForNull ArrayList<Long> optionalList) {
+        this.mList = list;
+        this.mOptionalList = optionalList;
+    }
+
     public PrimitiveList(
             @Nonnull ArrayList<Long> list) {
-        this.mList = list;
+        this(list,
+             null);
     }
 
     @Nonnull
@@ -26,10 +36,20 @@ public class PrimitiveList {
         this.mList = list;
     }
 
+    @CheckForNull
+    public ArrayList<Long> getOptionalList() {
+        return mOptionalList;
+    }
+
+    public void setOptionalList(ArrayList<Long> optionalList) {
+        this.mOptionalList = optionalList;
+    }
+
     @Override
     public String toString() {
         return "PrimitiveList{" +
                 "mList=" + mList +
+                "," + "mOptionalList=" + mOptionalList +
         "}";
     }
 

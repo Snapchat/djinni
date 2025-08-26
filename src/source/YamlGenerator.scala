@@ -39,6 +39,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   val tsMarshal = new TsGenerator(spec, false)
   val swiftMarshal = new SwiftMarshal(spec)
   val swiftxxMarshal = new SwiftxxMarshal(spec)
+  val cMarshal = new CGenerator(spec)
 
   case class QuotedString(str: String) // For anything that migt require escaping
 
@@ -89,6 +90,11 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     if (spec.swiftxxOutFolder.isDefined) {
       w.wl("swiftxx:").nested {write(w, swiftxx(td))}
     }
+    if (spec.cOutFolder.isDefined) {
+      w.wl("c:").nested {
+        write(w, c(td))
+      }
+    }
   }
 
   private def write(w: IndentWriter, m: Map[String, Any]) {
@@ -130,7 +136,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   )
 
   private def typeDef(td: TypeDecl) = {
-    def ext(e: Ext): String = (if(e.cpp) " +c" else "") + (if(e.objc) " +o" else "") + (if(e.java) " +j" else "") + (if(e.js) " +w" else "") + (if(e.swift) " +sw" else "")
+    def ext(e: Ext): String = (if(e.cpp) " +c" else "") + (if(e.objc) " +o" else "") + (if(e.java) " +j" else "") + (if(e.js) " +w" else "") + (if(e.swift) " +sw" else "") + (if(e.cc) " +cc" else "")
     def deriving(r: Record) = {
       if(r.derivingTypes.isEmpty) {
         ""
@@ -228,6 +234,13 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     "header" -> QuotedString(swiftxxMarshal.include(td.ident))
   )
 
+  private def c(td: TypeDecl) = Map[String, Any](
+    "typename" -> QuotedString(cMarshal.typename(td)),
+    "translator" -> QuotedString(cMarshal.helperName(td)),
+    "public_header" -> QuotedString(cMarshal.publicHeader(td)),
+    "private_header" -> QuotedString(cMarshal.privateHeader(td))
+  )
+
   // TODO: there has to be a way to do all this without the MExpr/Meta conversions?
   private def mexpr(td: TypeDecl) = MExpr(meta(td), List())
 
@@ -323,7 +336,14 @@ object YamlGenerator {
       getOptionalField(td, "swift", "generic", false)),
     MExtern.Swiftxx(
       getOptionalField(td, "swiftxx", "translator"),
-      getOptionalField(td, "swiftxx", "header"))
+      getOptionalField(td, "swiftxx", "header")),
+    MExtern.C(
+      getOptionalField(td, "c", "typename"),
+      getOptionalField(td, "c", "public_header"),
+      getOptionalField(td, "c", "private_header"),
+      getOptionalField(td, "c", "translator"),
+      getOptionalField(td, "c", "ignore_type_params", false)
+  )
   )
 
   private def nested(td: ExternTypeDecl, key: String) = {

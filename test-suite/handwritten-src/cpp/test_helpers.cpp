@@ -36,7 +36,7 @@ bool TestHelpers::check_set_record(const SetRecord & rec) {
     return rec.set == std::unordered_set<std::string>{ "StringA", "StringB", "StringC" };
 }
 
-static const PrimitiveList cPrimitiveList { { 1, 2, 3 } };
+static const PrimitiveList cPrimitiveList { { 1, 2, 3 }, {} };
 
 PrimitiveList TestHelpers::get_primitive_list() {
     return cPrimitiveList;
@@ -240,17 +240,17 @@ djinni::Future<std::string> TestHelpers::check_async_composition(const std::shar
     auto str2num = [] (djinni::Future<std::string> s) {
         return std::stoi(s.get());
     };
-    
+
     auto f3 = f1.then(str2num);
     auto f4 = f2.then(str2num);
-    
+
     std::vector<djinni::Future<std::string>> futures;
     futures.push_back(i->future_roundtrip(std::move(f3)));
     futures.push_back(i->future_roundtrip(std::move(f4)));
 
     p1.setValue("36");
     p2.setValue("36");
-    
+
 #ifdef DJINNI_FUTURE_HAS_COROUTINE_SUPPORT
     co_await djinni::whenAll(futures);
     co_return std::string("42");

@@ -7,11 +7,27 @@
 @implementation DBPrimitiveList
 
 - (nonnull instancetype)initWithList:(nonnull NSArray<NSNumber *> *)list
+                        optionalList:(nullable NSArray<NSNumber *> *)optionalList
 {
     if (self = [super init]) {
         _list = [list copy];
+        _optionalList = [optionalList copy];
     }
     return self;
+}
+
+- (nonnull instancetype)initWithList:(nonnull NSArray<NSNumber *> *)list
+{
+    self = [self initWithList:list
+                 optionalList:nil];
+    return self;
+}
+
++ (nonnull instancetype)primitiveListWithList:(nonnull NSArray<NSNumber *> *)list
+                                 optionalList:(nullable NSArray<NSNumber *> *)optionalList
+{
+    return [[self alloc] initWithList:list
+                         optionalList:optionalList];
 }
 
 + (nonnull instancetype)primitiveListWithList:(nonnull NSArray<NSNumber *> *)list
@@ -22,7 +38,7 @@
 #ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<%@ %p list:%@>", self.class, (void *)self, self.list];
+    return [NSString stringWithFormat:@"<%@ %p list:%@ optionalList:%@>", self.class, (void *)self, self.list, self.optionalList];
 }
 
 #endif

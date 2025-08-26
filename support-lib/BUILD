@@ -5,7 +5,7 @@ load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 cc_library(
     name = "djinni-support-common",
     srcs = glob(["cpp/*.cpp"]),
-    hdrs = glob(["*.hpp", "cpp/*.hpp"]),
+    hdrs = glob(["*.hpp", "cpp/*.hpp", "cpp/*.h"]),
     includes = ["cpp"],
     visibility = ["//visibility:public"],
 )

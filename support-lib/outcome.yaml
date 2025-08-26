@@ -47,3 +47,9 @@ swift:
 swiftxx:
   translator: '::djinni::swift::OutcomeAdaptor'
   header: '"Outcome_swift.hpp"'
+c:
+  typename: 'djinni_outcome_ref'
+  translator: '::djinni::c_api::OutcomeTranslator'
+  public_header: '"$Outcome_c.h"'
+  private_header: '"$Outcome_c_translator.hpp"'
+

@@ -73,7 +73,7 @@ test_helpers = interface +c {
 # (Second line of multi-line documentation.
 #   Indented third line of multi-line documentation.)
 empty_record = record {
-    
+
 }
 
 # Test for conflict of method name with an interface name.

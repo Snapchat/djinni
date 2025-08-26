@@ -45,6 +45,12 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Duration'
   header: '"Duration-swift.hpp"'
+c:
+  typename: 'djinni_number_ref'
+  translator: '::djinni::c_api::DurationTranslator'
+  public_header: '"djinni_c.h"'
+  private_header: '"$duration_c_translator.hpp"'
+  ignore_type_params: true
 ---
 name: h
 typedef: 'record'
@@ -88,6 +94,11 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Duration_h'
   header: '"Duration-swift.hpp"'
+c:
+  typename: 'djinni_number_ref'
+  translator: '::djinni::c_api::DurationTranslator_h'
+  public_header: '"djinni_c.h"'
+  private_header: '"$duration_c_translator.hpp"'
 ---
 name: min
 typedef: 'record'
@@ -131,6 +142,11 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Duration_min'
   header: '"Duration-swift.hpp"'
+c:
+  typename: 'djinni_number_ref'
+  translator: '::djinni::c_api::DurationTranslator_min'
+  public_header: '"djinni_c.h"'
+  private_header: '"$duration_c_translator.hpp"'
 ---
 name: s
 typedef: 'record'
@@ -174,6 +190,11 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Duration_s'
   header: '"Duration-swift.hpp"'
+c:
+  typename: 'djinni_number_ref'
+  translator: '::djinni::c_api::DurationTranslator_s'
+  public_header: '"djinni_c.h"'
+  private_header: '"$duration_c_translator.hpp"'
 ---
 name: ms
 typedef: 'record'
@@ -217,6 +238,11 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Duration_ms'
   header: '"Duration-swift.hpp"'
+c:
+  typename: 'djinni_number_ref'
+  translator: '::djinni::c_api::DurationTranslator_ms'
+  public_header: '"djinni_c.h"'
+  private_header: '"$duration_c_translator.hpp"'
 ---
 name: us
 typedef: 'record'
@@ -260,6 +286,11 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Duration_us'
   header: '"Duration-swift.hpp"'
+c:
+  typename: 'djinni_number_ref'
+  translator: '::djinni::c_api::DurationTranslator_us'
+  public_header: '"djinni_c.h"'
+  private_header: '"$duration_c_translator.hpp"'
 ---
 name: ns
 typedef: 'record'
@@ -303,3 +334,8 @@ swift:
 swiftxx:
   translator: '::djinni::swift::Duration_ns'
   header: '"Duration-swift.hpp"'
+c:
+  typename: 'djinni_number_ref'
+  translator: '::djinni::c_api::DurationTranslator_ns'
+  public_header: '"djinni_c.h"'
+  private_header: '"$duration_c_translator.hpp"'

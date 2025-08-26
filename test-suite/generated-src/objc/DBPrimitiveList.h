@@ -6,9 +6,15 @@
 @interface DBPrimitiveList : NSObject
 - (nonnull instancetype)init NS_UNAVAILABLE;
 + (nonnull instancetype)new NS_UNAVAILABLE;
-- (nonnull instancetype)initWithList:(nonnull NSArray<NSNumber *> *)list NS_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithList:(nonnull NSArray<NSNumber *> *)list
+                        optionalList:(nullable NSArray<NSNumber *> *)optionalList NS_DESIGNATED_INITIALIZER;
++ (nonnull instancetype)primitiveListWithList:(nonnull NSArray<NSNumber *> *)list
+                                 optionalList:(nullable NSArray<NSNumber *> *)optionalList;
+- (nonnull instancetype)initWithList:(nonnull NSArray<NSNumber *> *)list;
 + (nonnull instancetype)primitiveListWithList:(nonnull NSArray<NSNumber *> *)list;
 
 @property (nonatomic, copy, nonnull) NSArray<NSNumber *> * list;
+
+@property (nonatomic, copy, nullable) NSArray<NSNumber *> * optionalList;
 
 @end

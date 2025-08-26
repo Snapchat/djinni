@@ -75,3 +75,10 @@ emsdk_deps()
 
 load("@emsdk//:emscripten_deps.bzl", emsdk_emscripten_deps = "emscripten_deps")
 emsdk_emscripten_deps()
+
+http_archive(
+    name = "gtest",
+    strip_prefix = "googletest-1.13.0",
+    url = "https://github.com/google/googletest/archive/refs/tags/v1.13.0.tar.gz",
+    integrity = "sha256-rX/boR6gEcHZJbMonPSvLGajUuGNTHJkOS/q116Rk2M=",
+)

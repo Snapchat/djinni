@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "../../handwritten-src/cpp/optional.hpp"
 #include <cstdint>
 #include <utility>
 #include <vector>
@@ -11,10 +12,18 @@ namespace testsuite {
 
 struct PrimitiveList final {
     std::vector<int64_t> list;
+    std::experimental::optional<std::vector<std::experimental::optional<int64_t>>> optional_list;
+
+    PrimitiveList(std::vector<int64_t> list_,
+                  std::experimental::optional<std::vector<std::experimental::optional<int64_t>>> optional_list_)
+    : list(std::move(list_))
+    , optional_list(std::move(optional_list_))
+    {}
 
     //NOLINTNEXTLINE(google-explicit-constructor)
     PrimitiveList(std::vector<int64_t> list_)
-    : list(std::move(list_))
+    : PrimitiveList(std::move(list_),
+                    std::experimental::nullopt)
     {}
 };
 
