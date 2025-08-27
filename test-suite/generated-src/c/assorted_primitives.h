@@ -12,6 +12,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_assorted_primitives_ref;
 
 testsuite_assorted_primitives_ref testsuite_assorted_primitives_new(bool b, int8_t eight, int16_t sixteen, int32_t thirtytwo, int64_t sixtyfour, float fthirtytwo, double fsixtyfour, djinni_optional_bool o_b, djinni_optional_int8 o_eight, djinni_optional_int16 o_sixteen, djinni_optional_int32 o_thirtytwo, djinni_optional_int64 o_sixtyfour, djinni_optional_float o_fthirtytwo, djinni_optional_double o_fsixtyfour);
+
 bool testsuite_assorted_primitives_get_b(testsuite_assorted_primitives_ref instance);
 void testsuite_assorted_primitives_set_b(testsuite_assorted_primitives_ref instance, bool value);
 

@@ -11,6 +11,10 @@ testsuite_record_using_extended_record_ref testsuite_record_using_extended_recor
     return ::djinni::c_api::RecordTranslator<::testsuite::RecordUsingExtendedRecord>::make(::djinni::c_api::RecordTranslator<::testsuite::ExtendedRecord>::toCpp(er));
 }
 
+testsuite_record_using_extended_record_ref testsuite_record_using_extended_record_get_cr() {
+    return ::djinni::c_api::RecordTranslator<::testsuite::RecordUsingExtendedRecord>::fromCpp(::testsuite::RecordUsingExtendedRecord::CR);
+}
+
 testsuite_extended_record_ref testsuite_record_using_extended_record_get_er(testsuite_record_using_extended_record_ref instance)
 {
     return ::djinni::c_api::RecordTranslator<::testsuite::ExtendedRecord>::fromCpp(::djinni::c_api::RecordTranslator<::testsuite::RecordUsingExtendedRecord>::toCpp(instance).er);

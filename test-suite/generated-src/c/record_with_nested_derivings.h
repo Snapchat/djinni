@@ -13,6 +13,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_record_with_nested_derivings_ref;
 
 testsuite_record_with_nested_derivings_ref testsuite_record_with_nested_derivings_new(int32_t key, testsuite_record_with_derivings_ref rec);
+
 int32_t testsuite_record_with_nested_derivings_get_key(testsuite_record_with_nested_derivings_ref instance);
 void testsuite_record_with_nested_derivings_set_key(testsuite_record_with_nested_derivings_ref instance, int32_t value);
 

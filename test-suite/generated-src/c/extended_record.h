@@ -4,6 +4,7 @@
 #pragma once
 
 #include "djinni_c.h"
+#include "extended_record.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +14,9 @@ extern "C" {
 typedef djinni_record_ref testsuite_extended_record_ref;
 
 testsuite_extended_record_ref testsuite_extended_record_new(bool foo);
+
+testsuite_extended_record_ref testsuite_extended_record_get_extended_record_const();
+
 bool testsuite_extended_record_get_foo(testsuite_extended_record_ref instance);
 void testsuite_extended_record_set_foo(testsuite_extended_record_ref instance, bool value);
 

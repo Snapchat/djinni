@@ -12,6 +12,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_vec2_ref;
 
 testsuite_vec2_ref testsuite_vec2_new(int32_t x, int32_t y);
+
 int32_t testsuite_vec2_get_x(testsuite_vec2_ref instance);
 void testsuite_vec2_set_x(testsuite_vec2_ref instance, int32_t value);
 

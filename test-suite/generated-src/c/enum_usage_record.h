@@ -13,6 +13,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_enum_usage_record_ref;
 
 testsuite_enum_usage_record_ref testsuite_enum_usage_record_new(testsuite_color e, djinni_number_ref o, djinni_array_ref l, djinni_array_ref s, djinni_keyval_array_ref m);
+
 testsuite_color testsuite_enum_usage_record_get_e(testsuite_enum_usage_record_ref instance);
 void testsuite_enum_usage_record_set_e(testsuite_enum_usage_record_ref instance, testsuite_color value);
 

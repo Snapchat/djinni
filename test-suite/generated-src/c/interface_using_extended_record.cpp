@@ -5,6 +5,11 @@
 #include "djinni_c_translators.hpp"
 #include "../../handwritten-src/cpp/extended_record.hpp"
 #include "interface_using_extended_record.hpp"
+#include "record_using_extended_record.hpp"
+
+testsuite_record_using_extended_record_ref testsuite_interface_using_extended_record_get_cr() {
+    return ::djinni::c_api::RecordTranslator<::testsuite::RecordUsingExtendedRecord>::fromCpp(::testsuite::InterfaceUsingExtendedRecord::CR);
+}
 
 testsuite_extended_record_ref testsuite_interface_using_extended_record_meth(testsuite_interface_using_extended_record_ref instance, testsuite_extended_record_ref er)
 {

@@ -17,6 +17,7 @@ extern "C" {
 typedef djinni_record_ref testsuite__varname_record__ref;
 
 testsuite__varname_record__ref testsuite__varname_record__new(int8_t _field_);
+
 int8_t testsuite__varname_record__get__field_(testsuite__varname_record__ref instance);
 void testsuite__varname_record__set__field_(testsuite__varname_record__ref instance, int8_t value);
 

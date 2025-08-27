@@ -10,6 +10,10 @@ testsuite_extended_record_ref testsuite_extended_record_new(bool foo)
     return ::djinni::c_api::RecordTranslator<::testsuite::ExtendedRecord>::make(foo);
 }
 
+testsuite_extended_record_ref testsuite_extended_record_get_extended_record_const() {
+    return ::djinni::c_api::RecordTranslator<::testsuite::ExtendedRecord>::fromCpp(::testsuite::ExtendedRecord::EXTENDED_RECORD_CONST);
+}
+
 bool testsuite_extended_record_get_foo(testsuite_extended_record_ref instance)
 {
     return ::djinni::c_api::RecordTranslator<::testsuite::ExtendedRecord>::toCpp(instance).foo;

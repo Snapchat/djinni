@@ -13,6 +13,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_client_returned_record_ref;
 
 testsuite_client_returned_record_ref testsuite_client_returned_record_new(int64_t record_id, djinni_string_ref content, djinni_string_ref misc);
+
 int64_t testsuite_client_returned_record_get_record_id(testsuite_client_returned_record_ref instance);
 void testsuite_client_returned_record_set_record_id(testsuite_client_returned_record_ref instance, int64_t value);
 

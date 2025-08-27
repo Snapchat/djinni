@@ -3,6 +3,11 @@
 
 #include "constant_interface_with_enum.h"
 #include "djinni_c_translators.hpp"
+#include "constant_enum.hpp"
 #include "constant_interface_with_enum.hpp"
+
+testsuite_constant_enum testsuite_constant_interface_with_enum_get_const_enum() {
+    return ::djinni::c_api::EnumTranslator<::testsuite::constant_enum, testsuite_constant_enum>::fromCpp(::testsuite::ConstantInterfaceWithEnum::CONST_ENUM);
+}
 
 

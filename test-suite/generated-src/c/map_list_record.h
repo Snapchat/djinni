@@ -12,6 +12,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_map_list_record_ref;
 
 testsuite_map_list_record_ref testsuite_map_list_record_new(djinni_array_ref map_list);
+
 djinni_array_ref testsuite_map_list_record_get_map_list(testsuite_map_list_record_ref instance);
 void testsuite_map_list_record_set_map_list(testsuite_map_list_record_ref instance, djinni_array_ref value);
 

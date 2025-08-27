@@ -13,6 +13,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_nested_outcome_ref;
 
 testsuite_nested_outcome_ref testsuite_nested_outcome_new(djinni_outcome_ref o);
+
 djinni_outcome_ref testsuite_nested_outcome_get_o(testsuite_nested_outcome_ref instance);
 void testsuite_nested_outcome_set_o(testsuite_nested_outcome_ref instance, djinni_outcome_ref value);
 

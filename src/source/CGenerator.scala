@@ -10,6 +10,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
   private val cppMarshal = new CppMarshal(spec)
 
   private class ResolvedField(val field: Field, val translator: CTypeTranslator)
+  private class ResolvedConst(val const: ast.Const, val translator: CTypeTranslator)
 
   private class ResolvedMethod(val resolvedName: String, val method: Interface.Method, val parameters: Seq[ResolvedField], val returnType: Option[CTypeTranslator]) {
     def retTypename: String = if (returnType.isDefined) returnType.get.typename else "void"
@@ -131,6 +132,25 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     writeParamList(w, params.map(p => (p.translator.typename, p.field.ident.name)))
   }
 
+  private def generateConstsHeader(typename: String, consts: Seq[ResolvedConst], w: IndentWriter): Unit = {
+    for (const <- consts) {
+      writeDoc(w, const.const.doc)
+      w.wl(s"""${const.translator.typename} ${typename}_get_${const.const.ident.name}();""")
+      w.wl
+    }
+  }
+
+  private def generateConstsImpl(cppTypename: String, typename: String, consts: Seq[ResolvedConst], w: IndentWriter): Unit = {
+    for (const <- consts) {
+      w.w(s"""${const.translator.typename} ${typename}_get_${const.const.ident.name}()""")
+      w.braced {
+        val cppValue = s"${cppTypename}::${idCpp.const(const.const.ident)}"
+        w.wl(s"""return ${const.translator.fromCpp(cppValue)};""")
+      }
+      w.wl
+    }
+  }
+
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: ast.Record): Unit = {
     val selfCpp = cppMarshal.fqTypename(ident, r)
 
@@ -139,6 +159,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     val typeName = resolveRefSymbolTypeName(ident)
 
     val resolvedFields = r.fields.map(f => (new ResolvedField(f, typeResolver.resolve(f.ty.resolved))))
+    val resolvedConsts = r.consts.map(r => new ResolvedConst(r, typeResolver.resolve(r.ty.resolved)))
 
     writeCFilePair(origin, ident, typeResolver.publicImports.toSeq, typeResolver.privateImports.toSeq)((w: IndentWriter) => {
       writeDoc(w, doc)
@@ -148,6 +169,9 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       w.w(s"""${typeName} ${prefix}_new(""")
       writeParamListWithResolvedFields(w, resolvedFields)
       w.wl(");")
+      w.wl
+
+      generateConstsHeader(prefix, resolvedConsts, w)
 
       for (resolvedField <- resolvedFields) {
         val fieldName = resolvedField.field.ident.name
@@ -173,6 +197,8 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       }
 
       w.wl
+
+      generateConstsImpl(selfCpp, prefix, resolvedConsts, w)
 
       val toCppExpr = s"::djinni::c_api::RecordTranslator<${selfCpp}>::toCpp(instance)"
       for (resolvedField <- resolvedFields) {
@@ -293,6 +319,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         ),
         m.ret.map(r => typeResolver.resolve(r.resolved))
       ))
+    val resolvedConsts = i.consts.map(r => new ResolvedConst(r, typeResolver.resolve(r.ty.resolved)))
 
     val prefix = resolveSymbolName(ident.name)
     val typeName = resolveRefSymbolTypeName(ident)
@@ -330,6 +357,8 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         w.wl
       }
 
+      generateConstsHeader(prefix, resolvedConsts, w)
+
       for (resolvedMethod <- resolvedMethods) {
         writeDoc(w, resolvedMethod.method.doc)
         w.w(s"${resolvedMethod.retTypename} ${prefix}_${resolvedMethod.resolvedName}(")
@@ -360,6 +389,8 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         }
         w.wl
       }
+
+      generateConstsImpl(selfCpp, prefix, resolvedConsts, w)
 
       for (resolvedMethod <- resolvedMethods) {
         writeDoc(w, resolvedMethod.method.doc)
