@@ -100,8 +100,8 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       val symbolName = resolveSymbolName(ident.name)
       val enumCasePrefix = symbolName + "_"
       writeDoc(w, doc)
-      w.w("enum " + symbolName)
-      w.bracedSemi {
+      w.w("typedef enum")
+      w.bracedEnd(s" ${symbolName};") {
         writeEnumOptionNone(w, e, idCpp.enum, "=", enumCasePrefix)
         writeEnumOptions(w, e, idCpp.enum, "=", enumCasePrefix)
         writeEnumOptionAll(w, e, idCpp.enum, "=", enumCasePrefix)

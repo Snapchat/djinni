@@ -10,7 +10,7 @@ extern "C" {
 #endif // __cplusplus
 
 /** This is a test */
-enum testsuite_color {
+typedef enum {
     testsuite_color_RED = 0,
     testsuite_color_ORANGE = 1,
     testsuite_color_YELLOW = 2,
@@ -23,7 +23,7 @@ enum testsuite_color {
      */
     testsuite_color_INDIGO = 5,
     testsuite_color_VIOLET = 6,
-};
+} testsuite_color;
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
