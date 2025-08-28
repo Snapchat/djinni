@@ -12,6 +12,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_RecordWithEmbeddedProto_ref;
 
 testsuite_RecordWithEmbeddedProto_ref testsuite_RecordWithEmbeddedProto_new(djinni_binary_ref person);
+
 djinni_binary_ref testsuite_RecordWithEmbeddedProto_get_person(testsuite_RecordWithEmbeddedProto_ref instance);
 void testsuite_RecordWithEmbeddedProto_set_person(testsuite_RecordWithEmbeddedProto_ref instance, djinni_binary_ref value);
 

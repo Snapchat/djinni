@@ -4,6 +4,7 @@
 #pragma once
 
 #include "djinni_c.h"
+#include "constant_enum.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,6 +12,8 @@ extern "C" {
 
 /** Interface containing enum constant */
 typedef djinni_interface_ref testsuite_constant_interface_with_enum_ref;
+
+testsuite_constant_enum testsuite_constant_interface_with_enum_get_const_enum();
 
 #ifdef __cplusplus
 } // extern "C"

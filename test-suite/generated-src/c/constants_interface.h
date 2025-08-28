@@ -4,6 +4,7 @@
 #pragma once
 
 #include "djinni_c.h"
+#include "constant_record.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -11,6 +12,58 @@ extern "C" {
 
 /** Interface containing constants */
 typedef djinni_interface_ref testsuite_constants_interface_ref;
+
+bool testsuite_constants_interface_get_bool_constant();
+
+int8_t testsuite_constants_interface_get_i8_constant();
+
+int16_t testsuite_constants_interface_get_i16_constant();
+
+/** i32_constant has documentation. */
+int32_t testsuite_constants_interface_get_i32_constant();
+
+/**
+ * i64_constant has long documentation.
+ * (Second line of multi-line documentation.
+ *   Indented third line of multi-line documentation.)
+ */
+int64_t testsuite_constants_interface_get_i64_constant();
+
+float testsuite_constants_interface_get_f32_constant();
+
+double testsuite_constants_interface_get_f64_constant();
+
+djinni_optional_bool testsuite_constants_interface_get_opt_bool_constant();
+
+djinni_optional_int8 testsuite_constants_interface_get_opt_i8_constant();
+
+/** opt_i16_constant has documentation. */
+djinni_optional_int16 testsuite_constants_interface_get_opt_i16_constant();
+
+djinni_optional_int32 testsuite_constants_interface_get_opt_i32_constant();
+
+djinni_optional_int64 testsuite_constants_interface_get_opt_i64_constant();
+
+/**
+ * opt_f32_constant has long documentation.
+ * (Second line of multi-line documentation.
+ *   Indented third line of multi-line documentation.)
+ */
+djinni_optional_float testsuite_constants_interface_get_opt_f32_constant();
+
+djinni_optional_double testsuite_constants_interface_get_opt_f64_constant();
+
+djinni_string_ref testsuite_constants_interface_get_string_constant();
+
+djinni_string_ref testsuite_constants_interface_get_opt_string_constant();
+
+testsuite_constant_record_ref testsuite_constants_interface_get_object_constant();
+
+/**
+ * This constant will not be generated correctly with style FooBar
+ * to get it correct we would have to use "FooBar!" (see ident_explicit)
+ */
+djinni_string_ref testsuite_constants_interface_get_UPPER_CASE_CONSTANT();
 
 /**
  * No support for null optional constants

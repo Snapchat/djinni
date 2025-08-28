@@ -13,6 +13,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_record_with_flags_ref;
 
 testsuite_record_with_flags_ref testsuite_record_with_flags_new(testsuite_access_flags access);
+
 testsuite_access_flags testsuite_record_with_flags_get_access(testsuite_record_with_flags_ref instance);
 void testsuite_record_with_flags_set_access(testsuite_record_with_flags_ref instance, testsuite_access_flags value);
 

@@ -13,6 +13,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_record_with_duration_and_derivings_ref;
 
 testsuite_record_with_duration_and_derivings_ref testsuite_record_with_duration_and_derivings_new(djinni_number_ref dt);
+
 djinni_number_ref testsuite_record_with_duration_and_derivings_get_dt(testsuite_record_with_duration_and_derivings_ref instance);
 void testsuite_record_with_duration_and_derivings_set_dt(testsuite_record_with_duration_and_derivings_ref instance, djinni_number_ref value);
 

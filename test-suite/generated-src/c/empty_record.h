@@ -17,6 +17,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_empty_record_ref;
 
 testsuite_empty_record_ref testsuite_empty_record_new();
+
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus

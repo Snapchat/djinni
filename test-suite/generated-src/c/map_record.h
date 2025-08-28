@@ -12,6 +12,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_map_record_ref;
 
 testsuite_map_record_ref testsuite_map_record_new(djinni_keyval_array_ref map, djinni_keyval_array_ref imap);
+
 djinni_keyval_array_ref testsuite_map_record_get_map(testsuite_map_record_ref instance);
 void testsuite_map_record_set_map(testsuite_map_record_ref instance, djinni_keyval_array_ref value);
 

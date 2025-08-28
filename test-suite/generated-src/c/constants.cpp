@@ -3,11 +3,84 @@
 
 #include "constants.h"
 #include "djinni_c_translators.hpp"
+#include "constant_record.hpp"
 #include "constants.hpp"
 
 testsuite_constants_ref testsuite_constants_new() 
 {
     return ::djinni::c_api::RecordTranslator<::testsuite::Constants>::make();
+}
+
+bool testsuite_constants_get_bool_constant() {
+    return ::testsuite::Constants::BOOL_CONSTANT;
+}
+
+int8_t testsuite_constants_get_i8_constant() {
+    return ::testsuite::Constants::I8_CONSTANT;
+}
+
+int16_t testsuite_constants_get_i16_constant() {
+    return ::testsuite::Constants::I16_CONSTANT;
+}
+
+int32_t testsuite_constants_get_i32_constant() {
+    return ::testsuite::Constants::I32_CONSTANT;
+}
+
+int64_t testsuite_constants_get_i64_constant() {
+    return ::testsuite::Constants::I64_CONSTANT;
+}
+
+float testsuite_constants_get_f32_constant() {
+    return ::testsuite::Constants::F32_CONSTANT;
+}
+
+double testsuite_constants_get_f64_constant() {
+    return ::testsuite::Constants::F64_CONSTANT;
+}
+
+djinni_optional_bool testsuite_constants_get_opt_bool_constant() {
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<bool>, djinni_optional_bool>::fromCpp(::testsuite::Constants::OPT_BOOL_CONSTANT);
+}
+
+djinni_optional_int8 testsuite_constants_get_opt_i8_constant() {
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int8_t>, djinni_optional_int8>::fromCpp(::testsuite::Constants::OPT_I8_CONSTANT);
+}
+
+djinni_optional_int16 testsuite_constants_get_opt_i16_constant() {
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int16_t>, djinni_optional_int16>::fromCpp(::testsuite::Constants::OPT_I16_CONSTANT);
+}
+
+djinni_optional_int32 testsuite_constants_get_opt_i32_constant() {
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int32_t>, djinni_optional_int32>::fromCpp(::testsuite::Constants::OPT_I32_CONSTANT);
+}
+
+djinni_optional_int64 testsuite_constants_get_opt_i64_constant() {
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<int64_t>, djinni_optional_int64>::fromCpp(::testsuite::Constants::OPT_I64_CONSTANT);
+}
+
+djinni_optional_float testsuite_constants_get_opt_f32_constant() {
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<float>, djinni_optional_float>::fromCpp(::testsuite::Constants::OPT_F32_CONSTANT);
+}
+
+djinni_optional_double testsuite_constants_get_opt_f64_constant() {
+    return ::djinni::c_api::PrimitiveOptionalTranslator<std::experimental::optional<double>, djinni_optional_double>::fromCpp(::testsuite::Constants::OPT_F64_CONSTANT);
+}
+
+djinni_string_ref testsuite_constants_get_string_constant() {
+    return ::djinni::c_api::StringTranslator::fromCpp(::testsuite::Constants::STRING_CONSTANT);
+}
+
+djinni_string_ref testsuite_constants_get_opt_string_constant() {
+    return ::djinni::c_api::OptionalTranslator<std::experimental::optional<std::string>, ::djinni::c_api::StringTranslator>::fromCpp(::testsuite::Constants::OPT_STRING_CONSTANT);
+}
+
+testsuite_constant_record_ref testsuite_constants_get_object_constant() {
+    return ::djinni::c_api::RecordTranslator<::testsuite::ConstantRecord>::fromCpp(::testsuite::Constants::OBJECT_CONSTANT);
+}
+
+bool testsuite_constants_get_dummy() {
+    return ::testsuite::Constants::DUMMY;
 }
 
 

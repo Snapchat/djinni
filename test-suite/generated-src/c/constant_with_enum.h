@@ -4,6 +4,7 @@
 #pragma once
 
 #include "djinni_c.h"
+#include "constant_enum.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +14,9 @@ extern "C" {
 typedef djinni_record_ref testsuite_constant_with_enum_ref;
 
 testsuite_constant_with_enum_ref testsuite_constant_with_enum_new();
+
+testsuite_constant_enum testsuite_constant_with_enum_get_const_enum();
+
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus

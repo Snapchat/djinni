@@ -5,12 +5,15 @@
 
 #include "djinni_c.h"
 #include "extended_record.h"
+#include "record_using_extended_record.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
 
 typedef djinni_interface_ref testsuite_interface_using_extended_record_ref;
+
+testsuite_record_using_extended_record_ref testsuite_interface_using_extended_record_get_cr();
 
 testsuite_extended_record_ref testsuite_interface_using_extended_record_meth(testsuite_interface_using_extended_record_ref instance, testsuite_extended_record_ref er);
 

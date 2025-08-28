@@ -12,6 +12,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_primitive_list_ref;
 
 testsuite_primitive_list_ref testsuite_primitive_list_new(djinni_array_ref list, djinni_array_ref optional_list);
+
 djinni_array_ref testsuite_primitive_list_get_list(testsuite_primitive_list_ref instance);
 void testsuite_primitive_list_set_list(testsuite_primitive_list_ref instance, djinni_array_ref value);
 

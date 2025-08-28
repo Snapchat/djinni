@@ -9,7 +9,7 @@
 extern "C" {
 #endif // __cplusplus
 
-enum testsuite_access_flags {
+typedef enum {
     testsuite_access_flags_NOBODY = 0,
     testsuite_access_flags_OWNER_READ = 1 << 0,
     testsuite_access_flags_OWNER_WRITE = 1 << 1,
@@ -21,7 +21,7 @@ enum testsuite_access_flags {
     testsuite_access_flags_SYSTEM_WRITE = 1 << 7,
     testsuite_access_flags_SYSTEM_EXECUTE = 1 << 8,
     testsuite_access_flags_EVERYBODY = 0 | (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 5) | (1 << 6) | (1 << 7) | (1 << 8),
-};
+} testsuite_access_flags;
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus

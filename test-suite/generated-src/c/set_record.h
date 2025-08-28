@@ -12,6 +12,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_set_record_ref;
 
 testsuite_set_record_ref testsuite_set_record_new(djinni_array_ref set, djinni_array_ref iset);
+
 djinni_array_ref testsuite_set_record_get_set(testsuite_set_record_ref instance);
 void testsuite_set_record_set_set(testsuite_set_record_ref instance, djinni_array_ref value);
 

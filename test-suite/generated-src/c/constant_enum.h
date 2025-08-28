@@ -10,10 +10,10 @@ extern "C" {
 #endif // __cplusplus
 
 /** enum for use in constants */
-enum testsuite_constant_enum {
+typedef enum {
     testsuite_constant_enum_SOME_VALUE = 0,
     testsuite_constant_enum_SOME_OTHER_VALUE = 1,
-};
+} testsuite_constant_enum;
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus

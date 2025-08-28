@@ -9,10 +9,10 @@
 extern "C" {
 #endif // __cplusplus
 
-enum testsuite_empty_flags {
+typedef enum {
     testsuite_empty_flags_NONE = 0,
     testsuite_empty_flags_ALL = 0,
-};
+} testsuite_empty_flags;
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus

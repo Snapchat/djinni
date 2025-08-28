@@ -13,6 +13,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_date_record_ref;
 
 testsuite_date_record_ref testsuite_date_record_new(djinni_date_ref created_at);
+
 djinni_date_ref testsuite_date_record_get_created_at(testsuite_date_record_ref instance);
 void testsuite_date_record_set_created_at(testsuite_date_record_ref instance, djinni_date_ref value);
 

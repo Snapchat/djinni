@@ -12,6 +12,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_nested_collection_ref;
 
 testsuite_nested_collection_ref testsuite_nested_collection_new(djinni_array_ref set_list);
+
 djinni_array_ref testsuite_nested_collection_get_set_list(testsuite_nested_collection_ref instance);
 void testsuite_nested_collection_set_set_list(testsuite_nested_collection_ref instance, djinni_array_ref value);
 

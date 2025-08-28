@@ -12,6 +12,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_record_with_derivings_ref;
 
 testsuite_record_with_derivings_ref testsuite_record_with_derivings_new(int8_t eight, int16_t sixteen, int32_t thirtytwo, int64_t sixtyfour, float fthirtytwo, double fsixtyfour, djinni_date_ref d, djinni_string_ref s);
+
 int8_t testsuite_record_with_derivings_get_eight(testsuite_record_with_derivings_ref instance);
 void testsuite_record_with_derivings_set_eight(testsuite_record_with_derivings_ref instance, int8_t value);
 

@@ -5,6 +5,7 @@
 
 #include "djinni_c.h"
 #include "extended_record.h"
+#include "record_using_extended_record.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,6 +14,9 @@ extern "C" {
 typedef djinni_record_ref testsuite_record_using_extended_record_ref;
 
 testsuite_record_using_extended_record_ref testsuite_record_using_extended_record_new(testsuite_extended_record_ref er);
+
+testsuite_record_using_extended_record_ref testsuite_record_using_extended_record_get_cr();
+
 testsuite_extended_record_ref testsuite_record_using_extended_record_get_er(testsuite_record_using_extended_record_ref instance);
 void testsuite_record_using_extended_record_set_er(testsuite_record_using_extended_record_ref instance, testsuite_extended_record_ref value);
 

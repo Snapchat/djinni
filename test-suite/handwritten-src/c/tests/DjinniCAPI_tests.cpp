@@ -3,6 +3,8 @@
 #include "assorted_primitives.h"
 #include "client_interface.h"
 #include "client_returned_record.h"
+#include "constant_with_enum.h"
+#include "constants.h"
 #include "enum_usage_record.h"
 #include "map_record.h"
 #include "primitive_list.h"
@@ -697,6 +699,30 @@ TEST(DjinniCAPI, supportsPropagatingErrorInFuture) {
 
   ASSERT_EQ(std::string("Error"),
             std::string(djinni_string_get_data(result.error)));
+}
+
+TEST(DjinniCAPI, supportsConstants) {
+  ASSERT_EQ(true, testsuite_constants_get_bool_constant());
+  ASSERT_EQ(4, testsuite_constants_get_i64_constant());
+  ASSERT_EQ(5.0f, testsuite_constants_get_f32_constant());
+  ASSERT_EQ(5.0, testsuite_constants_get_f64_constant());
+
+  auto opt = testsuite_constants_get_opt_f64_constant();
+  ASSERT_TRUE(opt.has_value);
+  ASSERT_EQ(5.0, opt.value);
+
+  ASSERT_EQ(testsuite_constant_enum_SOME_VALUE,
+            testsuite_constant_with_enum_get_const_enum());
+}
+
+TEST(DjinniCAPI, supportsConstantsRecord) {
+  auto constant = CRef(testsuite_constants_get_object_constant());
+
+  ASSERT_EQ(3, testsuite_constant_record_get_some_integer(constant.value));
+
+  auto str = CRef(testsuite_constant_record_get_some_string(constant.value));
+  ASSERT_EQ(std::string("string-constant"),
+            std::string(djinni_string_get_data(str.value)));
 }
 
 } // namespace djinni

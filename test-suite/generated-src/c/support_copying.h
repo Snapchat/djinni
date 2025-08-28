@@ -12,6 +12,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_support_copying_ref;
 
 testsuite_support_copying_ref testsuite_support_copying_new(int32_t x);
+
 int32_t testsuite_support_copying_get_x(testsuite_support_copying_ref instance);
 void testsuite_support_copying_set_x(testsuite_support_copying_ref instance, int32_t value);
 

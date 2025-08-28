@@ -13,6 +13,7 @@ extern "C" {
 typedef djinni_record_ref testsuite_constant_record_ref;
 
 testsuite_constant_record_ref testsuite_constant_record_new(int32_t some_integer, djinni_string_ref some_string);
+
 int32_t testsuite_constant_record_get_some_integer(testsuite_constant_record_ref instance);
 void testsuite_constant_record_set_some_integer(testsuite_constant_record_ref instance, int32_t value);
 
