@@ -107,6 +107,26 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
       }
     },
     w => {
+      // Add template function specialization for max_enum_value in djinni namespace (regular enums only)
+      val normalOptions = normalEnumOptions(e)
+      if (normalOptions.nonEmpty && !e.flags) {
+        val lastOption = normalOptions.last
+        val fqSelf = marshal.fqTypename(ident, e)
+        val maxValue = s"$fqSelf::${idCpp.enum(lastOption.ident.name)}"
+        w.wl
+        wrapNamespace(w, "djinni",
+          (w: IndentWriter) => {
+            w.wl("template<typename T>")
+            w.wl("inline constexpr T max_enum_value();")
+            w.wl
+            w.wl("template<>")
+            w.wl(s"inline constexpr $fqSelf max_enum_value<$fqSelf>() {")
+            w.wl(s"    return $maxValue;")
+            w.wl("}")
+          }
+        )
+      }
+      
       // std::hash specialization has to go *outside* of the wrapNs
       if (spec.cppEnumHashWorkaround) {
         val fqSelf = marshal.fqTypename(ident, e)

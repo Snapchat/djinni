@@ -22,6 +22,18 @@ constexpr const char* to_string(constant_enum e) noexcept {
 
 } // namespace testsuite
 
+namespace djinni {
+
+template<typename T>
+inline constexpr T max_enum_value();
+
+template<>
+inline constexpr ::testsuite::constant_enum max_enum_value<::testsuite::constant_enum>() {
+    return ::testsuite::constant_enum::SOME_OTHER_VALUE;
+}
+
+} // namespace djinni
+
 namespace std {
 
 template <>
