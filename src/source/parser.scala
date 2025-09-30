@@ -339,6 +339,8 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
   //   - if `ts` is present then `ts.module` must be present
   // - `messages` key must be present
   //   - `messages` must be a string list
+  // - `enums` key is optional
+  //   - `enums` must be a string list
   val c = Option(doc.get("cpp")) match {
     case Some(properties) => properties.asInstanceOf[JMap[String, String]].toMap
     case None => return Left(Error(Loc(fileStack.top, 1, 1), "'cpp' properties not found"))
@@ -370,6 +372,40 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
   for(message <- doc.get("messages").asInstanceOf[java.util.List[String]]) {
     val ident = Ident(message, fileStack.top, Loc(fileStack.top, 1, 1))
     tds += ProtobufTypeDecl(ident, Seq.empty[TypeParam], proto, origin);
+  }
+  
+  // Handle enums if present
+  Option(doc.get("enums")) match {
+    case Some(enumList) => {
+      for(enumItem <- enumList.asInstanceOf[java.util.List[String]]) {
+        val ident = Ident(enumItem.replaceAllLiterally(".", "_"), fileStack.top, Loc(fileStack.top, 1, 1))
+        
+        // Extract full java class and use enum item directly as typename
+        val fullJavaClass = j("class")  // Outer Java class determined by filename
+        val javaTypename = enumItem  // Actual (nested) typename, e.g. "OuterMessage.EnumName"
+        
+        val enumDef = ProtobufEnum(
+          ProtobufEnum.Cpp(c("header"), c("namespace"), enumItem.replaceAllLiterally(".", "_")),
+          ProtobufEnum.Java(javaTypename, fullJavaClass),
+          Option(doc.get("objc")) match {
+            case Some(properties) => {
+              val p = properties.asInstanceOf[JMap[String, String]].toMap
+              Some(ProtobufEnum.Objc(p("header"), p("prefix") + enumItem.replaceAllLiterally(".", "_")))
+            }
+            case None => None
+          },
+          Option(doc.get("ts")) match {
+            case Some(properties) => {
+              val p = properties.asInstanceOf[JMap[String, String]].toMap
+              Some(ProtobufEnum.Ts(p("module"), enumItem.replaceAllLiterally(".", "_")))
+            }
+            case None => None
+          }
+        )
+        tds += ProtobufTypeDecl(ident, Seq.empty[TypeParam], enumDef, origin);
+      }
+    }
+    case None => // No enums, continue
   }
   Right(tds)
 }

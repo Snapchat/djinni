@@ -100,6 +100,31 @@ inline bool Person_PhoneType_Parse(
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<Person_PhoneType>(
     Person_PhoneType_descriptor(), name, value);
 }
+enum Priority : int {
+  LOW = 0,
+  MEDIUM = 1,
+  HIGH = 2,
+  URGENT = 3
+};
+bool Priority_IsValid(int value);
+constexpr Priority Priority_MIN = LOW;
+constexpr Priority Priority_MAX = URGENT;
+constexpr int Priority_ARRAYSIZE = Priority_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Priority_descriptor();
+template<typename T>
+inline const std::string& Priority_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, Priority>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function Priority_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    Priority_descriptor(), enum_t_value);
+}
+inline bool Priority_Parse(
+    const std::string& name, Priority* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<Priority>(
+    Priority_descriptor(), name, value);
+}
 // ===================================================================
 
 class Person_PhoneNumber PROTOBUF_FINAL :
@@ -1153,6 +1178,11 @@ template <> struct is_proto_enum< ::djinni::test::Person_PhoneType> : ::std::tru
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::djinni::test::Person_PhoneType>() {
   return ::djinni::test::Person_PhoneType_descriptor();
+}
+template <> struct is_proto_enum< ::djinni::test::Priority> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::djinni::test::Priority>() {
+  return ::djinni::test::Priority_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

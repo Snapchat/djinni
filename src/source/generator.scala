@@ -417,6 +417,8 @@ abstract class Generator(spec: Spec)
 
   def generate(idl: Seq[TypeDecl]) {
     val decls = idl.collect { case itd: InternTypeDecl => itd }
+    val protobufDecls = idl.collect { case ptd: ProtobufTypeDecl => ptd }
+    
     for (td <- decls) td.body match {
       case e: Enum =>
         assert(td.params.isEmpty)
@@ -424,12 +426,20 @@ abstract class Generator(spec: Spec)
       case r: Record => generateRecord(td.origin, td.ident, td.doc, td.params, r)
       case i: Interface => generateInterface(td.origin, td.ident, td.doc, td.params, i)
       case p: ProtobufMessage => // never need to generate files for protobuf types
+      case pe: djinni.ast.ProtobufEnum => generateEnum(td.origin, td.ident, td.doc, pe)
     }
+    
+    for (ptd <- protobufDecls) ptd.body match {
+      case p: ProtobufMessage => // never need to generate files for protobuf message types
+      case pe: djinni.ast.ProtobufEnum => generateEnum(ptd.origin, ptd.ident, Doc(Nil), pe)
+    }
+    
     generateModule(decls.filter(td => td.body.isInstanceOf[Interface]))
   }
 
   def generateModule(decls: Seq[InternTypeDecl]) {}
   def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum)
+  def generateEnum(origin: String, ident: Ident, doc: Doc, pe: djinni.ast.ProtobufEnum)
   def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: Record)
   def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface)
 

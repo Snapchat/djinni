@@ -3,8 +3,11 @@
 
 #include "NativeProtoTests.hpp"  // my header
 #include "Marshal.hpp"
+#include "NativePersonPhoneType.hpp"
+#include "NativePriority.hpp"
 #include "NativeRecordWithEmbeddedCppProto.hpp"
 #include "NativeRecordWithEmbeddedProto.hpp"
+#include "NativeRecordWithProtobufEnum.hpp"
 #include "Outcome_jni.hpp"
 
 namespace djinni_generated {
@@ -122,6 +125,54 @@ CJNIEXPORT ::djinni::Outcome<::djinni::Protobuf<::djinni::test::Person, ::djinni
     try {
         auto r = ::testsuite::ProtoTests::stringToProtoOutcome(::djinni::String::toCpp(jniEnv, j_x));
         return ::djinni::release(::djinni::Outcome<::djinni::Protobuf<::djinni::test::Person, ::djinni::JavaClassName<'d','j','i','n','n','i','/','t','e','s','t','/','T','e','s','t','$','P','e','r','s','o','n'>>, ::djinni::I32>::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jstring JNICALL Java_com_dropbox_djinni_test_ProtoTests_phoneTypeToString(JNIEnv* jniEnv, jobject /*this*/, jobject j_x)
+{
+    try {
+        auto r = ::testsuite::ProtoTests::phoneTypeToString(::djinni_generated::NativePersonPhoneType::toCpp(jniEnv, j_x));
+        return ::djinni::release(::djinni::String::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_ProtoTests_stringToPhoneType(JNIEnv* jniEnv, jobject /*this*/, jstring j_x)
+{
+    try {
+        auto r = ::testsuite::ProtoTests::stringToPhoneType(::djinni::String::toCpp(jniEnv, j_x));
+        return ::djinni::release(::djinni_generated::NativePersonPhoneType::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jstring JNICALL Java_com_dropbox_djinni_test_ProtoTests_enumRecordToString(JNIEnv* jniEnv, jobject /*this*/, jobject j_x)
+{
+    try {
+        auto r = ::testsuite::ProtoTests::enumRecordToString(::djinni_generated::NativeRecordWithProtobufEnum::toCpp(jniEnv, j_x));
+        return ::djinni::release(::djinni::String::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_ProtoTests_stringToEnumRecord(JNIEnv* jniEnv, jobject /*this*/, jstring j_x)
+{
+    try {
+        auto r = ::testsuite::ProtoTests::stringToEnumRecord(::djinni::String::toCpp(jniEnv, j_x));
+        return ::djinni::release(::djinni_generated::NativeRecordWithProtobufEnum::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jstring JNICALL Java_com_dropbox_djinni_test_ProtoTests_priorityToString(JNIEnv* jniEnv, jobject /*this*/, jobject j_x)
+{
+    try {
+        auto r = ::testsuite::ProtoTests::priorityToString(::djinni_generated::NativePriority::toCpp(jniEnv, j_x));
+        return ::djinni::release(::djinni::String::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
+CJNIEXPORT jobject JNICALL Java_com_dropbox_djinni_test_ProtoTests_stringToPriority(JNIEnv* jniEnv, jobject /*this*/, jstring j_x)
+{
+    try {
+        auto r = ::testsuite::ProtoTests::stringToPriority(::djinni::String::toCpp(jniEnv, j_x));
+        return ::djinni::release(::djinni_generated::NativePriority::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 

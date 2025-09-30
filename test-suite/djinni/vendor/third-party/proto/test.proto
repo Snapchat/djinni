@@ -4,6 +4,13 @@ package djinni.test;
 
 option objc_class_prefix = "DJTest";
 
+enum Priority {
+  LOW = 0;
+  MEDIUM = 1;
+  HIGH = 2;
+  URGENT = 3;
+}
+
 message Person {
   required string name = 1;
   required int32 id = 2;

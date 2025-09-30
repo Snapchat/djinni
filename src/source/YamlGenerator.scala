@@ -131,6 +131,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
       case i: Interface => "interface" + ext(i.ext)
       case r: Record => "record" + ext(r.ext) + deriving(r)
       case p: ProtobufMessage => "protobuf"
+      case p: djinni.ast.ProtobufEnum => "protobuf_enum"
       case Enum(_, false) => "enum"
       case Enum(_, true) => "flags"
     }
@@ -200,13 +201,17 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
 
   private def meta(td: TypeDecl) = {
     td match {
-      case p: ProtobufTypeDecl => MProtobuf(p.ident.name, 0, p.body.asInstanceOf[ProtobufMessage])
+      case p: ProtobufTypeDecl => p.body match {
+        case proto: ProtobufMessage => MProtobuf(p.ident.name, 0, proto)
+        case enum: djinni.ast.ProtobufEnum => MProtobufEnum(p.ident.name, 0, enum)
+      }
       case _ =>
         val defType = td.body match {
           case i: Interface => DInterface
           case r: Record => DRecord
           case e: Enum => DEnum
           case p: ProtobufMessage => throw new AssertionError("unreachable")
+          case p: djinni.ast.ProtobufEnum => throw new AssertionError("unreachable")
         }
         MDef(td.ident, 0, defType, td.body)
     }
@@ -223,9 +228,8 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
-    // unused
-  }
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum): Unit = {}
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, pe: djinni.ast.ProtobufEnum): Unit = {}
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface) {
     // unused
@@ -307,5 +311,6 @@ object YamlGenerator {
     case r: Record => DRecord
     case e: Enum => DEnum
     case p: ProtobufMessage => throw new AssertionError("unreachable")
+    case p: djinni.ast.ProtobufEnum => throw new AssertionError("unreachable")
   }
 }

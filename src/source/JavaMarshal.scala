@@ -55,6 +55,7 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
         case _ => List()
       }
     case p: MProtobuf => List(ImportRef(withPackage(Some(p.body.java.pkg), p.name)))
+    case p: MProtobufEnum => List(ImportRef(p.body.java.baseClass + "." + p.body.java.typename))
     case e if isEnumFlags(e) => List(ImportRef("java.util.EnumSet"))
     case _ => List()
   }
@@ -85,6 +86,7 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
     case r: Record => true
     case e: Enum =>  true
     case p: ProtobufMessage => true
+    case p: djinni.ast.ProtobufEnum => true
   }
 
   def isEnumFlags(m: Meta): Boolean = m match {
@@ -118,6 +120,7 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
         case MArray => toJavaType(tm.args.head, packageName) + "[]"
         case e: MExtern => (if(needRef) e.java.boxed else e.java.typename) + (if(e.java.generic) args(tm) else "")
         case p: MProtobuf => p.name
+        case p: MProtobufEnum => p.body.java.baseClass + "." + p.body.java.typename
         case o =>
           val base = o match {
             case p: MPrimitive => if (needRef) p.jBoxed else p.jName
@@ -132,6 +135,7 @@ class JavaMarshal(spec: Spec) extends Marshal(spec) {
             case d: MDef => withPackage(packageName, idJava.ty(d.name))
             case e: MExtern => throw new AssertionError("unreachable")
             case e: MProtobuf => throw new AssertionError("unreachable")
+            case e: MProtobufEnum => throw new AssertionError("unreachable")
             case p: MParam => idJava.typeParam(p.name)
             case MVoid => "Void"
           }

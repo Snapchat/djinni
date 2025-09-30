@@ -45,7 +45,7 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
     }
   }
 
-  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum): Unit = {
     val refs = new ObjcRefs()
 
     refs.header.add("#import <Foundation/Foundation.h>")
@@ -68,6 +68,10 @@ class ObjcGenerator(spec: Spec) extends BaseObjcGenerator(spec) {
         writeEnumOptionAll(w, e, self + idObjc.enum(_))
       }
     })
+  }
+
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, pe: djinni.ast.ProtobufEnum): Unit = {
+    // Objective-C protobuf enums are already defined by the protobuf library
   }
 
   def bodyName(ident: String): String = idObjc.ty(ident) + "." + spec.objcppExt // Must be a Obj-C++ file in case the constants are not compile-time constant expressions

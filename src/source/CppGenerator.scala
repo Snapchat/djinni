@@ -57,7 +57,7 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum): Unit = {
     val refs = new CppRefs(ident.name)
     val self = marshal.typename(ident, e)
 
@@ -123,6 +123,10 @@ class CppGenerator(spec: Spec) extends Generator(spec) {
         )
       }
     })
+  }
+
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, pe: djinni.ast.ProtobufEnum): Unit = {
+    // C++ protobuf enums are already defined by the protobuf library
   }
 
   def shouldConstexpr(c: Const) = {

@@ -5,6 +5,7 @@
 #import "DBProtoTests.h"
 #import "DBRecordWithEmbeddedCppProto+Private.h"
 #import "DBRecordWithEmbeddedProto+Private.h"
+#import "DBRecordWithProtobufEnum+Private.h"
 #import "DJICppWrapperCache+Private.h"
 #import "DJIError.h"
 #import "DJIMarshal+Private.h"
@@ -122,6 +123,48 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     try {
         auto objcpp_result_ = ::testsuite::ProtoTests::stringToProtoOutcome(::djinni::String::toCpp(x));
         return ::djinni::Outcome<::djinni::Protobuf<::djinni::test::Person, DJTestPerson>, ::djinni::I32>::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
++ (nonnull NSString *)phoneTypeToString:(DJTestPerson_PhoneType)x {
+    try {
+        auto objcpp_result_ = ::testsuite::ProtoTests::phoneTypeToString(::djinni::Enum<::djinni::test::Person_PhoneType, DJTestPerson_PhoneType>::toCpp(x));
+        return ::djinni::String::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
++ (DJTestPerson_PhoneType)stringToPhoneType:(nonnull NSString *)x {
+    try {
+        auto objcpp_result_ = ::testsuite::ProtoTests::stringToPhoneType(::djinni::String::toCpp(x));
+        return ::djinni::Enum<::djinni::test::Person_PhoneType, DJTestPerson_PhoneType>::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
++ (nonnull NSString *)enumRecordToString:(nonnull DBRecordWithProtobufEnum *)x {
+    try {
+        auto objcpp_result_ = ::testsuite::ProtoTests::enumRecordToString(::djinni_generated::RecordWithProtobufEnum::toCpp(x));
+        return ::djinni::String::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
++ (nonnull DBRecordWithProtobufEnum *)stringToEnumRecord:(nonnull NSString *)x {
+    try {
+        auto objcpp_result_ = ::testsuite::ProtoTests::stringToEnumRecord(::djinni::String::toCpp(x));
+        return ::djinni_generated::RecordWithProtobufEnum::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
++ (nonnull NSString *)priorityToString:(DJTestPriority)x {
+    try {
+        auto objcpp_result_ = ::testsuite::ProtoTests::priorityToString(::djinni::Enum<::djinni::test::Priority, DJTestPriority>::toCpp(x));
+        return ::djinni::String::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
++ (DJTestPriority)stringToPriority:(nonnull NSString *)x {
+    try {
+        auto objcpp_result_ = ::testsuite::ProtoTests::stringToPriority(::djinni::String::toCpp(x));
+        return ::djinni::Enum<::djinni::test::Priority, DJTestPriority>::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 

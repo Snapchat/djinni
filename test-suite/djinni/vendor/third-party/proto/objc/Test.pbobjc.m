@@ -53,6 +53,45 @@ static GPBFileDescriptor *DJTestTestRoot_FileDescriptor(void) {
   return descriptor;
 }
 
+#pragma mark - Enum DJTestPriority
+
+GPBEnumDescriptor *DJTestPriority_EnumDescriptor(void) {
+  static _Atomic(GPBEnumDescriptor*) descriptor = nil;
+  if (!descriptor) {
+    static const char *valueNames =
+        "Low\000Medium\000High\000Urgent\000";
+    static const int32_t values[] = {
+        DJTestPriority_Low,
+        DJTestPriority_Medium,
+        DJTestPriority_High,
+        DJTestPriority_Urgent,
+    };
+    GPBEnumDescriptor *worker =
+        [GPBEnumDescriptor allocDescriptorForName:GPBNSStringifySymbol(DJTestPriority)
+                                       valueNames:valueNames
+                                           values:values
+                                            count:(uint32_t)(sizeof(values) / sizeof(int32_t))
+                                     enumVerifier:DJTestPriority_IsValidValue];
+    GPBEnumDescriptor *expected = nil;
+    if (!atomic_compare_exchange_strong(&descriptor, &expected, worker)) {
+      [worker release];
+    }
+  }
+  return descriptor;
+}
+
+BOOL DJTestPriority_IsValidValue(int32_t value__) {
+  switch (value__) {
+    case DJTestPriority_Low:
+    case DJTestPriority_Medium:
+    case DJTestPriority_High:
+    case DJTestPriority_Urgent:
+      return YES;
+    default:
+      return NO;
+  }
+}
+
 #pragma mark - DJTestPerson
 
 @implementation DJTestPerson

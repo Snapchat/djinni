@@ -55,6 +55,10 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
       case Some(o) => List(ImportRef(q(spec.objcBaseLibIncludePrefix + "DJIMarshal+Private.h")), ImportRef(o.header))
       case None => List(ImportRef(q(spec.objcBaseLibIncludePrefix + "DJIMarshal+Private.h")))
     }
+    case p: MProtobufEnum => p.body.objc match {
+      case Some(o) => List(ImportRef(q(spec.objcBaseLibIncludePrefix + "DJIMarshal+Private.h")), ImportRef(o.header))
+      case None => List(ImportRef(q(spec.objcBaseLibIncludePrefix + "DJIMarshal+Private.h")))
+    }
     case d: MDef => d.defType match {
       case DEnum | DInterface =>
         List(ImportRef(include(m)))
@@ -98,6 +102,12 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
       case None => withNs(Some("djinni"), "ProtobufPassthrough") + "<" +
         withNs(Some(p.body.cpp.ns), p.name) + ">"
     }
+    case p: MProtobufEnum => p.body.objc match {
+      case Some(o) => withNs(Some("djinni"), "Enum") + "<" +
+        withNs(Some(p.body.cpp.ns), p.body.cpp.typename) + ", " + o.typename + ">"
+      case None => withNs(Some("djinni"), "ProtobufEnumPassthrough") + "<" +
+        withNs(Some(p.body.cpp.ns), p.body.cpp.typename) + ">"
+    }
     case o => withNs(Some("djinni"), o match {
       case p: MPrimitive => p.idlName match {
         case "i8" => "I8"
@@ -120,6 +130,7 @@ class ObjcppMarshal(spec: Spec) extends Marshal(spec) {
       case e: MExtern => throw new AssertionError("unreachable")
       case p: MParam => throw new AssertionError("not applicable")
       case p: MProtobuf => throw new AssertionError("not applicable")
+      case p: MProtobufEnum => throw new AssertionError("not applicable")
       case MVoid => "Void"
     })
   }

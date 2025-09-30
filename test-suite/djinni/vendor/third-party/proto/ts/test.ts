@@ -18,6 +18,14 @@ export enum Person_PhoneType {
   UNRECOGNIZED = -1,
 }
 
+export enum Priority {
+  LOW = 0,
+  MEDIUM = 1,
+  HIGH = 2,
+  URGENT = 3,
+  UNRECOGNIZED = -1,
+}
+
 export function person_PhoneTypeFromJSON(object: any): Person_PhoneType {
   switch (object) {
     case 0:
@@ -44,6 +52,42 @@ export function person_PhoneTypeToJSON(object: Person_PhoneType): string {
       return "HOME";
     case Person_PhoneType.WORK:
       return "WORK";
+    default:
+      return "UNKNOWN";
+  }
+}
+
+export function priorityFromJSON(object: any): Priority {
+  switch (object) {
+    case 0:
+    case "LOW":
+      return Priority.LOW;
+    case 1:
+    case "MEDIUM":
+      return Priority.MEDIUM;
+    case 2:
+    case "HIGH":
+      return Priority.HIGH;
+    case 3:
+    case "URGENT":
+      return Priority.URGENT;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return Priority.UNRECOGNIZED;
+  }
+}
+
+export function priorityToJSON(object: Priority): string {
+  switch (object) {
+    case Priority.LOW:
+      return "LOW";
+    case Priority.MEDIUM:
+      return "MEDIUM";
+    case Priority.HIGH:
+      return "HIGH";
+    case Priority.URGENT:
+      return "URGENT";
     default:
       return "UNKNOWN";
   }

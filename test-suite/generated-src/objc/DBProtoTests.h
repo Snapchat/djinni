@@ -3,6 +3,7 @@
 
 #import "DBRecordWithEmbeddedCppProto.h"
 #import "DBRecordWithEmbeddedProto.h"
+#import "DBRecordWithProtobufEnum.h"
 #import "DJOutcome.h"
 #import "proto/cpp/test2.pb.h"
 #import "proto/objc/test.pbobjc.h"
@@ -36,5 +37,17 @@
 + (nullable DJTestPerson *)stringToOptionalProto:(nonnull NSString *)x;
 
 + (nonnull DJOutcome<DJTestPerson *, NSNumber *> *)stringToProtoOutcome:(nonnull NSString *)x;
+
++ (nonnull NSString *)phoneTypeToString:(DJTestPerson_PhoneType)x;
+
++ (DJTestPerson_PhoneType)stringToPhoneType:(nonnull NSString *)x;
+
++ (nonnull NSString *)enumRecordToString:(nonnull DBRecordWithProtobufEnum *)x;
+
++ (nonnull DBRecordWithProtobufEnum *)stringToEnumRecord:(nonnull NSString *)x;
+
++ (nonnull NSString *)priorityToString:(DJTestPriority)x;
+
++ (DJTestPriority)stringToPriority:(nonnull NSString *)x;
 
 @end

@@ -14,6 +14,120 @@ public final class Test {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
+  /**
+   * Protobuf enum {@code djinni.test.Priority}
+   */
+  public enum Priority
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>LOW = 0;</code>
+     */
+    LOW(0),
+    /**
+     * <code>MEDIUM = 1;</code>
+     */
+    MEDIUM(1),
+    /**
+     * <code>HIGH = 2;</code>
+     */
+    HIGH(2),
+    /**
+     * <code>URGENT = 3;</code>
+     */
+    URGENT(3),
+    ;
+
+    /**
+     * <code>LOW = 0;</code>
+     */
+    public static final int LOW_VALUE = 0;
+    /**
+     * <code>MEDIUM = 1;</code>
+     */
+    public static final int MEDIUM_VALUE = 1;
+    /**
+     * <code>HIGH = 2;</code>
+     */
+    public static final int HIGH_VALUE = 2;
+    /**
+     * <code>URGENT = 3;</code>
+     */
+    public static final int URGENT_VALUE = 3;
+
+
+    public final int getNumber() {
+      return value;
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     * @deprecated Use {@link #forNumber(int)} instead.
+     */
+    @java.lang.Deprecated
+    public static Priority valueOf(int value) {
+      return forNumber(value);
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     */
+    public static Priority forNumber(int value) {
+      switch (value) {
+        case 0: return LOW;
+        case 1: return MEDIUM;
+        case 2: return HIGH;
+        case 3: return URGENT;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<Priority>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        Priority> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<Priority>() {
+            public Priority findValueByNumber(int number) {
+              return Priority.forNumber(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      return getDescriptor().getValues().get(ordinal());
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return djinni.test.Test.getDescriptor().getEnumTypes().get(0);
+    }
+
+    private static final Priority[] VALUES = values();
+
+    public static Priority valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int value;
+
+    private Priority(int value) {
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:djinni.test.Priority)
+  }
+
   public interface PersonOrBuilder extends
       // @@protoc_insertion_point(interface_extends:djinni.test.Person)
       com.google.protobuf.MessageOrBuilder {
@@ -2961,7 +3075,9 @@ public final class Test {
       "\004type\030\002 \001(\0162\035.djinni.test.Person.PhoneTy" +
       "pe:\004HOME\"+\n\tPhoneType\022\n\n\006MOBILE\020\000\022\010\n\004HOM" +
       "E\020\001\022\010\n\004WORK\020\002\"2\n\013AddressBook\022#\n\006people\030\001" +
-      " \003(\0132\023.djinni.test.PersonB\t\242\002\006DJTest"
+      " \003(\0132\023.djinni.test.Person*5\n\010Priority\022\007\n" +
+      "\003LOW\020\000\022\n\n\006MEDIUM\020\001\022\010\n\004HIGH\020\002\022\n\n\006URGENT\020\003" +
+      "B\t\242\002\006DJTest"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,

@@ -97,3 +97,11 @@ object ProtobufMessage {
   case class Objc(header: String, prefix: String)
   case class Ts(module: String, ns: String)
 }
+
+case class ProtobufEnum(cpp: ProtobufEnum.Cpp, java: ProtobufEnum.Java, objc: Option[ProtobufEnum.Objc], ts: Option[ProtobufEnum.Ts]) extends TypeDef
+object ProtobufEnum {
+  case class Cpp(header: String, ns: String, typename: String)
+  case class Java(typename: String, baseClass: String)
+  case class Objc(header: String, typename: String)
+  case class Ts(module: String, typename: String)
+}

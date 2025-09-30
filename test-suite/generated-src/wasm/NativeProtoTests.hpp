@@ -36,6 +36,12 @@ struct NativeProtoTests : ::djinni::JsInterface<::testsuite::ProtoTests, NativeP
     static std::string optionalProtoToString(const em::val& w_x);
     static em::val stringToOptionalProto(const std::string& w_x);
     static em::val stringToProtoOutcome(const std::string& w_x);
+    static std::string phoneTypeToString(const em::val& w_x);
+    static em::val stringToPhoneType(const std::string& w_x);
+    static std::string enumRecordToString(const em::val& w_x);
+    static em::val stringToEnumRecord(const std::string& w_x);
+    static std::string priorityToString(const em::val& w_x);
+    static em::val stringToPriority(const std::string& w_x);
 
 };
 

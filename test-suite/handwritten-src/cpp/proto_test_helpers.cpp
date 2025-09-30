@@ -1,6 +1,7 @@
 #include "proto_tests.hpp"
 #include "RecordWithEmbeddedProto.hpp"
 #include "RecordWithEmbeddedCppProto.hpp"
+#include "RecordWithProtobufEnum.hpp"
 
 namespace testsuite {
 
@@ -90,6 +91,40 @@ djinni::expected<::djinni::test::Person, int32_t> ProtoTests::stringToProtoOutco
     proto.set_name(x);
     proto.set_id(1);
     return proto;    
+}
+
+std::string ProtoTests::phoneTypeToString(const ::djinni::test::Person_PhoneType& x) {
+    return ::djinni::test::Person_PhoneType_Name(x);
+}
+
+::djinni::test::Person_PhoneType ProtoTests::stringToPhoneType(const std::string& x) {
+    if (x == "MOBILE") {
+        return ::djinni::test::Person_PhoneType_MOBILE;
+    } else if (x == "HOME") {
+        return ::djinni::test::Person_PhoneType_HOME;
+    } else if (x == "WORK") {
+        return ::djinni::test::Person_PhoneType_WORK;
+    } else {
+        return ::djinni::test::Person_PhoneType_HOME; // default
+    }
+}
+
+std::string ProtoTests::enumRecordToString(const RecordWithProtobufEnum& x) {
+    return phoneTypeToString(x.phone_type);
+}
+
+RecordWithProtobufEnum ProtoTests::stringToEnumRecord(const std::string& x) {
+    return RecordWithProtobufEnum{stringToPhoneType(x), ::djinni::test::Priority::LOW};
+}
+
+std::string ProtoTests::priorityToString(const ::djinni::test::Priority& x) {
+    return ::djinni::test::Priority_Name(x);
+}
+
+::djinni::test::Priority ProtoTests::stringToPriority(const std::string& x) {
+    ::djinni::test::Priority result;
+    ::djinni::test::Priority_Parse(x, &result);
+    return result;
 }
 
 }

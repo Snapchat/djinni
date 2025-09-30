@@ -63,6 +63,7 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
         case _ => headers
       }
     }
+    case pe: MProtobufEnum => List(ImportRef(include(pe.name)))
     case d: MDef => List(ImportRef(include(d.name)))
     case e: MExtern => List(ImportRef(resolveExtJniHdr(e.jni.header)))
     case _ => List()
@@ -118,6 +119,12 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       val prefix = p.body.java.pkg.replaceAllLiterally(".", "/")
       s"L${prefix}$$${p.name};"
     }
+    case p: MProtobufEnum => {
+      // For protobuf enums: baseClass + $ + typename (with $ separators)
+      val baseClassPath = p.body.java.baseClass.replaceAllLiterally(".", "/")
+      val nestedClassPath = p.body.java.typename.replaceAllLiterally(".", "$")
+      s"L${baseClassPath}$$${nestedClassPath};"
+    }
   }
 
   // Regexp shortcut
@@ -142,6 +149,7 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
 
   def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => withNs(Some(spec.jniNamespace), helperClass(d.name))
+    case pe: MProtobufEnum => withNs(Some(spec.jniNamespace), helperClass(pe.name))
     case e: MExtern => e.jni.translator
     case o => withNs(Some("djinni"), o match {
       case p: MPrimitive => p.idlName match {
@@ -161,6 +169,7 @@ class JNIMarshal(spec: Spec) extends Marshal(spec) {
       case MSet => "Set"
       case MMap => "Map"
       case MProtobuf(_,_,_) => "Protobuf"
+      case MProtobufEnum(_,_,_) => throw new AssertionError("unreachable")
       case MArray => "Array"
       case d: MDef => throw new AssertionError("unreachable")
       case e: MExtern => throw new AssertionError("unreachable")

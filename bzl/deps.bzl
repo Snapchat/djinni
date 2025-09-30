@@ -47,3 +47,18 @@ def djinni_deps():
         url = "https://github.com/bazelbuild/rules_jvm_external/archive/{}.zip".format(rules_jvm_external_tag),
         sha256 = "62133c125bf4109dfd9d2af64830208356ce4ef8b165a6ef15bbff7460b35c3a",
     )
+    
+    # Override zlib to use custom BUILD file that excludes problematic gz* files on macOS
+    zlib_version = "1.2.11"
+    maybe(
+        http_archive,
+        name = "zlib",
+        build_file = "//third_party/zlib:BUILD.bazel",
+        sha256 = "c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1",
+        strip_prefix = "zlib-{}".format(zlib_version),
+        urls = [
+            "https://mirror.bazel.build/zlib.net/zlib-{}.tar.gz".format(zlib_version),
+            "https://zlib.net/zlib-{}.tar.gz".format(zlib_version),
+        ],
+    )
+
