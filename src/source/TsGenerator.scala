@@ -85,6 +85,10 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
         case MArray => tsArrayType(tm.args.head)
         case e: MExtern => e.ts.typename + (if (e.ts.generic) args(tm) else "")
         case p: MProtobuf => p.name
+        case p: MProtobufEnum => p.body.ts match {
+          case Some(ts) => ts.typename
+          case None => p.name
+        }
         case o =>
           val base = o match {
             case p: MPrimitive => tsPrimitiveType(p)
@@ -99,6 +103,7 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
             case d: MDef => idJs.ty(d.name)
             case e: MExtern => throw new AssertionError("unreachable")
             case e: MProtobuf => throw new AssertionError("unreachable")
+            case e: MProtobufEnum => throw new AssertionError("unreachable")
             case p: MParam => idJs.typeParam(p.name)
             case MVoid => "void"
           }
@@ -112,6 +117,10 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
   def references(m: Meta): Seq[TsSymbolRef] = m match {
     case e: MExtern => List(TsSymbolRef(idJs.ty(e.name), e.ts.module))
     case MProtobuf(name, _, ProtobufMessage(_,_,_,Some(ts))) => List(TsSymbolRef(name, ts.module))
+    case MProtobufEnum(name, _, enum) => enum.ts match {
+      case Some(ts) => List(TsSymbolRef(ts.typename, ts.module))
+      case None => List()
+    }
     case _ => List()
   }
   class TsRefs() {
@@ -296,7 +305,8 @@ class TsGenerator(spec: Spec) extends Generator(spec) {
       }
     })
   }
-  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {}
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum): Unit = {}
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, pe: djinni.ast.ProtobufEnum): Unit = {}
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: Record) {}
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface) {}
 }

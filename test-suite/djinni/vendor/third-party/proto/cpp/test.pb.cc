@@ -77,7 +77,7 @@ static void InitDefaultsscc_info_Person_PhoneNumber_test_2eproto() {
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_Person_PhoneNumber_test_2eproto}, {}};
 
 static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_test_2eproto[3];
-static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_test_2eproto[1];
+static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_test_2eproto[2];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_test_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_test_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -130,7 +130,9 @@ const char descriptor_table_protodef_test_2eproto[] PROTOBUF_SECTION_VARIABLE(pr
   "\004type\030\002 \001(\0162\035.djinni.test.Person.PhoneTy"
   "pe:\004HOME\"+\n\tPhoneType\022\n\n\006MOBILE\020\000\022\010\n\004HOM"
   "E\020\001\022\010\n\004WORK\020\002\"2\n\013AddressBook\022#\n\006people\030\001"
-  " \003(\0132\023.djinni.test.PersonB\t\242\002\006DJTest"
+  " \003(\0132\023.djinni.test.Person*5\n\010Priority\022\007\n"
+  "\003LOW\020\000\022\n\n\006MEDIUM\020\001\022\010\n\004HIGH\020\002\022\n\n\006URGENT\020\003"
+  "B\t\242\002\006DJTest"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_test_2eproto_deps[1] = {
 };
@@ -141,7 +143,7 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_tes
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_test_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_test_2eproto = {
-  false, false, descriptor_table_protodef_test_2eproto, "test.proto", 316,
+  false, false, descriptor_table_protodef_test_2eproto, "test.proto", 371,
   &descriptor_table_test_2eproto_once, descriptor_table_test_2eproto_sccs, descriptor_table_test_2eproto_deps, 3, 0,
   schemas, file_default_instances, TableStruct_test_2eproto::offsets,
   file_level_metadata_test_2eproto, 3, file_level_enum_descriptors_test_2eproto, file_level_service_descriptors_test_2eproto,
@@ -174,6 +176,22 @@ constexpr Person_PhoneType Person::PhoneType_MIN;
 constexpr Person_PhoneType Person::PhoneType_MAX;
 constexpr int Person::PhoneType_ARRAYSIZE;
 #endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Priority_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_test_2eproto);
+  return file_level_enum_descriptors_test_2eproto[1];
+}
+bool Priority_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      return true;
+    default:
+      return false;
+  }
+}
+
 
 // ===================================================================
 

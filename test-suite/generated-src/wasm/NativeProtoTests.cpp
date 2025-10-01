@@ -4,6 +4,7 @@
 #include "NativeProtoTests.hpp"  // my header
 #include "NativeRecordWithEmbeddedCppProto.hpp"
 #include "NativeRecordWithEmbeddedProto.hpp"
+#include "NativeRecordWithProtobufEnum.hpp"
 #include "Outcome_wasm.hpp"
 
 namespace djinni_generated {
@@ -131,6 +132,60 @@ em::val NativeProtoTests::stringToProtoOutcome(const std::string& w_x) {
         return ::djinni::ExceptionHandlingTraits<::djinni::Outcome<::djinni::Protobuf<::djinni::test::Person, ::djinni::JsClassName<'p','r','o','t','o','t','e','s','t','.','P','e','r','s','o','n'>>, ::djinni::I32>>::handleNativeException(e);
     }
 }
+std::string NativeProtoTests::phoneTypeToString(const em::val& w_x) {
+    try {
+        auto r = ::testsuite::ProtoTests::phoneTypeToString(::djinni::Protobuf::toCpp(w_x));
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        return ::djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
+    }
+}
+em::val NativeProtoTests::stringToPhoneType(const std::string& w_x) {
+    try {
+        auto r = ::testsuite::ProtoTests::stringToPhoneType(::djinni::String::toCpp(w_x));
+        return ::djinni::Protobuf::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        return ::djinni::ExceptionHandlingTraits<::djinni::Protobuf>::handleNativeException(e);
+    }
+}
+std::string NativeProtoTests::enumRecordToString(const em::val& w_x) {
+    try {
+        auto r = ::testsuite::ProtoTests::enumRecordToString(::djinni_generated::NativeRecordWithProtobufEnum::toCpp(w_x));
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        return ::djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
+    }
+}
+em::val NativeProtoTests::stringToEnumRecord(const std::string& w_x) {
+    try {
+        auto r = ::testsuite::ProtoTests::stringToEnumRecord(::djinni::String::toCpp(w_x));
+        return ::djinni_generated::NativeRecordWithProtobufEnum::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        return ::djinni::ExceptionHandlingTraits<::djinni_generated::NativeRecordWithProtobufEnum>::handleNativeException(e);
+    }
+}
+std::string NativeProtoTests::priorityToString(const em::val& w_x) {
+    try {
+        auto r = ::testsuite::ProtoTests::priorityToString(::djinni::Protobuf::toCpp(w_x));
+        return ::djinni::String::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        return ::djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
+    }
+}
+em::val NativeProtoTests::stringToPriority(const std::string& w_x) {
+    try {
+        auto r = ::testsuite::ProtoTests::stringToPriority(::djinni::String::toCpp(w_x));
+        return ::djinni::Protobuf::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        return ::djinni::ExceptionHandlingTraits<::djinni::Protobuf>::handleNativeException(e);
+    }
+}
 
 EMSCRIPTEN_BINDINGS(testsuite_proto_tests) {
     ::djinni::DjinniClass_<::testsuite::ProtoTests>("testsuite_ProtoTests", "testsuite.ProtoTests")
@@ -149,6 +204,12 @@ EMSCRIPTEN_BINDINGS(testsuite_proto_tests) {
         .class_function("optionalProtoToString", NativeProtoTests::optionalProtoToString)
         .class_function("stringToOptionalProto", NativeProtoTests::stringToOptionalProto)
         .class_function("stringToProtoOutcome", NativeProtoTests::stringToProtoOutcome)
+        .class_function("phoneTypeToString", NativeProtoTests::phoneTypeToString)
+        .class_function("stringToPhoneType", NativeProtoTests::stringToPhoneType)
+        .class_function("enumRecordToString", NativeProtoTests::enumRecordToString)
+        .class_function("stringToEnumRecord", NativeProtoTests::stringToEnumRecord)
+        .class_function("priorityToString", NativeProtoTests::priorityToString)
+        .class_function("stringToPriority", NativeProtoTests::stringToPriority)
         ;
 }
 

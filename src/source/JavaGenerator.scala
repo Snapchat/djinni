@@ -125,7 +125,7 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum): Unit = {
     val refs = new JavaRefs()
 
     writeJavaFile(ident, origin, refs.java, w => {
@@ -139,6 +139,10 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
         w.wl(";")
       }
     })
+  }
+
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, pe: djinni.ast.ProtobufEnum): Unit = {
+    // Java protobuf enums are already defined by the protobuf library
   }
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface) {

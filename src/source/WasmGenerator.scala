@@ -60,6 +60,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
       case MSet => "Set"
       case MMap => "Map"
       case MProtobuf(_,_,_) => "Protobuf"
+      case MProtobufEnum(_,_,_) => "Protobuf"
       case MArray => "Array"
       case d: MDef => throw new AssertionError("unreachable")
       case e: MExtern => throw new AssertionError("unreachable")
@@ -230,7 +231,7 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
 
   //------------------------------------------------------------------------------
 
-  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum): Unit = {
     val refs = new WasmRefs(ident.name)
     refs.cpp.add("#include <mutex>")
     val cls = cppMarshal.fqTypename(ident, e)
@@ -271,6 +272,10 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
         }
       }))
     }
+  }
+
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, pe: djinni.ast.ProtobufEnum): Unit = {
+    // WASM protobuf enums are already defined by the protobuf library
   }
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface) {

@@ -1,5 +1,6 @@
 djinni-output-temp/cpp/RecordWithEmbeddedProto.hpp
 djinni-output-temp/cpp/RecordWithEmbeddedCppProto.hpp
+djinni-output-temp/cpp/RecordWithProtobufEnum.hpp
 djinni-output-temp/cpp/proto_tests.hpp
 djinni-output-temp/cpp/nested_outcome.hpp
 djinni-output-temp/cpp/nested_outcome.cpp
@@ -74,6 +75,7 @@ djinni-output-temp/cpp/record_with_nested_derivings.cpp
 djinni-output-temp/cpp/set_record.hpp
 djinni-output-temp/java/RecordWithEmbeddedProto.java
 djinni-output-temp/java/RecordWithEmbeddedCppProto.java
+djinni-output-temp/java/RecordWithProtobufEnum.java
 djinni-output-temp/java/ProtoTests.java
 djinni-output-temp/java/NestedOutcome.java
 djinni-output-temp/java/TestOutcome.java
@@ -136,6 +138,8 @@ djinni-output-temp/jni/NativeRecordWithEmbeddedProto.hpp
 djinni-output-temp/jni/NativeRecordWithEmbeddedProto.cpp
 djinni-output-temp/jni/NativeRecordWithEmbeddedCppProto.hpp
 djinni-output-temp/jni/NativeRecordWithEmbeddedCppProto.cpp
+djinni-output-temp/jni/NativeRecordWithProtobufEnum.hpp
+djinni-output-temp/jni/NativeRecordWithProtobufEnum.cpp
 djinni-output-temp/jni/NativeProtoTests.hpp
 djinni-output-temp/jni/NativeProtoTests.cpp
 djinni-output-temp/jni/NativeNestedOutcome.hpp
@@ -248,10 +252,14 @@ djinni-output-temp/jni/NativeRecordWithNestedDerivings.hpp
 djinni-output-temp/jni/NativeRecordWithNestedDerivings.cpp
 djinni-output-temp/jni/NativeSetRecord.hpp
 djinni-output-temp/jni/NativeSetRecord.cpp
+djinni-output-temp/jni/NativePersonPhoneType.hpp
+djinni-output-temp/jni/NativePriority.hpp
 djinni-output-temp/objc/DBRecordWithEmbeddedProto.h
 djinni-output-temp/objc/DBRecordWithEmbeddedProto.mm
 djinni-output-temp/objc/DBRecordWithEmbeddedCppProto.h
 djinni-output-temp/objc/DBRecordWithEmbeddedCppProto.mm
+djinni-output-temp/objc/DBRecordWithProtobufEnum.h
+djinni-output-temp/objc/DBRecordWithProtobufEnum.mm
 djinni-output-temp/objc/DBProtoTests.h
 djinni-output-temp/objc/DBNestedOutcome.h
 djinni-output-temp/objc/DBNestedOutcome.mm
@@ -341,6 +349,8 @@ djinni-output-temp/objc/DBRecordWithEmbeddedProto+Private.h
 djinni-output-temp/objc/DBRecordWithEmbeddedProto+Private.mm
 djinni-output-temp/objc/DBRecordWithEmbeddedCppProto+Private.h
 djinni-output-temp/objc/DBRecordWithEmbeddedCppProto+Private.mm
+djinni-output-temp/objc/DBRecordWithProtobufEnum+Private.h
+djinni-output-temp/objc/DBRecordWithProtobufEnum+Private.mm
 djinni-output-temp/objc/DBProtoTests+Private.h
 djinni-output-temp/objc/DBProtoTests+Private.mm
 djinni-output-temp/objc/DBNestedOutcome+Private.h
@@ -457,6 +467,8 @@ djinni-output-temp/wasm/NativeRecordWithEmbeddedProto.hpp
 djinni-output-temp/wasm/NativeRecordWithEmbeddedProto.cpp
 djinni-output-temp/wasm/NativeRecordWithEmbeddedCppProto.hpp
 djinni-output-temp/wasm/NativeRecordWithEmbeddedCppProto.cpp
+djinni-output-temp/wasm/NativeRecordWithProtobufEnum.hpp
+djinni-output-temp/wasm/NativeRecordWithProtobufEnum.cpp
 djinni-output-temp/wasm/NativeProtoTests.hpp
 djinni-output-temp/wasm/NativeProtoTests.cpp
 djinni-output-temp/wasm/NativeNestedOutcome.hpp

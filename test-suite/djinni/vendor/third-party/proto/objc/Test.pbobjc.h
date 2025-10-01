@@ -32,6 +32,23 @@ CF_EXTERN_C_BEGIN
 
 NS_ASSUME_NONNULL_BEGIN
 
+#pragma mark - Enum DJTestPriority
+
+typedef GPB_ENUM(DJTestPriority) {
+  DJTestPriority_Low = 0,
+  DJTestPriority_Medium = 1,
+  DJTestPriority_High = 2,
+  DJTestPriority_Urgent = 3,
+};
+
+GPBEnumDescriptor *DJTestPriority_EnumDescriptor(void);
+
+/**
+ * Checks to see if the given value is defined by the enum or was not known at
+ * the time this source was generated.
+ **/
+BOOL DJTestPriority_IsValidValue(int32_t value);
+
 #pragma mark - Enum DJTestPerson_PhoneType
 
 typedef GPB_ENUM(DJTestPerson_PhoneType) {

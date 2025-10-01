@@ -15,6 +15,7 @@ namespace testsuite {
 
 struct RecordWithEmbeddedCppProto;
 struct RecordWithEmbeddedProto;
+struct RecordWithProtobufEnum;
 
 class ProtoTests {
 public:
@@ -45,6 +46,18 @@ public:
     static std::experimental::optional<::djinni::test::Person> stringToOptionalProto(const std::string & x);
 
     static djinni::expected<::djinni::test::Person, int32_t> stringToProtoOutcome(const std::string & x);
+
+    static std::string phoneTypeToString(const ::djinni::test::Person_PhoneType & x);
+
+    static ::djinni::test::Person_PhoneType stringToPhoneType(const std::string & x);
+
+    static std::string enumRecordToString(const RecordWithProtobufEnum & x);
+
+    static RecordWithProtobufEnum stringToEnumRecord(const std::string & x);
+
+    static std::string priorityToString(const ::djinni::test::Priority & x);
+
+    static ::djinni::test::Priority stringToPriority(const std::string & x);
 };
 
 } // namespace testsuite

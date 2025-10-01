@@ -61,6 +61,79 @@ export class ProtoTest extends TestCase {
         const r = this.m.testsuite.ProtoTests.stringToProtoOutcome('tom');
         assertEq(r, {result: {name: 'tom', id: 1, email:'', phones:[]}});
     }
+
+    testProtobufEnum() {
+        // Test enum conversion - should match Java/ObjC behavior
+        const homeEnum = this.m.testsuite.ProtoTests.stringToPhoneType("HOME");
+        assertEq(homeEnum, prototest.Person_PhoneType.HOME);
+        
+        const workEnum = this.m.testsuite.ProtoTests.stringToPhoneType("WORK");
+        assertEq(workEnum, prototest.Person_PhoneType.WORK);
+        
+        const mobileEnum = this.m.testsuite.ProtoTests.stringToPhoneType("MOBILE");
+        assertEq(mobileEnum, prototest.Person_PhoneType.MOBILE);
+        
+        // Test unknown string defaults to home (same as other platforms)
+        const unknownEnum = this.m.testsuite.ProtoTests.stringToPhoneType("unknown");
+        assertEq(unknownEnum, prototest.Person_PhoneType.HOME);
+        
+        // Test enum to string conversion
+        const homeString = this.m.testsuite.ProtoTests.phoneTypeToString(prototest.Person_PhoneType.HOME);
+        assertEq(homeString, "HOME");
+        
+        const workString = this.m.testsuite.ProtoTests.phoneTypeToString(prototest.Person_PhoneType.WORK);
+        assertEq(workString, "WORK");
+        
+        const mobileString = this.m.testsuite.ProtoTests.phoneTypeToString(prototest.Person_PhoneType.MOBILE);
+        assertEq(mobileString, "MOBILE");
+    }
+
+    testRecordWithProtobufEnum() {
+        // Test record with protobuf enum
+        const workRecord: test.RecordWithProtobufEnum = {
+            phoneType: prototest.Person_PhoneType.WORK,
+            priority: prototest.Priority.HIGH
+        };
+        const workString = this.m.testsuite.ProtoTests.enumRecordToString(workRecord);
+        assertEq(workString, "WORK");
+        
+        const mobileRecord = this.m.testsuite.ProtoTests.stringToEnumRecord("MOBILE");
+        assertEq(mobileRecord.phoneType, prototest.Person_PhoneType.MOBILE);
+        
+        const mobileString = this.m.testsuite.ProtoTests.enumRecordToString(mobileRecord);
+        assertEq(mobileString, "MOBILE");
+        
+        // Test round-trip conversion
+        const homeRecord: test.RecordWithProtobufEnum = {
+            phoneType: prototest.Person_PhoneType.HOME,
+            priority: prototest.Priority.LOW
+        };
+        const homeString = this.m.testsuite.ProtoTests.enumRecordToString(homeRecord);
+        const reconvertedRecord = this.m.testsuite.ProtoTests.stringToEnumRecord(homeString);
+        assertEq(reconvertedRecord.phoneType, prototest.Person_PhoneType.HOME);
+    }
+
+    testPriorityEnum() {
+        // Test Priority enum conversion
+        const lowPriority = this.m.testsuite.ProtoTests.stringToPriority("LOW");
+        assertEq(lowPriority, prototest.Priority.LOW);
+        
+        const highPriority = this.m.testsuite.ProtoTests.stringToPriority("HIGH");
+        assertEq(highPriority, prototest.Priority.HIGH);
+        
+        const urgentPriority = this.m.testsuite.ProtoTests.stringToPriority("URGENT");
+        assertEq(urgentPriority, prototest.Priority.URGENT);
+        
+        // Test enum to string conversion
+        const lowString = this.m.testsuite.ProtoTests.priorityToString(prototest.Priority.LOW);
+        assertEq(lowString, "LOW");
+        
+        const highString = this.m.testsuite.ProtoTests.priorityToString(prototest.Priority.HIGH);
+        assertEq(highString, "HIGH");
+        
+        const urgentString = this.m.testsuite.ProtoTests.priorityToString(prototest.Priority.URGENT);
+        assertEq(urgentString, "URGENT");
+    }
 }
 
 allTests.push(ProtoTest);

@@ -53,11 +53,15 @@ def resolve(metas: Scope, idl: Seq[TypeDecl]): Option[Error] = {
         case r: Record => DRecord
         case i: Interface => DInterface
         case p: ProtobufMessage => throw new AssertionError("unreachable")
+        case p: djinni.ast.ProtobufEnum => DEnum
       }
       topScope = topScope.updated(typeDecl.ident.name, typeDecl match {
         case td: InternTypeDecl => MDef(typeDecl.ident.name, typeDecl.params.length, defType, typeDecl.body)
         case td: ExternTypeDecl => YamlGenerator.metaFromYaml(td)
-        case td: ProtobufTypeDecl => MProtobuf(td.ident.name, 0, td.body.asInstanceOf[ProtobufMessage])
+        case td: ProtobufTypeDecl => td.body match {
+          case proto: ProtobufMessage => MProtobuf(td.ident.name, 0, proto)
+          case enum: djinni.ast.ProtobufEnum => MProtobufEnum(td.ident.name, 0, enum)
+        }
       })
     }
 
@@ -94,6 +98,7 @@ private def resolve(scope: Scope, typeDef: TypeDef) {
     case r: Record => resolveRecord(scope, r)
     case i: Interface => resolveInterface(scope, i)
     case p: ProtobufMessage=>
+    case p: djinni.ast.ProtobufEnum=>
   }
 }
 
@@ -122,6 +127,7 @@ private def resolveConst(typeDef: TypeDef) {
     case r: Record => f(r.consts)
     case i: Interface => f(i.consts)
     case p: ProtobufMessage=>
+    case p: djinni.ast.ProtobufEnum=>
   }
 }
 
@@ -260,6 +266,7 @@ private def resolveRecord(scope: Scope, r: Record) {
         case DEnum =>
       }
       case p: MProtobuf =>
+      case p: MProtobufEnum =>
       case _ => throw new AssertionError("Type cannot be resolved")
     }
   }

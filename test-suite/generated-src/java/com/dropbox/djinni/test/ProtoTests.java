@@ -6,6 +6,8 @@ package com.dropbox.djinni.test;
 import com.snapchat.djinni.NativeObjectManager;
 import djinni.test.Test.AddressBook;
 import djinni.test.Test.Person;
+import djinni.test.Test.Person.PhoneType;
+import djinni.test.Test.Priority;
 import djinni.test2.Test2.PersistingState;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -51,6 +53,24 @@ public abstract class ProtoTests {
 
     @Nonnull
     public static native com.snapchat.djinni.Outcome<Person, Integer> stringToProtoOutcome(@Nonnull String x);
+
+    @Nonnull
+    public static native String phoneTypeToString(@Nonnull djinni.test.Test.Person.PhoneType x);
+
+    @Nonnull
+    public static native djinni.test.Test.Person.PhoneType stringToPhoneType(@Nonnull String x);
+
+    @Nonnull
+    public static native String enumRecordToString(@Nonnull RecordWithProtobufEnum x);
+
+    @Nonnull
+    public static native RecordWithProtobufEnum stringToEnumRecord(@Nonnull String x);
+
+    @Nonnull
+    public static native String priorityToString(@Nonnull djinni.test.Test.Priority x);
+
+    @Nonnull
+    public static native djinni.test.Test.Priority stringToPriority(@Nonnull String x);
 
     public static final class CppProxy extends ProtoTests
     {

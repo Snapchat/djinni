@@ -37,12 +37,18 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
   def writeJniHppFile(name: String, origin: String, includes: Iterable[String], fwds: Iterable[String], f: IndentWriter => Unit, f2: IndentWriter => Unit = (w => {})) =
     writeHppFileGeneric(spec.jniHeaderOutFolder.get, spec.jniNamespace, spec.jniFileIdentStyle)(name, origin, includes, fwds, f, f2)
 
-  class JNIRefs(name: String, cppPrefixOverride: Option[String]=None) {
+  class JNIRefs(name: String, cppPrefixOverride: Option[String]=None, customCppHeader: Option[String]=None) {
     var jniHpp = mutable.TreeSet[String]()
     var jniCpp = mutable.TreeSet[String]()
 
-    val cppPrefix = cppPrefixOverride.getOrElse(spec.jniIncludeCppPrefix)
-    jniHpp.add("#include " + q(cppPrefix + spec.cppFileIdentStyle(name) + "." + spec.cppHeaderExt))
+    // Add the C++ header - either custom (for protobuf enums) or auto-generated
+    customCppHeader match {
+      case Some(header) => jniHpp.add("#include " + header)
+      case None => 
+        val cppPrefix = cppPrefixOverride.getOrElse(spec.jniIncludeCppPrefix)
+        jniHpp.add("#include " + q(cppPrefix + spec.cppFileIdentStyle(name) + "." + spec.cppHeaderExt))
+    }
+    
     jniHpp.add("#include " + q(spec.jniBaseLibIncludePrefix + "djinni_support.hpp"))
     spec.cppNnHeader match {
       case Some(nnHdr) => jniHpp.add("#include " + nnHdr)
@@ -60,35 +66,54 @@ class JNIGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
-    val refs = new JNIRefs(ident.name)
+  // Helper method to generate JNI enum from either protobuf or regular enum
+  private def generateJniEnum(origin: String, ident: Ident, typeDef: TypeDef, customHeader: Option[String], 
+                              baseClass: String, isFlags: Boolean, enumCount: Int) {
+    val refs = new JNIRefs(ident.name, customCppHeader = customHeader)
     val jniHelper = jniMarshal.helperClass(ident)
-    val cppSelf = cppMarshal.fqTypename(ident, e)
+    val cppSelf = cppMarshal.fqTypename(ident.name, typeDef)
 
     writeJniHppFile(ident, origin, Iterable.concat(refs.jniHpp, refs.jniCpp), Nil, w => {
-      val base = if(e.flags) "JniFlags" else "JniEnum"
-      val count = normalEnumOptions(e).length
-      w.w(s"class $jniHelper final : ::djinni::$base").bracedSemi {
+      w.w(s"class $jniHelper final : ::djinni::$baseClass").bracedSemi {
         w.wlOutdent("public:")
         w.wl(s"using CppType = $cppSelf;")
         w.wl(s"using JniType = jobject;")
         w.wl
         w.wl(s"using Boxed = $jniHelper;")
         w.wl
-        if(e.flags) {
+        if(isFlags) {
           w.wl(s"static CppType toCpp(JNIEnv* jniEnv, JniType j) { return static_cast<CppType>(::djinni::JniClass<$jniHelper>::get().flags(jniEnv, j)); }")
-          w.wl(s"static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, CppType c) { return ::djinni::JniClass<$jniHelper>::get().create(jniEnv, static_cast<unsigned>(c), $count); }")
+          w.wl(s"static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, CppType c) { return ::djinni::JniClass<$jniHelper>::get().create(jniEnv, static_cast<unsigned>(c), $enumCount); }")
         } else {
           w.wl(s"static CppType toCpp(JNIEnv* jniEnv, JniType j) { return static_cast<CppType>(::djinni::JniClass<$jniHelper>::get().ordinal(jniEnv, j)); }")
           w.wl(s"static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, CppType c) { return ::djinni::JniClass<$jniHelper>::get().create(jniEnv, static_cast<jint>(c)); }")
         }
         w.wl
         w.wlOutdent("private:")
-        val classLookup = q(jniMarshal.undecoratedTypename(ident, e))
-        w.wl(s"$jniHelper() : $base($classLookup) {}")
+        val classLookup = typeDef match {
+          case pe: ProtobufEnum =>
+            // For protobuf enums: baseClass + $ + typename (with $ separators)
+            val baseClassPath = pe.java.baseClass.replaceAllLiterally(".", "/")
+            val nestedClassPath = pe.java.typename.replaceAllLiterally(".", "$")
+            q(s"${baseClassPath}$$${nestedClassPath}")
+          case _ =>
+            // For regular enums, use the standard naming
+            q(jniMarshal.undecoratedTypename(ident.name, typeDef))
+        }
+        w.wl(s"$jniHelper() : $baseClass($classLookup) {}")
         w.wl(s"friend ::djinni::JniClass<$jniHelper>;")
       }
     })
+  }
+
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum): Unit = {
+    val baseClass = if(e.flags) "JniFlags" else "JniEnum"
+    val enumCount = normalEnumOptions(e).length
+    generateJniEnum(origin, ident, e, None, baseClass, e.flags, enumCount)
+  }
+
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, pe: djinni.ast.ProtobufEnum): Unit = {
+    generateJniEnum(origin, ident, pe, Some(pe.cpp.header), "JniEnum", false, 0)
   }
 
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: Record) {

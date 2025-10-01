@@ -13,3 +13,7 @@ ts:
 messages:
     - Person
     - AddressBook
+
+enums:
+    - Person.PhoneType
+    - Priority

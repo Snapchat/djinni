@@ -35,6 +35,10 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
 
   def cppProtoType(tm: MExpr):Option[String] = tm.base match {
     case MProtobuf(name, _, ProtobufMessage(cpp, _, None, _)) => Some(cpp.ns + "::" + name)
+    case MProtobufEnum(name, _, enum) => enum.objc match {
+      case Some(_) => None  // Use ObjC type if available
+      case None => throw new AssertionError(s"Protobuf enum '$name' requires Objective-C definition in yaml")
+    }
     case _ => None
   }
 
@@ -56,6 +60,7 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
         case DRecord => if(e.objc.pointer) nonnull else None
       }
       case MProtobuf(_, _, ProtobufMessage(_, _, None, _)) => None
+      case MProtobufEnum(_, _, _) => None
       case _ => nonnull
     }
   }
@@ -108,6 +113,10 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
       case Some(o) => List(ImportRef(o.header))
       case None => List(ImportRef(p.body.cpp.header))
     }
+    case p: MProtobufEnum => p.body.objc match {
+      case Some(o) => List(ImportRef(o.header))
+      case None => List(ImportRef(p.body.cpp.header))
+    }
     case p: MParam => List()
   }
 
@@ -124,6 +133,7 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
     case r: Record => true
     case e: Enum => false
     case p: ProtobufMessage => true
+    case p: djinni.ast.ProtobufEnum => false
   }
 
   def boxedTypename(td: TypeDecl) = td.body match {
@@ -131,6 +141,7 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
     case r: Record => typename(td.ident, r)
     case e: Enum => "NSNumber"
     case p: ProtobufMessage => typename(td.ident, p)
+    case p: djinni.ast.ProtobufEnum => "NSNumber"
   }
 
   // Return value: (Type_Name, Is_Class_Or_Not)
@@ -183,6 +194,10 @@ class ObjcMarshal(spec: Spec) extends Marshal(spec) {
             case p: MProtobuf => p.body.objc match {
               case Some(o) => (o.prefix + p.name, true)
               case None => (p.body.cpp.ns + "::" + p.name, true)
+            }
+            case p: MProtobufEnum => p.body.objc match {
+              case Some(o) => (o.typename, false)
+              case None => throw new AssertionError(s"Protobuf enum '${p.name}' requires Objective-C definition in yaml")
             }
             case p: MParam => throw new AssertionError("Parameter should not happen at Obj-C top level")
             case MVoid => ("NSNull", true)

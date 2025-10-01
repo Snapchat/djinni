@@ -10,6 +10,11 @@ RecordWithEmbeddedCppProto = record {
     state: PersistingState;
 }
 
+RecordWithProtobufEnum = record {
+    phone_type: Person_PhoneType;
+    priority: Priority;
+}
+
 proto_tests = interface +c {
     static protoToStrings(x: AddressBook): list<string>;
     static stringsToProto(x: list<string>): AddressBook;
@@ -30,4 +35,13 @@ proto_tests = interface +c {
     static stringToOptionalProto(x: string): optional<Person>;
 
     static stringToProtoOutcome(x: string): outcome<Person, i32>;
+
+    static phoneTypeToString(x: Person_PhoneType): string;
+    static stringToPhoneType(x: string): Person_PhoneType;
+
+    static enumRecordToString(x: RecordWithProtobufEnum): string;
+    static stringToEnumRecord(x: string): RecordWithProtobufEnum;
+
+    static priorityToString(x: Priority): string;
+    static stringToPriority(x: string): Priority;
 }

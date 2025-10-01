@@ -95,4 +95,39 @@
     XCTAssertEqualObjects(r, [DJOutcome fromResult:tom]);
 }
 
+- (void) testProtobufEnum {
+    // Test enum conversion
+    DJTestPerson_PhoneType homeEnum = [DBProtoTests stringToPhoneType:@"HOME"];
+    XCTAssertEqual(homeEnum, DJTestPerson_PhoneType_Home);
+    
+    DJTestPerson_PhoneType workEnum = [DBProtoTests stringToPhoneType:@"WORK"];
+    XCTAssertEqual(workEnum, DJTestPerson_PhoneType_Work);
+    
+    DJTestPerson_PhoneType mobileEnum = [DBProtoTests stringToPhoneType:@"MOBILE"];
+    XCTAssertEqual(mobileEnum, DJTestPerson_PhoneType_Mobile);
+    
+    // Test unknown string defaults to home
+    DJTestPerson_PhoneType unknownEnum = [DBProtoTests stringToPhoneType:@"unknown"];
+    XCTAssertEqual(unknownEnum, DJTestPerson_PhoneType_Home);
+}
+
+- (void) testRecordWithProtobufEnum {
+    // Test record with protobuf enum
+    DBRecordWithProtobufEnum* workRecord = [DBRecordWithProtobufEnum RecordWithProtobufEnumWithPhoneType:DJTestPerson_PhoneType_Work priority:DJTestPriority_High];
+    NSString* workString = [DBProtoTests enumRecordToString:workRecord];
+    XCTAssertEqualObjects(workString, @"WORK");
+    
+    DBRecordWithProtobufEnum* mobileRecord = [DBProtoTests stringToEnumRecord:@"MOBILE"];
+    XCTAssertEqual(mobileRecord.phoneType, DJTestPerson_PhoneType_Mobile);
+    
+    NSString* mobileString = [DBProtoTests enumRecordToString:mobileRecord];
+    XCTAssertEqualObjects(mobileString, @"MOBILE");
+    
+    // Test round-trip conversion
+    DBRecordWithProtobufEnum* homeRecord = [DBRecordWithProtobufEnum RecordWithProtobufEnumWithPhoneType:DJTestPerson_PhoneType_Home priority:DJTestPriority_Low];
+    NSString* homeString = [DBProtoTests enumRecordToString:homeRecord];
+    DBRecordWithProtobufEnum* reconvertedRecord = [DBProtoTests stringToEnumRecord:homeString];
+    XCTAssertEqual(reconvertedRecord.phoneType, DJTestPerson_PhoneType_Home);
+}
+
 @end

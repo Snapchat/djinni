@@ -24,7 +24,14 @@ import djinni.generatorTools._
 class SwiftBridgingHeaderGenerator(spec: Spec) extends Generator(spec) {
   val marshal = new ObjcMarshal(spec)
 
-  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum): Unit = {
+    // Swift bridging header not needed for enums
+  }
+  override def generateEnum(origin: String, ident: Ident, doc: Doc, pe: djinni.ast.ProtobufEnum): Unit = {
+    // Swift bridging header not needed for protobuf enums
+  }
+
+  private def generateRegularEnum(ident: Ident): Unit = {
     spec.objcSwiftBridgingHeaderWriter.get.write("#import \"" + marshal.headerName(ident) + "\"\n")
   }
 

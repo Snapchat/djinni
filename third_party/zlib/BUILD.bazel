@@ -1,0 +1,37 @@
+cc_library(
+    name = "zlib",
+    srcs = [
+        "adler32.c",
+        "compress.c",
+        "crc32.c",
+        "deflate.c",
+        "inflate.c",
+        "infback.c",
+        "inftrees.c",
+        "inffast.c",
+        "trees.c",
+        "uncompr.c",
+        # zutil.c excluded due to gzguts.h dependency
+    ],
+    hdrs = [
+        "zlib.h",
+        "zconf.h",
+        "crc32.h",
+        "deflate.h",
+        "inffast.h",
+        "inffixed.h",
+        "inflate.h",
+        "inftrees.h",
+        "trees.h",
+        "zutil.h",
+    ],
+    copts = [
+        "-Wno-unused-variable",
+        "-Wno-implicit-function-declaration",
+        "-Wno-macro-redefined",
+        "-Wno-deprecated-non-prototype",
+        "-DNO_GZCOMPRESS",
+        "-DNO_GZIP",
+    ],
+    visibility = ["//visibility:public"],
+)

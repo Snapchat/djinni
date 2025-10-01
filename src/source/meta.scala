@@ -85,6 +85,7 @@ object MExtern {
   )
 }
 case class MProtobuf(name: String, override val numParams: Int, body: ProtobufMessage) extends Meta
+case class MProtobufEnum(name: String, override val numParams: Int, body: djinni.ast.ProtobufEnum) extends Meta
 
 abstract sealed class MOpaque extends Meta { val idlName: String }
 
