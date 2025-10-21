@@ -35,7 +35,7 @@ public:
 
     static CppType toCpp(ValdiType v)
     {
-        auto outcomeCpp = castOrNull<Valdi::ComposerOutcome>(v.getComposerObject());
+        auto outcomeCpp = castOrNull<Valdi::ValdiOutcome>(v.getValdiObject());
         if (outcomeCpp->error.isUndefined()) {
             return {RESULT::toCpp(outcomeCpp->result)};
         } else {
@@ -45,7 +45,7 @@ public:
 
     static ValdiType fromCpp(const CppType& c)
     {
-        auto outcomeCpp = Valdi::makeShared<Valdi::ComposerOutcome>();
+        auto outcomeCpp = Valdi::makeShared<Valdi::ValdiOutcome>();
         if (c.has_value()) {
             outcomeCpp->result = RESULT::fromCpp(c.value());
         } else {

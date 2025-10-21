@@ -33,7 +33,7 @@ wasm:
 ts:
   typename: 'Uint8Array'
   module: ''
-composer:
+valdi:
   translator: '::djinni::valdi::NativeDataRef'
   header: '"$DataRef_valdi.hpp"'
 swift:

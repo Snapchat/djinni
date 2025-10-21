@@ -127,7 +127,7 @@ private object IdlParser extends RegexParsers {
           if (foundJavascript) return err("Found multiple \"js\" modifiers.")
           foundJavascript = true
         }
-        // +js is an alias for +w for both wasm and composer
+        // +js is an alias for +w for both wasm and valdi
         case "js" => {
           if (foundJavascript) return err("Found multiple \"js\" modifiers.")
           foundJavascript = true

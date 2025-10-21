@@ -26,7 +26,7 @@ import scala.collection.mutable
 import java.util.regex.Pattern
 import java.util.regex.Matcher
 
-class ComposerGenerator(spec: Spec) extends Generator(spec) {
+class ValdiGenerator(spec: Spec) extends Generator(spec) {
 
   val cppMarshal = new CppMarshal(spec)
 
@@ -37,14 +37,14 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     return Seq(ns, cls).map( e=> s"""djinni::valdi::CTS{"$e"}""").mkString(", ")
   }
 
-  class ComposerRefs(name: String, cppPrefixOverride: Option[String]=None) {
+  class ValdiRefs(name: String, cppPrefixOverride: Option[String]=None) {
     var hpp = mutable.TreeSet[String]()
     var cpp = mutable.TreeSet[String]()
     var interfaces = mutable.TreeSet[String]()
 
-    val cppPrefix = cppPrefixOverride.getOrElse(spec.composerIncludeCppPrefix)
+    val cppPrefix = cppPrefixOverride.getOrElse(spec.valdiIncludeCppPrefix)
     hpp.add("#include " + q(cppPrefix + spec.cppFileIdentStyle(name) + "." + spec.cppHeaderExt))
-    hpp.add("#include " + q(spec.composerBaseLibIncludePrefix + "djinni_valdi.hpp"))
+    hpp.add("#include " + q(spec.valdiBaseLibIncludePrefix + "djinni_valdi.hpp"))
     spec.cppNnHeader match {
       case Some(nnHdr) => hpp.add("#include " + nnHdr)
       case _ =>
@@ -66,18 +66,18 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  private def composerFilenameStyle(name: String): String = {
-    return spec.composerFileIdentStyle(name)
+  private def valdiFilenameStyle(name: String): String = {
+    return spec.valdiFileIdentStyle(name)
   }
   private def helperNamespace(): String = {
-    return spec.composerNamespace;
+    return spec.valdiNamespace;
   }
 
-  private def helperClass(name: String) = spec.composerClassIdentStyle(name)
+  private def helperClass(name: String) = spec.valdiClassIdentStyle(name)
   private def helperClass(tm: MExpr): String = helperName(tm) + helperTemplates(tm)
   def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => withNs(Some(helperNamespace()), helperClass(d.name))
-    case e: MExtern => e.composer.translator
+    case e: MExtern => e.valdi.translator
     case o => withNs(Some("djinni::valdi"), o match {
       case p: MPrimitive => p.idlName match {
         case "i8" => "I8"
@@ -127,16 +127,16 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  def include(ident: String) = q(spec.composerIncludePrefix + composerFilenameStyle(ident) + "." + spec.cppHeaderExt)
+  def include(ident: String) = q(spec.valdiIncludePrefix + valdiFilenameStyle(ident) + "." + spec.cppHeaderExt)
 
   def references(m: Meta, exclude: String = ""): Seq[SymbolReference] = m match {
     case d: MDef => List(ImportRef(include(d.name)))
-    case e: MExtern => List(ImportRef(resolveExtComposerHdr(e.composer.header)))
+    case e: MExtern => List(ImportRef(resolveExtValdiHdr(e.valdi.header)))
     case _ => List()
   }
 
-  def resolveExtComposerHdr(path: String) = {
-    path.replaceAll("\\$", spec.composerBaseLibIncludePrefix);
+  def resolveExtValdiHdr(path: String) = {
+    path.replaceAll("\\$", spec.valdiBaseLibIncludePrefix);
   }
 
   def dependentInterfaces(m: Meta): Seq[MExpr] = m match {
@@ -167,26 +167,26 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
   }
 
   override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
-    val refs = new ComposerRefs(ident.name)
+    val refs = new ValdiRefs(ident.name)
     val cls = cppMarshal.fqTypename(ident, e)
     val helper = helperClass(ident)
     //TODO: support namespace?
     // val fullyQualifiedName = withWasmNamespace(idJs.ty(ident))
     val fullyQualifiedName = idJs.ty(ident)
-    writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
+    writeHppFileGeneric(spec.valdiOutFolder.get, helperNamespace(), valdiFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.wl(s"using $helper = ::djinni::valdi::Enum<$cls>;")
     }), (w => {}))
   }
 
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: Record) {
-    val refs = new ComposerRefs(ident.name)
+    val refs = new ValdiRefs(ident.name)
     r.fields.foreach(f => refs.find(f.ty))
     r.consts.foreach(c => refs.find(c.ty))
 
     val cls = withNs(Some(spec.cppNamespace), idCpp.ty(ident.name))
     val helper = helperClass(ident)
 
-    writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
+    writeHppFileGeneric(spec.valdiOutFolder.get, helperNamespace(), valdiFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.wl(s"struct $helper").bracedSemi {
         w.wl(s"using CppType = $cls;")
         w.wl("using ValdiType = Valdi:: Value;")
@@ -198,7 +198,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         w.wl("static const Valdi::ValueSchema& schema() noexcept;")
       }
     }), (w => {}))
-    writeCppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle, spec.composerIncludePrefix) (ident.name, origin, refs.cpp, (w => {
+    writeCppFileGeneric(spec.valdiOutFolder.get, helperNamespace(), valdiFilenameStyle, spec.valdiIncludePrefix) (ident.name, origin, refs.cpp, (w => {
       w.wl("using namespace Valdi;")
       w.wl
       w.w(s"auto $helper::toCpp(const ValdiType& v) -> CppType").braced {
@@ -236,7 +236,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
   }
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface) {
-    val refs = new ComposerRefs(ident.name)
+    val refs = new ValdiRefs(ident.name)
     i.consts.foreach(c => refs.find(c.ty))
     i.methods.foreach(m => {
       m.params.foreach(p => refs.find(p.ty))
@@ -244,7 +244,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
     })
     val cls = withNs(Some(spec.cppNamespace), idCpp.ty(ident))
     val helper = helperClass(ident)
-    writeHppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
+    writeHppFileGeneric(spec.valdiOutFolder.get, helperNamespace(), valdiFilenameStyle)(ident.name, origin, refs.hpp, Nil, (w => {
       w.w(s"struct $helper : ::djinni::valdi::JsInterface<$cls, $helper>").bracedSemi {
         w.wl("static void registerSchema(bool resolve) noexcept;")
         w.wl("static const Valdi::ValueSchema& schemaRef() noexcept;")
@@ -252,7 +252,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
 
         // cpp marshal helper
         if (i.ext.cpp) {
-          w.wl("static Valdi::Ref<Valdi::ValueTypedProxyObject> toComposer(const CppOptType& c);")
+          w.wl("static Valdi::Ref<Valdi::ValueTypedProxyObject> toValdi(const CppOptType& c);")
         }
 
         // js proxy
@@ -284,7 +284,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
       }
     }), (w => {}))
 
-    writeCppFileGeneric(spec.composerOutFolder.get, helperNamespace(), composerFilenameStyle, spec.composerIncludePrefix)(ident.name, origin, refs.cpp, (w => {
+    writeCppFileGeneric(spec.valdiOutFolder.get, helperNamespace(), valdiFilenameStyle, spec.valdiIncludePrefix)(ident.name, origin, refs.cpp, (w => {
       w.wl("using namespace Valdi;")
       w.wl("using namespace std::placeholders;")
       w.wl
@@ -317,7 +317,7 @@ class ComposerGenerator(spec: Spec) extends Generator(spec) {
         }
         w.wl("}")
         // instance method object factory method
-        w.w(s"Ref<ValueTypedProxyObject> $helper::toComposer(const CppOptType& c)").braced{
+        w.w(s"Ref<ValueTypedProxyObject> $helper::toValdi(const CppOptType& c)").braced{
           w.w("auto o = ValueTypedObject::make(schema().getClassRef(),").bracedEnd(");") {
             for (m <- i.methods.filter(m => !m.static)) {
               w.wl(s"""djinni::valdi::tsFunc<${exceptionHandlingTraits(m)}>(std::bind(shim::${idCpp.method(m.ident)}, c, _1)),""")

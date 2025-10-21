@@ -100,17 +100,17 @@ object Main {
     var wasmOmitConstants: Boolean = false
     var wasmNamespace: Option[String] = None
     var wasmOmitNsAlias: Boolean = false
-    var composerNamespace: String = "djinni_generated"
-    var composerClassIdentStyleOptional: Option[IdentConverter] = None
-    var composerFileIdentStyleOptional: Option[IdentConverter] = None
-    var composerTsOutFolder: Option[File] = None
+    var valdiNamespace: String = "djinni_generated"
+    var valdiClassIdentStyleOptional: Option[IdentConverter] = None
+    var valdiFileIdentStyleOptional: Option[IdentConverter] = None
+    var valdiTsOutFolder: Option[File] = None
     var jsIdentStyle = IdentStyle.jsDefault
     var tsOutFolder: Option[File] = None
     var tsModule: String = "module"
-    var composerOutFolder: Option[File] = None
-    var composerIncludePrefix: String = ""
-    var composerIncludeCppPrefix: String = ""
-    var composerBaseLibIncludePrefix: String = ""
+    var valdiOutFolder: Option[File] = None
+    var valdiIncludePrefix: String = ""
+    var valdiIncludeCppPrefix: String = ""
+    var valdiBaseLibIncludePrefix: String = ""
     var cOutFolder: Option[File] = None
     var cHeaderOutFolderOptional: Option[File] = None
     var cNamespace: String = ""
@@ -293,18 +293,18 @@ object Main {
       opt[String]("ts-module").valueName("<name>").foreach(tsModule = _)
         .text("TypeScript declaration module name (default: \"module\").")
       note("")
-      opt[File]("composer-out").valueName("<out-folder>").foreach(x => composerOutFolder = Some(x))
-        .text("The output for the Composer bridge C++ files (Generator disabled if unspecified).")
-      opt[String]("composer-include-prefix").valueName("<prefix>").foreach(composerIncludePrefix = _)
-        .text("The prefix for #includes of Composer header files from Composer C++ files.")
-      opt[String]("composer-include-cpp-prefix").valueName("<prefix>").foreach(composerIncludeCppPrefix = _)
-        .text("The prefix for #includes of the main header files from Composer C++ files.")
-      opt[String]("composer-base-lib-include-prefix").valueName("...").foreach(x => composerBaseLibIncludePrefix = x)
-        .text("The Composer base library's include path, relative to the Composer C++ classes.")
-      opt[String]("composer-namespace").valueName("...").foreach(x => composerNamespace = x)
-        .text("The namespace name to use for generated Composer C++ classes.")
-      opt[File]("composer-ts-out").valueName("<out-folder>").foreach(x => composerTsOutFolder = Some(x))
-        .text("The output for the Composer TypeScript interface files (Generator disabled if unspecified).")
+      opt[File]("valdi-out").valueName("<out-folder>").foreach(x => valdiOutFolder = Some(x))
+        .text("The output for the Valdi bridge C++ files (Generator disabled if unspecified).")
+      opt[String]("valdi-include-prefix").valueName("<prefix>").foreach(valdiIncludePrefix = _)
+        .text("The prefix for #includes of Valdi header files from Valdi C++ files.")
+      opt[String]("valdi-include-cpp-prefix").valueName("<prefix>").foreach(valdiIncludeCppPrefix = _)
+        .text("The prefix for #includes of the main header files from Valdi C++ files.")
+      opt[String]("valdi-base-lib-include-prefix").valueName("...").foreach(x => valdiBaseLibIncludePrefix = x)
+        .text("The Valdi base library's include path, relative to the Valdi C++ classes.")
+      opt[String]("valdi-namespace").valueName("...").foreach(x => valdiNamespace = x)
+        .text("The namespace name to use for generated Valdi C++ classes.")
+      opt[File]("valdi-ts-out").valueName("<out-folder>").foreach(x => valdiTsOutFolder = Some(x))
+        .text("The output for the Valdi TypeScript interface files (Generator disabled if unspecified).")
       note("")
       opt[File]("c-out").valueName("<out-folder>").foreach(x => cOutFolder = Some(x))
         .text("The output for the C files (Generated disabled if unspecified).")
@@ -365,8 +365,8 @@ object Main {
       identStyle("ident-objc-local",      c => { objcIdentStyle = objcIdentStyle.copy(local = c) })
       identStyle("ident-objc-const",      c => { objcIdentStyle = objcIdentStyle.copy(const = c) })
       identStyle("ident-objc-file",       c => { objcFileIdentStyleOptional = Some(c) })
-      identStyle("ident-composer-class", c => { composerClassIdentStyleOptional = Some(c)})
-      identStyle("ident-composer-file",  c => { composerFileIdentStyleOptional = Some(c)})
+      identStyle("ident-valdi-class", c => { valdiClassIdentStyleOptional = Some(c)})
+      identStyle("ident-valdi-file",  c => { valdiFileIdentStyleOptional = Some(c)})
       identStyle("ident-swiftxx-class", c => { swiftxxClassIdentStyleOptional = Some(c)})
       identStyle("ident-swiftxx-file",  c => { swiftxxFileIdentStyleOptional = Some(c)})
     }
@@ -388,8 +388,8 @@ object Main {
     objcIdentStyle = objcIdentStyle.copy(ty = IdentStyle.prefix(objcTypePrefix,objcIdentStyle.ty))
     objcFileIdentStyle = IdentStyle.prefix(objcTypePrefix, objcFileIdentStyle)
 
-    val composerClassIdentStyle = composerClassIdentStyleOptional.getOrElse(cppIdentStyle.ty)
-    val composerFileIdentStyle = composerFileIdentStyleOptional.getOrElse(cppFileIdentStyle)
+    val valdiClassIdentStyle = valdiClassIdentStyleOptional.getOrElse(cppIdentStyle.ty)
+    val valdiFileIdentStyle = valdiFileIdentStyleOptional.getOrElse(cppFileIdentStyle)
 
     if (cppTypeEnumIdentStyle != null) {
       cppIdentStyle = cppIdentStyle.copy(enumType = cppTypeEnumIdentStyle)
@@ -528,14 +528,14 @@ object Main {
       jsIdentStyle,
       tsOutFolder,
       tsModule,
-      composerOutFolder,
-      composerIncludePrefix,
-      composerIncludeCppPrefix,
-      composerBaseLibIncludePrefix,
-      composerNamespace,
-      composerClassIdentStyle,
-      composerFileIdentStyle,
-      composerTsOutFolder,
+      valdiOutFolder,
+      valdiIncludePrefix,
+      valdiIncludeCppPrefix,
+      valdiBaseLibIncludePrefix,
+      valdiNamespace,
+      valdiClassIdentStyle,
+      valdiFileIdentStyle,
+      valdiTsOutFolder,
       cOutFolder,
       cHeaderOutFolder,
       cNamespace,

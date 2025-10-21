@@ -20,27 +20,27 @@
 
 namespace djinni::valdi {
 
-struct ComposerDataObject: Valdi::ComposerObject {
-    COMPOSER_CLASS_HEADER(ComposerDataObject);
+struct ValdiDataObject: Valdi::ValdiObject {
+    COMPOSER_CLASS_HEADER(ValdiDataObject);
     std::variant<std::vector<uint8_t>, std::string, std::shared_ptr<DataRef::Impl>> _data;
 };
-COMPOSER_CLASS_IMPL(ComposerDataObject);
+COMPOSER_CLASS_IMPL(ValdiDataObject);
 
-class DataRefComposer: public DataRef::Impl {
+class DataRefValdi: public DataRef::Impl {
 public:
     // create an empty buffer from c++
-    explicit DataRefComposer(size_t len) {
+    explicit DataRefValdi(size_t len) {
         auto bytes = Valdi::makeShared<Valdi::Bytes>();
         bytes->assignVec(std::vector<uint8_t>(len));
         _array = Valdi::makeShared<Valdi::ValueTypedArray>(Valdi::kDefaultTypedArrayType, bytes);
     }
     // wrap an array object from JS
-    explicit DataRefComposer(const Valdi::Ref<Valdi::ValueTypedArray>& array) {
+    explicit DataRefValdi(const Valdi::Ref<Valdi::ValueTypedArray>& array) {
         _array = array;
     }
     // take over a std::vector's buffer without copying it
-    explicit DataRefComposer(std::vector<uint8_t>&& vec) {
-        auto container = Valdi::makeShared<ComposerDataObject>();
+    explicit DataRefValdi(std::vector<uint8_t>&& vec) {
+        auto container = Valdi::makeShared<ValdiDataObject>();
         container->_data = std::move(vec);
         const auto& containedVec = std::get<std::vector<uint8_t>>(container->_data);
         auto bytes = containedVec.data();
@@ -49,8 +49,8 @@ public:
                                                        Valdi::BytesView(container, bytes, len));
     }
     // take over a std::string's buffer without copying it
-    explicit DataRefComposer(std::string&& str) {
-        auto container = Valdi::makeShared<ComposerDataObject>();
+    explicit DataRefValdi(std::string&& str) {
+        auto container = Valdi::makeShared<ValdiDataObject>();
         container->_data = std::move(str);
         const std::string& containedStr = std::get<std::string>(container->_data);
         auto bytes = reinterpret_cast<const uint8_t*>(containedStr.data());
@@ -59,7 +59,7 @@ public:
                                                                  Valdi::BytesView(container, bytes, len));
     }
 
-    DataRefComposer(const DataRefComposer&) = delete;
+    DataRefValdi(const DataRefValdi&) = delete;
 
     const uint8_t* buf() const override {
         return _array->getBuffer().data();
@@ -81,17 +81,17 @@ private:
 
 DataRef NativeDataRef::toCpp(const Valdi::Value& v) {
     auto arr = v.getTypedArrayRef();
-    auto impl = std::make_shared<DataRefComposer>(arr);
+    auto impl = std::make_shared<DataRefValdi>(arr);
     return DataRef(impl);
 }
 
 Valdi::Value NativeDataRef::fromCpp(const DataRef& c) {
-    auto impl = std::dynamic_pointer_cast<DataRefComposer>(c.impl());
+    auto impl = std::dynamic_pointer_cast<DataRefValdi>(c.impl());
     if (impl) {
         auto arr = impl->platformObj();
         return Valdi::Value(arr);
     } else {
-        auto container = Valdi::makeShared<ComposerDataObject>();
+        auto container = Valdi::makeShared<ValdiDataObject>();
         auto bytes = c.buf();
         auto len = c.len();
         container->_data = c.impl();
