@@ -1,6 +1,6 @@
 output_target: release
 dependencies:
-  - composer_core
+  - valdi_core
   - coreutils
   - foundation
-  - composer_protobuf
+  - valdi_protobuf

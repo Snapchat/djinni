@@ -35,7 +35,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   val javaMarshal = new JavaMarshal(spec)
   val jniMarshal = new JNIMarshal(spec)
   val wasmMarshal = new WasmGenerator(spec)
-  val composerMarshal = new ComposerGenerator(spec)
+  val valdiMarshal = new ValdiGenerator(spec)
   val tsMarshal = new TsGenerator(spec, false)
   val swiftMarshal = new SwiftMarshal(spec)
   val swiftxxMarshal = new SwiftxxMarshal(spec)
@@ -78,10 +78,10 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     if (spec.wasmOutFolder.isDefined) {
       w.wl("wasm:").nested { write(w, wasm(td)) }
     }
-    if (spec.composerOutFolder.isDefined) {
-      w.wl("composer:").nested { write(w, composer(td)) }
+    if (spec.valdiOutFolder.isDefined) {
+      w.wl("valdi:").nested { write(w, valdi(td)) }
     }
-    if (spec.wasmOutFolder.isDefined || spec.composerOutFolder.isDefined) {
+    if (spec.wasmOutFolder.isDefined || spec.valdiOutFolder.isDefined) {
       w.wl("ts:").nested {write(w, ts(td)) }
     }
     if (spec.swiftOutFolder.isDefined) {
@@ -212,9 +212,9 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     "typename" -> wasmMarshal.wasmType(mexpr(td))
   )
 
-  private def composer(td: TypeDecl) = Map[String, Any](
-    "translator" -> QuotedString(composerMarshal.helperName(mexpr(td))),
-    "header" -> QuotedString(composerMarshal.include(td.ident))
+  private def valdi(td: TypeDecl) = Map[String, Any](
+    "translator" -> QuotedString(valdiMarshal.helperName(mexpr(td))),
+    "header" -> QuotedString(valdiMarshal.include(td.ident))
   )
 
   private def ts(td: TypeDecl) = Map[String, Any](
@@ -321,9 +321,9 @@ object YamlGenerator {
       getOptionalField(td, "wasm", "typename"),
       getOptionalField(td, "wasm", "translator"),
       getOptionalField(td, "wasm", "header")),
-    MExtern.Composer(
-      getOptionalField(td, "composer", "translator"),
-      getOptionalField(td, "composer", "header")),
+    MExtern.Valdi(
+      getOptionalField(td, "valdi", "translator"),
+      getOptionalField(td, "valdi", "header")),
     MExtern.Ts(
       getOptionalField(td, "ts", "typename"),
       getOptionalField(td, "ts", "module"),

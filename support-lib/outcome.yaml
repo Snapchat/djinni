@@ -36,7 +36,7 @@ ts:
   typename: 'Outcome'
   module: '@djinni_support/Outcome'
   generic: true
-composer:
+valdi:
   translator: '::djinni::valdi::Outcome'
   header: '"$Outcome_valdi.hpp"'
 swift:

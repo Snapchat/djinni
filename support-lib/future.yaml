@@ -36,7 +36,7 @@ ts:
   typename: 'Promise'
   module: ''
   generic: true
-composer:
+valdi:
   translator: '::djinni::valdi::FutureAdaptor'
   header: '"$Future_valdi.hpp"'
 swift:

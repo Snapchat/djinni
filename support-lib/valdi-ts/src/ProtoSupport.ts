@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Arena } from 'composer_protobuf/src/Arena';
+import { Arena } from "valdi_protobuf/src/Arena";
 /* eslint @typescript-eslint/no-explicit-any: "off" */
 /* eslint @typescript-eslint/no-unsafe-member-access: "off" */
 /* eslint @typescript-eslint/no-unsafe-assignment: "off" */
@@ -23,7 +23,7 @@ import { Arena } from 'composer_protobuf/src/Arena';
 declare const global: any;
 
 export function registerProtobufLib(name: string, protolib: any): void {
-  if (!('protoSupport' in global)) {
+  if (!("protoSupport" in global)) {
     global.protoSupport = {
       Arena: Arena,
       protoLibs: {},

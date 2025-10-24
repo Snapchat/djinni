@@ -16,19 +16,19 @@
 
 #pragma once
 
-#include "composer_core/cpp/Schema/ValueSchema.hpp"
-#include "composer_core/cpp/Schema/ValueSchemaRegistry.hpp"
-#include "composer_core/cpp/Schema/ValueSchemaTypeResolver.hpp"
-#include "composer_core/cpp/Utils/Shared.hpp"
-#include "composer_core/cpp/Utils/ValueFunction.hpp"
-#include "composer_core/cpp/Utils/ValueFunctionWithCallable.hpp"
-#include "composer_core/cpp/Utils/ValueMap.hpp"
-#include "composer_core/cpp/Utils/DjinniUtils.hpp"
-#include "composer_core/cpp/Utils/ValueTypedObject.hpp"
-#include "composer_core/cpp/Utils/ValueTypedProxyObject.hpp"
-#include "composer_core/cpp/Utils/ValueTypedArray.hpp"
-#include "composer_core/cpp/Utils/StaticString.hpp"
-#include "composer_core/ModuleFactory.hpp"
+#include "valdi_core/cpp/Schema/ValueSchema.hpp"
+#include "valdi_core/cpp/Schema/ValueSchemaRegistry.hpp"
+#include "valdi_core/cpp/Schema/ValueSchemaTypeResolver.hpp"
+#include "valdi_core/cpp/Utils/Shared.hpp"
+#include "valdi_core/cpp/Utils/ValueFunction.hpp"
+#include "valdi_core/cpp/Utils/ValueFunctionWithCallable.hpp"
+#include "valdi_core/cpp/Utils/ValueMap.hpp"
+#include "valdi_core/cpp/Utils/DjinniUtils.hpp"
+#include "valdi_core/cpp/Utils/ValueTypedObject.hpp"
+#include "valdi_core/cpp/Utils/ValueTypedProxyObject.hpp"
+#include "valdi_core/cpp/Utils/ValueTypedArray.hpp"
+#include "valdi_core/cpp/Utils/StaticString.hpp"
+#include "valdi_core/ModuleFactory.hpp"
 
 #include <fmt/format.h>
 
@@ -280,7 +280,7 @@ public:
     using Boxed = Set;
 
     static CppType toCpp(const ValdiType& v) {
-        auto es6set = castOrNull<Valdi::ES6Set>(v.getComposerObject());
+        auto es6set = castOrNull<Valdi::ES6Set>(v.getValdiObject());
         CppType cppSet;
         for (auto i = es6set->entries.begin(); i != es6set->entries.end(); i++) {
             cppSet.insert(T::toCpp(*i));
@@ -304,15 +304,15 @@ template<typename Key, typename Value>
 class Map {
     using CppKeyType = typename Key::CppType;
     using CppValueType = typename Value::CppType;
-    using ComposerKeyType = typename Key::Boxed::ValdiType;
-    using ComposerValueType = typename Value::Boxed::ValdiType;
+    using ValdiKeyType = typename Key::Boxed::ValdiType;
+    using ValdiValueType = typename Value::Boxed::ValdiType;
 
 public:
     using CppType = std::unordered_map<CppKeyType, CppValueType>;
     using ValdiType = Valdi::Value;
     using Boxed = Map;
     static CppType toCpp(const ValdiType& v) {
-        auto es6map = castOrNull<Valdi::ES6Map>(v.getComposerObject());
+        auto es6map = castOrNull<Valdi::ES6Map>(v.getValdiObject());
         CppType cppMap;
         for (auto i = es6map->entries.begin(); i != es6map->entries.end();) {
             auto k = Key::toCpp(*i++);
@@ -594,7 +594,7 @@ private:
         }
     }
 
-    // enable this only when the derived class has `toComposer` defined
+    // enable this only when the derived class has `toValdi` defined
     // (interface +c)
     template<typename, typename>
     struct GetOrCreateCppProxy {
@@ -604,7 +604,7 @@ private:
         }
     };
     template<typename T>
-    struct GetOrCreateCppProxy<T, std::void_t<decltype(T::toComposer)>> {
+    struct GetOrCreateCppProxy<T, std::void_t<decltype(T::toValdi)>> {
         Valdi::Value operator()(const std::shared_ptr<I>& c) noexcept {
             // look up in cpp proxy cache
             std::lock_guard lk(cppProxyCacheMutex);
@@ -620,7 +620,7 @@ private:
             }
             // not found or cache entry expired
             // create a new cpp proxy and store it in cache
-            auto o = Self::toComposer(c);
+            auto o = Self::toValdi(c);
             if (i == cppProxyCache.end()) {
                 cppProxyCache.emplace(c.get(), CppProxyCacheEntry{o.toWeak(), jsRefCount});
             } else {

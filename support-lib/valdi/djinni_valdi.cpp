@@ -16,7 +16,7 @@
 
 #include "djinni_valdi.hpp"
 
-#include "composer_core/cpp/Utils/ValueTypedArray.hpp"
+#include "valdi_core/cpp/Utils/ValueTypedArray.hpp"
 
 namespace djinni::valdi {
 

@@ -18,7 +18,7 @@
 
 #include "djinni_valdi.hpp"
 #include "../cpp/Future.hpp"
-#include "composer_core/cpp/Utils/ResolvablePromise.hpp"
+#include "valdi_core/cpp/Utils/ResolvablePromise.hpp"
 
 namespace djinni::valdi {
 
@@ -37,10 +37,10 @@ public:
 
     static CppType toCpp(ValdiType o)
     {
-        auto composerPromise = castOrNull<Valdi::Promise>(o.getComposerObject());
+        auto valdiPromise = castOrNull<Valdi::Promise>(o.getValdiObject());
         auto cppPromise = Valdi::makeShared<Promise<CppResType>>();
         auto cppFuture = cppPromise->getFuture();
-        composerPromise->onComplete([cppPromise] (const Valdi::Result<Valdi::Value>& result) {
+        valdiPromise->onComplete([cppPromise] (const Valdi::Result<Valdi::Value>& result) {
             if (result.success()) {
                 if constexpr(std::is_same_v<Void, RESULT>) {
                     cppPromise->setValue();
@@ -56,19 +56,19 @@ public:
 
     static ValdiType fromCpp(CppType c)
     {
-        auto composerPromise = Valdi::makeShared<Valdi::ResolvablePromise>();
-        c.then([composerPromise] (Future<CppResType> f) {
+        auto valdiPromise = Valdi::makeShared<Valdi::ResolvablePromise>();
+        c.then([valdiPromise] (Future<CppResType> f) {
             try {
                 if constexpr(std::is_same_v<Void, RESULT>) {
-                    composerPromise->fulfill(Valdi::Result<Valdi::Value>(Valdi::Value::undefined()));
+                    valdiPromise->fulfill(Valdi::Result<Valdi::Value>(Valdi::Value::undefined()));
                 } else {
-                    composerPromise->fulfill(Valdi::Result<Valdi::Value>(RESULT::fromCpp(f.get())));
+                    valdiPromise->fulfill(Valdi::Result<Valdi::Value>(RESULT::fromCpp(f.get())));
                 }
             } catch (const std::exception& e) {
-                composerPromise->fulfill({Valdi::Result<Valdi::Value>{Valdi::Error(e.what())}});
+                valdiPromise->fulfill({Valdi::Result<Valdi::Value>{Valdi::Error(e.what())}});
             }
         });
-        return Valdi::Value(composerPromise);
+        return Valdi::Value(valdiPromise);
     }
     static const Valdi::ValueSchema& schema() {
         static auto schema = Valdi::ValueSchema::promise(schemaOrRef<RESULT>());
@@ -81,15 +81,15 @@ struct ExceptionHandlingTraits<FutureAdaptor<U>> {
     static Valdi::Value handleNativeException(const std::exception& e, const Valdi::ValueFunctionCallContext& callContext) noexcept {
         // store C++ exception in JS Error and raise in JS runtime
         auto msg = STRING_FORMAT("C++: {}", e.what());
-        auto composerPromise = Valdi::makeShared<Valdi::ResolvablePromise>();
-        composerPromise->fulfill(Valdi::Result<Valdi::Value>(Valdi::Error(std::move(msg))));
-        return Valdi::Value(composerPromise);
+        auto valdiPromise = Valdi::makeShared<Valdi::ResolvablePromise>();
+        valdiPromise->fulfill(Valdi::Result<Valdi::Value>(Valdi::Error(std::move(msg))));
+        return Valdi::Value(valdiPromise);
     }
     static Valdi::Value handleNativeException(const JsException& e, const Valdi::ValueFunctionCallContext& callContext) noexcept {
         // JS error passthrough
-        auto composerPromise = Valdi::makeShared<Valdi::ResolvablePromise>();
-        composerPromise->fulfill(Valdi::Result<Valdi::Value>(e.cause()));
-        return Valdi::Value(composerPromise);
+        auto valdiPromise = Valdi::makeShared<Valdi::ResolvablePromise>();
+        valdiPromise->fulfill(Valdi::Result<Valdi::Value>(e.cause()));
+        return Valdi::Value(valdiPromise);
     }
 };
 

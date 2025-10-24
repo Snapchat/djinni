@@ -105,14 +105,14 @@ package object generatorTools {
                    jsIdentStyle: JsIdentStyle,
                    tsOutFolder: Option[File],
                    tsModule: String,
-                   composerOutFolder: Option[File],
-                   composerIncludePrefix: String,
-                   composerIncludeCppPrefix: String,
-                   composerBaseLibIncludePrefix: String,
-                   composerNamespace: String,
-                   composerClassIdentStyle: IdentConverter,
-                   composerFileIdentStyle: IdentConverter,
-                   composerTsOutFolder: Option[File],
+                   valdiOutFolder: Option[File],
+                   valdiIncludePrefix: String,
+                   valdiIncludeCppPrefix: String,
+                   valdiBaseLibIncludePrefix: String,
+                   valdiNamespace: String,
+                   valdiClassIdentStyle: IdentConverter,
+                   valdiFileIdentStyle: IdentConverter,
+                   valdiTsOutFolder: Option[File],
                    cOutFolder: Option[File],
                    cHeaderOutFolder: Option[File],
                    cNamespace: String,
@@ -332,18 +332,18 @@ package object generatorTools {
         }
         new WasmGenerator(spec).generate(idl)
       }
-      if (spec.composerOutFolder.isDefined) {
+      if (spec.valdiOutFolder.isDefined) {
         if (!spec.skipGeneration) {
-          createFolder("Composer", spec.composerOutFolder.get)
+          createFolder("Valdi", spec.valdiOutFolder.get)
         }
-        new ComposerGenerator(spec).generate(idl)
+        new ValdiGenerator(spec).generate(idl)
       }
       if (spec.cOutFolder.isDefined) {
         if (!spec.skipGeneration) {
           createFolder("C", spec.cOutFolder.get)
           createFolder("C header", spec.cHeaderOutFolder.get)
         }
-              new CGenerator(spec).generate(idl)
+        new CGenerator(spec).generate(idl)
       }
       if (spec.tsOutFolder.isDefined) {
         if (!spec.skipGeneration) {
@@ -351,9 +351,9 @@ package object generatorTools {
         }
         new TsGenerator(spec, false).generate(idl)
       }
-      if (spec.composerTsOutFolder.isDefined) {
+      if (spec.valdiTsOutFolder.isDefined) {
         if (!spec.skipGeneration) {
-          createFolder("Composer TypeScript", spec.composerTsOutFolder.get)
+          createFolder("Valdi TypeScript", spec.valdiTsOutFolder.get)
         }
         new TsGenerator(spec, true).generate(idl)
       }
