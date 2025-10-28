@@ -317,7 +317,7 @@ public:
         for (auto i = es6map->entries.begin(); i != es6map->entries.end();) {
             auto k = Key::toCpp(*i++);
             auto v = Value::toCpp(*i++);
-            cppMap[k] = std::move(v);
+            cppMap.insert_or_assign(k, std::move(v));
         }
         return cppMap;
     }
