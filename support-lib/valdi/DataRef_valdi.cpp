@@ -21,10 +21,10 @@
 namespace djinni::valdi {
 
 struct ValdiDataObject: Valdi::ValdiObject {
-    COMPOSER_CLASS_HEADER(ValdiDataObject);
+    VALDI_CLASS_HEADER(ValdiDataObject);
     std::variant<std::vector<uint8_t>, std::string, std::shared_ptr<DataRef::Impl>> _data;
 };
-COMPOSER_CLASS_IMPL(ValdiDataObject);
+VALDI_CLASS_IMPL(ValdiDataObject);
 
 class DataRefValdi: public DataRef::Impl {
 public:
