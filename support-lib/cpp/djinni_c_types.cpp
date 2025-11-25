@@ -8,9 +8,11 @@ constexpr size_t alignUp(size_t size, size_t alignment) {
 }
 
 template <typename T, typename ValueType> struct ArrayAllocator {
+  static constexpr size_t alignedValueSize = alignUp(sizeof(ValueType), alignof(ValueType));
+
   template <typename... Args> static T *allocate(size_t size, Args &&...args) {
     auto allocSize =
-        alignUp(sizeof(T), alignof(ValueType)) + (sizeof(ValueType) * size);
+        alignUp(sizeof(T), alignof(ValueType)) + (alignedValueSize * size);
 
     auto *arrayRegion = ::operator new(allocSize);
 
@@ -69,7 +71,7 @@ const char *String::data() const {
 size_t String::String::length() const { return _length; }
 
 String *String::make(const char *str, size_t length) {
-  auto *output = StringAllocator::allocate(length, length);
+  auto *output = StringAllocator::allocate(length + 1, length);
   auto *data = StringAllocator::getContainerStartPtr(output);
   for (size_t i = 0; i < length; i++) {
     data[i] = str[i];
@@ -110,7 +112,8 @@ void ObjectArray::setObjectAtIndex(size_t index, Object *object) {
 ObjectArray *ObjectArray::make(size_t length) {
   auto *output = ObjectArrayAllocator::allocate(length, length);
 
-  std::memset(ObjectArrayAllocator::getContainerStartPtr(output), 0, length);
+  std::memset(ObjectArrayAllocator::getContainerStartPtr(output), 0,
+    length * ObjectArrayAllocator::alignedValueSize);
 
   return output;
 }
