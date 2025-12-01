@@ -158,6 +158,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: ast.Record): Unit = {
     val selfCpp = cppMarshal.fqTypename(ident, r)
+    val selfCppClass = cppMarshal.typename(ident, r)
 
     val typeResolver = new CTypeResolver(ident, spec, cppMarshal)
     val prefix = resolveSymbolName(ident.name)
@@ -185,6 +186,24 @@ class CGenerator(spec: Spec) extends Generator(spec) {
           writeDoc(w, resolvedField.field.doc)
           w.wl(s"""${fieldTypename} ${prefix}_get_${fieldName}(${typeName} instance);""")
           w.wl(s"""void ${prefix}_set_${fieldName}(${typeName} instance, ${fieldTypename} value);""")
+          w.wl
+        }
+      })
+
+      w.wl
+      writeCppWrapperClass(ident, selfCppClass, w, (w: IndentWriter) => {
+        for (resolvedField <- resolvedFields) {
+          val fieldName = resolvedField.field.ident.name
+          val fieldTypename = resolvedField.translator.typename
+          w.w(s"${fieldTypename} ${fieldName}() const")
+          w.braced {
+            w.wl(s"return ${prefix}_get_${fieldName}(_ref.get);")
+          }
+          w.wl
+          w.w(s"${fieldTypename} ${fieldName}(${fieldTypename} value)")
+          w.braced {
+            w.wl(s"${prefix}_set_${fieldName}(_ref.get, value);")
+          }
           w.wl
         }
       })
@@ -383,9 +402,10 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         }
       })
 
-      w.wl
-      writeCppWrapperClass(ident, selfCppClass, w, (w: IndentWriter) => {
-        for (resolvedMethod <- resolvedMethods) {
+      if (i.ext.cpp) {
+        w.wl
+        writeCppWrapperClass(ident, selfCppClass, w, (w: IndentWriter) => {
+          for (resolvedMethod <- resolvedMethods) {
             w.w(s"${resolvedMethod.retTypename} ${resolvedMethod.resolvedName}(")
             writeParamList(w, resolvedMethod.parameters.map(p => (p.translator.typename, p.field.ident.name)))
             w.w(") ")
@@ -396,8 +416,9 @@ class CGenerator(spec: Spec) extends Generator(spec) {
               w.wl(s"${returnStr}${prefix}_${resolvedMethod.resolvedName}(${fullArgsList.mkString(", ")});")
             }
             w.wl
-          }
-      })
+            }
+        })
+      }
     }, (w: IndentWriter) => {
       if (i.ext.cc) {
         val proxyClassNameCpp = writeProxyClass(w, ident, methodDefsStructName, resolvedMethods)
