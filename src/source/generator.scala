@@ -118,6 +118,7 @@ package object generatorTools {
                    cNamespace: String,
                    cBaseLibIncludePrefix: String,
                    cIncludePrefix: String,
+                   cWrapperCppNamespace: Option[String],
                    swiftOutFolder: Option[File],
                    swiftIdentStyle: SwiftIdentStyle,
                    swiftModule: String,

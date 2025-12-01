@@ -148,10 +148,12 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  private def writeCppWrapperClass(ident: Ident, cppClassName: String, w: IndentWriter, methods: IndentWriter => Unit): Unit = {
+  private def writeCppWrapperClass(ident: Ident, w: IndentWriter, methods: IndentWriter => Unit): Unit = {
     val typeName = resolveRefSymbolTypeName(ident)
+    val cppClassName = ident.name
+    val cppNamespace = spec.cWrapperCppNamespace.getOrElse(spec.cppNamespace + "::c_wrappers")
     wrapIfCpp(w, (w: IndentWriter) => {
-      wrapNamespace(w, spec.cppNamespace + "::c_wrappers", (w: IndentWriter) => {
+      wrapNamespace(w, cppNamespace, (w: IndentWriter) => {
           w.w(s"template <template <typename> class Ref> class ${cppClassName}").bracedSemi {
             w.wlOutdent("public:")
             w.wl(s"using RefType = Ref<${typeName}>;")
@@ -214,23 +216,25 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         }
       })
 
-      w.wl
-      writeCppWrapperClass(ident, selfCppClass, w, (w: IndentWriter) => {
-        for (resolvedField <- resolvedFields) {
-          val fieldName = resolvedField.field.ident.name
-          val fieldTypename = resolvedField.translator.typename
-          w.w(s"${fieldTypename} ${fieldName}() const")
-          w.braced {
-            w.wl(s"return ${prefix}_get_${fieldName}(_ref.get());")
+      if (spec.cWrapperCppNamespace.isDefined) {
+        w.wl
+        writeCppWrapperClass(ident, w, (w: IndentWriter) => {
+          for (resolvedField <- resolvedFields) {
+            val fieldName = resolvedField.field.ident.name
+            val fieldTypename = resolvedField.translator.typename
+            w.w(s"${fieldTypename} ${fieldName}() const")
+            w.braced {
+              w.wl(s"return ${prefix}_get_${fieldName}(_ref.get());")
+            }
+            w.wl
+            w.w(s"${fieldTypename} ${fieldName}(${fieldTypename} value)")
+            w.braced {
+              w.wl(s"${prefix}_set_${fieldName}(_ref.get(), value);")
+            }
+            w.wl
           }
-          w.wl
-          w.w(s"${fieldTypename} ${fieldName}(${fieldTypename} value)")
-          w.braced {
-            w.wl(s"${prefix}_set_${fieldName}(_ref.get(), value);")
-          }
-          w.wl
-        }
-      })
+        })
+      }
     }, (w: IndentWriter) => {
       w.w(s"""${typeName} ${prefix}_new(""")
       writeParamListWithResolvedFields(w, resolvedFields)
@@ -426,9 +430,9 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         }
       })
 
-      if (i.ext.cpp) {
+      if (i.ext.cpp && spec.cWrapperCppNamespace.isDefined) {
         w.wl
-        writeCppWrapperClass(ident, selfCppClass, w, (w: IndentWriter) => {
+        writeCppWrapperClass(ident, w, (w: IndentWriter) => {
           for (resolvedMethod <- resolvedMethods) {
             if (resolvedMethod.method.static) {
               w.w("static ")
