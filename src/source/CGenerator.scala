@@ -53,6 +53,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     wrapIfCpp(w, (w: IndentWriter) => {
       w.wl("extern \"C\" {")
     })
+    w.wl
     f(w)
     wrapIfCpp(w, (w: IndentWriter) => {
       w.wl("} // extern \"C\"")
@@ -96,14 +97,15 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     writeCFilePair(origin, ident, List.empty[String], List.empty[String])((w: IndentWriter) => {
       val symbolName = resolveSymbolName(ident.name)
       val enumCasePrefix = symbolName + "_"
-      writeDoc(w, doc)
-      w.w("typedef enum")
-      w.bracedEnd(s" ${symbolName};") {
-        writeEnumOptionNone(w, e, idCpp.enum, "=", enumCasePrefix)
-        writeEnumOptions(w, e, idCpp.enum, "=", enumCasePrefix)
-        writeEnumOptionAll(w, e, idCpp.enum, "=", enumCasePrefix)
-      }
-
+      wrapExternC(w, (w: IndentWriter) => {
+        writeDoc(w, doc)
+        w.w("typedef enum")
+        w.bracedEnd(s" ${symbolName};") {
+          writeEnumOptionNone(w, e, idCpp.enum, "=", enumCasePrefix)
+          writeEnumOptions(w, e, idCpp.enum, "=", enumCasePrefix)
+          writeEnumOptionAll(w, e, idCpp.enum, "=", enumCasePrefix)
+        }
+      })
     }, (w: IndentWriter) => {
     })
   }
