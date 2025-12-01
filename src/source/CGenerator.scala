@@ -44,13 +44,11 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
   def privateHeader(t: TypeDecl): String = q(spec.cppIncludePrefix + spec.cppFileIdentStyle(t.ident.name) + "." + spec.cppHeaderExt)
 
-  private def writeExternCBegin(w: IndentWriter): Unit = {
+  private def wrapExternC(w: IndentWriter, f: IndentWriter => Unit) = {
     w.wl("#ifdef __cplusplus")
     w.wl("extern \"C\" {")
     w.wl("#endif // __cplusplus")
-  }
-
-  private def writeExternCEnd(w: IndentWriter): Unit = {
+    f(w)
     w.wl("#ifdef __cplusplus")
     w.wl("} // extern \"C\"")
     w.wl("#endif // __cplusplus")
@@ -76,13 +74,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       publicIncludes.foreach(w.wl)
 
       w.wl
-
-      writeExternCBegin(w)
-      w.wl
-
       header(w)
-
-      writeExternCEnd(w)
     })
 
     writeCFile(origin, ident, "cpp", (w: IndentWriter) => {
@@ -151,6 +143,19 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
+  private def writeCppWrapperClass(ident: Ident, cppClassName: String, w: IndentWriter, body: IndentWriter => Unit): Unit = {
+    val typeName = resolveRefSymbolTypeName(ident)
+    wrapNamespace(w, spec.cppNamespace + "::c_wrappers", (w: IndentWriter) => {
+        w.w(s"template <template <typename> class Ref> class ${cppClassName}").bracedSemi {
+          w.wlOutdent("public:")
+          body(w)
+          w.wl
+          w.wlOutdent("private:")
+          w.wl(s"Ref<${typeName}> _ref;")
+        }
+      })
+  }
+
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: ast.Record): Unit = {
     val selfCpp = cppMarshal.fqTypename(ident, r)
 
@@ -162,25 +167,27 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     val resolvedConsts = r.consts.map(r => new ResolvedConst(r, typeResolver.resolve(r.ty.resolved)))
 
     writeCFilePair(origin, ident, typeResolver.publicImports.toSeq, typeResolver.privateImports.toSeq)((w: IndentWriter) => {
-      writeDoc(w, doc)
-      w.wl(s"""typedef djinni_record_ref ${typeName};""")
-      w.wl
-
-      w.w(s"""${typeName} ${prefix}_new(""")
-      writeParamListWithResolvedFields(w, resolvedFields)
-      w.wl(");")
-      w.wl
-
-      generateConstsHeader(prefix, resolvedConsts, w)
-
-      for (resolvedField <- resolvedFields) {
-        val fieldName = resolvedField.field.ident.name
-        val fieldTypename = resolvedField.translator.typename
-        writeDoc(w, resolvedField.field.doc)
-        w.wl(s"""${fieldTypename} ${prefix}_get_${fieldName}(${typeName} instance);""")
-        w.wl(s"""void ${prefix}_set_${fieldName}(${typeName} instance, ${fieldTypename} value);""")
+      wrapExternC(w, (w: IndentWriter) => {
+        writeDoc(w, doc)
+        w.wl(s"""typedef djinni_record_ref ${typeName};""")
         w.wl
-      }
+
+        w.w(s"""${typeName} ${prefix}_new(""")
+        writeParamListWithResolvedFields(w, resolvedFields)
+        w.wl(");")
+        w.wl
+
+        generateConstsHeader(prefix, resolvedConsts, w)
+
+        for (resolvedField <- resolvedFields) {
+          val fieldName = resolvedField.field.ident.name
+          val fieldTypename = resolvedField.translator.typename
+          writeDoc(w, resolvedField.field.doc)
+          w.wl(s"""${fieldTypename} ${prefix}_get_${fieldName}(${typeName} instance);""")
+          w.wl(s"""void ${prefix}_set_${fieldName}(${typeName} instance, ${fieldTypename} value);""")
+          w.wl
+        }
+      })
     }, (w: IndentWriter) => {
       w.w(s"""${typeName} ${prefix}_new(""")
       writeParamListWithResolvedFields(w, resolvedFields)
@@ -217,7 +224,6 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         }
         w.wl
       }
-
     })
   }
 
@@ -307,6 +313,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface): Unit = {
     val selfCpp = cppMarshal.fqTypename(ident, i)
+    val selfCppClass = cppMarshal.typename(ident, i)
     val typeResolver = new CTypeResolver(ident, spec, cppMarshal)
     val resolvedMethods = i.methods.map(m =>
       new ResolvedMethod(
@@ -327,53 +334,70 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     val proxyClassName = s"${resolveSymbolName(ident)}_proxy_class_ref"
     val methodDefsStructName = s"${resolveSymbolName(ident)}_method_defs"
     writeCFilePair(origin, ident, typeResolver.publicImports.toSeq, typeResolver.privateImports.toSeq)((w: IndentWriter) => {
-      writeDoc(w, doc)
-      w.wl(s"""typedef djinni_interface_ref ${typeName};""")
+      wrapExternC(w, (w: IndentWriter) => {
+        writeDoc(w, doc)
+        w.wl(s"""typedef djinni_interface_ref ${typeName};""")
 
-      if (i.ext.cc) {
-        w.wl(s"""typedef djinni_proxy_class_ref ${proxyClassName};""")
-        w.wl
+        if (i.ext.cc) {
+          w.wl(s"""typedef djinni_proxy_class_ref ${proxyClassName};""")
+          w.wl
 
-        w.wl(s"""typedef struct """)
-        w.bracedEnd(s" ${methodDefsStructName};") {
+          w.wl(s"""typedef struct """)
+          w.bracedEnd(s" ${methodDefsStructName};") {
 
-          if (resolvedMethods.isEmpty) {
-            w.wl("void *reserved[1];")
-          } else {
-            for (resolvedMethod <- resolvedMethods) {
-              w.w(s"""${resolvedMethod.retTypename} (*${resolvedMethod.method.ident.name})(""")
-              writeDelimited(w, "void *" +: resolvedMethod.parameters.map(p => p.translator.typename), ", ")(s => w.w(s))
-              w.wl(");")
+            if (resolvedMethods.isEmpty) {
+              w.wl("void *reserved[1];")
+            } else {
+              for (resolvedMethod <- resolvedMethods) {
+                w.w(s"""${resolvedMethod.retTypename} (*${resolvedMethod.method.ident.name})(""")
+                writeDelimited(w, "void *" +: resolvedMethod.parameters.map(p => p.translator.typename), ", ")(s => w.w(s))
+                w.wl(");")
+              }
             }
           }
-        }
-        w.wl
+          w.wl
 
-        w.wl(s"${proxyClassName} ${prefix}_proxy_class_new(const ${methodDefsStructName} *method_defs, djinni_opaque_deallocator opaque_deallocator);")
-        w.wl
-        w.wl(s"${typeName} ${prefix}_new(${proxyClassName} proxy_class, void *opaque);")
-        w.wl("")
-      } else {
-        w.wl
-      }
-
-      generateConstsHeader(prefix, resolvedConsts, w)
-
-      for (resolvedMethod <- resolvedMethods) {
-        writeDoc(w, resolvedMethod.method.doc)
-        w.w(s"${resolvedMethod.retTypename} ${prefix}_${resolvedMethod.resolvedName}(")
-
-        if (resolvedMethod.method.static) {
-          writeParamList(w, resolvedMethod.parameters.map(p => (p.translator.typename, p.field.ident.name)))
+          w.wl(s"${proxyClassName} ${prefix}_proxy_class_new(const ${methodDefsStructName} *method_defs, djinni_opaque_deallocator opaque_deallocator);")
+          w.wl
+          w.wl(s"${typeName} ${prefix}_new(${proxyClassName} proxy_class, void *opaque);")
+          w.wl("")
         } else {
-          writeParamList(w, (typeName, "instance") +: resolvedMethod.parameters.map(p => (p.translator.typename, p.field.ident.name)))
+          w.wl
         }
 
-        w.wl(");")
+        generateConstsHeader(prefix, resolvedConsts, w)
 
-        w.wl
-      }
+        for (resolvedMethod <- resolvedMethods) {
+          writeDoc(w, resolvedMethod.method.doc)
+          w.w(s"${resolvedMethod.retTypename} ${prefix}_${resolvedMethod.resolvedName}(")
 
+          if (resolvedMethod.method.static) {
+            writeParamList(w, resolvedMethod.parameters.map(p => (p.translator.typename, p.field.ident.name)))
+          } else {
+            writeParamList(w, (typeName, "instance") +: resolvedMethod.parameters.map(p => (p.translator.typename, p.field.ident.name)))
+          }
+
+          w.wl(");")
+
+          w.wl
+        }
+      })
+
+      w.wl
+      writeCppWrapperClass(ident, selfCppClass, w, (w: IndentWriter) => {
+        for (resolvedMethod <- resolvedMethods) {
+            w.w(s"${resolvedMethod.retTypename} ${resolvedMethod.resolvedName}(")
+            writeParamList(w, resolvedMethod.parameters.map(p => (p.translator.typename, p.field.ident.name)))
+            w.w(") ")
+            w.braced {
+              val returnStr = if (resolvedMethod.retTypename != "void") "return " else ""
+              val argsList = resolvedMethod.parameters.map(p => (p.field.ident.name))
+              val fullArgsList = if (resolvedMethod.method.static) argsList else "_ref.get()" +: argsList
+              w.wl(s"${returnStr}${prefix}_${resolvedMethod.resolvedName}(${fullArgsList.mkString(", ")});")
+            }
+            w.wl
+          }
+      })
     }, (w: IndentWriter) => {
       if (i.ext.cc) {
         val proxyClassNameCpp = writeProxyClass(w, ident, methodDefsStructName, resolvedMethods)
