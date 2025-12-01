@@ -184,7 +184,6 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: ast.Record): Unit = {
     val selfCpp = cppMarshal.fqTypename(ident, r)
-    val selfCppClass = cppMarshal.typename(ident, r)
 
     val typeResolver = new CTypeResolver(ident, spec, cppMarshal)
     val prefix = resolveSymbolName(ident.name)
@@ -360,7 +359,6 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
   override def generateInterface(origin: String, ident: Ident, doc: Doc, typeParams: Seq[TypeParam], i: Interface): Unit = {
     val selfCpp = cppMarshal.fqTypename(ident, i)
-    val selfCppClass = cppMarshal.typename(ident, i)
     val typeResolver = new CTypeResolver(ident, spec, cppMarshal)
     val resolvedMethods = i.methods.map(m =>
       new ResolvedMethod(
