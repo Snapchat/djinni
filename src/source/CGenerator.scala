@@ -44,14 +44,19 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
   def privateHeader(t: TypeDecl): String = q(spec.cppIncludePrefix + spec.cppFileIdentStyle(t.ident.name) + "." + spec.cppHeaderExt)
 
-  private def wrapExternC(w: IndentWriter, f: IndentWriter => Unit) = {
+  private def wrapIfCpp(w: IndentWriter, f: IndentWriter => Unit) = {
     w.wl("#ifdef __cplusplus")
-    w.wl("extern \"C\" {")
-    w.wl("#endif // __cplusplus")
     f(w)
-    w.wl("#ifdef __cplusplus")
-    w.wl("} // extern \"C\"")
     w.wl("#endif // __cplusplus")
+  }
+  private def wrapExternC(w: IndentWriter, f: IndentWriter => Unit) = {
+    wrapIfCpp(w, (w: IndentWriter) => {
+      w.wl("extern \"C\" {")
+    })
+    f(w)
+    wrapIfCpp(w, (w: IndentWriter) => {
+      w.wl("} // extern \"C\"")
+    })
   }
 
   private def writeCFile(origin: String, ident: Ident, ext: String, f: IndentWriter => Unit): Unit = {
@@ -143,17 +148,36 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  private def writeCppWrapperClass(ident: Ident, cppClassName: String, w: IndentWriter, body: IndentWriter => Unit): Unit = {
+  private def writeCppWrapperClass(ident: Ident, cppClassName: String, w: IndentWriter, methods: IndentWriter => Unit): Unit = {
     val typeName = resolveRefSymbolTypeName(ident)
-    wrapNamespace(w, spec.cppNamespace + "::c_wrappers", (w: IndentWriter) => {
-        w.w(s"template <template <typename> class Ref> class ${cppClassName}").bracedSemi {
-          w.wlOutdent("public:")
-          body(w)
-          w.wl
-          w.wlOutdent("private:")
-          w.wl(s"Ref<${typeName}> _ref;")
-        }
-      })
+    wrapIfCpp(w, (w: IndentWriter) => {
+      wrapNamespace(w, spec.cppNamespace + "::c_wrappers", (w: IndentWriter) => {
+          w.w(s"template <template <typename> class Ref> class ${cppClassName}").bracedSemi {
+            w.wlOutdent("public:")
+            w.wl(s"using RefType = Ref<${typeName}>;")
+            w.wl
+            w.wl(s"explicit ${cppClassName}(const RefType& ref) : _ref(ref) {}")
+            w.wl
+            w.wl(s"${cppClassName}(const ${cppClassName}&) = default;")
+            w.wl
+            w.wl(s"${cppClassName}(${cppClassName}&&) = default;")
+            w.wl
+            w.wl(s"${cppClassName}& operator=(const ${cppClassName}&) = default;")
+            w.wl
+            w.wl(s"${cppClassName}& operator=(${cppClassName}&&) = default;")
+            w.wl
+            w.wl(s"operator const RefType&() const { return _ref; }")
+            w.wl
+            w.wl(s"operator ${typeName}() const { return _ref.get(); }")
+            w.wl
+            w.wl(s"${typeName} _djinni_ref() const { return _ref.get(); }")
+            w.wl
+            methods(w)
+            w.wlOutdent("private:")
+            w.wl(s"RefType _ref;")
+          }
+        })
+    })
   }
 
   override def generateRecord(origin: String, ident: Ident, doc: Doc, params: Seq[TypeParam], r: ast.Record): Unit = {
@@ -197,12 +221,12 @@ class CGenerator(spec: Spec) extends Generator(spec) {
           val fieldTypename = resolvedField.translator.typename
           w.w(s"${fieldTypename} ${fieldName}() const")
           w.braced {
-            w.wl(s"return ${prefix}_get_${fieldName}(_ref.get);")
+            w.wl(s"return ${prefix}_get_${fieldName}(_ref.get());")
           }
           w.wl
           w.w(s"${fieldTypename} ${fieldName}(${fieldTypename} value)")
           w.braced {
-            w.wl(s"${prefix}_set_${fieldName}(_ref.get, value);")
+            w.wl(s"${prefix}_set_${fieldName}(_ref.get(), value);")
           }
           w.wl
         }
@@ -406,14 +430,19 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         w.wl
         writeCppWrapperClass(ident, selfCppClass, w, (w: IndentWriter) => {
           for (resolvedMethod <- resolvedMethods) {
+            if (resolvedMethod.method.static) {
+              w.w("static ")
+            }
             w.w(s"${resolvedMethod.retTypename} ${resolvedMethod.resolvedName}(")
             writeParamList(w, resolvedMethod.parameters.map(p => (p.translator.typename, p.field.ident.name)))
             w.w(") ")
             w.braced {
-              val returnStr = if (resolvedMethod.retTypename != "void") "return " else ""
               val argsList = resolvedMethod.parameters.map(p => (p.field.ident.name))
               val fullArgsList = if (resolvedMethod.method.static) argsList else "_ref.get()" +: argsList
-              w.wl(s"${returnStr}${prefix}_${resolvedMethod.resolvedName}(${fullArgsList.mkString(", ")});")
+              if (resolvedMethod.retTypename != "void") {
+                w.w("return ")
+              }
+              w.wl(s"${prefix}_${resolvedMethod.resolvedName}(${fullArgsList.mkString(", ")});")
             }
             w.wl
             }
