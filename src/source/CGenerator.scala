@@ -155,25 +155,24 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     val cppClassName = ident.name
     val cppNamespace = spec.cWrapperCppNamespace.getOrElse(spec.cppNamespace + "::c_wrappers")
     wrapIfCpp(w, (w: IndentWriter) => {
+      w.wl("#include <utility>")
       wrapNamespace(w, cppNamespace, (w: IndentWriter) => {
           w.w(s"template <template <typename> class Ref> class ${cppClassName}").bracedSemi {
             w.wlOutdent("public:")
             w.wl(s"using RefType = Ref<${typeName}>;")
             w.wl
-            w.wl(s"explicit ${cppClassName}(const RefType& ref) : _ref(ref) {}")
-            w.wl
+            w.wl(s"${cppClassName}(const RefType& ref) : _ref(ref) {}")
+            w.wl(s"${cppClassName}(const ${typeName}& ref) : _ref(ref) {}")
+            w.wl(s"${cppClassName}(${typeName}&& ref) : _ref(std::move(ref)) {}")
             w.wl(s"${cppClassName}(const ${cppClassName}&) = default;")
-            w.wl
             w.wl(s"${cppClassName}(${cppClassName}&&) = default;")
-            w.wl
             w.wl(s"${cppClassName}& operator=(const ${cppClassName}&) = default;")
-            w.wl
             w.wl(s"${cppClassName}& operator=(${cppClassName}&&) = default;")
+            w.wl(s"${cppClassName}& operator=(const ${typeName}& ref) { _ref = ref; return *this; }")
+            w.wl(s"${cppClassName}& operator=(${typeName}&& ref) { _ref = std::move(ref); return *this; }")
             w.wl
             w.wl(s"operator const RefType&() const { return _ref; }")
-            w.wl
             w.wl(s"operator ${typeName}() const { return _ref.get(); }")
-            w.wl
             w.wl(s"${typeName} _djinni_ref() const { return _ref.get(); }")
             w.wl
             methods(w)
@@ -228,9 +227,10 @@ class CGenerator(spec: Spec) extends Generator(spec) {
               w.wl(s"return ${prefix}_get_${fieldName}(_ref.get());")
             }
             w.wl
-            w.w(s"${fieldTypename} ${fieldName}(${fieldTypename} value)")
+            w.w(s"${ident.name}& ${fieldName}(${fieldTypename} value)")
             w.braced {
               w.wl(s"${prefix}_set_${fieldName}(_ref.get(), value);")
+              w.wl("return *this;")
             }
             w.wl
           }
