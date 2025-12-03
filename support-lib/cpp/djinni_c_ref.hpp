@@ -41,7 +41,7 @@ public:
     return *this;
   }
 
-  T get() const { return _ref; }
+  const T& get() const { return _ref; }
 
 private:
   T _ref;
