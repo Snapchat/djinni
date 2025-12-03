@@ -249,6 +249,15 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       if (spec.cWrapperCppNamespace.isDefined) {
         w.wl
         writeCppWrapperClass(ident, w, (w: IndentWriter) => {
+          w.w(s"static ${ident.name} make(")
+          writeParamListWithResolvedFields(w, resolvedFields)
+          w.w(")")
+          w.braced {
+            w.w(s"return ${prefix}_new(")
+            w.w(resolvedFields.map(p => p.field.ident.name).mkString(", "))
+            w.wl(");")
+          }
+          w.wl
           for (resolvedField <- resolvedFields) {
             val fieldName = resolvedField.field.ident.name
             val fieldTypename = resolvedField.translator.typename
