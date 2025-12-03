@@ -157,27 +157,57 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     wrapIfCpp(w, (w: IndentWriter) => {
       w.wl("#include <utility>")
       wrapNamespace(w, cppNamespace, (w: IndentWriter) => {
-          w.w(s"template <template <typename> class Ref> class ${cppClassName}").bracedSemi {
+          w.w(s"class ${cppClassName}").bracedSemi {
             w.wlOutdent("public:")
-            w.wl(s"using RefType = Ref<${typeName}>;")
             w.wl
-            w.wl(s"${cppClassName}(const RefType& ref) : _ref(ref) {}")
-            w.wl(s"${cppClassName}(const ${typeName}& ref) : _ref(ref) {}")
-            w.wl(s"${cppClassName}(${typeName}&& ref) : _ref(std::move(ref)) {}")
-            w.wl(s"${cppClassName}(const ${cppClassName}&) = default;")
-            w.wl(s"${cppClassName}(${cppClassName}&&) = default;")
-            w.wl(s"${cppClassName}& operator=(const ${cppClassName}&) = default;")
-            w.wl(s"${cppClassName}& operator=(${cppClassName}&&) = default;")
-            w.wl(s"${cppClassName}& operator=(const ${typeName}& ref) { _ref = ref; return *this; }")
-            w.wl(s"${cppClassName}& operator=(${typeName}&& ref) { _ref = std::move(ref); return *this; }")
+            w.wl(s"${cppClassName}(const ${typeName}& ref) : _ref(ref) { djinni_ref_retain(_ref); }")
+            w.wl(s"${cppClassName}(${typeName}&& ref) noexcept : _ref(std::move(ref)) {}")
+            w.wl(s"${cppClassName}(const ${cppClassName}& other) : _ref(other._ref) { djinni_ref_retain(_ref); }")
+            w.wl(s"${cppClassName}(${cppClassName}&& other) : _ref(std::move(other._ref)) { other._ref = nullptr; }")
+            w.wl(s"~${cppClassName}() { djinni_ref_release(_ref); }")
+
+            val assignOps =
+              s"""${cppClassName}& operator=(const ${cppClassName}& other) {
+                |  if (&other != this) {
+                |      auto old = _ref;
+                |      _ref = other._ref;
+                |      djinni_ref_retain(_ref);
+                |      djinni_ref_release(old);
+                |   }
+                |   return *this;
+                |}
+                |${cppClassName}& operator=(${cppClassName}&& other) noexcept {
+                |  if (&other != this) {
+                |    auto old = _ref;
+                |    _ref = other._ref;
+                |    other._ref = nullptr;
+                |
+                |    djinni_ref_release(old);
+                |  }
+                |  return *this;
+                |}
+                |${cppClassName}& operator=(${typeName}&& ref) {
+                |  auto old = _ref;
+                |  _ref = ref;
+                |  djinni_ref_release(old);
+                |  return *this;
+                |}
+                |${cppClassName}& operator=(const ${typeName}& ref) {
+                |  auto old = _ref;
+                |  _ref = ref;
+                |  djinni_ref_retain(ref);
+                |  djinni_ref_release(old);
+                |  return *this;
+                |}""".stripMargin
+            assignOps.split("\n").toSeq.foreach(line => w.wl(line))
+
             w.wl
-            w.wl(s"operator const RefType&() const { return _ref; }")
-            w.wl(s"operator ${typeName}() const { return _ref.get(); }")
-            w.wl(s"${typeName} _djinni_ref() const { return _ref.get(); }")
+            w.wl(s"operator ${typeName}() const { return _ref; }")
+            w.wl(s"${typeName} _djinni_ref() const { return _ref; }")
             w.wl
             methods(w)
             w.wlOutdent("private:")
-            w.wl(s"RefType _ref;")
+            w.wl(s"${typeName} _ref;")
           }
         })
     })
@@ -224,12 +254,12 @@ class CGenerator(spec: Spec) extends Generator(spec) {
             val fieldTypename = resolvedField.translator.typename
             w.w(s"${fieldTypename} ${fieldName}() const")
             w.braced {
-              w.wl(s"return ${prefix}_get_${fieldName}(_ref.get());")
+              w.wl(s"return ${prefix}_get_${fieldName}(_ref);")
             }
             w.wl
             w.w(s"${ident.name}& ${fieldName}(${fieldTypename} value)")
             w.braced {
-              w.wl(s"${prefix}_set_${fieldName}(_ref.get(), value);")
+              w.wl(s"${prefix}_set_${fieldName}(_ref, value);")
               w.wl("return *this;")
             }
             w.wl
@@ -442,7 +472,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
             w.w(") ")
             w.braced {
               val argsList = resolvedMethod.parameters.map(p => (p.field.ident.name))
-              val fullArgsList = if (resolvedMethod.method.static) argsList else "_ref.get()" +: argsList
+              val fullArgsList = if (resolvedMethod.method.static) argsList else "_ref" +: argsList
               if (resolvedMethod.retTypename != "void") {
                 w.w("return ")
               }
