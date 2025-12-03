@@ -202,8 +202,8 @@ class CGenerator(spec: Spec) extends Generator(spec) {
             assignOps.split("\n").toSeq.foreach(line => w.wl(line))
 
             w.wl
-            w.wl(s"operator ${typeName}() const { return _ref; }")
-            w.wl(s"${typeName} _djinni_ref() const { return _ref; }")
+            w.wl(s"operator const ${typeName}&() const { return _ref; }")
+            w.wl(s"const ${typeName}& _djinni_ref() const { return _ref; }")
             w.wl
             methods(w)
             w.wlOutdent("private:")
