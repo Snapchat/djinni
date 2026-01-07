@@ -14,6 +14,26 @@ bazel_dep(name = "rules_java", version = "8.14.0")
 bazel_dep(name = "rules_proto", version = "7.0.2")
 bazel_dep(name = "protobuf", version = "29.0", repo_name = "com_google_protobuf")
 
+# Android support
+bazel_dep(name = "rules_android", version = "0.6.0")
+bazel_dep(name = "rules_android_ndk", version = "0.1.2")
+bazel_dep(name = "rules_python", version = "0.40.0")  # Required by rules_android_ndk
+
+# Configure Android SDK via Bzlmod extension
+android_sdk_repository_extension = use_extension("@rules_android//rules/android_sdk_repository:rule.bzl", "android_sdk_repository_extension")
+use_repo(android_sdk_repository_extension, "androidsdk")
+
+# Configure Android NDK via Bzlmod extension
+android_ndk_repository_extension = use_extension("@rules_android_ndk//:extension.bzl", "android_ndk_repository_extension")
+use_repo(android_ndk_repository_extension, "androidndk")
+
+# Register Android toolchains
+register_toolchains(
+    "@androidsdk//:sdk-toolchain",
+    "@androidsdk//:all",
+    "@androidndk//:all",
+)
+
 # Scala support - rules_scala 7.1.5 with Bzlmod (officially supports Bazel 8.x)
 bazel_dep(name = "rules_scala", version = "7.1.5")
 bazel_dep(name = "rules_jvm_external", version = "6.4")

@@ -14,6 +14,7 @@
 | **C++ Compilation** | ✅ **WORKING** | No LC_UUID errors with apple_support@1.23.1 |
 | **Java Tests** | ✅ **PASSING** | All tests pass (1/1) |
 | **ObjC Tests** | ✅ **PASSING** | All 88 tests pass |
+| **Android Build** | ✅ **WORKING** | Using rules_android_ndk@0.1.2 |
 | **Bzlmod** | ✅ **PURE MODE** | 100% Bzlmod, minimal WORKSPACE |
 
 ### Test Results
@@ -32,6 +33,14 @@ bazel test //test-suite:djinni-java-tests
 bazel test //test-suite:djinni-objc-tests
 # Result: 88 tests, 0 failures ✅
 # Note: Reports "FAILED in 8.9s" due to Bazel bug (see Known Issues below)
+
+# External Consumer Test
+cd external-test && bazel run @snap_djinni//src:djinni -- --help
+# Result: BUILD COMPLETED SUCCESSFULLY ✅
+
+# Android Example
+bazel build //examples:android-app --android_platforms=//:arm64-v8a
+# Result: BUILD COMPLETED SUCCESSFULLY ✅ (517KB APK generated)
 ```
 
 ### ⚠️ Known Issue: ObjC Test Exit Code
@@ -141,6 +150,60 @@ scala_deps.scala()
 bazel build //src:djinni  # ✅ Works!
 bazel run //src:djinni -- --help  # ✅ Works!
 ```
+
+## 🤖 Android Build Working!
+
+**Status:** ✅ **FULLY WORKING** on Bazel 8.5.0
+
+**Key Discovery:** Android NDK support in Bazel 8 requires a separate [`rules_android_ndk`](https://github.com/bazelbuild/rules_android_ndk) repository!
+
+**Configuration:**
+```python
+# MODULE.bazel
+bazel_dep(name = "rules_android", version = "0.6.0")
+bazel_dep(name = "rules_android_ndk", version = "0.1.2")  # ← Separate NDK rules!
+bazel_dep(name = "rules_python", version = "0.40.0")  # Required by NDK
+
+# Configure Android SDK
+android_sdk_repository_extension = use_extension(
+    "@rules_android//rules/android_sdk_repository:rule.bzl",
+    "android_sdk_repository_extension"
+)
+use_repo(android_sdk_repository_extension, "androidsdk")
+
+# Configure Android NDK
+android_ndk_repository_extension = use_extension(
+    "@rules_android_ndk//:extension.bzl",
+    "android_ndk_repository_extension"
+)
+use_repo(android_ndk_repository_extension, "androidndk")
+
+# Register toolchains
+register_toolchains(
+    "@androidsdk//:sdk-toolchain",
+    "@androidsdk//:all",
+    "@androidndk//:all",
+)
+```
+
+**Platform Definitions (BUILD file in repo root):**
+```python
+platform(
+    name = "arm64-v8a",
+    constraint_values = [
+        "@platforms//cpu:arm64",
+        "@platforms//os:android",
+    ],
+)
+```
+
+**Build Command:**
+```bash
+bazel build //examples:android-app --android_platforms=//:arm64-v8a  # ✅ Works!
+# Output: 517KB APK at bazel-bin/examples/android-app.apk
+```
+
+**Important:** Removed `-Wl,-random_uuid` linker flag from `.bazelrc` as it's macOS-specific and breaks Android's `ld.lld` linker.
 
 ## 📊 Performance
 

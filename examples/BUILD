@@ -8,7 +8,7 @@ cc_library(
     srcs = glob([
         "generated-src/cpp/*.cpp",
         "handwritten-src/cpp/*.cpp",
-    ]),
+    ], allow_empty = True),
     hdrs = glob([
         "generated-src/cpp/*.hpp",
         "handwritten-src/cpp/*.hpp",

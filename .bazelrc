@@ -13,16 +13,11 @@ build --define=android_incremental_dexing_tool=d8_dexbuilder
 # Note: --nouse_workers_with_dexbuilder removed in Bazel 7.x
 
 # Bzlmod Configuration (Bazel 8.x)  
-# Pure Bzlmod mode for tests (C++, Java, ObjC all work)
-# Scala generator uses separate Bazel 7.4.1 environment if needed
+# Pure Bzlmod mode - WORKSPACE not needed
+common --enable_bzlmod=true
 
-# Apple toolchain configuration for ObjC/Swift (Bazel 7.x + Bzlmod)
-# Using git override of apple_support which should have LC_UUID fixes
+# Apple toolchain configuration for ObjC/Swift (Bazel 8.x + Bzlmod)
 build --incompatible_enable_apple_toolchain_resolution
-
-# Fix for macOS Sequoia "missing LC_UUID" error - force UUID in all binaries
-build --linkopt=-Wl,-random_uuid
-build --host_linkopt=-Wl,-random_uuid
 
 # Performance and caching
 build --experimental_repository_cache_hardlinks
