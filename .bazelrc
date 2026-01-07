@@ -1,1 +1,32 @@
-build --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 --incompatible_java_common_parameters=false --define=android_dexmerger_tool=d8_dexmerger --define=android_incremental_dexing_tool=d8_dexbuilder --nouse_workers_with_dexbuilder
+###############################################################################
+# Djinni Build Configuration
+###############################################################################
+
+# C++ Standard
+build --cxxopt=-std=c++17
+build --host_cxxopt=-std=c++17
+
+# Android Configuration
+build --incompatible_java_common_parameters=false
+build --define=android_dexmerger_tool=d8_dexmerger
+build --define=android_incremental_dexing_tool=d8_dexbuilder
+# Note: --nouse_workers_with_dexbuilder removed in Bazel 7.x
+
+# Bzlmod Configuration (Bazel 8.x)  
+# Pure Bzlmod mode for tests (C++, Java, ObjC all work)
+# Scala generator uses separate Bazel 7.4.1 environment if needed
+
+# Apple toolchain configuration for ObjC/Swift (Bazel 7.x + Bzlmod)
+# Using git override of apple_support which should have LC_UUID fixes
+build --incompatible_enable_apple_toolchain_resolution
+
+# Fix for macOS Sequoia "missing LC_UUID" error - force UUID in all binaries
+build --linkopt=-Wl,-random_uuid
+build --host_linkopt=-Wl,-random_uuid
+
+# Performance and caching
+build --experimental_repository_cache_hardlinks
+build --experimental_guard_against_concurrent_changes
+
+# Enable build without the bytes (for faster remote builds)
+build --remote_download_outputs=minimal

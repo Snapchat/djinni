@@ -40,7 +40,7 @@ cc_library(
 
 objc_library(
     name = "djinni-support-objc",
-    srcs = glob(["objc/*.mm", "objc/*.cpp"]),
+    srcs = glob(["objc/*.mm", "objc/*.cpp"], allow_empty = True),
     hdrs = glob(["objc/*.h", "objc/*.hpp"]),
     copts = [
         "-ObjC++",
@@ -116,4 +116,21 @@ cc_library(
     ],
     tags = ["swift_module=DjinniSupportCxx"],
     visibility = ["//visibility:public"],
+)
+
+# cc_library version of djinni-support-objc to avoid apple_support
+cc_library(
+    name = "djinni-support-objc-cc",
+    srcs = glob(["objc/*.mm", "objc/*.cpp"], allow_empty = True),
+    hdrs = glob(["objc/*.h", "objc/*.hpp"]),
+    copts = [
+        "-x objective-c++",
+        "-std=c++17",
+        "-fobjc-arc",
+    ],
+    includes = ["objc"],
+    defines = ["DATAREF_OBJC=1"],
+    linkopts = ["-framework Foundation"],
+    visibility = ["//visibility:public"],
+    deps = ["//support-lib:djinni-support-common"],
 )

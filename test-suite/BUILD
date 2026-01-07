@@ -121,7 +121,7 @@ objc_library(
     srcs = glob([
         "generated-src/objc/**/*.m",
         "handwritten-src/objc/**/*.m",
-    ]),
+    ], allow_empty = True),
     hdrs = glob([
         "generated-src/objc/**/*.h",
         "handwritten-src/objc/**/*.h",
