@@ -414,6 +414,47 @@ bazel build //example-app-objc:DjinniObjcExample
 
 This ensures CI passes when all tests actually succeed, while still catching real test failures.
 
+### CI Cache Configuration
+
+**Important:** Bazel cache paths differ between macOS and Linux.
+
+**Cross-platform cache configuration:**
+```yaml
+- name: Get Bazel cache directory
+  id: bazel-cache-dir
+  run: |
+    if [[ "$RUNNER_OS" == "macOS" ]]; then
+      echo "dir=/private/var/tmp/_bazel_$USER" >> $GITHUB_OUTPUT
+    else
+      echo "dir=~/.cache/bazel" >> $GITHUB_OUTPUT
+    fi
+
+- name: Cache bazel build results
+  uses: actions/cache@v3
+  with:
+    path: ${{ steps.bazel-cache-dir.outputs.dir }}
+    key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', 'MODULE.bazel', 'MODULE.bazel.lock') }}
+    restore-keys: |
+      ${{ runner.os }}-bazel-
+```
+
+**Why this approach:**
+- ✅ Works on both macOS and Linux runners
+- ✅ Dynamically detects the correct Bazel cache location
+- ✅ Uses GitHub Actions runner user (`runner` in CI, your username locally)
+- ✅ Includes OS in cache key so macOS and Linux caches don't conflict
+
+**Cache paths by OS:**
+- **macOS**: `/private/var/tmp/_bazel_runner/` (contains output_base and repository cache)
+- **Linux**: `~/.cache/bazel/` (standard XDG cache location)
+
+**Cache key strategy:**
+- Invalidates when Bazel version or dependencies change
+- Shared across all branches with same dependencies
+- Separate caches per OS to avoid conflicts
+
+This dramatically improves CI build times by caching compiled dependencies like protobuf!
+
 ## 🎯 Next Steps
 
 1. **✅ CI/CD Updated:**

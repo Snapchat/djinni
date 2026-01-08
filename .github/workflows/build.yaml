@@ -14,15 +14,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Get Bazel cache directory
+        id: bazel-cache-dir
+        run: |
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            echo "dir=/private/var/tmp/_bazel_$USER" >> $GITHUB_OUTPUT
+          else
+            echo "dir=~/.cache/bazel" >> $GITHUB_OUTPUT
+          fi
+      
       - name: Cache bazel build results
         uses: actions/cache@v3
-        env:
-          cache-name: bazel-cache
         with:
-          path: ~/.cache/bazel
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.ref }}
+          path: ${{ steps.bazel-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', 'MODULE.bazel', 'MODULE.bazel.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-main
+            ${{ runner.os }}-bazel-
 
       - name: Build
         run: bazel build //src:djinni
