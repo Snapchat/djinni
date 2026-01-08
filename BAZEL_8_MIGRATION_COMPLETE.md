@@ -187,7 +187,39 @@ bazel build //src:djinni  # ✅ Works!
 bazel run //src:djinni -- --help  # ✅ Works!
 ```
 
-## 🤖 Android Build Working!
+## ✅ External Consumer Test Working!
+
+**Status:** ✅ **FULLY WORKING** with Bazel 8.5.0 and Bzlmod
+
+The external-test workspace successfully consumes djinni as a Bzlmod dependency using `local_path_override`.
+
+**Configuration:**
+
+```python
+# external-test/MODULE.bazel
+module(name = "djinni_external_test", version = "1.0.0")
+
+# Use local_path_override to test against parent djinni workspace
+local_path_override(
+    module_name = "snap_djinni",
+    path = "..",
+)
+
+bazel_dep(name = "snap_djinni", version = "")
+```
+
+**Test Command:**
+```bash
+cd external-test
+bazel run @snap_djinni//src:djinni -- --help  # ✅ Works!
+```
+
+**Note:** The module name is `snap_djinni` (from `MODULE.bazel`), not `@djinni` (the old WORKSPACE name).
+
+**Files Updated:**
+- `.github/workflows/build.yaml`: Changed from `@djinni` to `@snap_djinni`
+
+## 🎉 Android Build Working!
 
 **Status:** ✅ **FULLY WORKING** on Bazel 8.5.0
 
