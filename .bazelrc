@@ -7,8 +7,9 @@ build --cxxopt=-std=c++17
 build --host_cxxopt=-std=c++17
 
 # C Standard (required for protobuf utf8_range.c and other C code)
-build --conlyopt=-std=c99
-build --host_conlyopt=-std=c99
+# Use --copt which applies to both C and C++ (C++ will override with --cxxopt)
+build --copt=-std=c99
+build --host_copt=-std=c99
 
 # Android Configuration
 build --incompatible_java_common_parameters=false
