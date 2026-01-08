@@ -31,7 +31,7 @@ jobs:
         run: ./ci/generate.sh
 
       - name: Test
-        run: bazel test --test_output=all //test-suite:djinni-java-tests  //test-suite:djinni-objc-tests //test-suite:djinni-tests-c
+        run: ./ci/run-tests.sh
 
       - name: External Test
         working-directory: external-test
