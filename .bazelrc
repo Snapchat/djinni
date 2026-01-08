@@ -3,11 +3,10 @@
 ###############################################################################
 
 # C Standard (required for protobuf utf8_range.c and other C code)
-# Force c99 for all .c files compilation using multiple approaches
+# NOTE: Global flags don't reach all toolchains, so protobuf is patched directly
 common --copt=-std=c99
-common --conlyopt=-std=c99
 
-# C++ Standard - overrides c99 for C++ files  
+# C++ Standard
 common --cxxopt=-std=c++17
 
 # Android Configuration
