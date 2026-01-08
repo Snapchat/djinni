@@ -7,6 +7,7 @@ cc_library(
     srcs = glob(["cpp/*.cpp"]),
     hdrs = glob(["*.hpp", "cpp/*.hpp", "cpp/*.h"]),
     includes = ["cpp"],
+    copts = ["-fexceptions"],  # Required for Future.hpp which uses try/catch
     visibility = ["//visibility:public"],
 )
 

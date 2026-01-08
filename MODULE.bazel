@@ -85,18 +85,20 @@ maven.install(
 )
 use_repo(maven, "maven_djinni")
 
-# Non-BCR dependencies that need to be added via http_archive
-# These will be handled via repository rules in a separate file
+# Non-BCR dependencies
 bazel_dep(name = "rules_foreign_cc", version = "0.13.0")
 
-# Non-module dependencies (not yet in BCR)
-# Note: rules_scala and some other dependencies have complex setup requirements
-# that don't work well with Bzlmod yet. These are loaded via WORKSPACE.
-# The WORKSPACE file provides the necessary configuration for these legacy dependencies.
+# Emscripten for WASM support - now in BCR!
+bazel_dep(name = "emsdk", version = "4.0.17")
 
+# Other non-BCR dependencies (Swift Protobuf)
 non_module_deps = use_extension("//bzl:extensions.bzl", "non_module_deps")
 use_repo(
     non_module_deps,
-    "emsdk",
     "apple_swift_protobuf",
+)
+
+# Register Emscripten toolchain for WASM
+register_toolchains(
+    "@emsdk//emscripten_toolchain:all",
 )

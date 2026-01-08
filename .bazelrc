@@ -13,7 +13,7 @@ build --define=android_incremental_dexing_tool=d8_dexbuilder
 # Note: --nouse_workers_with_dexbuilder removed in Bazel 7.x
 
 # Bzlmod Configuration (Bazel 8.x)  
-# Pure Bzlmod mode - WORKSPACE not needed
+# Pure Bzlmod mode
 common --enable_bzlmod=true
 
 # Apple toolchain configuration for ObjC/Swift (Bazel 8.x + Bzlmod)

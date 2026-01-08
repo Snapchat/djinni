@@ -15,6 +15,7 @@
 | **Java Tests** | ✅ **PASSING** | All tests pass (1/1) |
 | **ObjC Tests** | ✅ **PASSING** | All 88 tests pass |
 | **Android Build** | ✅ **WORKING** | Using rules_android_ndk@0.1.2 |
+| **WASM Build** | ✅ **WORKING** | Using emsdk@4.0.17 from BCR |
 | **Bzlmod** | ✅ **PURE MODE** | 100% Bzlmod, minimal WORKSPACE |
 
 ### Test Results
@@ -204,6 +205,58 @@ bazel build //examples:android-app --android_platforms=//:arm64-v8a  # ✅ Works
 ```
 
 **Important:** Removed `-Wl,-random_uuid` linker flag from `.bazelrc` as it's macOS-specific and breaks Android's `ld.lld` linker.
+
+## 🌐 WASM Build Working!
+
+**Status:** ✅ **FULLY WORKING** on Bazel 8.5.0
+
+**Key Discovery:** emsdk 4.0.17 is now available in the [Bazel Central Registry](https://registry.bazel.build/modules/emsdk)!
+
+**Configuration:**
+```python
+# MODULE.bazel
+bazel_dep(name = "emsdk", version = "4.0.17")  # ← Now in BCR!
+
+# Register Emscripten toolchain
+register_toolchains(
+    "@emsdk//emscripten_toolchain:all",
+)
+```
+
+**Code Changes for Emscripten 4.x Compatibility:**
+
+1. **Enable exceptions in support-lib/BUILD:**
+```python
+cc_library(
+    name = "djinni-support-common",
+    copts = ["-fexceptions"],  # Required for Future.hpp
+    ...
+)
+```
+
+2. **Fix string conversion in support-lib/wasm/djinni_wasm.cpp:**
+```cpp
+// Backward compatibility: readLatin1String removed in Emscripten 4.x
+var stringConverter = (typeof readLatin1String !== 'undefined') ? readLatin1String : UTF8ToString;
+```
+
+3. **Export heap types in BUILD files:**
+```python
+EMSCRIPTEN_LINKOPTS = [
+    "--bind",
+    "-s MALLOC=emmalloc",
+    "-s MODULARIZE=1",
+    "-s WASM_BIGINT=1",
+    "-s EXPORTED_RUNTIME_METHODS=HEAPU8,HEAP8,HEAPU16,HEAP16,HEAPU32,HEAP32,HEAPF32,HEAPF64",
+]
+```
+
+**Test Command:**
+```bash
+bazel build //test-suite:wasm  # ✅ Builds successfully
+bazel run //test-suite:server-ts  # ✅ Runs test server
+# Open browser to http://localhost:8000 - all tests pass!
+```
 
 ## 📊 Performance
 

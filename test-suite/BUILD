@@ -193,6 +193,7 @@ EMSCRIPTEN_LINKOPTS = [
     "-s MALLOC=emmalloc",  # Switch to using the much smaller implementation
     "-s MODULARIZE=1",  # Allows us to manually invoke the initialization of wasm
     "-s WASM_BIGINT=1",  # We need to pass int64_t
+    "-s EXPORTED_RUNTIME_METHODS=HEAPU8,HEAP8,HEAPU16,HEAP16,HEAPU32,HEAP32,HEAPF32,HEAPF64",  # Export heap views for memory access (required in Emscripten 4.x)
 ]
 
 cc_binary(

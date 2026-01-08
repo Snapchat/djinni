@@ -13,17 +13,6 @@ _scala_toolchain_config_tag = tag_class(
 def _non_module_deps_impl(module_ctx):
     """Module extension to load non-BCR dependencies"""
     
-    # Note: Scala and Kotlin are now loaded via WORKSPACE due to complexity
-    
-    # Emscripten for WebAssembly support
-    emsdk_version = "3.1.68"
-    http_archive(
-        name = "emsdk",
-        strip_prefix = "emsdk-{}/bazel".format(emsdk_version),
-        url = "https://github.com/emscripten-core/emsdk/archive/{}.tar.gz".format(emsdk_version),
-        sha256 = "97f21c32c0c1eecb963d19d1cacf58538086ce28eb28274993ab21d3673b5c29",
-    )
-    
     # Swift Protobuf
     swiftprotobuf_version = "1.28.2"
     http_archive(
@@ -47,7 +36,6 @@ swift_library(
     return module_ctx.extension_metadata(
         reproducible = True,
         root_module_direct_deps = [
-            "emsdk",
             "apple_swift_protobuf",
         ],
         root_module_direct_dev_deps = [],
