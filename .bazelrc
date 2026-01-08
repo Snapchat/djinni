@@ -3,10 +3,11 @@
 ###############################################################################
 
 # C Standard (required for protobuf utf8_range.c and other C code)
-# Use 'common' to apply to all configurations (build, exec, host)
-common --copt=-std=gnu99
+# Force c99 for all .c files compilation
+common --copt=-std=c99
+common --conlyopt=-std=c99
 
-# C++ Standard - overrides gnu99 for C++ files  
+# C++ Standard - overrides c99 for C++ files  
 common --cxxopt=-std=c++17
 
 # Android Configuration

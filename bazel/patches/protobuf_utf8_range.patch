@@ -1,0 +1,11 @@
+--- a/third_party/utf8_range/BUILD.bazel
++++ b/third_party/utf8_range/BUILD.bazel
+@@ -39,6 +39,7 @@ cc_library(
+     name = "utf8_range",
+     srcs = ["utf8_range.c"],
+     hdrs = ["utf8_range.h"],
++    copts = ["-std=c99"],
+     visibility = ["//:__subpackages__"],
+ )
+ 
+
