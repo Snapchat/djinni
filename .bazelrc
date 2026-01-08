@@ -3,7 +3,7 @@
 ###############################################################################
 
 # C Standard (required for protobuf utf8_range.c and other C code)
-# Force c99 for all .c files compilation
+# Force c99 for all .c files compilation using multiple approaches
 common --copt=-std=c99
 common --conlyopt=-std=c99
 
