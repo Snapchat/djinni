@@ -227,7 +227,7 @@ sh_binary(
         "djinni/vendor/third-party/proto/ts/*.ts",
         "node_modules/**",
         "generated-src/ts/*.ts",
-    ]) + [":wasm"],
+    ], allow_empty = True) + [":wasm"],
     deps = ["//support-lib:djinni-support-ts"],
 )
 

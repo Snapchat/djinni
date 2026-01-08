@@ -113,11 +113,23 @@ bazel_dep(name = "googletest", version = "1.14.0.bcr.1")
 ### 3. BUILD Files Fixed
 
 **test-suite/BUILD:**
-- Fixed glob patterns to use `allow_empty = True`
-- Separated `.m` and `.mm` files between `djinni-tests-objc` and `djinni-tests-objcxx`
+- Fixed glob patterns to use `allow_empty = True` for generated files and external dependencies:
+  - `.mm` files in `djinni-tests-objc` 
+  - `.cpp` files (ensuring no conflicts with objcxx target)
+  - `node_modules/**` for TypeScript/WASM tests (not checked into repo)
+- Separated `.m` and `.mm` files between `djinni-tests-objc` and `djinni-tests-objcxx` to avoid duplicate symbol errors
+- Added `-s EXPORTED_RUNTIME_METHODS=[...]` to `EMSCRIPTEN_LINKOPTS` for WASM heap access
 
 **support-lib/BUILD:**
-- Added `allow_empty = True` to glob patterns
+- Added `allow_empty = True` to glob patterns for ObjC/C++ source files
+- Added `copts = ["-fexceptions"]` to `djinni-support-common` for WASM Future.hpp support
+
+**examples/BUILD:**
+- Modified `textsort-common` glob to `allow_empty = True` for generated C++ files
+- Added `-s EXPORTED_RUNTIME_METHODS=[...]` to `EMSCRIPTEN_LINKOPTS`
+
+**perftest/BUILD:**
+- Added `-s EXPORTED_RUNTIME_METHODS=[...]` to `EMSCRIPTEN_LINKOPTS`
 
 ### 4. Configuration Updates
 
