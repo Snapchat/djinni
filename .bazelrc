@@ -2,14 +2,14 @@
 # Djinni Build Configuration
 ###############################################################################
 
-# C++ Standard
-build --cxxopt=-std=c++17
-build --host_cxxopt=-std=c++17
-
 # C Standard (required for protobuf utf8_range.c and other C code)
-# Use --copt which applies to both C and C++ (C++ will override with --cxxopt)
+# Apply -std=c99 to all C/C++ files first
 build --copt=-std=c99
 build --host_copt=-std=c99
+
+# C++ Standard - this overrides the C standard for C++ files
+build --cxxopt=-std=c++17
+build --host_cxxopt=-std=c++17
 
 # Android Configuration
 build --incompatible_java_common_parameters=false
@@ -26,7 +26,7 @@ build --incompatible_enable_apple_toolchain_resolution
 
 # Performance and caching
 build --experimental_repository_cache_hardlinks
-build --experimental_guard_against_concurrent_changes
+build --guard_against_concurrent_changes
 
 # Enable build without the bytes (for faster remote builds)
 build --remote_download_outputs=minimal

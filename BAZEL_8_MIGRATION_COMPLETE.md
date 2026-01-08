@@ -122,13 +122,18 @@ bazel_dep(name = "googletest", version = "1.14.0.bcr.1")
 ### 4. Configuration Updates
 
 **.bazelrc:**
-- Removed deprecated `--experimental_guard_against_concurrent_changes`
+- Removed deprecated `--experimental_guard_against_concurrent_changes` (replaced with `--guard_against_concurrent_changes`)
 - Added C99 standard for C code compilation:
 ```
-build --conlyopt=-std=c99
-build --host_conlyopt=-std=c99
+# Apply -std=c99 to all C/C++ files first
+build --copt=-std=c99
+build --host_copt=-std=c99
+
+# C++ Standard - this overrides the C standard for C++ files
+build --cxxopt=-std=c++17
+build --host_cxxopt=-std=c++17
 ```
-This is required for protobuf's utf8_range.c and other C code that uses C99 features (inline keyword, // comments).
+This is required for protobuf's utf8_range.c and other C code that uses C99 features (inline keyword, // comments). The `--copt` applies to all files first, then `--cxxopt` overrides it for C++ files.
 
 **WORKSPACE:**
 - Simplified to minimal file (Bzlmod handles dependencies)
