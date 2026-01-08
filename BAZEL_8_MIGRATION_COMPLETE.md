@@ -401,11 +401,12 @@ bazel build //example-app-objc:DjinniObjcExample
 - All individual test cases pass
 
 **CI Workaround:** Created `ci/run-tests.sh` wrapper script that:
-1. Runs the bazel test command
+1. Runs the bazel test command with `tee` to capture output in a temp file
 2. Checks if ObjC tests show the false failure pattern  
 3. Verifies all tests actually passed by checking test output
 4. Returns success (exit 0) if tests passed despite Bazel reporting failure
 5. Returns failure for genuine test failures
+6. Handles large test outputs without "Broken pipe" errors
 
 **Files:**
 - `ci/run-tests.sh`: Wrapper script that handles the false failure
