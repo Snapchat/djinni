@@ -3,13 +3,11 @@
 ###############################################################################
 
 # C Standard (required for protobuf utf8_range.c and other C code)
-# Apply to both C and C++ files, then override for C++
-build --copt=-std=gnu99
-build --host_copt=-std=gnu99
+# Use 'common' to apply to all configurations (build, exec, host)
+common --copt=-std=gnu99
 
-# C++ Standard - overrides gnu99 for C++ files
-build --cxxopt=-std=c++17
-build --host_cxxopt=-std=c++17
+# C++ Standard - overrides gnu99 for C++ files  
+common --cxxopt=-std=c++17
 
 # Android Configuration
 build --incompatible_java_common_parameters=false

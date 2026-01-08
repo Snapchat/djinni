@@ -123,17 +123,15 @@ bazel_dep(name = "googletest", version = "1.14.0.bcr.1")
 
 **.bazelrc:**
 - Removed deprecated `--experimental_guard_against_concurrent_changes` (replaced with `--guard_against_concurrent_changes`)
-- Added C99 standard for C code compilation:
+- Added C99 standard for C code compilation using `common` to apply to all configurations (build, exec, host):
 ```
-# Apply gnu99 to both C and C++ files first
-build --copt=-std=gnu99
-build --host_copt=-std=gnu99
+# Use 'common' to apply to all configurations (build, exec, host)
+common --copt=-std=gnu99
 
-# C++ Standard - overrides gnu99 for C++ files
-build --cxxopt=-std=c++17
-build --host_cxxopt=-std=c++17
+# C++ Standard - overrides gnu99 for C++ files  
+common --cxxopt=-std=c++17
 ```
-This is required for protobuf's utf8_range.c and other C code that uses C99 features (inline keyword, // comments). Using `gnu99` instead of `c99` for better Apple toolchain compatibility. The `--copt` applies to all files first, then `--cxxopt` overrides it for C++ files only.
+This is required for protobuf's utf8_range.c and other C code that uses C99 features (inline keyword, // comments). Using `gnu99` instead of `c99` for better Apple toolchain compatibility. The `common` scope ensures flags reach the exec configuration used for building tools like protoc.
 
 **WORKSPACE:**
 - Simplified to minimal file (Bzlmod handles dependencies)
