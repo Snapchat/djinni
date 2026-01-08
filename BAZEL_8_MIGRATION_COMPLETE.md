@@ -123,7 +123,12 @@ bazel_dep(name = "googletest", version = "1.14.0.bcr.1")
 
 **.bazelrc:**
 - Removed deprecated `--experimental_guard_against_concurrent_changes`
-- Kept LC_UUID workaround flags (still useful)
+- Added C99 standard for C code compilation:
+```
+build --conlyopt=-std=c99
+build --host_conlyopt=-std=c99
+```
+This is required for protobuf's utf8_range.c and other C code that uses C99 features (inline keyword, // comments).
 
 **WORKSPACE:**
 - Simplified to minimal file (Bzlmod handles dependencies)
