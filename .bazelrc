@@ -3,11 +3,11 @@
 ###############################################################################
 
 # C Standard (required for protobuf utf8_range.c and other C code)
-# Apply -std=c99 to all C/C++ files first
-build --copt=-std=c99
-build --host_copt=-std=c99
+# Apply to both C and C++ files, then override for C++
+build --copt=-std=gnu99
+build --host_copt=-std=gnu99
 
-# C++ Standard - this overrides the C standard for C++ files
+# C++ Standard - overrides gnu99 for C++ files
 build --cxxopt=-std=c++17
 build --host_cxxopt=-std=c++17
 
