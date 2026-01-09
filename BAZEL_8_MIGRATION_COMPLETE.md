@@ -40,7 +40,7 @@ cd external-test && bazel run @snap_djinni//src:djinni -- --help
 # Result: BUILD COMPLETED SUCCESSFULLY ✅
 
 # Android Example
-bazel build //examples:android-app --android_platforms=//:arm64-v8a
+bazel build //examples:android-app --android_platforms=@rules_android//:arm64-v8a
 # Result: BUILD COMPLETED SUCCESSFULLY ✅ (517KB APK generated)
 ```
 
@@ -97,8 +97,9 @@ bazel-bin/external/protobuf+/protoc --cpp_out=cpp --java_out=java --objc_out=obj
 
 ### 2. MODULE.bazel Updated
 
-**Updated to Bazel 8.5.0 compatible versions:**
+**Updated to Bazel 8.5.0 compatible versions (latest stable):**
 ```python
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
 bazel_dep(name = "platforms", version = "0.0.11")
 bazel_dep(name = "rules_cc", version = "0.1.1")
 bazel_dep(name = "rules_java", version = "8.14.0")
@@ -107,6 +108,9 @@ bazel_dep(name = "protobuf", version = "29.0")
 bazel_dep(name = "apple_support", version = "1.23.1")  # ← Key fix for Xcode 26
 bazel_dep(name = "rules_apple", version = "4.0.0")
 bazel_dep(name = "rules_swift", version = "2.4.0")
+bazel_dep(name = "rules_python", version = "1.3.0")
+bazel_dep(name = "rules_jvm_external", version = "6.6")
+```
 bazel_dep(name = "googletest", version = "1.14.0.bcr.1")
 ```
 
@@ -160,8 +164,9 @@ This is necessary because global `--copt` flags don't reliably reach all toolcha
 **protobuf_c99.patch:**
 - Patches the utf8_range BUILD file to add `copts = ["-std=c99"]` directly to the target
 
-**WORKSPACE:**
-- Simplified to minimal file (Bzlmod handles dependencies)
+**Pure Bzlmod:**
+- Added `--noenable_workspace` to `.bazelrc` to completely disable WORKSPACE
+- Removed WORKSPACE files entirely (not needed with pure Bzlmod)
 
 ## 🎉 Scala Generator Working!
 
@@ -267,7 +272,7 @@ platform(
 
 **Build Command:**
 ```bash
-bazel build //examples:android-app --android_platforms=//:arm64-v8a  # ✅ Works!
+bazel build //examples:android-app --android_platforms=@rules_android//:arm64-v8a  # ✅ Works!
 # Output: 517KB APK at bazel-bin/examples/android-app.apk
 ```
 
@@ -418,6 +423,11 @@ This ensures CI passes when all tests actually succeed, while still catching rea
 
 **Important:** Bazel cache paths differ between macOS and Linux.
 
+**Bazel Version Management:**
+- GitHub Actions runners pre-install Bazelisk
+- The `bazel` command automatically uses `.bazelversion` to download Bazel 8.5.0
+- No explicit Bazelisk installation needed in CI
+
 **Cross-platform cache configuration:**
 ```yaml
 - name: Get Bazel cache directory
@@ -455,19 +465,103 @@ This ensures CI passes when all tests actually succeed, while still catching rea
 
 This dramatically improves CI build times by caching compiled dependencies like protobuf!
 
+## 🧹 Post-Migration Cleanup
+
+### Files Removed
+
+The following legacy files were removed as they're no longer needed with pure Bzlmod:
+
+**Legacy Bzl Files:**
+- `bzl/repos.bzl` - Old WORKSPACE dependency setup
+- `bzl/deps.bzl` - Legacy dependency management
+- `bzl/scala_config.bzl` - Now handled by `rules_scala` Bzlmod module
+- `bzl/setup_deps.bzl` - Legacy setup scripts
+- `bzl/android_configure.bzl` - Android config now via Bzlmod extension
+
+**Bzl Directory Recreated (Minimal):**
+- `bzl/BUILD` - Just exports protobuf patch file
+- `bzl/extensions.bzl` - Minimal extension for Swift Protobuf only
+- `bzl/protobuf_c99.patch` - Patch for protobuf utf8_range C99 support
+
+**Migration Documentation:**
+- `MIGRATION_NOTES.md` - Superseded by this document
+- `BAZEL_UPGRADE_STATUS.md` - Obsolete status doc
+- `BAZEL_8_STATUS.md` - Obsolete status doc
+
+**ObjC Testing Workarounds:**
+- `.bazelversion.objc-testing` - No longer needed
+- `test-objc-bazel6.sh` - Bazel 6 testing script
+- `OBJC_TESTING_OPTIONS.md` - Obsolete
+- `OBJC_TESTS_WORKAROUND.md` - Integrated into main CI
+- `test-suite/test-objc-direct.sh` - Replaced by CI wrapper
+
+**Temporary Test Files:**
+- `test_cpp/BUILD` - Test artifacts
+- `test_cpp/hello.cc` - Test artifacts
+- `test-suite/BUILD.cc_only` - Temporary testing build file
+
+**WORKSPACE Files:**
+- `WORKSPACE` - Removed (using `--noenable_workspace`)
+- `external-test/WORKSPACE` - Removed (pure Bzlmod)
+
+**Root BUILD File:**
+- `BUILD` - Removed (Android platforms now reference `@rules_android//:*`)
+
+**Obsolete Patches:**
+- `bazel/patches/protobuf_utf8_range.patch` - Moved to `bzl/protobuf_c99.patch`
+
+### `.bazelrc` Simplification
+
+**Removed:** Caching-related options that require remote cache setup
+- No remote caching configured → removed unused cache flags
+- Kept only essential build configuration
+- Retained `--experimental_repository_cache_hardlinks` for local performance
+
+**Current `.bazelrc` focuses on:**
+- C/C++ standard flags (C99 for protobuf, C++17 for main code)
+- Android configuration
+- Pure Bzlmod with WORKSPACE completely disabled (`--noenable_workspace`)
+- Apple toolchain resolution
+
+### What Remains
+
+**Core Configuration:**
+- `MODULE.bazel` - Pure Bzlmod dependency management
+- `.bazelrc` - Clean, essential build flags with WORKSPACE disabled
+- `.bazelversion` - Locked to 8.5.0
+- `bzl/` - Minimal directory for patches and Swift Protobuf extension only
+
+**Working CI:**
+- `.github/workflows/build.yaml` - Cross-platform cache support
+- `ci/run-tests.sh` - ObjC false failure workaround
+- `ci/generate.sh` - Code generation verification
+
+**Documentation:**
+- `BAZEL_8_MIGRATION_COMPLETE.md` - This comprehensive guide
+- `README.md` - Main project documentation
+
+The repository is now clean and optimized for Bazel 8.5.0 LTS! 🧹✨
+
 ## 🎯 Next Steps
 
 1. **✅ CI/CD Updated:**
    - `.github/workflows/build.yaml` uses Bazel 8.5.0
+   - Cross-platform cache support (macOS + Linux ready)
    - `ci/run-tests.sh` handles ObjC test false failure
    - All tests pass in CI
 
-2. **Document for Team:**
+2. **✅ Cleanup Complete:**
+   - Legacy `bzl/` directory removed
+   - Obsolete migration docs removed
+   - Temporary test artifacts removed
+   - `.bazelrc` simplified
+
+3. **Document for Team:**
    - ✅ Created `BAZEL_8_MIGRATION_COMPLETE.md` migration guide
    - Update README.md with Bazel 8.5.0 requirements
    - Add troubleshooting section
 
-3. **Monitor:**
+4. **Monitor:**
    - Watch for rules_scala Bzlmod compatibility updates
    - Track apple_support updates
    - Monitor Bazel 8.x releases

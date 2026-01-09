@@ -1,19 +1,11 @@
 """Bazel module extensions for Djinni"""
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
-load("//bzl:android_configure.bzl", "android_configure")
-
-# Tag classes for configuring the extension
-_scala_toolchain_config_tag = tag_class(
-    attrs = {
-        "scala_version": attr.string(default = "2.11.12"),
-    },
-)
 
 def _non_module_deps_impl(module_ctx):
     """Module extension to load non-BCR dependencies"""
     
-    # Swift Protobuf
+    # Swift Protobuf (not yet in BCR)
     swiftprotobuf_version = "1.28.2"
     http_archive(
         name = "apple_swift_protobuf",
@@ -30,9 +22,6 @@ swift_library(
 )""",
     )
     
-    # Android configuration
-    android_configure(name = "local_config_android")
-    
     return module_ctx.extension_metadata(
         reproducible = True,
         root_module_direct_deps = [
@@ -43,23 +32,5 @@ swift_library(
 
 non_module_deps = module_extension(
     implementation = _non_module_deps_impl,
-    tag_classes = {
-        "scala_toolchain": _scala_toolchain_config_tag,
-    },
-)
-
-# Toolchain registration extension
-def _toolchain_setup_impl(module_ctx):
-    """Module extension to set up toolchains after dependencies are loaded"""
-    # This extension can be used to register toolchains that need to be
-    # set up after repositories are loaded
-    return module_ctx.extension_metadata(
-        reproducible = True,
-        root_module_direct_deps = [],
-        root_module_direct_dev_deps = [],
-    )
-
-toolchain_setup = module_extension(
-    implementation = _toolchain_setup_impl,
 )
 

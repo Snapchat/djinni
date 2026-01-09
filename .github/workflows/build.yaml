@@ -14,6 +14,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Verify Bazel version
+        run: |
+          echo "Bazel executable: $(which bazel)"
+          bazel --version
+          echo "Expected version from .bazelversion: $(cat .bazelversion)"
+
       - name: Get Bazel cache directory
         id: bazel-cache-dir
         run: |
