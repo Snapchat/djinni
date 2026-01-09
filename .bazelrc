@@ -7,7 +7,7 @@
 common --copt=-std=c99
 
 # C++ Standard
-common --cxxopt=-std=c++17
+common --cxxopt=-std=c++20
 
 # Android Configuration
 build --incompatible_java_common_parameters=false

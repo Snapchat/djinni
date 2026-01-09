@@ -45,7 +45,7 @@ objc_library(
     hdrs = glob(["objc/*.h", "objc/*.hpp"]),
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
     ],
     includes = ["objc"],
     defines = ["DATAREF_OBJC=1"],
@@ -88,7 +88,7 @@ swift_library(
     ]),
     copts = [
         "-cxx-interoperability-mode=default",
-        "-Xcc", "-std=c++17",
+        "-Xcc", "-std=c++20",
     ],
     deps = [
         ":djinni-support-swiftxx",
@@ -113,7 +113,7 @@ cc_library(
         ":djinni-support-common",
     ],
     copts = [
-        "-std=c++17",
+        "-std=c++20",
     ],
     tags = ["swift_module=DjinniSupportCxx"],
     visibility = ["//visibility:public"],

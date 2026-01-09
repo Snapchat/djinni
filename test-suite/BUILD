@@ -256,7 +256,7 @@ swift_test(
     copts = [
         "-cxx-interoperability-mode=default",
         "-Xcc",
-        "-std=c++17",
+        "-std=c++20",
     ],
     deps = [":test-swift-bridge"],
 )
@@ -271,7 +271,7 @@ swift_library(
     copts = [
         "-cxx-interoperability-mode=default",
         "-Xcc",
-        "-std=c++17",
+        "-std=c++20",
     ],
     module_name = "TestSuite",
     visibility = ["//visibility:public"],
@@ -302,7 +302,7 @@ cc_library(
     hdrs = glob([
         "generated-src/swiftxx/*.hpp",
     ]),
-    copts = ["-std=c++17"],
+    copts = ["-std=c++20"],
     includes = [
         ".",
         "generated-src/swiftxx",

@@ -145,9 +145,15 @@ bazel_dep(name = "googletest", version = "1.14.0.bcr.1")
 common --copt=-std=c99
 
 # C++ Standard
-common --cxxopt=-std=c++17
+common --cxxopt=-std=c++20
 ```
 This is required for protobuf's utf8_range.c and other C code that uses C99 features (inline keyword, // comments).
+
+The C++20 upgrade also:
+- Enabled standard coroutines (removed experimental `<experimental/coroutine>` fallback)
+- Fixed UTF-8 literal handling (`u8"string"` is now `char8_t*`)
+- Updated `tl_expected.hpp` to version 1.3.1 from upstream
+- See `CPP20_UPGRADE.md` for full details
 
 **MODULE.bazel:**
 - Added patch for protobuf to directly set C99 standard on utf8_range target:
@@ -518,7 +524,7 @@ The following legacy files were removed as they're no longer needed with pure Bz
 - Retained `--experimental_repository_cache_hardlinks` for local performance
 
 **Current `.bazelrc` focuses on:**
-- C/C++ standard flags (C99 for protobuf, C++17 for main code)
+- C/C++ standard flags (C99 for protobuf, C++20 for main code)
 - Android configuration
 - Pure Bzlmod with WORKSPACE completely disabled (`--noenable_workspace`)
 - Apple toolchain resolution

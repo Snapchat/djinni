@@ -113,7 +113,7 @@ swift_library(
     srcs = glob([
         "generated-src/swift/*.swift",
     ], exclude = [ swift_private_files ]),
-    copts = ["-cxx-interoperability-mode=default", "-Xcc", "-std=c++17",],
+    copts = ["-cxx-interoperability-mode=default", "-Xcc", "-std=c++20",],
     deps = [
         "//support-lib:djinni-support-swift",
     ],
@@ -124,7 +124,7 @@ swift_library(
     name = "textsort-swift-bridge",
     module_name = "TextSortBridge",
     srcs = glob([swift_private_files,]),
-    copts = ["-cxx-interoperability-mode=default", "-Xcc", "-std=c++17",],
+    copts = ["-cxx-interoperability-mode=default", "-Xcc", "-std=c++20",],
     deps = [
         ":textsort-common",
         ":textsort-swift",
@@ -153,7 +153,7 @@ cc_library(
         "//support-lib:djinni-support-common",
         "//support-lib:djinni-support-swiftxx",
     ],
-    copts = ["-std=c++17",],
+    copts = ["-std=c++20",],
     tags = ["swift_module=TextSortCxx"],
     visibility = ["//visibility:public"],
 )

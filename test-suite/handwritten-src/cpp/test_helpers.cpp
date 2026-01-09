@@ -46,8 +46,10 @@ bool TestHelpers::check_primitive_list(const PrimitiveList & pl) {
     return pl.list == cPrimitiveList.list;
 }
 
-static const NestedCollection cNestedCollection { { {u8"String1", u8"String2"},
-                                                    {u8"StringA", u8"StringB"} } };
+// In C++20, u8"string" literals are char8_t*, not const char*
+// Use regular string literals for ASCII strings
+static const NestedCollection cNestedCollection { { {"String1", "String2"},
+                                                    {"StringA", "StringB"} } };
 
 NestedCollection TestHelpers::get_nested_collection() {
     return cNestedCollection;
