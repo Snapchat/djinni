@@ -9,6 +9,8 @@
 #include <utility>
 #include <type_traits>
 
+// C++23 introduced std::expected. When available, use the standard version.
+// Otherwise, fall back to the third-party tl::expected implementation.
 #ifdef __cpp_lib_expected
 
 #include <expected>

@@ -14,15 +14,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Verify Bazel version
+        run: |
+          echo "Bazel executable: $(which bazel)"
+          bazel --version
+          echo "Expected version from .bazelversion: $(cat .bazelversion)"
+
+      - name: Get Bazel cache directory
+        id: bazel-cache-dir
+        run: |
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            echo "dir=/private/var/tmp/_bazel_$USER" >> $GITHUB_OUTPUT
+          else
+            echo "dir=~/.cache/bazel" >> $GITHUB_OUTPUT
+          fi
+      
       - name: Cache bazel build results
         uses: actions/cache@v3
-        env:
-          cache-name: bazel-cache
         with:
-          path: ~/.cache/bazel
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ github.ref }}
+          path: ${{ steps.bazel-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-bazel-${{ hashFiles('.bazelversion', 'MODULE.bazel', 'MODULE.bazel.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ env.cache-name }}-main
+            ${{ runner.os }}-bazel-
 
       - name: Build
         run: bazel build //src:djinni
@@ -31,8 +44,8 @@ jobs:
         run: ./ci/generate.sh
 
       - name: Test
-        run: bazel test --test_output=all //test-suite:djinni-java-tests  //test-suite:djinni-objc-tests //test-suite:djinni-tests-c
+        run: ./ci/run-tests.sh
 
       - name: External Test
         working-directory: external-test
-        run: bazel run @djinni//src:djinni -- --help
+        run: bazel run @snap_djinni//src:djinni -- --help

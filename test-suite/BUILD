@@ -121,7 +121,7 @@ objc_library(
     srcs = glob([
         "generated-src/objc/**/*.m",
         "handwritten-src/objc/**/*.m",
-    ]),
+    ], allow_empty = True),
     hdrs = glob([
         "generated-src/objc/**/*.h",
         "handwritten-src/objc/**/*.h",
@@ -193,6 +193,7 @@ EMSCRIPTEN_LINKOPTS = [
     "-s MALLOC=emmalloc",  # Switch to using the much smaller implementation
     "-s MODULARIZE=1",  # Allows us to manually invoke the initialization of wasm
     "-s WASM_BIGINT=1",  # We need to pass int64_t
+    "-s EXPORTED_RUNTIME_METHODS=HEAPU8,HEAP8,HEAPU16,HEAP16,HEAPU32,HEAP32,HEAPF32,HEAPF64",  # Export heap views for memory access (required in Emscripten 4.x)
 ]
 
 cc_binary(
@@ -226,7 +227,7 @@ sh_binary(
         "djinni/vendor/third-party/proto/ts/*.ts",
         "node_modules/**",
         "generated-src/ts/*.ts",
-    ]) + [":wasm"],
+    ], allow_empty = True) + [":wasm"],
     deps = ["//support-lib:djinni-support-ts"],
 )
 
@@ -255,7 +256,7 @@ swift_test(
     copts = [
         "-cxx-interoperability-mode=default",
         "-Xcc",
-        "-std=c++17",
+        "-std=c++20",
     ],
     deps = [":test-swift-bridge"],
 )
@@ -270,7 +271,7 @@ swift_library(
     copts = [
         "-cxx-interoperability-mode=default",
         "-Xcc",
-        "-std=c++17",
+        "-std=c++20",
     ],
     module_name = "TestSuite",
     visibility = ["//visibility:public"],
@@ -301,7 +302,7 @@ cc_library(
     hdrs = glob([
         "generated-src/swiftxx/*.hpp",
     ]),
-    copts = ["-std=c++17"],
+    copts = ["-std=c++20"],
     includes = [
         ".",
         "generated-src/swiftxx",

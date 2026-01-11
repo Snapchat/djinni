@@ -1,0 +1,24 @@
+"""External test module - tests consuming djinni as a Bzlmod dependency"""
+
+module(
+    name = "djinni_external_test",
+    version = "1.0.0",
+)
+
+# Use local_path_override to test against the parent djinni workspace
+local_path_override(
+    module_name = "snap_djinni",
+    path = "..",
+)
+
+# Import djinni as a dependency
+bazel_dep(name = "snap_djinni", version = "")
+
+# Configure Scala to match parent (2.11.12)
+bazel_dep(name = "rules_scala", version = "7.1.5")
+
+scala_config = use_extension("@rules_scala//scala/extensions:config.bzl", "scala_config")
+scala_config.settings(scala_version = "2.11.12")
+
+scala_deps = use_extension("@rules_scala//scala/extensions:deps.bzl", "scala_deps")
+scala_deps.scala()

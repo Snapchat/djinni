@@ -8,7 +8,7 @@ cc_library(
     srcs = glob([
         "generated-src/cpp/*.cpp",
         "handwritten-src/cpp/*.cpp",
-    ]),
+    ], allow_empty = True),
     hdrs = glob([
         "generated-src/cpp/*.hpp",
         "handwritten-src/cpp/*.hpp",
@@ -73,6 +73,7 @@ EMSCRIPTEN_LINKOPTS = [
     "-s MALLOC=emmalloc",  # Switch to using the much smaller implementation
     "-s MODULARIZE=1",  # Allows us to manually invoke the initialization of wasm
     "-s WASM_BIGINT=1", # We need to pass int64_t
+    "-s EXPORTED_RUNTIME_METHODS=HEAPU8,HEAP8,HEAPU16,HEAP16,HEAPU32,HEAP32,HEAPF32,HEAPF64",  # Export heap views for memory access (required in Emscripten 4.x)
 ]
 
 cc_binary(
@@ -112,7 +113,7 @@ swift_library(
     srcs = glob([
         "generated-src/swift/*.swift",
     ], exclude = [ swift_private_files ]),
-    copts = ["-cxx-interoperability-mode=default", "-Xcc", "-std=c++17",],
+    copts = ["-cxx-interoperability-mode=default", "-Xcc", "-std=c++20",],
     deps = [
         "//support-lib:djinni-support-swift",
     ],
@@ -123,7 +124,7 @@ swift_library(
     name = "textsort-swift-bridge",
     module_name = "TextSortBridge",
     srcs = glob([swift_private_files,]),
-    copts = ["-cxx-interoperability-mode=default", "-Xcc", "-std=c++17",],
+    copts = ["-cxx-interoperability-mode=default", "-Xcc", "-std=c++20",],
     deps = [
         ":textsort-common",
         ":textsort-swift",
@@ -152,7 +153,7 @@ cc_library(
         "//support-lib:djinni-support-common",
         "//support-lib:djinni-support-swiftxx",
     ],
-    copts = ["-std=c++17",],
+    copts = ["-std=c++20",],
     tags = ["swift_module=TextSortCxx"],
     visibility = ["//visibility:public"],
 )

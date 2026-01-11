@@ -190,12 +190,18 @@ object Main {
         .text("The filename extension for C++ files (default: \"cpp\").")
       opt[String]("hpp-ext").valueName("<ext>").foreach(cppHeaderExt = _)
         .text("The filename extension for C++ header files (default: \"hpp\").")
-      opt[String]("cpp-optional-template").valueName("<template>").foreach(x => cppOptionalTemplate = x)
-        .text("The template to use for optional values (default: \"std::optional\")")
-      opt[String]("cpp-optional-header").valueName("<header>").foreach(x => cppOptionalHeader = x)
-        .text("The header to use for optional values (default: \"<optional>\")")
-      opt[String]("cpp-nullopt-value").valueName("<value>").foreach(x => cppNulloptValue = x)
-        .text("The value to use for nullopt defaults of optional values (default: \"std::nullopt\")")
+      opt[String]("cpp-optional-template").valueName("<template>").foreach { x =>
+        System.err.println("Warning: --cpp-optional-template is deprecated. std::optional is standard in C++17+.")
+        cppOptionalTemplate = x
+      }.text("DEPRECATED: The template to use for optional values (default: \"std::optional\")")
+      opt[String]("cpp-optional-header").valueName("<header>").foreach { x =>
+        System.err.println("Warning: --cpp-optional-header is deprecated. std::optional is standard in C++17+.")
+        cppOptionalHeader = x
+      }.text("DEPRECATED: The header to use for optional values (default: \"<optional>\")")
+      opt[String]("cpp-nullopt-value").valueName("<value>").foreach { x =>
+        System.err.println("Warning: --cpp-nullopt-value is deprecated. std::optional is standard in C++17+.")
+        cppNulloptValue = x
+      }.text("DEPRECATED: The value to use for nullopt defaults of optional values (default: \"std::nullopt\")")
       opt[Boolean]("cpp-enum-hash-workaround").valueName("<true/false>").foreach(x => cppEnumHashWorkaround = x)
         .text("Work around LWG-2148 by generating std::hash specializations for C++ enums (default: true)")
       opt[String]("cpp-nn-header").valueName("<header>").foreach(x => cppNnHeader = Some(x))

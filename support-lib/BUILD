@@ -7,6 +7,7 @@ cc_library(
     srcs = glob(["cpp/*.cpp"]),
     hdrs = glob(["*.hpp", "cpp/*.hpp", "cpp/*.h"]),
     includes = ["cpp"],
+    copts = ["-fexceptions"],  # Required for Future.hpp which uses try/catch
     visibility = ["//visibility:public"],
 )
 
@@ -40,11 +41,11 @@ cc_library(
 
 objc_library(
     name = "djinni-support-objc",
-    srcs = glob(["objc/*.mm", "objc/*.cpp"]),
+    srcs = glob(["objc/*.mm", "objc/*.cpp"], allow_empty = True),
     hdrs = glob(["objc/*.h", "objc/*.hpp"]),
     copts = [
         "-ObjC++",
-        "-std=c++17",
+        "-std=c++20",
     ],
     includes = ["objc"],
     defines = ["DATAREF_OBJC=1"],
@@ -87,7 +88,7 @@ swift_library(
     ]),
     copts = [
         "-cxx-interoperability-mode=default",
-        "-Xcc", "-std=c++17",
+        "-Xcc", "-std=c++20",
     ],
     deps = [
         ":djinni-support-swiftxx",
@@ -112,8 +113,25 @@ cc_library(
         ":djinni-support-common",
     ],
     copts = [
-        "-std=c++17",
+        "-std=c++20",
     ],
     tags = ["swift_module=DjinniSupportCxx"],
     visibility = ["//visibility:public"],
+)
+
+# cc_library version of djinni-support-objc to avoid apple_support
+cc_library(
+    name = "djinni-support-objc-cc",
+    srcs = glob(["objc/*.mm", "objc/*.cpp"], allow_empty = True),
+    hdrs = glob(["objc/*.h", "objc/*.hpp"]),
+    copts = [
+        "-x objective-c++",
+        "-std=c++17",
+        "-fobjc-arc",
+    ],
+    includes = ["objc"],
+    defines = ["DATAREF_OBJC=1"],
+    linkopts = ["-framework Foundation"],
+    visibility = ["//visibility:public"],
+    deps = ["//support-lib:djinni-support-common"],
 )

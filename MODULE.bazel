@@ -1,0 +1,110 @@
+"""Djinni - Bazel Module Configuration"""
+
+module(
+    name = "snap_djinni",
+    version = "1.0.0",
+    repo_name = "snap_djinni",
+)
+
+# Core Bazel dependencies (updated for Bazel 8.5.0)
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
+bazel_dep(name = "platforms", version = "0.0.11")
+bazel_dep(name = "rules_cc", version = "0.1.1")
+bazel_dep(name = "rules_java", version = "8.14.0")
+bazel_dep(name = "rules_proto", version = "7.0.2")
+bazel_dep(name = "protobuf", version = "29.0", repo_name = "com_google_protobuf")
+
+# Patch protobuf to add C99 standard to utf8_range target
+single_version_override(
+    module_name = "protobuf",
+    patches = ["//bzl:protobuf_c99.patch"],
+    patch_strip = 1,
+)
+
+# Android support
+bazel_dep(name = "rules_android", version = "0.6.0")
+bazel_dep(name = "rules_android_ndk", version = "0.1.2")
+bazel_dep(name = "rules_python", version = "1.3.0")  # Required by rules_android_ndk
+
+# Configure Android SDK via Bzlmod extension
+android_sdk_repository_extension = use_extension("@rules_android//rules/android_sdk_repository:rule.bzl", "android_sdk_repository_extension")
+use_repo(android_sdk_repository_extension, "androidsdk")
+
+# Configure Android NDK via Bzlmod extension
+android_ndk_repository_extension = use_extension("@rules_android_ndk//:extension.bzl", "android_ndk_repository_extension")
+use_repo(android_ndk_repository_extension, "androidndk")
+
+# Register Android toolchains
+register_toolchains(
+    "@androidsdk//:sdk-toolchain",
+    "@androidsdk//:all",
+    "@androidndk//:all",
+)
+
+# Scala support - rules_scala 7.1.5 with Bzlmod (officially supports Bazel 8.x)
+bazel_dep(name = "rules_scala", version = "7.1.5")
+bazel_dep(name = "rules_jvm_external", version = "6.6")
+
+# Configure Scala 2.11.12
+scala_config = use_extension("@rules_scala//scala/extensions:config.bzl", "scala_config")
+scala_config.settings(scala_version = "2.11.12")
+
+# Setup Scala dependencies and toolchain
+scala_deps = use_extension("@rules_scala//scala/extensions:deps.bzl", "scala_deps")
+scala_deps.scala()
+use_repo(scala_deps, "io_bazel_rules_scala_scala_compiler", "io_bazel_rules_scala_scala_library", "io_bazel_rules_scala_scala_reflect")
+
+# Apple/Swift support for iOS examples (compatible with macOS Sequoia + Xcode 26)
+bazel_dep(name = "apple_support", version = "1.23.1", repo_name = "build_bazel_apple_support")
+bazel_dep(name = "rules_apple", version = "4.0.0", repo_name = "build_bazel_rules_apple")
+bazel_dep(name = "rules_swift", version = "2.4.0", repo_name = "build_bazel_rules_swift")
+
+# Configure Apple CC toolchain for ObjC builds
+apple_cc_configure = use_extension("@build_bazel_apple_support//crosstool:setup.bzl", "apple_cc_configure_extension")
+use_repo(apple_cc_configure, "local_config_apple_cc", "local_config_apple_cc_toolchains")
+
+# Register Apple toolchains
+register_toolchains(
+    "@local_config_apple_cc_toolchains//:all",
+)
+
+# Testing support
+bazel_dep(name = "googletest", version = "1.14.0.bcr.1", repo_name = "gtest")
+
+# Maven dependencies for Scala/Java
+# Using Scala 2.11 (matching rules_scala 6.1.0 in WORKSPACE)
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    name = "maven_djinni",
+    artifacts = [
+        "com.google.code.findbugs:jsr305:3.0.2",
+        "junit:junit:4.13.2",
+        "org.scala-lang.modules:scala-parser-combinators_2.11:1.1.2",
+        "org.yaml:snakeyaml:2.3",
+        "com.github.scopt:scopt_2.11:3.7.1",
+        "io.reactivex.rxjava2:rxjava:2.2.21",
+    ],
+    repositories = [
+        "https://maven.google.com",
+        "https://repo1.maven.org/maven2",
+    ],
+)
+use_repo(maven, "maven_djinni")
+
+# Non-BCR dependencies
+bazel_dep(name = "rules_foreign_cc", version = "0.13.0")
+
+# Emscripten for WASM support - now in BCR!
+bazel_dep(name = "emsdk", version = "4.0.17")
+
+# Other non-BCR dependencies (Swift Protobuf)
+non_module_deps = use_extension("//bzl:extensions.bzl", "non_module_deps")
+use_repo(
+    non_module_deps,
+    "apple_swift_protobuf",
+)
+
+# Register Emscripten toolchain for WASM
+register_toolchains(
+    "@emsdk//emscripten_toolchain:all",
+)
