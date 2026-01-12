@@ -43,4 +43,18 @@ BinaryTranslator::fromCpp(const std::vector<uint8_t> &binary) {
   return djinni_binary_new_with_bytes_copy(binary.data(), binary.size());
 }
 
+djinni_date_ref DateTranslator::fromCpp(const CppType &date) {
+  // Convert time_point to milliseconds since Unix epoch
+  auto duration_since_epoch = date.time_since_epoch();
+  auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration_since_epoch).count();
+  return djinni_date_new(static_cast<uint64_t>(millis));
+}
+
+DateTranslator::CppType DateTranslator::toCpp(CType date) {
+  // Convert milliseconds since Unix epoch to time_point
+  uint64_t millis = djinni_date_get_epoch(date);
+  auto duration = std::chrono::milliseconds(millis);
+  return std::chrono::system_clock::time_point(duration);
+}
+
 } // namespace djinni::c_api
