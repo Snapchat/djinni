@@ -3,7 +3,7 @@ import XCTest
 
 final class PrimitivesListTest: XCTestCase {
 
-    let swiftPrimitiveList: PrimitiveList = PrimitiveList(list: [1, 2, 3])
+    let swiftPrimitiveList: PrimitiveList = PrimitiveList(list: [1, 2, 3], optionalList: nil)
     
     func testSwiftPrimitiveListToCpp() throws {
         XCTAssertTrue(try TestHelpers_statics.checkPrimitiveList(swiftPrimitiveList))

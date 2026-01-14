@@ -1,0 +1,38 @@
+@extern "../../../../support-lib/lazy.yaml"
+
+# Simple object interface for lazy testing
+simple_object = interface +c {
+    get_value(): i32;
+    get_name(): string;
+}
+
+nested_lazy = record {
+  l: lazy<i32>;
+}
+
+nested_lazy_interface = record {
+  obj: lazy<simple_object>;
+}
+
+test_lazy = interface +c {
+	# Simple type lazy tests
+	static getLazyString(): lazy<string>;
+	static getLazyInt(): lazy<i32>;
+
+    static callLazyString(x: lazy<string>): string;
+	static callLazyInt(x: lazy<i32>): i32;
+
+	static getNestedLazy(): nested_lazy;
+    static callNestedLazy(x: nested_lazy): i32;
+
+	# Interface lazy tests - main use case for deferred expensive object creation
+	static getLazyObject(): lazy<simple_object>;
+	static callLazyObject(x: lazy<simple_object>): i32;
+	static callLazyObjectGetName(x: lazy<simple_object>): string;
+
+	static getNestedLazyInterface(): nested_lazy_interface;
+	static callNestedLazyInterface(x: nested_lazy_interface): i32;
+
+	# Helper to create simple_object for testing
+	static createSimpleObject(value: i32, name: string): simple_object;
+}
