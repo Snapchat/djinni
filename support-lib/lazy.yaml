@@ -11,8 +11,8 @@ objc:
   typename: 'DJLazy'
   header: '"$DJLazy.h"'
   boxed: 'DJLazy'
-  pointer: true  # DJLazy is now a class, so it's a pointer
-  generic: true  # Enable generics for type safety
+  pointer: true
+  generic: true
   hash: '%s.hash'
 objcpp:
   translator: '::djinni::LazyAdaptor'
