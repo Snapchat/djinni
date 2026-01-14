@@ -11,15 +11,15 @@ import javax.annotation.Nonnull;
 public abstract class TestLazy {
     /** Simple type lazy tests */
     @Nonnull
-    public static native java.util.function.Supplier<String> getLazyString();
+    public static native com.google.common.base.Supplier<String> getLazyString();
 
     @Nonnull
-    public static native java.util.function.Supplier<Integer> getLazyInt();
+    public static native com.google.common.base.Supplier<Integer> getLazyInt();
 
     @Nonnull
-    public static native String callLazyString(@Nonnull java.util.function.Supplier<String> x);
+    public static native String callLazyString(@Nonnull com.google.common.base.Supplier<String> x);
 
-    public static native int callLazyInt(@Nonnull java.util.function.Supplier<Integer> x);
+    public static native int callLazyInt(@Nonnull com.google.common.base.Supplier<Integer> x);
 
     @Nonnull
     public static native NestedLazy getNestedLazy();
@@ -28,12 +28,12 @@ public abstract class TestLazy {
 
     /** Interface lazy tests - main use case for deferred expensive object creation */
     @Nonnull
-    public static native java.util.function.Supplier<SimpleObject> getLazyObject();
+    public static native com.google.common.base.Supplier<SimpleObject> getLazyObject();
 
-    public static native int callLazyObject(@Nonnull java.util.function.Supplier<SimpleObject> x);
+    public static native int callLazyObject(@Nonnull com.google.common.base.Supplier<SimpleObject> x);
 
     @Nonnull
-    public static native String callLazyObjectGetName(@Nonnull java.util.function.Supplier<SimpleObject> x);
+    public static native String callLazyObjectGetName(@Nonnull com.google.common.base.Supplier<SimpleObject> x);
 
     @Nonnull
     public static native NestedLazyInterface getNestedLazyInterface();

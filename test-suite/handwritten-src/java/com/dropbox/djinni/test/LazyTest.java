@@ -1,7 +1,7 @@
 package com.dropbox.djinni.test;
 
 import junit.framework.TestCase;
-import java.util.function.Supplier;
+import com.google.common.base.Supplier;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LazyTest extends TestCase {

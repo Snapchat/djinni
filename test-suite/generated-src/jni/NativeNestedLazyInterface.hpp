@@ -25,8 +25,8 @@ private:
     friend ::djinni::JniClass<NativeNestedLazyInterface>;
 
     const ::djinni::GlobalRef<jclass> clazz { ::djinni::jniFindClass("com/dropbox/djinni/test/NestedLazyInterface") };
-    const jmethodID jconstructor { ::djinni::jniGetMethodID(clazz.get(), "<init>", "(Ljava/util/function/Supplier;)V") };
-    const jfieldID field_mObj { ::djinni::jniGetFieldID(clazz.get(), "mObj", "Ljava/util/function/Supplier;") };
+    const jmethodID jconstructor { ::djinni::jniGetMethodID(clazz.get(), "<init>", "(Lcom/google/common/base/Supplier;)V") };
+    const jfieldID field_mObj { ::djinni::jniGetFieldID(clazz.get(), "mObj", "Lcom/google/common/base/Supplier;") };
 };
 
 } // namespace djinni_generated

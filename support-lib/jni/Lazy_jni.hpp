@@ -23,7 +23,7 @@
 namespace djinni {
 
 struct SupplierJniInfo {
-    const GlobalRef<jclass> clazz { jniFindClass("java/util/function/Supplier") };
+    const GlobalRef<jclass> clazz { jniFindClass("com/google/common/base/Supplier") };
     const jmethodID method_get { jniGetMethodID(clazz.get(), "get", "()Ljava/lang/Object;") };
 };
 

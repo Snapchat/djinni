@@ -9,19 +9,19 @@ import javax.annotation.Nonnull;
 public class NestedLazyInterface {
 
 
-    /*package*/ java.util.function.Supplier<SimpleObject> mObj;
+    /*package*/ com.google.common.base.Supplier<SimpleObject> mObj;
 
     public NestedLazyInterface(
-            @Nonnull java.util.function.Supplier<SimpleObject> obj) {
+            @Nonnull com.google.common.base.Supplier<SimpleObject> obj) {
         this.mObj = obj;
     }
 
     @Nonnull
-    public java.util.function.Supplier<SimpleObject> getObj() {
+    public com.google.common.base.Supplier<SimpleObject> getObj() {
         return mObj;
     }
 
-    public void setObj(@Nonnull java.util.function.Supplier<SimpleObject> obj) {
+    public void setObj(@Nonnull com.google.common.base.Supplier<SimpleObject> obj) {
         this.mObj = obj;
     }
 

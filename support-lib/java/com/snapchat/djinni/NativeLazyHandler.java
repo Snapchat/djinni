@@ -16,10 +16,10 @@
 
 package com.snapchat.djinni;
 
-import java.util.function.Supplier;
+import com.google.common.base.Supplier;
 
 /**
- * Internal helper class used to bridge native lazy functions to Java Supplier interface.
+ * Internal helper class used to bridge native lazy functions to Guava's Supplier interface.
  * This class should not be used directly by application code.
  * 
  * Note: This class is intentionally package-private and should only be instantiated

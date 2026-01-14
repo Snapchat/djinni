@@ -58,6 +58,9 @@ java_library(
     name = "djinni-support-java",
     srcs = glob(["java/**/*.java"]),
     visibility = ["//visibility:public"],
+    deps = [
+        "@maven_djinni//:com_google_guava_guava",
+    ],
 )
 
 cc_library(

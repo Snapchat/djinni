@@ -174,6 +174,7 @@ java_test(
         "//support-lib:djinni-support-java",
         "@com_google_protobuf//java/core",
         "@maven_djinni//:com_google_code_findbugs_jsr305",
+        "@maven_djinni//:com_google_guava_guava",
         "@maven_djinni//:io_reactivex_rxjava2_rxjava",
         "@maven_djinni//:junit_junit",
     ],

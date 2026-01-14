@@ -18,8 +18,8 @@ objcpp:
   translator: '::djinni::LazyAdaptor'
   header: '"$Lazy_objc.hpp"'
 java:
-  typename: 'java.util.function.Supplier'
-  boxed: 'java.util.function.Supplier'
+  typename: 'com.google.common.base.Supplier'
+  boxed: 'com.google.common.base.Supplier'
   reference: true
   generic: true
   hash: '%s.hashCode()'
@@ -27,7 +27,7 @@ jni:
   translator: '::djinni::LazyAdaptor'
   header: '"$Lazy_jni.hpp"'
   typename: jobject
-  typeSignature: 'Ljava/util/function/Supplier;'
+  typeSignature: 'Lcom/google/common/base/Supplier;'
 wasm:
   typename: 'em::val'
   translator: '::djinni::LazyAdaptor'

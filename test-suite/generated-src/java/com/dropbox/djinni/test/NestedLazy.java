@@ -9,19 +9,19 @@ import javax.annotation.Nonnull;
 public class NestedLazy {
 
 
-    /*package*/ java.util.function.Supplier<Integer> mL;
+    /*package*/ com.google.common.base.Supplier<Integer> mL;
 
     public NestedLazy(
-            @Nonnull java.util.function.Supplier<Integer> l) {
+            @Nonnull com.google.common.base.Supplier<Integer> l) {
         this.mL = l;
     }
 
     @Nonnull
-    public java.util.function.Supplier<Integer> getL() {
+    public com.google.common.base.Supplier<Integer> getL() {
         return mL;
     }
 
-    public void setL(@Nonnull java.util.function.Supplier<Integer> l) {
+    public void setL(@Nonnull com.google.common.base.Supplier<Integer> l) {
         this.mL = l;
     }
 
