@@ -150,12 +150,14 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  private def writeCppWrapperClass(ident: Ident, w: IndentWriter, methods: IndentWriter => Unit): Unit = {
+  private def writeCppWrapperClass(ident: Ident, w: IndentWriter, methods: IndentWriter => Unit, functionNames: Seq[String] = Seq.empty): Unit = {
     val typeName = resolveRefSymbolTypeName(ident)
     val cppClassName = ident.name
     val cppNamespace = spec.cWrapperCppNamespace.getOrElse(spec.cppNamespace + "::c_wrappers")
     wrapIfCpp(w, (w: IndentWriter) => {
+      w.wl("#include <cassert>")
       w.wl("#include <utility>")
+      w.wl("#include <dlfcn.h>")
       wrapNamespace(w, cppNamespace, (w: IndentWriter) => {
           w.w(s"class ${cppClassName}").bracedSemi {
             w.wlOutdent("public:")
@@ -207,7 +209,31 @@ class CGenerator(spec: Spec) extends Generator(spec) {
             w.wl
             methods(w)
             w.wlOutdent("private:")
-            w.wl(s"${typeName} _ref;")
+
+            w.wl(s"${typeName} _ref{nullptr};")
+            w.wl
+            // function table
+            w.w(s"struct Funcs").bracedSemi {
+              for (functionName <- functionNames) {
+                w.wl(s"decltype(&${functionName}) ${functionName};")
+              }
+            }
+            w.wl
+            val functionLoads = functionNames.map(functionName =>
+              s"""|    reinterpret_cast<decltype(&${functionName})>(loadAndAssert("${functionName}")),""").mkString("\n")
+            val functionLoader =
+              s"""static inline Funcs* _loadFuncs() {
+              |  auto loadAndAssert = [](const char* funcName) {
+              |    auto* ptr = dlsym(RTLD_DEFAULT, funcName);
+              |    assert(ptr && "dlsym failed");
+              |    return ptr;
+              |  };
+              |  static Funcs funcs {
+              ${functionLoads}
+              |  };
+              |  return &funcs;
+              |}""".stripMargin
+            functionLoader.split("\n").toSeq.foreach(line => w.wl(line))
           }
         })
     })
@@ -248,12 +274,16 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
       if (spec.cWrapperCppNamespace.isDefined) {
         w.wl
+        val functionNames = Seq(s"${prefix}_new") ++ resolvedFields.flatMap(resolvedField => {
+          val fieldName = resolvedField.field.ident.name
+          Seq(s"${prefix}_get_${fieldName}", s"${prefix}_set_${fieldName}")
+        })
         writeCppWrapperClass(ident, w, (w: IndentWriter) => {
           w.w(s"static ${ident.name} make(")
           writeParamListWithResolvedFields(w, resolvedFields)
           w.w(")")
           w.braced {
-            w.w(s"return ${prefix}_new(")
+            w.w(s"return _loadFuncs()->${prefix}_new(")
             w.w(resolvedFields.map(p => p.field.ident.name).mkString(", "))
             w.wl(");")
           }
@@ -263,17 +293,17 @@ class CGenerator(spec: Spec) extends Generator(spec) {
             val fieldTypename = resolvedField.translator.typename
             w.w(s"${fieldTypename} ${fieldName}() const")
             w.braced {
-              w.wl(s"return ${prefix}_get_${fieldName}(_ref);")
+              w.wl(s"return _loadFuncs()->${prefix}_get_${fieldName}(_ref);")
             }
             w.wl
             w.w(s"${ident.name}& ${fieldName}(${fieldTypename} value)")
             w.braced {
-              w.wl(s"${prefix}_set_${fieldName}(_ref, value);")
+              w.wl(s"_loadFuncs()->${prefix}_set_${fieldName}(_ref, value);")
               w.wl("return *this;")
             }
             w.wl
           }
-        })
+        }, functionNames)
       }
     }, (w: IndentWriter) => {
       w.w(s"""${typeName} ${prefix}_new(""")
@@ -471,6 +501,8 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
       if (i.ext.cpp && spec.cWrapperCppNamespace.isDefined) {
         w.wl
+        val functionNames = resolvedMethods.map(resolvedMethod =>
+          s"${prefix}_${resolvedMethod.resolvedName}")
         writeCppWrapperClass(ident, w, (w: IndentWriter) => {
           for (resolvedMethod <- resolvedMethods) {
             if (resolvedMethod.method.static) {
@@ -485,11 +517,11 @@ class CGenerator(spec: Spec) extends Generator(spec) {
               if (resolvedMethod.retTypename != "void") {
                 w.w("return ")
               }
-              w.wl(s"${prefix}_${resolvedMethod.resolvedName}(${fullArgsList.mkString(", ")});")
+              w.wl(s"_loadFuncs()->${prefix}_${resolvedMethod.resolvedName}(${fullArgsList.mkString(", ")});")
             }
             w.wl
             }
-        })
+        }, functionNames)
       }
     }, (w: IndentWriter) => {
       if (i.ext.cc) {
