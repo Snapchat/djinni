@@ -155,7 +155,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  private def writeCppWrapperClass(ident: Ident, w: IndentWriter, methods: IndentWriter => Unit, functionNames: Seq[String] = Seq.empty): Unit = {
+  private def writeCppWrapperClass(ident: Ident, w: IndentWriter, methods: IndentWriter => Unit, functionNames: Seq[String]): Unit = {
     val typeName = resolveRefSymbolTypeName(ident)
     val cppClassName = ident.name
     val cppNamespace = spec.cWrapperCppNamespace.getOrElse(spec.cppNamespace + "::c_wrappers")
@@ -225,7 +225,6 @@ class CGenerator(spec: Spec) extends Generator(spec) {
             w.wl
             methods(w)
             w.wlOutdent("private:")
-
             w.wl(s"${typeName} _ref;")
             if (spec.cWrapperUseDlsym) {
               w.wl
