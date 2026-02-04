@@ -160,7 +160,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     val cppClassName = ident.name
     val cppNamespace = spec.cWrapperCppNamespace.getOrElse(spec.cppNamespace + "::c_wrappers")
     val prefix = resolveSymbolName(ident.name)
-    val libHandleDefine = s"DJINNI_LIB_HANDLE_${prefix}"
+    val libHandleDefine = s"DJINNI_C_LIB_HANDLE_${prefix}"
     wrapIfCpp(w, (w: IndentWriter) => {
       w.wl("#include <utility>")
       if (spec.cWrapperUseDlsym) {
