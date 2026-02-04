@@ -162,9 +162,9 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     val prefix = resolveSymbolName(ident.name)
     val libHandleDefine = s"DJINNI_LIB_HANDLE_${prefix}"
     wrapIfCpp(w, (w: IndentWriter) => {
-      w.wl("#include <cassert>")
       w.wl("#include <utility>")
       if (spec.cWrapperUseDlsym) {
+        w.wl("#include <cassert>")
         w.wl("#include <dlfcn.h>")
         w.wl(s"#if !defined(${libHandleDefine})")
         w.wl(s"#if defined(DJINNI_C_DEFAULT_LIB_HANDLE)")
@@ -226,7 +226,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
             methods(w)
             w.wlOutdent("private:")
 
-            w.wl(s"${typeName} _ref{nullptr};")
+            w.wl(s"${typeName} _ref;")
             if (spec.cWrapperUseDlsym) {
               w.wl
               // function table
