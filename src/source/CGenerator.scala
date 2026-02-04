@@ -59,6 +59,11 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       w.wl("} // extern \"C\"")
     })
   }
+  private def writeFunctionVisiblity(w: IndentWriter) = {
+    if (spec.cWrapperUseDlsym) {
+      w.wl(s"""__attribute__((visibility("default")))""")
+    }
+  }
 
   private def writeCFile(origin: String, ident: Ident, ext: String, f: IndentWriter => Unit): Unit = {
     val targetDir = if (ext == "h") spec.cHeaderOutFolder else spec.cOutFolder
@@ -154,10 +159,21 @@ class CGenerator(spec: Spec) extends Generator(spec) {
     val typeName = resolveRefSymbolTypeName(ident)
     val cppClassName = ident.name
     val cppNamespace = spec.cWrapperCppNamespace.getOrElse(spec.cppNamespace + "::c_wrappers")
+    val prefix = resolveSymbolName(ident.name)
+    val libHandleDefine = s"DJINNI_LIB_HANDLE_${prefix}"
     wrapIfCpp(w, (w: IndentWriter) => {
       w.wl("#include <cassert>")
       w.wl("#include <utility>")
-      w.wl("#include <dlfcn.h>")
+      if (spec.cWrapperUseDlsym) {
+        w.wl("#include <dlfcn.h>")
+        w.wl(s"#if !defined(${libHandleDefine})")
+        w.wl(s"#if defined(DJINNI_C_DEFAULT_LIB_HANDLE)")
+        w.wl(s"#define ${libHandleDefine} DJINNI_C_DEFAULT_LIB_HANDLE")
+        w.wl(s"#else")
+        w.wl(s"#define ${libHandleDefine} RTLD_DEFAULT")
+        w.wl(s"#endif // DJINNI_C_DEFAULT_LIB_HANDLE")
+        w.wl(s"#endif // !${libHandleDefine}")
+      }
       wrapNamespace(w, cppNamespace, (w: IndentWriter) => {
           w.w(s"class ${cppClassName}").bracedSemi {
             w.wlOutdent("public:")
@@ -211,29 +227,31 @@ class CGenerator(spec: Spec) extends Generator(spec) {
             w.wlOutdent("private:")
 
             w.wl(s"${typeName} _ref{nullptr};")
-            w.wl
-            // function table
-            w.w(s"struct Funcs").bracedSemi {
-              for (functionName <- functionNames) {
-                w.wl(s"decltype(&${functionName}) ${functionName};")
+            if (spec.cWrapperUseDlsym) {
+              w.wl
+              // function table
+              w.w(s"struct Funcs").bracedSemi {
+                for (functionName <- functionNames) {
+                  w.wl(s"decltype(&${functionName}) ${functionName};")
+                }
               }
+              w.wl
+              val functionLoads = functionNames.map(functionName =>
+                s"""|    reinterpret_cast<decltype(&${functionName})>(loadAndAssert("${functionName}")),""").mkString("\n")
+              val functionLoader =
+                s"""static inline Funcs* _loadFuncs() {
+                |  auto loadAndAssert = [](const char* funcName) {
+                |    auto* ptr = dlsym(${libHandleDefine}, funcName);
+                |    assert(ptr && "dlsym() failed loading djinni C functions for class ${cppNamespace}::${cppClassName}");
+                |    return ptr;
+                |  };
+                |  static Funcs funcs {
+                ${functionLoads}
+                |  };
+                |  return &funcs;
+                |}""".stripMargin
+              functionLoader.split("\n").toSeq.foreach(line => w.wl(line))
             }
-            w.wl
-            val functionLoads = functionNames.map(functionName =>
-              s"""|    reinterpret_cast<decltype(&${functionName})>(loadAndAssert("${functionName}")),""").mkString("\n")
-            val functionLoader =
-              s"""static inline Funcs* _loadFuncs() {
-              |  auto loadAndAssert = [](const char* funcName) {
-              |    auto* ptr = dlsym(RTLD_DEFAULT, funcName);
-              |    assert(ptr && "dlsym failed");
-              |    return ptr;
-              |  };
-              |  static Funcs funcs {
-              ${functionLoads}
-              |  };
-              |  return &funcs;
-              |}""".stripMargin
-            functionLoader.split("\n").toSeq.foreach(line => w.wl(line))
           }
         })
     })
@@ -255,6 +273,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
         w.wl(s"""typedef djinni_record_ref ${typeName};""")
         w.wl
 
+        writeFunctionVisiblity(w)
         w.w(s"""${typeName} ${prefix}_new(""")
         writeParamListWithResolvedFields(w, resolvedFields)
         w.wl(");")
@@ -266,13 +285,16 @@ class CGenerator(spec: Spec) extends Generator(spec) {
           val fieldName = resolvedField.field.ident.name
           val fieldTypename = resolvedField.translator.typename
           writeDoc(w, resolvedField.field.doc)
+          writeFunctionVisiblity(w)
           w.wl(s"""${fieldTypename} ${prefix}_get_${fieldName}(${typeName} instance);""")
+          writeFunctionVisiblity(w)
           w.wl(s"""void ${prefix}_set_${fieldName}(${typeName} instance, ${fieldTypename} value);""")
           w.wl
         }
       })
 
       if (spec.cWrapperCppNamespace.isDefined) {
+        val loadFuncPtr = if (spec.cWrapperUseDlsym) "_loadFuncs()->" else ""
         w.wl
         val functionNames = Seq(s"${prefix}_new") ++ resolvedFields.flatMap(resolvedField => {
           val fieldName = resolvedField.field.ident.name
@@ -283,7 +305,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
           writeParamListWithResolvedFields(w, resolvedFields)
           w.w(")")
           w.braced {
-            w.w(s"return _loadFuncs()->${prefix}_new(")
+            w.w(s"return ${loadFuncPtr}${prefix}_new(")
             w.w(resolvedFields.map(p => p.field.ident.name).mkString(", "))
             w.wl(");")
           }
@@ -293,12 +315,12 @@ class CGenerator(spec: Spec) extends Generator(spec) {
             val fieldTypename = resolvedField.translator.typename
             w.w(s"${fieldTypename} ${fieldName}() const")
             w.braced {
-              w.wl(s"return _loadFuncs()->${prefix}_get_${fieldName}(_ref);")
+              w.wl(s"return ${loadFuncPtr}${prefix}_get_${fieldName}(_ref);")
             }
             w.wl
             w.w(s"${ident.name}& ${fieldName}(${fieldTypename} value)")
             w.braced {
-              w.wl(s"_loadFuncs()->${prefix}_set_${fieldName}(_ref, value);")
+              w.wl(s"${loadFuncPtr}${prefix}_set_${fieldName}(_ref, value);")
               w.wl("return *this;")
             }
             w.wl
@@ -473,8 +495,10 @@ class CGenerator(spec: Spec) extends Generator(spec) {
           }
           w.wl
 
+          writeFunctionVisiblity(w)
           w.wl(s"${proxyClassName} ${prefix}_proxy_class_new(const ${methodDefsStructName} *method_defs, djinni_opaque_deallocator opaque_deallocator);")
           w.wl
+          writeFunctionVisiblity(w)
           w.wl(s"${typeName} ${prefix}_new(${proxyClassName} proxy_class, void *opaque);")
           w.wl("")
         } else {
@@ -485,6 +509,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
 
         for (resolvedMethod <- resolvedMethods) {
           writeDoc(w, resolvedMethod.method.doc)
+          writeFunctionVisiblity(w)
           w.w(s"${resolvedMethod.retTypename} ${prefix}_${resolvedMethod.resolvedName}(")
 
           if (resolvedMethod.method.static) {
@@ -500,9 +525,9 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       })
 
       if (i.ext.cpp && spec.cWrapperCppNamespace.isDefined) {
+        val loadFuncPtr = if (spec.cWrapperUseDlsym) "_loadFuncs()->" else ""
         w.wl
-        val functionNames = resolvedMethods.map(resolvedMethod =>
-          s"${prefix}_${resolvedMethod.resolvedName}")
+        val functionNames = resolvedMethods.map(resolvedMethod => s"${prefix}_${resolvedMethod.resolvedName}")
         writeCppWrapperClass(ident, w, (w: IndentWriter) => {
           for (resolvedMethod <- resolvedMethods) {
             if (resolvedMethod.method.static) {
@@ -517,7 +542,7 @@ class CGenerator(spec: Spec) extends Generator(spec) {
               if (resolvedMethod.retTypename != "void") {
                 w.w("return ")
               }
-              w.wl(s"_loadFuncs()->${prefix}_${resolvedMethod.resolvedName}(${fullArgsList.mkString(", ")});")
+              w.wl(s"${loadFuncPtr}${prefix}_${resolvedMethod.resolvedName}(${fullArgsList.mkString(", ")});")
             }
             w.wl
             }
