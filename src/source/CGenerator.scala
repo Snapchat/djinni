@@ -166,6 +166,9 @@ class CGenerator(spec: Spec) extends Generator(spec) {
       if (spec.cWrapperUseDlsym) {
         w.wl("#include <cassert>")
         w.wl("#include <dlfcn.h>")
+        w.wl(s"#if !defined(DJINNI_C_LOAD_SYM_FUNC)")
+        w.wl(s"#define DJINNI_C_LOAD_SYM_FUNC dlsym")
+        w.wl(s"#endif // !DJINNI_C_LOAD_SYM_FUNC")
         w.wl(s"#if !defined(${libHandleDefine})")
         w.wl(s"#if defined(DJINNI_C_DEFAULT_LIB_HANDLE)")
         w.wl(s"#define ${libHandleDefine} DJINNI_C_DEFAULT_LIB_HANDLE")
@@ -240,8 +243,8 @@ class CGenerator(spec: Spec) extends Generator(spec) {
               val functionLoader =
                 s"""static inline Funcs* _loadFuncs() {
                 |  auto loadAndAssert = [](const char* funcName) {
-                |    auto* ptr = dlsym(${libHandleDefine}, funcName);
-                |    assert(ptr && "dlsym() failed loading djinni C functions for class ${cppNamespace}::${cppClassName}");
+                |    auto* ptr = DJINNI_C_LOAD_SYM_FUNC(${libHandleDefine}, funcName);
+                |    assert(ptr && "Failed to load djinni C functions for class ${cppNamespace}::${cppClassName}");
                 |    return ptr;
                 |  };
                 |  static Funcs funcs {
