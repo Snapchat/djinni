@@ -117,6 +117,7 @@ object Main {
     var cBaseLibIncludePrefix: String = ""
     var cIncludePrefix: String = ""
     var cWrapperCppNamespace: Option[String] = None
+    var cWrapperUseDlsym: Boolean = false
     var swiftOutFolder: Option[File] = None
     var swiftModule: String = "Module"
     var swiftIdentStyle = IdentStyle.swiftDefault
@@ -325,6 +326,8 @@ object Main {
         .text("The prefix for #includes of header files from C++ files.")
       opt[String]("c-wrapper-cpp-namespace").valueName("...").foreach(x => cWrapperCppNamespace = Some(x))
         .text("The C++ namespace to use for C API wrapper convenience classes.")
+      opt[Boolean]( "c-wrapper-use-dlsym").valueName("<true/false>").foreach(x => cWrapperUseDlsym = x)
+        .text("In C wrapper, resolve functions at runtime using dlsym() instead of directly linking at build-time. (default: false)")
       opt[File]("swift-out").valueName("<out-folder>").foreach(x => swiftOutFolder = Some(x))
         .text("The output folder for Swift files (Generator disabled if unspecified).")
       opt[String]("swift-module").valueName("<name>").foreach(swiftModule = _)
@@ -551,6 +554,7 @@ object Main {
       cBaseLibIncludePrefix,
       cIncludePrefix,
       cWrapperCppNamespace,
+      cWrapperUseDlsym,
       swiftOutFolder,
       swiftIdentStyle,
       swiftModule,
