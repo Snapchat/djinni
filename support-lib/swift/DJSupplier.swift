@@ -17,6 +17,20 @@
 import DjinniSupportCxx
 import Foundation
 
+/// Supplier of a value: equivalent to `() -> T`. Used by the Djinni `supplier<T>` type
+/// so generated code has a concrete nominal type (e.g. `Supplier<Int32>`).
+public struct Supplier<T> {
+    private let fn: () -> T
+
+    public init(_ fn: @escaping () -> T) {
+        self.fn = fn
+    }
+
+    public func callAsFunction() -> T {
+        fn()
+    }
+}
+
 // Box to hold a Swift closure so we can pass it to C++ as (callback, context).
 private final class SupplierClosureBox {
     let fn: () -> djinni.swift.AnyValue
