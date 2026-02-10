@@ -253,7 +253,6 @@ swift_test(
         exclude = [
             swift_helper_files,
             swift_error_files,
-            "handwritten-src/swift/LazyTest.swift",  # Temporarily excluded - Lazy support incomplete
         ],
     ),
     copts = [
@@ -273,7 +272,7 @@ swift_library(
             swift_helper_files,
         ],
         exclude = [
-            "generated-src/swift/*Lazy*.swift",  # Temporarily excluded - Lazy support incomplete
+            "generated-src/swift/*Lazy*.swift",  # Legacy - supplier types use *Supplier*.swift
         ],
     ),
     copts = [
@@ -311,11 +310,11 @@ cc_library(
     name = "test-swiftxx",
     srcs = glob(
         ["generated-src/swiftxx/*.cpp"],
-        exclude = ["generated-src/swiftxx/*Lazy*.cpp"],  # Temporarily excluded - Lazy support incomplete
+        exclude = ["generated-src/swiftxx/*Lazy*.cpp"],  # Legacy - supplier types use *Supplier*
     ),
     hdrs = glob(
         ["generated-src/swiftxx/*.hpp"],
-        exclude = ["generated-src/swiftxx/*Lazy*.hpp"],  # Temporarily excluded - Lazy support incomplete
+        exclude = ["generated-src/swiftxx/*Lazy*.hpp"],  # Legacy - supplier types use *Supplier*
     ),
     copts = ["-std=c++20"],
     includes = [

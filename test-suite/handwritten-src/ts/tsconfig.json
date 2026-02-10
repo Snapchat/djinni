@@ -5,8 +5,9 @@
         "paths": {
             "@djinni_support/*": ["../../../support-lib/ts/*"]
         },
-	"esModuleInterop": true,
+        "esModuleInterop": true,
         "strict": true,
+        "skipLibCheck": true
     },
-    "include": ["./*.ts"],
+    "include": ["./*.ts"]
 }

@@ -87,10 +87,7 @@ sh_library(
 swift_library(
     name = "djinni-support-swift",
     module_name = "DjinniSupport",
-    srcs = glob(
-        ["swift/*.swift"],
-        exclude = ["swift/DJLazy.swift"],  # Temporarily excluded - Lazy support incomplete
-    ),
+    srcs = glob(["swift/*.swift"]),
     copts = [
         "-cxx-interoperability-mode=default",
         "-Xcc", "-std=c++20",
@@ -109,14 +106,8 @@ swift_interop_hint(
 
 cc_library(
     name = "djinni-support-swiftxx",
-    srcs = glob(
-        ["swiftxx/*.cpp"],
-        exclude = ["swiftxx/Lazy_swift.cpp"],  # Temporarily excluded - Lazy support incomplete
-    ),
-    hdrs = glob(
-        ["swiftxx/*.hpp"],
-        exclude = ["swiftxx/Lazy_swift.hpp"],  # Temporarily excluded - Lazy support incomplete
-    ),
+    srcs = glob(["swiftxx/*.cpp"]),
+    hdrs = glob(["swiftxx/*.hpp"]),
     includes = [
         "swiftxx",
         ".",

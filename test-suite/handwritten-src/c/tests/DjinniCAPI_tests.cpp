@@ -12,7 +12,7 @@
 #include "proto_tests.h"
 #include "test_helpers.h"
 #include "test_outcome.h"
-#include "test_lazy.h"
+#include "test_supplier.h"
 #include "simple_object.h"
 #include "gtest/gtest.h"
 #include <memory>
@@ -727,61 +727,61 @@ TEST(DjinniCAPI, supportsConstantsRecord) {
             std::string(djinni_string_get_data(str.value)));
 }
 
-TEST(DjinniCAPI, supportsLazy) {
-  // Test getting lazy string from C++ and calling it
-  auto lazyStr = CRef(testsuite_test_lazy_getLazyString());
-  auto str = CRef(djinni_lazy_call(lazyStr.value));
+TEST(DjinniCAPI, supportsSupplier) {
+  // Test getting supplier string from C++ and calling it
+  auto supplierStr = CRef(testsuite_test_supplier_getSupplierString());
+  auto str = CRef(djinni_supplier_call(supplierStr.value));
   ASSERT_EQ(std::string("hello"), std::string(djinni_string_get_data(str.value)));
 
-  // Test getting lazy int from C++ and calling it
-  auto lazyInt = CRef(testsuite_test_lazy_getLazyInt());
-  auto intVal = CRef(djinni_lazy_call(lazyInt.value));
+  // Test getting supplier int from C++ and calling it
+  auto supplierInt = CRef(testsuite_test_supplier_getSupplierInt());
+  auto intVal = CRef(djinni_supplier_call(supplierInt.value));
   ASSERT_EQ(42, djinni_number_get_int64(intVal.value));
 
-  // Test passing lazy string to C++
+  // Test passing supplier string to C++
   struct StringContext {
     const char* value;
   };
   StringContext strCtx = {"world"};
-  
-  auto cLazyStr = CRef(djinni_lazy_make(
+
+  auto cSupplierStr = CRef(djinni_supplier_make(
       [](void* ctx) -> djinni_ref {
         auto* strCtx = static_cast<StringContext*>(ctx);
         return djinni_string_new(strCtx->value, strlen(strCtx->value));
       },
       &strCtx,
       nullptr));
-  
-  auto result = CRef(testsuite_test_lazy_callLazyString(cLazyStr.value));
+
+  auto result = CRef(testsuite_test_supplier_callSupplierString(cSupplierStr.value));
   ASSERT_EQ(std::string("world"), std::string(djinni_string_get_data(result.value)));
 
-  // Test passing lazy int to C++
+  // Test passing supplier int to C++
   struct IntContext {
     int64_t value;
   };
   IntContext intCtx = {123};
-  
-  auto cLazyInt = CRef(djinni_lazy_make(
+
+  auto cSupplierInt = CRef(djinni_supplier_make(
       [](void* ctx) -> djinni_ref {
         auto* intCtx = static_cast<IntContext*>(ctx);
         return djinni_number_int64_new(intCtx->value);
       },
       &intCtx,
       nullptr));
-  
-  ASSERT_EQ(123, testsuite_test_lazy_callLazyInt(cLazyInt.value));
+
+  ASSERT_EQ(123, testsuite_test_supplier_callSupplierInt(cSupplierInt.value));
 }
 
-TEST(DjinniCAPI, supportsLazyInterface) {
-  // Test getting lazy interface object from C++ and calling it
-  auto lazyObj = CRef(testsuite_test_lazy_getLazyObject());
-  auto obj = CRef(djinni_lazy_call(lazyObj.value));
-  
+TEST(DjinniCAPI, supportsSupplierInterface) {
+  // Test getting supplier interface object from C++ and calling it
+  auto supplierObj = CRef(testsuite_test_supplier_getSupplierObject());
+  auto obj = CRef(djinni_supplier_call(supplierObj.value));
+
   ASSERT_EQ(42, testsuite_simple_object_get_value(obj.value));
   auto name = CRef(testsuite_simple_object_get_name(obj.value));
   ASSERT_EQ(std::string("expensive"), std::string(djinni_string_get_data(name.value)));
 
-  // Test passing lazy interface to C++
+  // Test passing supplier interface to C++
   struct ObjectContext {
     int32_t value;
     const char* name;
@@ -789,26 +789,26 @@ TEST(DjinniCAPI, supportsLazyInterface) {
   };
   int creationCount = 0;
   ObjectContext objCtx = {999, "c-created", &creationCount};
-  
-  auto cLazyObj = CRef(djinni_lazy_make(
+
+  auto cSupplierObj = CRef(djinni_supplier_make(
       [](void* ctx) -> djinni_ref {
         auto* objCtx = static_cast<ObjectContext*>(ctx);
         (*objCtx->creationCount)++;
         auto cName = CRef(djinni_string_new(objCtx->name, strlen(objCtx->name)));
-        return testsuite_test_lazy_createSimpleObject(objCtx->value, cName.value);
+        return testsuite_test_supplier_createSimpleObject(objCtx->value, cName.value);
       },
       &objCtx,
       nullptr));
-  
+
   // Object not created yet
   ASSERT_EQ(0, creationCount);
-  
+
   // Call from C++ - object created on demand
-  ASSERT_EQ(999, testsuite_test_lazy_callLazyObject(cLazyObj.value));
+  ASSERT_EQ(999, testsuite_test_supplier_callSupplierObject(cSupplierObj.value));
   ASSERT_EQ(1, creationCount);
-  
+
   // Second call - object created again (not memoized in this test)
-  auto objName = CRef(testsuite_test_lazy_callLazyObjectGetName(cLazyObj.value));
+  auto objName = CRef(testsuite_test_supplier_callSupplierObjectGetName(cSupplierObj.value));
   ASSERT_EQ(std::string("c-created"), std::string(djinni_string_get_data(objName.value)));
   ASSERT_EQ(2, creationCount);
 }

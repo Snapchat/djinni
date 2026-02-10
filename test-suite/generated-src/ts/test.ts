@@ -3,7 +3,7 @@
 
 import { PersistingState } from "../../djinni/vendor/third-party/proto/ts/test2"
 import { AddressBook, Person } from "../../djinni/vendor/third-party/proto/ts/test"
-import { Lazy } from "@djinni_support/Lazy"
+import { Supplier } from "@djinni_support/Supplier"
 import { Outcome } from "@djinni_support/Outcome"
 
 export interface /*record*/ RecordWithEmbeddedProto {
@@ -49,36 +49,36 @@ export interface TestOutcome_statics {
     putNestedErrorOutcome(x: NestedOutcome): string;
 }
 
-/** Simple object interface for lazy testing */
+/** Simple object interface for supplier testing */
 export interface SimpleObject {
     getValue(): number;
     getName(): string;
 }
 
-export interface /*record*/ NestedLazy {
-    l: Lazy<number>;
+export interface /*record*/ NestedSupplier {
+    s: Supplier<number>;
 }
 
-export interface /*record*/ NestedLazyInterface {
-    obj: Lazy<SimpleObject>;
+export interface /*record*/ NestedSupplierInterface {
+    obj: Supplier<SimpleObject>;
 }
 
-export interface TestLazy {
+export interface TestSupplier {
 }
-export interface TestLazy_statics {
-    /** Simple type lazy tests */
-    getLazyString(): Lazy<string>;
-    getLazyInt(): Lazy<number>;
-    callLazyString(x: Lazy<string>): string;
-    callLazyInt(x: Lazy<number>): number;
-    getNestedLazy(): NestedLazy;
-    callNestedLazy(x: NestedLazy): number;
-    /** Interface lazy tests - main use case for deferred expensive object creation */
-    getLazyObject(): Lazy<SimpleObject>;
-    callLazyObject(x: Lazy<SimpleObject>): number;
-    callLazyObjectGetName(x: Lazy<SimpleObject>): string;
-    getNestedLazyInterface(): NestedLazyInterface;
-    callNestedLazyInterface(x: NestedLazyInterface): number;
+export interface TestSupplier_statics {
+    /** Simple type supplier tests */
+    getSupplierString(): Supplier<string>;
+    getSupplierInt(): Supplier<number>;
+    callSupplierString(x: Supplier<string>): string;
+    callSupplierInt(x: Supplier<number>): number;
+    getNestedSupplier(): NestedSupplier;
+    callNestedSupplier(x: NestedSupplier): number;
+    /** Interface supplier tests - main use case for deferred expensive object creation */
+    getSupplierObject(): Supplier<SimpleObject>;
+    callSupplierObject(x: Supplier<SimpleObject>): number;
+    callSupplierObjectGetName(x: Supplier<SimpleObject>): string;
+    getNestedSupplierInterface(): NestedSupplierInterface;
+    callNestedSupplierInterface(x: NestedSupplierInterface): number;
     /** Helper to create simple_object for testing */
     createSimpleObject(value: number, name: string): SimpleObject;
 }
@@ -647,7 +647,7 @@ export interface /*record*/ SetRecord {
 export interface ns_testsuite {
     ProtoTests: ProtoTests_statics;
     TestOutcome: TestOutcome_statics;
-    TestLazy: TestLazy_statics;
+    TestSupplier: TestSupplier_statics;
     TestDuration: TestDuration_statics;
     DataRefTest: DataRefTest_statics;
     FlagRoundtrip: FlagRoundtrip_statics;
@@ -662,7 +662,7 @@ export interface ns_testsuite {
 export interface Test_statics {
     testsuite_ProtoTests: ProtoTests_statics;
     testsuite_TestOutcome: TestOutcome_statics;
-    testsuite_TestLazy: TestLazy_statics;
+    testsuite_TestSupplier: TestSupplier_statics;
     testsuite_TestDuration: TestDuration_statics;
     testsuite_DataRefTest: DataRefTest_statics;
     testsuite_FlagRoundtrip: FlagRoundtrip_statics;

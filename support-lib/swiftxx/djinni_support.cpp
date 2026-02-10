@@ -117,4 +117,35 @@ AnyValue ProtocolWrapper::callProtocol(int idx, const ParameterList* params) {
     return ret;
 }
 
+// -------- Supplier bridge (callable from Swift as callSupplierFunction / makeSupplierFunction)
+AnyValue callSupplierFunction(const AnyValue& supplierValue) {
+    auto ptr = std::get<OpaqueValuePtr>(supplierValue);
+    auto* callable = dynamic_cast<CallableSupplier*>(ptr.get());
+    if (!callable) {
+        throw ErrorValue("callSupplierFunction: value is not a supplier");
+    }
+    return callable->call();
+}
+
+namespace {
+struct CallbackSupplierHolder : CallableSupplier {
+    AnyValue (*callback)(void*);
+    void* context;
+    void (*releaseContext)(void*);
+    CallbackSupplierHolder(AnyValue (*cb)(void*), void* ctx, void (*release)(void*) = nullptr)
+        : callback(cb), context(ctx), releaseContext(release) {}
+    ~CallbackSupplierHolder() override {
+        if (releaseContext && context) {
+            releaseContext(context);
+        }
+    }
+    AnyValue call() override { return callback(context); }
+};
+}
+
+AnyValue makeSupplierFunction(AnyValue (*callback)(void*), void* context, void (*releaseContext)(void*)) {
+    auto holder = std::make_shared<CallbackSupplierHolder>(callback, context, releaseContext);
+    return AnyValue{OpaqueValuePtr(holder)};
+}
+
 }
