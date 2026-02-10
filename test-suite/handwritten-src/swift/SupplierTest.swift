@@ -30,7 +30,7 @@ final class SupplierTest: XCTestCase {
         // Interface supplier tests - main use case for deferred expensive object creation
         // get supplier object from native and call it
         let supplierObj = try TestSupplier_statics.getSupplierObject()
-        let obj = try supplierObj()
+        let obj = supplierObj()
         XCTAssertEqual(try obj.getValue(), 42)
         XCTAssertEqual(try obj.getName(), "expensive")
 

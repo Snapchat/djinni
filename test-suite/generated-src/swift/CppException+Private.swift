@@ -4,7 +4,6 @@
 import DjinniSupport
 import DjinniSupportCxx
 import Foundation
-import TestSuite
 import TestSuiteCxx
 
 final class CppExceptionCppProxy: DjinniSupport.CppProxy, TestSuite.CppException {

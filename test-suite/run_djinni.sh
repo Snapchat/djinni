@@ -104,6 +104,7 @@ fi
     \
     --swift-out "$temp_out_relative/swift" \
     --swift-module "TestSuite" \
+    --swift-private-in-same-module \
     --swiftxx-out "$temp_out_relative/swiftxx" \
     --ident-swiftxx-class NativeFooBar \
     --ident-swiftxx-file NativeFooBar \
@@ -146,6 +147,7 @@ fi
     \
     --swift-out "$temp_out_relative/swift" \
     --swift-module "TestSuite" \
+    --swift-private-in-same-module \
     --swiftxx-out "$temp_out_relative/swiftxx" \
     --ident-swiftxx-class NativeFooBar \
     --ident-swiftxx-file NativeFooBar \
@@ -318,6 +320,7 @@ cp "$base_dir/djinni/yaml-test.djinni" "$temp_out/yaml"
     \
     --swift-out "$temp_out_relative/swift" \
     --swift-module "TestSuite" \
+    --swift-private-in-same-module \
     --swiftxx-out "$temp_out_relative/swiftxx" \
     --ident-swiftxx-class NativeFooBar \
     --ident-swiftxx-file NativeFooBar \

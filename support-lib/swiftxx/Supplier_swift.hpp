@@ -21,12 +21,6 @@
 
 namespace djinni::swift {
 
-// Callback from Swift to call a C++ supplier function
-typedef AnyValue (*SupplierFuncCb)(void* ctx);
-
-// Function to wrap a Swift supplier function for C++ use
-AnyValue callSwiftSupplierFunction(const AnyValue& supplierValue);
-
 // Holder for a C++ supplier function
 template<typename RESULT>
 struct CppSupplierHolder: CallableSupplier {
@@ -45,17 +39,6 @@ struct CppSupplierHolder: CallableSupplier {
     }
 };
 
-// Holder for a Swift supplier function
-struct SwiftSupplierHolder: CallableSupplier {
-    AnyValue supplierValue;
-
-    explicit SwiftSupplierHolder(const AnyValue& v) : supplierValue(v) {}
-
-    AnyValue call() override {
-        return callSwiftSupplierFunction(supplierValue);
-    }
-};
-
 template <class RESULT>
 class SupplierAdaptor {
     using CppResType = typename RESULT::CppType;
@@ -64,23 +47,26 @@ public:
     using CppType = std::function<CppResType()>;
 
     static CppType toCpp(const AnyValue& o) {
-        // Check if this is already a C++ supplier function
-        auto cppHolder = std::dynamic_pointer_cast<CppSupplierHolder<RESULT>>(std::get<OpaqueValuePtr>(o));
+        auto ptr = std::get<OpaqueValuePtr>(o);
+        // Already a C++ supplier function (e.g. from fromCpp earlier)
+        auto cppHolder = std::dynamic_pointer_cast<CppSupplierHolder<RESULT>>(ptr);
         if (cppHolder) {
             return std::move(cppHolder->func);
         }
-
-        // It's a Swift supplier function
-        auto swiftHolder = std::make_shared<SwiftSupplierHolder>(o);
-
-        return [swiftHolder]() -> CppResType {
-            auto result = swiftHolder->call();
-            if constexpr (std::is_void_v<CppResType>) {
-                return;
-            } else {
-                return RESULT::toCpp(result);
-            }
-        };
+        // Swift-created supplier: AnyValue holds CallbackSupplierHolder from makeSupplierFunction.
+        // Use it directly so call() invokes the Swift callback.
+        auto callable = std::dynamic_pointer_cast<CallableSupplier>(ptr);
+        if (callable) {
+            return [callable]() -> CppResType {
+                auto result = callable->call();
+                if constexpr (std::is_void_v<CppResType>) {
+                    return;
+                } else {
+                    return RESULT::toCpp(result);
+                }
+            };
+        }
+        throw ErrorValue("SupplierAdaptor::toCpp: value is not a supplier");
     }
 
     static AnyValue fromCpp(const CppType& c) {

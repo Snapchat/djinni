@@ -4,7 +4,6 @@
 import DjinniSupport
 import DjinniSupportCxx
 import Foundation
-import TestSuite
 import TestSuiteCxx
 
 /** Simple object interface for supplier testing */

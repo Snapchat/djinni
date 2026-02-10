@@ -4,7 +4,6 @@
 import DjinniSupport
 import DjinniSupportCxx
 import Foundation
-import TestSuite
 import TestSuiteCxx
 
 final class ExternInterface1CppProxy: DjinniSupport.CppProxy, TestSuite.ExternInterface1 {
