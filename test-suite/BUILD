@@ -174,7 +174,7 @@ java_test(
         "//support-lib:djinni-support-java",
         "@com_google_protobuf//java/core",
         "@maven_djinni//:com_google_code_findbugs_jsr305",
-        "@maven_djinni//:com_google_guava_guava",
+        "@maven_djinni//:javax_inject_javax_inject",
         "@maven_djinni//:io_reactivex_rxjava2_rxjava",
         "@maven_djinni//:junit_junit",
     ],
@@ -272,7 +272,7 @@ swift_library(
             swift_helper_files,
         ],
         exclude = [
-            "generated-src/swift/*Lazy*.swift",  # Legacy - supplier types use *Supplier*.swift
+            "generated-src/swift/*Lazy*.swift",  # Legacy - provider types use *Provider*.swift
         ],
     ),
     copts = [
@@ -310,11 +310,11 @@ cc_library(
     name = "test-swiftxx",
     srcs = glob(
         ["generated-src/swiftxx/*.cpp"],
-        exclude = ["generated-src/swiftxx/*Lazy*.cpp"],  # Legacy - supplier types use *Supplier*
+        exclude = ["generated-src/swiftxx/*Lazy*.cpp"],  # Legacy - provider types use *Provider*
     ),
     hdrs = glob(
         ["generated-src/swiftxx/*.hpp"],
-        exclude = ["generated-src/swiftxx/*Lazy*.hpp"],  # Legacy - supplier types use *Supplier*
+        exclude = ["generated-src/swiftxx/*Lazy*.hpp"],  # Legacy - provider types use *Provider*
     ),
     copts = ["-std=c++20"],
     includes = [

@@ -64,12 +64,12 @@ using AnyValue = std::variant<VoidValue, I32Value, I64Value, DoubleValue,
     StringValue, BinaryValue, DateValue, ErrorValue, OpaqueValuePtr, RangeValue,
     InterfaceValue, CompositeValuePtr>;
 
-// Base for opaque values that can be invoked as a supplier (returns AnyValue).
-// Used by callSupplierFunction so Swift can call into C++/Swift supplier holders.
-struct CallableSupplier : OpaqueValue {
+// Base for opaque values that can be invoked as a provider (returns AnyValue).
+// Used by callProviderFunction so Swift can call into C++/Swift provider holders.
+struct CallableProvider : OpaqueValue {
     virtual AnyValue call() = 0;
 };
-using CallableSupplierPtr = std::shared_ptr<CallableSupplier>;
+using CallableProviderPtr = std::shared_ptr<CallableProvider>;
 
 struct CompositeValue {
     virtual ~CompositeValue() = default;
@@ -105,9 +105,9 @@ AnyValue makeCompositeValue();
 bool isError(const AnyValue* ret);
 ErrorValue getError(const AnyValue* ret);
 
-// Supplier bridge: call a supplier held in AnyValue (C++ or Swift), or create one from a callback.
-AnyValue callSupplierFunction(const AnyValue& supplierValue);
-AnyValue makeSupplierFunction(AnyValue (*callback)(void*), void* context, void (*releaseContext)(void*) = nullptr);
+// Provider bridge: call a provider held in AnyValue (C++ or Swift), or create one from a callback.
+AnyValue callProviderFunction(const AnyValue& providerValue);
+AnyValue makeProviderFunction(AnyValue (*callback)(void*), void* context, void (*releaseContext)(void*) = nullptr);
 
 struct InterfaceInfo {
     void* cppPointer;

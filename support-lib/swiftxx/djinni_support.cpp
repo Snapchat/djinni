@@ -117,24 +117,24 @@ AnyValue ProtocolWrapper::callProtocol(int idx, const ParameterList* params) {
     return ret;
 }
 
-// -------- Supplier bridge (callable from Swift as callSupplierFunction / makeSupplierFunction)
-AnyValue callSupplierFunction(const AnyValue& supplierValue) {
-    auto ptr = std::get<OpaqueValuePtr>(supplierValue);
-    auto* callable = dynamic_cast<CallableSupplier*>(ptr.get());
+// -------- Provider bridge (callable from Swift as callProviderFunction / makeProviderFunction)
+AnyValue callProviderFunction(const AnyValue& providerValue) {
+    auto ptr = std::get<OpaqueValuePtr>(providerValue);
+    auto* callable = dynamic_cast<CallableProvider*>(ptr.get());
     if (!callable) {
-        throw ErrorValue("callSupplierFunction: value is not a supplier");
+        throw ErrorValue("callProviderFunction: value is not a provider");
     }
     return callable->call();
 }
 
 namespace {
-struct CallbackSupplierHolder : CallableSupplier {
+struct CallbackProviderHolder : CallableProvider {
     AnyValue (*callback)(void*);
     void* context;
     void (*releaseContext)(void*);
-    CallbackSupplierHolder(AnyValue (*cb)(void*), void* ctx, void (*release)(void*) = nullptr)
+    CallbackProviderHolder(AnyValue (*cb)(void*), void* ctx, void (*release)(void*) = nullptr)
         : callback(cb), context(ctx), releaseContext(release) {}
-    ~CallbackSupplierHolder() override {
+    ~CallbackProviderHolder() override {
         if (releaseContext && context) {
             releaseContext(context);
         }
@@ -143,8 +143,8 @@ struct CallbackSupplierHolder : CallableSupplier {
 };
 }
 
-AnyValue makeSupplierFunction(AnyValue (*callback)(void*), void* context, void (*releaseContext)(void*)) {
-    auto holder = std::make_shared<CallbackSupplierHolder>(callback, context, releaseContext);
+AnyValue makeProviderFunction(AnyValue (*callback)(void*), void* context, void (*releaseContext)(void*)) {
+    auto holder = std::make_shared<CallbackProviderHolder>(callback, context, releaseContext);
     return AnyValue{OpaqueValuePtr(holder)};
 }
 

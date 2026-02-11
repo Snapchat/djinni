@@ -160,11 +160,11 @@ EM_JS(void, djinni_init_wasm, (), {
             };
         };
 
-        // Helper to create supplier functions that call back into C++
-        // The handlerPtr points to a std::function<em::val()> that will be called when the supplier is evaluated
-        Module.makeNativeSupplierCallback = function(handlerPtr) {
+        // Helper to create provider functions that call back into C++
+        // The handlerPtr points to a std::function<em::val()> that will be called when the provider is evaluated
+        Module.makeNativeProviderCallback = function(handlerPtr) {
             return function() {
-                return Module.callNativeSupplierCallback(handlerPtr);
+                return Module.callNativeProviderCallback(handlerPtr);
             };
         };
 
@@ -222,11 +222,11 @@ void djinni_throw_native_exception(const std::exception& e) {
     djinni_native_exception_to_js(e).throw_();
 }
 
-// Supplier callback function - called from JavaScript when a supplier is evaluated
+// Provider callback function - called from JavaScript when a provider is evaluated
 // Note: Currently leaks memory as callbacks are never deleted.
-// This is acceptable for typical supplier usage where callbacks are short-lived.
+// This is acceptable for typical provider usage where callbacks are short-lived.
 // A proper solution would use FinalizationRegistry on the JS side.
-static em::val callNativeSupplierCallback(int handlerPtr) {
+static em::val callNativeProviderCallback(int handlerPtr) {
     if (!handlerPtr) {
         return em::val::undefined();
     }
@@ -244,7 +244,7 @@ EMSCRIPTEN_BINDINGS(djinni_wasm) {
     em::function("initCppResolveHandler", &CppResolveHandlerBase::initInstance);
     em::function("resolveNativePromise", &CppResolveHandlerBase::resolveNativePromise);
     em::function("rejectNativePromise", &CppResolveHandlerBase::rejectNativePromise);
-    em::function("callNativeSupplierCallback", &callNativeSupplierCallback);
+    em::function("callNativeProviderCallback", &callNativeProviderCallback);
 }
 
 }

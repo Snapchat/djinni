@@ -12,7 +12,7 @@
 #include "proto_tests.h"
 #include "test_helpers.h"
 #include "test_outcome.h"
-#include "test_supplier.h"
+#include "test_provider.h"
 #include "simple_object.h"
 #include "gtest/gtest.h"
 #include <memory>
@@ -727,24 +727,24 @@ TEST(DjinniCAPI, supportsConstantsRecord) {
             std::string(djinni_string_get_data(str.value)));
 }
 
-TEST(DjinniCAPI, supportsSupplier) {
-  // Test getting supplier string from C++ and calling it
-  auto supplierStr = CRef(testsuite_test_supplier_getSupplierString());
-  auto str = CRef(djinni_supplier_call(supplierStr.value));
+TEST(DjinniCAPI, supportsProvider) {
+  // Test getting provider string from C++ and calling it
+  auto providerStr = CRef(testsuite_test_provider_getProviderString());
+  auto str = CRef(djinni_provider_call(providerStr.value));
   ASSERT_EQ(std::string("hello"), std::string(djinni_string_get_data(str.value)));
 
-  // Test getting supplier int from C++ and calling it
-  auto supplierInt = CRef(testsuite_test_supplier_getSupplierInt());
-  auto intVal = CRef(djinni_supplier_call(supplierInt.value));
+  // Test getting provider int from C++ and calling it
+  auto providerInt = CRef(testsuite_test_provider_getProviderInt());
+  auto intVal = CRef(djinni_provider_call(providerInt.value));
   ASSERT_EQ(42, djinni_number_get_int64(intVal.value));
 
-  // Test passing supplier string to C++
+  // Test passing provider string to C++
   struct StringContext {
     const char* value;
   };
   StringContext strCtx = {"world"};
 
-  auto cSupplierStr = CRef(djinni_supplier_make(
+  auto cProviderStr = CRef(djinni_provider_make(
       [](void* ctx) -> djinni_ref {
         auto* strCtx = static_cast<StringContext*>(ctx);
         return djinni_string_new(strCtx->value, strlen(strCtx->value));
@@ -752,16 +752,16 @@ TEST(DjinniCAPI, supportsSupplier) {
       &strCtx,
       nullptr));
 
-  auto result = CRef(testsuite_test_supplier_callSupplierString(cSupplierStr.value));
+  auto result = CRef(testsuite_test_provider_callProviderString(cProviderStr.value));
   ASSERT_EQ(std::string("world"), std::string(djinni_string_get_data(result.value)));
 
-  // Test passing supplier int to C++
+  // Test passing provider int to C++
   struct IntContext {
     int64_t value;
   };
   IntContext intCtx = {123};
 
-  auto cSupplierInt = CRef(djinni_supplier_make(
+  auto cProviderInt = CRef(djinni_provider_make(
       [](void* ctx) -> djinni_ref {
         auto* intCtx = static_cast<IntContext*>(ctx);
         return djinni_number_int64_new(intCtx->value);
@@ -769,19 +769,19 @@ TEST(DjinniCAPI, supportsSupplier) {
       &intCtx,
       nullptr));
 
-  ASSERT_EQ(123, testsuite_test_supplier_callSupplierInt(cSupplierInt.value));
+  ASSERT_EQ(123, testsuite_test_provider_callProviderInt(cProviderInt.value));
 }
 
-TEST(DjinniCAPI, supportsSupplierInterface) {
-  // Test getting supplier interface object from C++ and calling it
-  auto supplierObj = CRef(testsuite_test_supplier_getSupplierObject());
-  auto obj = CRef(djinni_supplier_call(supplierObj.value));
+TEST(DjinniCAPI, supportsProviderInterface) {
+  // Test getting provider interface object from C++ and calling it
+  auto providerObj = CRef(testsuite_test_provider_getProviderObject());
+  auto obj = CRef(djinni_provider_call(providerObj.value));
 
   ASSERT_EQ(42, testsuite_simple_object_get_value(obj.value));
   auto name = CRef(testsuite_simple_object_get_name(obj.value));
   ASSERT_EQ(std::string("expensive"), std::string(djinni_string_get_data(name.value)));
 
-  // Test passing supplier interface to C++
+  // Test passing provider interface to C++
   struct ObjectContext {
     int32_t value;
     const char* name;
@@ -790,12 +790,12 @@ TEST(DjinniCAPI, supportsSupplierInterface) {
   int creationCount = 0;
   ObjectContext objCtx = {999, "c-created", &creationCount};
 
-  auto cSupplierObj = CRef(djinni_supplier_make(
+  auto cProviderObj = CRef(djinni_provider_make(
       [](void* ctx) -> djinni_ref {
         auto* objCtx = static_cast<ObjectContext*>(ctx);
         (*objCtx->creationCount)++;
         auto cName = CRef(djinni_string_new(objCtx->name, strlen(objCtx->name)));
-        return testsuite_test_supplier_createSimpleObject(objCtx->value, cName.value);
+        return testsuite_test_provider_createSimpleObject(objCtx->value, cName.value);
       },
       &objCtx,
       nullptr));
@@ -804,11 +804,11 @@ TEST(DjinniCAPI, supportsSupplierInterface) {
   ASSERT_EQ(0, creationCount);
 
   // Call from C++ - object created on demand
-  ASSERT_EQ(999, testsuite_test_supplier_callSupplierObject(cSupplierObj.value));
+  ASSERT_EQ(999, testsuite_test_provider_callProviderObject(cProviderObj.value));
   ASSERT_EQ(1, creationCount);
 
   // Second call - object created again (not memoized in this test)
-  auto objName = CRef(testsuite_test_supplier_callSupplierObjectGetName(cSupplierObj.value));
+  auto objName = CRef(testsuite_test_provider_callProviderObjectGetName(cProviderObj.value));
   ASSERT_EQ(std::string("c-created"), std::string(djinni_string_get_data(objName.value)));
   ASSERT_EQ(2, creationCount);
 }

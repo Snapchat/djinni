@@ -59,7 +59,7 @@ java_library(
     srcs = glob(["java/**/*.java"]),
     visibility = ["//visibility:public"],
     deps = [
-        "@maven_djinni//:com_google_guava_guava",
+        "@maven_djinni//:javax_inject_javax_inject",
     ],
 )
 

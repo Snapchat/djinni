@@ -8,7 +8,7 @@ import "./CppExceptionTest"
 import "./DataTest"
 import "./DurationTest"
 import "./EnumTest"
-import "./SupplierTest"
+import "./ProviderTest"
 import "./MapRecordTest"
 import "./NestedCollectionTest"
 import "./OutcomeTest"
@@ -22,4 +22,4 @@ import "./WcharTest"
 declare function Module(): Promise<DjinniModule>;
 Module().then(m => {
     runTests(m, allTests);
-})
+});

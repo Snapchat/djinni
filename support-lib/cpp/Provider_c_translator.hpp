@@ -1,0 +1,71 @@
+/**
+ * Copyright 2021 Snap, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#pragma once
+
+#include "Provider_c.h"
+#include <functional>
+
+namespace djinni::c_api {
+
+template <typename Tr>
+struct ProviderTranslator {
+    using CppType = std::function<typename Tr::CppType()>;
+    using CType = djinni_provider_ref;
+
+    static CppType toCpp(djinni_provider_ref provider) {
+        djinni_ref_retain(provider);
+        return [provider]() -> typename Tr::CppType {
+            auto result_c = djinni_provider_call(provider);
+            auto result_cpp = Tr::toCpp(result_c);
+            djinni_ref_release(result_c);
+            djinni_ref_release(provider);
+            return result_cpp;
+        };
+    }
+
+    static CType fromCpp(const CppType& provider) {
+        auto* func_ptr = new CppType(provider);
+        return djinni_provider_make(
+            [](void* context) -> djinni_ref {
+                auto provider_func = static_cast<CppType*>(context);
+                auto result = (*provider_func)();
+                return Tr::fromCpp(std::move(result));
+            },
+            func_ptr,
+            [](void* context) {
+                delete static_cast<CppType*>(context);
+            }
+        );
+    }
+
+    static CType fromCpp(CppType&& provider) {
+        auto* func_ptr = new CppType(std::move(provider));
+        return djinni_provider_make(
+            [](void* context) -> djinni_ref {
+                auto provider_func = static_cast<CppType*>(context);
+                auto result = (*provider_func)();
+                return Tr::fromCpp(std::move(result));
+            },
+            func_ptr,
+            [](void* context) {
+                delete static_cast<CppType*>(context);
+            }
+        );
+    }
+};
+
+} // namespace djinni::c_api

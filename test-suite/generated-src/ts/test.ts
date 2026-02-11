@@ -3,8 +3,8 @@
 
 import { PersistingState } from "../../djinni/vendor/third-party/proto/ts/test2"
 import { AddressBook, Person } from "../../djinni/vendor/third-party/proto/ts/test"
-import { Supplier } from "@djinni_support/Supplier"
 import { Outcome } from "@djinni_support/Outcome"
+import { Provider } from "@djinni_support/Provider"
 
 export interface /*record*/ RecordWithEmbeddedProto {
     person: Person;
@@ -49,36 +49,36 @@ export interface TestOutcome_statics {
     putNestedErrorOutcome(x: NestedOutcome): string;
 }
 
-/** Simple object interface for supplier testing */
+/** Simple object interface for provider testing */
 export interface SimpleObject {
     getValue(): number;
     getName(): string;
 }
 
-export interface /*record*/ NestedSupplier {
-    s: Supplier<number>;
+export interface /*record*/ NestedProvider {
+    s: Provider<number>;
 }
 
-export interface /*record*/ NestedSupplierInterface {
-    obj: Supplier<SimpleObject>;
+export interface /*record*/ NestedProviderInterface {
+    obj: Provider<SimpleObject>;
 }
 
-export interface TestSupplier {
+export interface TestProvider {
 }
-export interface TestSupplier_statics {
-    /** Simple type supplier tests */
-    getSupplierString(): Supplier<string>;
-    getSupplierInt(): Supplier<number>;
-    callSupplierString(x: Supplier<string>): string;
-    callSupplierInt(x: Supplier<number>): number;
-    getNestedSupplier(): NestedSupplier;
-    callNestedSupplier(x: NestedSupplier): number;
-    /** Interface supplier tests - main use case for deferred expensive object creation */
-    getSupplierObject(): Supplier<SimpleObject>;
-    callSupplierObject(x: Supplier<SimpleObject>): number;
-    callSupplierObjectGetName(x: Supplier<SimpleObject>): string;
-    getNestedSupplierInterface(): NestedSupplierInterface;
-    callNestedSupplierInterface(x: NestedSupplierInterface): number;
+export interface TestProvider_statics {
+    /** Simple type provider tests */
+    getProviderString(): Provider<string>;
+    getProviderInt(): Provider<number>;
+    callProviderString(x: Provider<string>): string;
+    callProviderInt(x: Provider<number>): number;
+    getNestedProvider(): NestedProvider;
+    callNestedProvider(x: NestedProvider): number;
+    /** Interface provider tests - main use case for deferred expensive object creation */
+    getProviderObject(): Provider<SimpleObject>;
+    callProviderObject(x: Provider<SimpleObject>): number;
+    callProviderObjectGetName(x: Provider<SimpleObject>): string;
+    getNestedProviderInterface(): NestedProviderInterface;
+    callNestedProviderInterface(x: NestedProviderInterface): number;
     /** Helper to create simple_object for testing */
     createSimpleObject(value: number, name: string): SimpleObject;
 }
@@ -647,7 +647,7 @@ export interface /*record*/ SetRecord {
 export interface ns_testsuite {
     ProtoTests: ProtoTests_statics;
     TestOutcome: TestOutcome_statics;
-    TestSupplier: TestSupplier_statics;
+    TestProvider: TestProvider_statics;
     TestDuration: TestDuration_statics;
     DataRefTest: DataRefTest_statics;
     FlagRoundtrip: FlagRoundtrip_statics;
@@ -662,7 +662,7 @@ export interface ns_testsuite {
 export interface Test_statics {
     testsuite_ProtoTests: ProtoTests_statics;
     testsuite_TestOutcome: TestOutcome_statics;
-    testsuite_TestSupplier: TestSupplier_statics;
+    testsuite_TestProvider: TestProvider_statics;
     testsuite_TestDuration: TestDuration_statics;
     testsuite_DataRefTest: DataRefTest_statics;
     testsuite_FlagRoundtrip: FlagRoundtrip_statics;

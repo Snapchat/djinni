@@ -1,13 +1,13 @@
 {
-    "compilerOptions": {
-        "lib": ["es2020", "dom"],
-        "baseUrl": ".",
-        "paths": {
-            "@djinni_support/*": ["../../../support-lib/ts/*"]
-        },
-        "esModuleInterop": true,
-        "strict": true,
-        "skipLibCheck": true
-    },
-    "include": ["./*.ts"]
+  "compilerOptions": {
+    "lib": ["es2020", "dom"],
+    "target": "ES2020",
+    "module": "CommonJS",
+    "baseUrl": ".",
+    "paths": { "@djinni_support/*": ["../../../support-lib/ts/*"] },
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["./*.ts"]
 }

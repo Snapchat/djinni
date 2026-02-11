@@ -79,6 +79,7 @@ maven.install(
     artifacts = [
         "com.google.code.findbugs:jsr305:3.0.2",
         "com.google.guava:guava:33.0.0-android",
+        "javax.inject:javax.inject:1",
         "junit:junit:4.13.2",
         "org.scala-lang.modules:scala-parser-combinators_2.11:1.1.2",
         "org.yaml:snakeyaml:2.3",
