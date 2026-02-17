@@ -11,7 +11,7 @@ def _non_module_deps_impl(module_ctx):
         name = "apple_swift_protobuf",
         url = "https://github.com/apple/swift-protobuf/archive/refs/tags/{}.tar.gz".format(swiftprotobuf_version),
         strip_prefix = "swift-protobuf-{}".format(swiftprotobuf_version),
-        sha256 = "5f1a3c09f045d6d9e435e930fe86be3ab96a79e19cd852f4e8f3761ce17cbf72",
+        sha256 = "d086deab3ca0b74751fcc1905d268697b0d471e747fb50eced94941f28b35fb8",
         build_file_content = """
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 swift_library(

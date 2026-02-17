@@ -160,6 +160,14 @@ EM_JS(void, djinni_init_wasm, (), {
             };
         };
 
+        // Helper to create provider functions that call back into C++
+        // The handlerPtr points to a std::function<em::val()> that will be called when the provider is evaluated
+        Module.makeNativeProviderCallback = function(handlerPtr) {
+            return function() {
+                return Module.callNativeProviderCallback(handlerPtr);
+            };
+        };
+
         Module.writeNativeMemory = function(src, nativePtr) {
             var srcByteView = new Uint8Array(src.buffer, src.byteOffset, src.byteLength);
             Module.HEAPU8.set(srcByteView, nativePtr);
@@ -214,12 +222,29 @@ void djinni_throw_native_exception(const std::exception& e) {
     djinni_native_exception_to_js(e).throw_();
 }
 
+// Provider callback function - called from JavaScript when a provider is evaluated
+// Note: Currently leaks memory as callbacks are never deleted.
+// This is acceptable for typical provider usage where callbacks are short-lived.
+// A proper solution would use FinalizationRegistry on the JS side.
+static em::val callNativeProviderCallback(int handlerPtr) {
+    if (!handlerPtr) {
+        return em::val::undefined();
+    }
+
+    // Cast back to std::function<em::val()>*
+    auto* callback = reinterpret_cast<std::function<em::val()>*>(handlerPtr);
+
+    // Call the callback
+    return (*callback)();
+}
+
 EMSCRIPTEN_BINDINGS(djinni_wasm) {
-    djinni_init_wasm();    
+    djinni_init_wasm();
     em::function("allocateWasmBuffer", &allocateWasmBuffer);
     em::function("initCppResolveHandler", &CppResolveHandlerBase::initInstance);
     em::function("resolveNativePromise", &CppResolveHandlerBase::resolveNativePromise);
     em::function("rejectNativePromise", &CppResolveHandlerBase::rejectNativePromise);
+    em::function("callNativeProviderCallback", &callNativeProviderCallback);
 }
 
 }

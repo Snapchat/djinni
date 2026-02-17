@@ -39,15 +39,15 @@ class AsyncTest {
     }
 
     async testVoidRoundTrip() {
-        await this.m.testsuite.TestHelpers.voidAsyncMethod(sleep(10));
+        await this.module.testsuite.TestHelpers.voidAsyncMethod(sleep(10));
     }
 
     async testOptionalFutureUnsetValue() {
-        assertUndefined(await this.m.testsuite.TestHelpers.addOneIfPresent(Promise.resolve(undefined)));
+        assertUndefined(await this.module.testsuite.TestHelpers.addOneIfPresent(Promise.resolve(undefined)));
     }
 
     async testOptionalFutureSetValue() {
-        assertEq(await this.m.testsuite.TestHelpers.addOneIfPresent(Promise.resolve(10)), 11);
+        assertEq(await this.module.testsuite.TestHelpers.addOneIfPresent(Promise.resolve(10)), 11);
     }
 
     async testFutureRoundtripWithException() {

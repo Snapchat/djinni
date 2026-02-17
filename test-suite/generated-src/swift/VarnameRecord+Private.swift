@@ -4,7 +4,6 @@
 import DjinniSupport
 import DjinniSupportCxx
 import Foundation
-import TestSuite
 import TestSuiteCxx
 
 public enum VarnameRecordMarshaller: DjinniSupport.Marshaller {

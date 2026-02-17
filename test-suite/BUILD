@@ -1,5 +1,6 @@
 load("@build_bazel_rules_apple//apple:macos.bzl", "macos_unit_test")
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library", "swift_test")
+load("@build_bazel_rules_swift//swift:swift_interop_hint.bzl", "swift_interop_hint")
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "objc_library")
 load("@rules_java//java:defs.bzl", "java_test")
@@ -173,6 +174,7 @@ java_test(
         "//support-lib:djinni-support-java",
         "@com_google_protobuf//java/core",
         "@maven_djinni//:com_google_code_findbugs_jsr305",
+        "@maven_djinni//:javax_inject_javax_inject",
         "@maven_djinni//:io_reactivex_rxjava2_rxjava",
         "@maven_djinni//:junit_junit",
     ],
@@ -263,11 +265,16 @@ swift_test(
 
 swift_library(
     name = "test-swift-bridge",
-    srcs = glob([
-        "generated-src/swift/*.swift",
-        swift_error_files,
-        swift_helper_files,
-    ]),
+    srcs = glob(
+        [
+            "generated-src/swift/*.swift",
+            swift_error_files,
+            swift_helper_files,
+        ],
+        exclude = [
+            "generated-src/swift/*Lazy*.swift",  # Legacy - provider types use *Provider*.swift
+        ],
+    ),
     copts = [
         "-cxx-interoperability-mode=default",
         "-Xcc",
@@ -294,20 +301,27 @@ swift_library(
     ],
 )
 
+swift_interop_hint(
+    name = "test-swiftxx_hint",
+    module_name = "TestSuiteCxx",
+)
+
 cc_library(
     name = "test-swiftxx",
-    srcs = glob([
-        "generated-src/swiftxx/*.cpp",
-    ]),
-    hdrs = glob([
-        "generated-src/swiftxx/*.hpp",
-    ]),
+    srcs = glob(
+        ["generated-src/swiftxx/*.cpp"],
+        exclude = ["generated-src/swiftxx/*Lazy*.cpp"],  # Legacy - provider types use *Provider*
+    ),
+    hdrs = glob(
+        ["generated-src/swiftxx/*.hpp"],
+        exclude = ["generated-src/swiftxx/*Lazy*.hpp"],  # Legacy - provider types use *Provider*
+    ),
     copts = ["-std=c++20"],
     includes = [
         ".",
         "generated-src/swiftxx",
     ],
-    tags = ["swift_module=TestSuiteCxx"],
+    aspect_hints = [":test-swiftxx_hint"],
     visibility = ["//visibility:public"],
     deps = [
         ":djinni-tests-common",

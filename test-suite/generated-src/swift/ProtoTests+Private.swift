@@ -5,7 +5,6 @@ import DjinniSupport
 import DjinniSupportCxx
 import Foundation
 import ProtobufTest
-import TestSuite
 import TestSuiteCxx
 
 final class ProtoTestsCppProxy: DjinniSupport.CppProxy, TestSuite.ProtoTests {

@@ -5,7 +5,6 @@ import DjinniSupport
 import DjinniSupportCxx
 import Foundation
 import ProtobufTest
-import TestSuite
 import TestSuiteCxx
 
 public enum RecordWithEmbeddedCppProtoMarshaller: DjinniSupport.Marshaller {

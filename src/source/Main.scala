@@ -120,6 +120,7 @@ object Main {
     var cWrapperUseDlsym: Boolean = false
     var swiftOutFolder: Option[File] = None
     var swiftModule: String = "Module"
+    var swiftPrivateInSameModule: Boolean = false
     var swiftIdentStyle = IdentStyle.swiftDefault
     var swiftxxOutFolder: Option[File] = None
     var swiftxxNamespace: String = "djinni_generated"
@@ -332,6 +333,8 @@ object Main {
         .text("The output folder for Swift files (Generator disabled if unspecified).")
       opt[String]("swift-module").valueName("<name>").foreach(swiftModule = _)
         .text("Swift module name (default: \"Module\").")
+      opt[Unit]("swift-private-in-same-module").foreach(_ => swiftPrivateInSameModule = true)
+        .text("Omit 'import <module>' in +Private Swift files (use when those files are compiled in the same module to avoid 'ignoring import' warnings).")
       opt[File]("swiftxx-out").valueName("<out-folder>").foreach(x => swiftxxOutFolder = Some(x))
         .text("The output folder for private Swift/C++ interop files (Generator disabled if unspecified).")
       opt[String]("swiftxx-include-prefix").valueName("<prefix>").foreach(swiftxxIncludePrefix = _)
@@ -558,6 +561,7 @@ object Main {
       swiftOutFolder,
       swiftIdentStyle,
       swiftModule,
+      swiftPrivateInSameModule,
       swiftxxOutFolder,
       swiftxxNamespace,
       swiftxxIncludePrefix,

@@ -4,6 +4,7 @@
 import { PersistingState } from "../../djinni/vendor/third-party/proto/ts/test2"
 import { AddressBook, Person } from "../../djinni/vendor/third-party/proto/ts/test"
 import { Outcome } from "@djinni_support/Outcome"
+import { Provider } from "@djinni_support/Provider"
 
 export interface /*record*/ RecordWithEmbeddedProto {
     person: Person;
@@ -46,6 +47,40 @@ export interface TestOutcome_statics {
     getNestedErrorOutcome(): NestedOutcome;
     putNestedSuccessOutcome(x: NestedOutcome): number;
     putNestedErrorOutcome(x: NestedOutcome): string;
+}
+
+/** Simple object interface for provider testing */
+export interface SimpleObject {
+    getValue(): number;
+    getName(): string;
+}
+
+export interface /*record*/ NestedProvider {
+    s: Provider<number>;
+}
+
+export interface /*record*/ NestedProviderInterface {
+    obj: Provider<SimpleObject>;
+}
+
+export interface TestProvider {
+}
+export interface TestProvider_statics {
+    /** Simple type provider tests */
+    getProviderString(): Provider<string>;
+    getProviderInt(): Provider<number>;
+    callProviderString(x: Provider<string>): string;
+    callProviderInt(x: Provider<number>): number;
+    getNestedProvider(): NestedProvider;
+    callNestedProvider(x: NestedProvider): number;
+    /** Interface provider tests - main use case for deferred expensive object creation */
+    getProviderObject(): Provider<SimpleObject>;
+    callProviderObject(x: Provider<SimpleObject>): number;
+    callProviderObjectGetName(x: Provider<SimpleObject>): string;
+    getNestedProviderInterface(): NestedProviderInterface;
+    callNestedProviderInterface(x: NestedProviderInterface): number;
+    /** Helper to create simple_object for testing */
+    createSimpleObject(value: number, name: string): SimpleObject;
 }
 
 export interface TestDuration {
@@ -612,6 +647,7 @@ export interface /*record*/ SetRecord {
 export interface ns_testsuite {
     ProtoTests: ProtoTests_statics;
     TestOutcome: TestOutcome_statics;
+    TestProvider: TestProvider_statics;
     TestDuration: TestDuration_statics;
     DataRefTest: DataRefTest_statics;
     FlagRoundtrip: FlagRoundtrip_statics;
@@ -626,6 +662,7 @@ export interface ns_testsuite {
 export interface Test_statics {
     testsuite_ProtoTests: ProtoTests_statics;
     testsuite_TestOutcome: TestOutcome_statics;
+    testsuite_TestProvider: TestProvider_statics;
     testsuite_TestDuration: TestDuration_statics;
     testsuite_DataRefTest: DataRefTest_statics;
     testsuite_FlagRoundtrip: FlagRoundtrip_statics;

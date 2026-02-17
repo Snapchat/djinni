@@ -64,6 +64,13 @@ using AnyValue = std::variant<VoidValue, I32Value, I64Value, DoubleValue,
     StringValue, BinaryValue, DateValue, ErrorValue, OpaqueValuePtr, RangeValue,
     InterfaceValue, CompositeValuePtr>;
 
+// Base for opaque values that can be invoked as a provider (returns AnyValue).
+// Used by callProviderFunction so Swift can call into C++/Swift provider holders.
+struct CallableProvider : OpaqueValue {
+    virtual AnyValue call() = 0;
+};
+using CallableProviderPtr = std::shared_ptr<CallableProvider>;
+
 struct CompositeValue {
     virtual ~CompositeValue() = default;
     std::vector<AnyValue> _elems;
@@ -97,6 +104,10 @@ bool isVoidValue(const AnyValue* c);
 AnyValue makeCompositeValue();
 bool isError(const AnyValue* ret);
 ErrorValue getError(const AnyValue* ret);
+
+// Provider bridge: call a provider held in AnyValue (C++ or Swift), or create one from a callback.
+AnyValue callProviderFunction(const AnyValue& providerValue);
+AnyValue makeProviderFunction(AnyValue (*callback)(void*), void* context, void (*releaseContext)(void*) = nullptr);
 
 struct InterfaceInfo {
     void* cppPointer;

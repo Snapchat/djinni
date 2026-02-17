@@ -117,4 +117,35 @@ AnyValue ProtocolWrapper::callProtocol(int idx, const ParameterList* params) {
     return ret;
 }
 
+// -------- Provider bridge (callable from Swift as callProviderFunction / makeProviderFunction)
+AnyValue callProviderFunction(const AnyValue& providerValue) {
+    auto ptr = std::get<OpaqueValuePtr>(providerValue);
+    auto* callable = dynamic_cast<CallableProvider*>(ptr.get());
+    if (!callable) {
+        throw ErrorValue("callProviderFunction: value is not a provider");
+    }
+    return callable->call();
+}
+
+namespace {
+struct CallbackProviderHolder : CallableProvider {
+    AnyValue (*callback)(void*);
+    void* context;
+    void (*releaseContext)(void*);
+    CallbackProviderHolder(AnyValue (*cb)(void*), void* ctx, void (*release)(void*) = nullptr)
+        : callback(cb), context(ctx), releaseContext(release) {}
+    ~CallbackProviderHolder() override {
+        if (releaseContext && context) {
+            releaseContext(context);
+        }
+    }
+    AnyValue call() override { return callback(context); }
+};
+}
+
+AnyValue makeProviderFunction(AnyValue (*callback)(void*), void* context, void (*releaseContext)(void*)) {
+    auto holder = std::make_shared<CallbackProviderHolder>(callback, context, releaseContext);
+    return AnyValue{OpaqueValuePtr(holder)};
+}
+
 }

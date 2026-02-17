@@ -123,6 +123,7 @@ package object generatorTools {
                    swiftOutFolder: Option[File],
                    swiftIdentStyle: SwiftIdentStyle,
                    swiftModule: String,
+                   swiftPrivateInSameModule: Boolean,
                    swiftxxOutFolder: Option[File],
                    swiftxxNamespace: String,
                    swiftxxIncludePrefix: String,

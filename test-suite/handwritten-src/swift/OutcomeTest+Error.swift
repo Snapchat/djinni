@@ -1,2 +1,2 @@
-extension Int32: Error {}
-extension String: Error {}
+extension Int32: @retroactive Error {}
+extension String: @retroactive Error {}

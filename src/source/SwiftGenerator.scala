@@ -100,7 +100,8 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
         }
       }
     })
-    writeSwiftPrivateFile(ident, origin, List[String]("DjinniSupport", spec.swiftModule), w => {
+    val enumPrivateImports = if (spec.swiftPrivateInSameModule) List("DjinniSupport") else List("DjinniSupport", spec.swiftModule)
+    writeSwiftPrivateFile(ident, origin, enumPrivateImports, w => {
       w.wl(s"public typealias ${marshal.typename(ident, e)}Marshaller = DjinniSupport.EnumMarshaller<${marshal.typename(ident, e)}>")
     })
   }
@@ -125,7 +126,10 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
 
   class SwiftRefs(name: String) {
     var swiftImports = mutable.TreeSet[String]()
-    var privateImports = mutable.TreeSet[String]("DjinniSupport", "Foundation", spec.swiftxxBaseLibModule, spec.swiftModule, spec.swiftModule + "Cxx")
+    var privateImports = mutable.TreeSet[String]("DjinniSupport", "Foundation", spec.swiftxxBaseLibModule, spec.swiftModule + "Cxx")
+    if (!spec.swiftPrivateInSameModule) {
+      privateImports.add(spec.swiftModule)
+    }
     swiftImports.add("Foundation")
     def find(ty: TypeRef) { find(ty.resolved) }
     def find(tm: MExpr) {

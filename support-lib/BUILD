@@ -1,6 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "objc_library")
 load("@rules_java//java:defs.bzl", "java_library")
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
+load("@build_bazel_rules_swift//swift:swift_interop_hint.bzl", "swift_interop_hint")
 
 cc_library(
     name = "djinni-support-common",
@@ -57,6 +58,9 @@ java_library(
     name = "djinni-support-java",
     srcs = glob(["java/**/*.java"]),
     visibility = ["//visibility:public"],
+    deps = [
+        "@maven_djinni//:javax_inject_javax_inject",
+    ],
 )
 
 cc_library(
@@ -83,9 +87,7 @@ sh_library(
 swift_library(
     name = "djinni-support-swift",
     module_name = "DjinniSupport",
-    srcs = glob([
-        "swift/*.swift",
-    ]),
+    srcs = glob(["swift/*.swift"]),
     copts = [
         "-cxx-interoperability-mode=default",
         "-Xcc", "-std=c++20",
@@ -97,14 +99,15 @@ swift_library(
     visibility = ["//visibility:public"],
 )
 
+swift_interop_hint(
+    name = "djinni-support-swiftxx_hint",
+    module_name = "DjinniSupportCxx",
+)
+
 cc_library(
     name = "djinni-support-swiftxx",
-    srcs = glob([
-        "swiftxx/*.cpp",
-    ]),
-    hdrs = glob([
-        "swiftxx/*.hpp",
-    ]),
+    srcs = glob(["swiftxx/*.cpp"]),
+    hdrs = glob(["swiftxx/*.hpp"]),
     includes = [
         "swiftxx",
         ".",
@@ -115,7 +118,7 @@ cc_library(
     copts = [
         "-std=c++20",
     ],
-    tags = ["swift_module=DjinniSupportCxx"],
+    aspect_hints = [":djinni-support-swiftxx_hint"],
     visibility = ["//visibility:public"],
 )
 
