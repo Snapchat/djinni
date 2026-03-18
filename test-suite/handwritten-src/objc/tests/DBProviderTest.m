@@ -41,18 +41,25 @@ static id (^memoize(id (^factory)(void)))(void) {
 {
     DJProvider<NSString *> *providerStr = [DBTestProvider getProviderString];
     XCTAssertEqualObjects([providerStr get], @"hello");
+    // C++ provider can be called more than once
+    XCTAssertEqualObjects([providerStr get], @"hello");
+    XCTAssertEqualObjects([providerStr get], @"hello");
 
     DJProvider<NSNumber *> *providerInt = [DBTestProvider getProviderInt];
+    XCTAssertEqual([[providerInt get] intValue], 42);
     XCTAssertEqual([[providerInt get] intValue], 42);
 
     DJProvider<NSString *> *objcProviderStr = [DJProvider providerWithBlock:^NSString*() {
         return @"world";
     }];
     XCTAssertEqualObjects([DBTestProvider callProviderString:objcProviderStr], @"world");
+    // Host provider can be used in multiple C++ calls
+    XCTAssertEqualObjects([DBTestProvider callProviderString:objcProviderStr], @"world");
 
     DJProvider<NSNumber *> *objcProviderInt = [DJProvider providerWithBlock:^NSNumber*() {
         return @123;
     }];
+    XCTAssertEqual([DBTestProvider callProviderInt:objcProviderInt], 123);
     XCTAssertEqual([DBTestProvider callProviderInt:objcProviderInt], 123);
 
     DBNestedProvider* np = [DBTestProvider getNestedProvider];
@@ -79,11 +86,12 @@ static id (^memoize(id (^factory)(void)))(void) {
     }];
 
     XCTAssertEqual(creationCount, 0);
+    // C++ calls host provider twice to verify multi-call; expect 2 creations
     XCTAssertEqual([DBTestProvider callProviderObject:objcProviderObj], 999);
-    XCTAssertEqual(creationCount, 1);
+    XCTAssertEqual(creationCount, 2);
 
     XCTAssertEqualObjects([DBTestProvider callProviderObjectGetName:objcProviderObj], @"objc-created");
-    XCTAssertEqual(creationCount, 2);
+    XCTAssertEqual(creationCount, 4);
 
     DBNestedProviderInterface* npi = [DBTestProvider getNestedProviderInterface];
     DJProvider<DBSimpleObject *> *objProvider = npi.obj;

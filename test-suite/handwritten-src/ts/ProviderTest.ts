@@ -12,14 +12,21 @@ class ProviderTest extends TestCase {
     var providerStr = this.m.testsuite.TestProvider.getProviderString();
     var result = providerStr();
     assertEq(result, "hello");
+    // C++ provider can be called more than once
+    assertEq(providerStr(), "hello");
+    assertEq(providerStr(), "hello");
 
     var providerInt = this.m.testsuite.TestProvider.getProviderInt();
+    assertEq(providerInt(), 42);
     assertEq(providerInt(), 42);
 
     var jsProviderStr = () => "world";
     assertEq(this.m.testsuite.TestProvider.callProviderString(jsProviderStr), "world");
+    // Host provider can be used in multiple C++ calls
+    assertEq(this.m.testsuite.TestProvider.callProviderString(jsProviderStr), "world");
 
     var jsProviderInt = () => 123;
+    assertEq(this.m.testsuite.TestProvider.callProviderInt(jsProviderInt), 123);
     assertEq(this.m.testsuite.TestProvider.callProviderInt(jsProviderInt), 123);
 
     var np = this.m.testsuite.TestProvider.getNestedProvider();
@@ -46,13 +53,14 @@ class ProviderTest extends TestCase {
 
     assertEq(creationCount, 0);
 
+    // C++ calls host provider twice to verify multi-call; expect 2 creations
     var result3 = this.m.testsuite.TestProvider.callProviderObject(jsProviderObj);
     assertEq(result3, 999);
-    assertEq(creationCount, 1);
+    assertEq(creationCount, 2);
 
     var result4 = this.m.testsuite.TestProvider.callProviderObjectGetName(jsProviderObj);
     assertEq(result4, "js-created");
-    assertEq(creationCount, 2);
+    assertEq(creationCount, 4);
 
     var npi = this.m.testsuite.TestProvider.getNestedProviderInterface();
     var npiObj = npi.obj();

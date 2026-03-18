@@ -9,14 +9,22 @@ public class ProviderTest extends TestCase {
         // Simple type tests
         Provider<String> providerStr = TestProvider.getProviderString();
         assertEquals(providerStr.get(), "hello");
+        // C++ provider can be called more than once
+        assertEquals(providerStr.get(), "hello");
+        assertEquals(providerStr.get(), "hello");
 
         Provider<Integer> providerInt = TestProvider.getProviderInt();
+        assertEquals(providerInt.get(), Integer.valueOf(42));
+        // C++ provider can be called more than once
         assertEquals(providerInt.get(), Integer.valueOf(42));
 
         Provider<String> javaProviderStr = () -> "world";
         assertEquals(TestProvider.callProviderString(javaProviderStr), "world");
+        // Host provider can be used in multiple C++ calls
+        assertEquals(TestProvider.callProviderString(javaProviderStr), "world");
 
         Provider<Integer> javaProviderInt = () -> 123;
+        assertEquals(123, TestProvider.callProviderInt(javaProviderInt));
         assertEquals(123, TestProvider.callProviderInt(javaProviderInt));
 
         NestedProvider np = TestProvider.getNestedProvider();
@@ -39,10 +47,11 @@ public class ProviderTest extends TestCase {
         };
 
         assertEquals(creationCount.get(), 0);
+        // C++ calls host provider twice to verify multi-call; expect 2 creations
         assertEquals(999, TestProvider.callProviderObject(javaProviderObj));
-        assertEquals(1, creationCount.get());
-        assertEquals("java-created", TestProvider.callProviderObjectGetName(javaProviderObj));
         assertEquals(2, creationCount.get());
+        assertEquals("java-created", TestProvider.callProviderObjectGetName(javaProviderObj));
+        assertEquals(4, creationCount.get());
 
         NestedProviderInterface npi = TestProvider.getNestedProviderInterface();
         assertEquals(777, npi.getObj().get().getValue());

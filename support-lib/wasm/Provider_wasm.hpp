@@ -49,8 +49,8 @@ public:
     }
 
     static JsType fromCpp(const CppType& c) {
-        // Create a type-erased callback that returns em::val
-        // Allocate on heap and let JavaScript manage lifetime
+        // Allocate on heap; makeNativeProviderCallback registers the JS function with
+        // FinalizationRegistry so the C++ handler is freed when the JS function is GC'd
         auto* callback = new std::function<em::val()>([c]() -> em::val {
             if constexpr (std::is_void_v<CppResType>) {
                 c();

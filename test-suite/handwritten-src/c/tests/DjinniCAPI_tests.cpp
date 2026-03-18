@@ -732,11 +732,18 @@ TEST(DjinniCAPI, supportsProvider) {
   auto providerStr = CRef(testsuite_test_provider_getProviderString());
   auto str = CRef(djinni_provider_call(providerStr.value));
   ASSERT_EQ(std::string("hello"), std::string(djinni_string_get_data(str.value)));
+  // C++ provider can be called more than once (use new CRef per call to avoid double-release)
+  auto str2 = CRef(djinni_provider_call(providerStr.value));
+  ASSERT_EQ(std::string("hello"), std::string(djinni_string_get_data(str2.value)));
+  auto str3 = CRef(djinni_provider_call(providerStr.value));
+  ASSERT_EQ(std::string("hello"), std::string(djinni_string_get_data(str3.value)));
 
   // Test getting provider int from C++ and calling it
   auto providerInt = CRef(testsuite_test_provider_getProviderInt());
   auto intVal = CRef(djinni_provider_call(providerInt.value));
   ASSERT_EQ(42, djinni_number_get_int64(intVal.value));
+  auto intVal2 = CRef(djinni_provider_call(providerInt.value));
+  ASSERT_EQ(42, djinni_number_get_int64(intVal2.value));
 
   // Test passing provider string to C++
   struct StringContext {
@@ -754,6 +761,9 @@ TEST(DjinniCAPI, supportsProvider) {
 
   auto result = CRef(testsuite_test_provider_callProviderString(cProviderStr.value));
   ASSERT_EQ(std::string("world"), std::string(djinni_string_get_data(result.value)));
+  // Host provider can be used in multiple C++ calls
+  auto result2 = CRef(testsuite_test_provider_callProviderString(cProviderStr.value));
+  ASSERT_EQ(std::string("world"), std::string(djinni_string_get_data(result2.value)));
 
   // Test passing provider int to C++
   struct IntContext {
@@ -770,6 +780,7 @@ TEST(DjinniCAPI, supportsProvider) {
       nullptr));
 
   ASSERT_EQ(123, testsuite_test_provider_callProviderInt(cProviderInt.value));
+  ASSERT_EQ(123, testsuite_test_provider_callProviderInt(cProviderInt.value));
 }
 
 TEST(DjinniCAPI, supportsProviderInterface) {
@@ -780,6 +791,11 @@ TEST(DjinniCAPI, supportsProviderInterface) {
   ASSERT_EQ(42, testsuite_simple_object_get_value(obj.value));
   auto name = CRef(testsuite_simple_object_get_name(obj.value));
   ASSERT_EQ(std::string("expensive"), std::string(djinni_string_get_data(name.value)));
+  // C++ provider can be called more than once (use new CRef per call to avoid double-release)
+  auto obj2 = CRef(djinni_provider_call(providerObj.value));
+  ASSERT_EQ(42, testsuite_simple_object_get_value(obj2.value));
+  auto obj3 = CRef(djinni_provider_call(providerObj.value));
+  ASSERT_EQ(42, testsuite_simple_object_get_value(obj3.value));
 
   // Test passing provider interface to C++
   struct ObjectContext {
@@ -803,14 +819,14 @@ TEST(DjinniCAPI, supportsProviderInterface) {
   // Object not created yet
   ASSERT_EQ(0, creationCount);
 
-  // Call from C++ - object created on demand
+  // Call from C++ - C++ calls host provider twice to verify multi-call support
   ASSERT_EQ(999, testsuite_test_provider_callProviderObject(cProviderObj.value));
-  ASSERT_EQ(1, creationCount);
+  ASSERT_EQ(2, creationCount);
 
-  // Second call - object created again (not memoized in this test)
+  // Second C++ call - again invokes provider twice
   auto objName = CRef(testsuite_test_provider_callProviderObjectGetName(cProviderObj.value));
   ASSERT_EQ(std::string("c-created"), std::string(djinni_string_get_data(objName.value)));
-  ASSERT_EQ(2, creationCount);
+  ASSERT_EQ(4, creationCount);
 }
 
 } // namespace djinni

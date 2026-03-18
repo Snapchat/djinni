@@ -51,7 +51,10 @@ public:
         // Already a C++ provider function (e.g. from fromCpp earlier)
         auto cppHolder = std::dynamic_pointer_cast<CppProviderHolder<RESULT>>(ptr);
         if (cppHolder) {
-            return std::move(cppHolder->func);
+            // Return a copy; the shared holder may be used again (e.g. toCpp called twice
+            // with the same AnyValue, or call() invoked later). Moving would leave the
+            // holder's func empty and cause std::bad_function_call.
+            return cppHolder->func;
         }
         // Swift-created provider: AnyValue holds CallbackProviderHolder from makeProviderFunction.
         // Use it directly so call() invokes the Swift callback.

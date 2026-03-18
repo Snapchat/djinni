@@ -161,11 +161,17 @@ EM_JS(void, djinni_init_wasm, (), {
         };
 
         // Helper to create provider functions that call back into C++
-        // The handlerPtr points to a std::function<em::val()> that will be called when the provider is evaluated
+        // The handlerPtr points to a std::function<em::val()> that will be called when the provider is evaluated.
+        // Register the JS function with FinalizationRegistry so we free the C++ handler when the function is GC'd.
+        Module.nativeProviderCallbackFinalizerRegistry = new FinalizationRegistry(handlerPtr => {
+            Module._releaseNativeProviderCallback(handlerPtr);
+        });
         Module.makeNativeProviderCallback = function(handlerPtr) {
-            return function() {
+            var fn = function() {
                 return Module.callNativeProviderCallback(handlerPtr);
             };
+            Module.nativeProviderCallbackFinalizerRegistry.register(fn, handlerPtr);
+            return fn;
         };
 
         Module.writeNativeMemory = function(src, nativePtr) {
@@ -222,20 +228,22 @@ void djinni_throw_native_exception(const std::exception& e) {
     djinni_native_exception_to_js(e).throw_();
 }
 
-// Provider callback function - called from JavaScript when a provider is evaluated
-// Note: Currently leaks memory as callbacks are never deleted.
-// This is acceptable for typical provider usage where callbacks are short-lived.
-// A proper solution would use FinalizationRegistry on the JS side.
+// Provider callback - called from JavaScript when a provider is evaluated
 static em::val callNativeProviderCallback(int handlerPtr) {
     if (!handlerPtr) {
         return em::val::undefined();
     }
 
-    // Cast back to std::function<em::val()>*
     auto* callback = reinterpret_cast<std::function<em::val()>*>(handlerPtr);
-
-    // Call the callback
     return (*callback)();
+}
+
+// Called by FinalizationRegistry when the JS provider function is GC'd; frees the C++ handler
+extern "C" EMSCRIPTEN_KEEPALIVE
+void releaseNativeProviderCallback(int handlerPtr) {
+    if (handlerPtr) {
+        delete reinterpret_cast<std::function<em::val()>*>(handlerPtr);
+    }
 }
 
 EMSCRIPTEN_BINDINGS(djinni_wasm) {

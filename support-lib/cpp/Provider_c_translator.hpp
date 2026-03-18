@@ -18,6 +18,7 @@
 
 #include "Provider_c.h"
 #include <functional>
+#include <memory>
 
 namespace djinni::c_api {
 
@@ -28,11 +29,18 @@ struct ProviderTranslator {
 
     static CppType toCpp(djinni_provider_ref provider) {
         djinni_ref_retain(provider);
-        return [provider]() -> typename Tr::CppType {
-            auto result_c = djinni_provider_call(provider);
+        // Use shared_ptr so the ref is released when the last copy of the std::function
+        // is destroyed, not when the lambda is invoked. This allows the provider to be
+        // called multiple times and avoids leaking if the lambda is never invoked.
+        auto provider_guard = std::shared_ptr<djinni_provider_ref>(new djinni_provider_ref(provider),
+            [](djinni_provider_ref* p) {
+                djinni_ref_release(*p);
+                delete p;
+            });
+        return [provider_guard]() -> typename Tr::CppType {
+            auto result_c = djinni_provider_call(*provider_guard);
             auto result_cpp = Tr::toCpp(result_c);
             djinni_ref_release(result_c);
-            djinni_ref_release(provider);
             return result_cpp;
         };
     }

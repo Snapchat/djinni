@@ -19,6 +19,7 @@
 #include "djinni_support.hpp"
 #include "Marshal.hpp"
 #include <functional>
+#include <memory>
 
 namespace djinni {
 
@@ -82,20 +83,19 @@ public:
     }
 
     static LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c) {
-        // Create a type-erased holder for the C++ function
-        // The implementation is in Provider_jni.cpp
-        auto* holder = new TypedProviderFunctionHolder<T>(c);
-        
-        // Create a Java NativeProviderHandler that calls back to C++
+        // Use unique_ptr so holder is freed if NewObject or jniExceptionCheck throws
+        auto holder = std::make_unique<TypedProviderFunctionHolder<T>>(c);
+
         const auto& nativeProviderHandlerJniInfo = JniClass<NativeProviderHandlerJniInfo>::get();
-        
+
         auto handler = LocalRef<jobject>(jniEnv, jniEnv->NewObject(
             nativeProviderHandlerJniInfo.clazz.get(),
             nativeProviderHandlerJniInfo.constructor,
-            reinterpret_cast<jlong>(holder)
+            reinterpret_cast<jlong>(holder.get())
         ));
         jniExceptionCheck(jniEnv);
-        
+
+        (void) holder.release();  // Java object now owns the native holder
         return handler;
     }
 };
