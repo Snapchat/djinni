@@ -38,7 +38,6 @@
 #include <unordered_set>
 #include <vector>
 #include <functional>
-#include <codecvt>
 
 namespace djinni::valdi {
 
@@ -632,4 +631,4 @@ private:
     }
 };
 
-} // namespace djinni
+} // namespace djinni::valdi
