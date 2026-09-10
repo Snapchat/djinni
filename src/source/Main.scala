@@ -42,6 +42,7 @@ object Main {
     var cppNnCheckExpression: Option[String] = None
     var cppUseWideStrings: Boolean = false
     var cppLegacyRecords: Boolean = false
+    var cppUseStringView: Boolean = false
     var javaOutFolder: Option[File] = None
     var javaPackage: Option[String] = None
     var javaClassAccessModifier: JavaAccessModifier.Value = JavaAccessModifier.Public
@@ -216,6 +217,8 @@ object Main {
         .text("Use wide strings in C++ code (default: false)")
       opt[Boolean]( "cpp-legacy-records").valueName("<true/false>").foreach(x => cppLegacyRecords = x)
         .text("Use legacy record behavior for C++ code (default: false)")
+      opt[Boolean]( "cpp-use-string-view").valueName("<true/false>").foreach(x => cppUseStringView = x)
+        .text("Use std::string_view for string parameters in C++ code (default: false)")
       note("")
       opt[File]("jni-out").valueName("<out-folder>").foreach(x => jniOutFolder = Some(x))
         .text("The folder for the JNI C++ output files (Generator disabled if unspecified).")
@@ -498,6 +501,7 @@ object Main {
       cppNnCheckExpression,
       cppUseWideStrings,
       cppLegacyRecords,
+      cppUseStringView,
       jniOutFolder,
       jniHeaderOutFolder,
       jniIncludePrefix,

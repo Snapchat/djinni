@@ -60,6 +60,7 @@ package object generatorTools {
                    cppNnCheckExpression: Option[String],
                    cppUseWideStrings: Boolean,
                    cppLegacyRecords: Boolean,
+                   cppUseStringView: Boolean,
                    jniOutFolder: Option[File],
                    jniHeaderOutFolder: Option[File],
                    jniIncludePrefix: String,

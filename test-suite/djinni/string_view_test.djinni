@@ -1,0 +1,6 @@
+# @flag "--cpp-use-string-view true"
+
+test_interface_with_string = interface +c {
+    # Method with string parameter to test string_view generation
+    process_string(message: string): string;
+}

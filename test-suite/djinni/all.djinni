@@ -3,6 +3,7 @@
 @import "enum_flags.djinni"
 @import "constant_enum.djinni"
 @import "data_ref_view.djinni"
+@import "string_view_test.djinni"
 
 @import "vendor/third-party/date.djinni"
 @import "third-party/duration.djinni"
