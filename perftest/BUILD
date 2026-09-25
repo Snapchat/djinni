@@ -1,5 +1,28 @@
 load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kt_android_library")
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
+load("//bzl:djinni_codegen.bzl", "djinni_codegen")
+load(":djinni_outputs.bzl", "BENCHMARK_DJINNI_OUTS")
+
+djinni_codegen(
+    name = "benchmark-djinni-codegen",
+    outs = BENCHMARK_DJINNI_OUTS,
+    cpp_namespace = "snapchat::djinni::benchmark",
+    ident_cpp_enum_type = "foo_bar",
+    ident_java_field = "mFooBar",
+    ident_jni_class = "NativeFooBar",
+    ident_jni_file = "NativeFooBar",
+    idl = "djinni_perf_benchmark.djinni",
+    java_class_access_modifier = "package",
+    java_nonnull_annotation = "javax.annotation.Nonnull",
+    java_nullable_annotation = "javax.annotation.CheckForNull",
+    java_package = "com.snapchat.djinni.benchmark",
+    objc_swift_bridging_header = "Benchmark-Bridging-Header",
+    objc_type_prefix = "TXS",
+    ts_module = "perftest",
+    visibility = ["//visibility:public"],
+    wasm_namespace = "benchmark",
+    wasm_omit_namespace_alias = True,
+)
 
 cc_library(
     name = "benchmark-common",
@@ -21,6 +44,25 @@ cc_library(
     alwayslink = 1,
 )
 
+cc_library(
+    name = "benchmark-common-generated",
+    srcs = BENCHMARK_DJINNI_OUTS.get("cpp_srcs", []) + glob([
+        "handwritten-src/cpp/*.cpp",
+    ]),
+    hdrs = BENCHMARK_DJINNI_OUTS["cpp_hdrs"] + glob([
+        "handwritten-src/cpp/*.hpp",
+    ]),
+    includes = [
+        "bazel-generated/benchmark/cpp",
+        "handwritten-src/cpp",
+    ],
+    deps = [
+        "//support-lib:djinni-support-common",
+    ],
+    alwayslink = 1,
+    visibility = ["//visibility:public"],
+)
+
 # ------------------------------------------------------------------
 
 java_library(
@@ -30,6 +72,16 @@ java_library(
         "//support-lib:djinni-support-java",
         "@maven_djinni//:com_google_code_findbugs_jsr305",
     ],
+)
+
+java_library(
+    name = "benchmark-java-generated",
+    srcs = BENCHMARK_DJINNI_OUTS["java_srcs"],
+    deps = [
+        "//support-lib:djinni-support-java",
+        "@maven_djinni//:com_google_code_findbugs_jsr305",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -46,6 +98,23 @@ cc_library(
         "//support-lib:djinni-support-android",
     ],
     alwayslink = 1,
+)
+
+cc_library(
+    name = "benchmark-jni-generated",
+    srcs = BENCHMARK_DJINNI_OUTS["jni_srcs"],
+    hdrs = BENCHMARK_DJINNI_OUTS["jni_hdrs"],
+    includes = ["bazel-generated/benchmark/jni"],
+    linkopts = [
+        "-lm",
+        "-ldl",
+    ],
+    deps = [
+        ":benchmark-common-generated",
+        "//support-lib:djinni-support-android",
+    ],
+    alwayslink = 1,
+    visibility = ["//visibility:public"],
 )
 
 # ------------------------------------------------------------------
@@ -92,6 +161,20 @@ cc_binary(
         ":benchmark-common",
         "//support-lib:djinni-support-wasm",
     ],
+)
+
+cc_binary(
+    name = "perftest-wasm-generated",
+    srcs = BENCHMARK_DJINNI_OUTS["wasm_srcs"] + BENCHMARK_DJINNI_OUTS["wasm_hdrs"],
+    copts = [
+        "-fexceptions",
+    ],
+    linkopts = EMSCRIPTEN_LINKOPTS,
+    deps = [
+        ":benchmark-common-generated",
+        "//support-lib:djinni-support-wasm",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 wasm_cc_binary(

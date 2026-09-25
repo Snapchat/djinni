@@ -1,6 +1,27 @@
 load("@build_bazel_rules_apple//apple:ios.bzl", "ios_application")
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
+load("//bzl:djinni_codegen.bzl", "djinni_codegen")
+load(":djinni_outputs.bzl", "EXAMPLE_DJINNI_OUTS")
+
+djinni_codegen(
+    name = "example-djinni-codegen",
+    outs = EXAMPLE_DJINNI_OUTS,
+    cpp_namespace = "textsort",
+    ident_cpp_enum_type = "foo_bar",
+    ident_java_field = "mFooBar",
+    ident_jni_class = "NativeFooBar",
+    ident_jni_file = "NativeFooBar",
+    idl = "example.djinni",
+    java_class_access_modifier = "package",
+    java_nonnull_annotation = "javax.annotation.Nonnull",
+    java_nullable_annotation = "javax.annotation.CheckForNull",
+    java_package = "com.dropbox.textsort",
+    objc_swift_bridging_header = "TextSort-Bridging-Header",
+    objc_type_prefix = "TXS",
+    ts_module = "example",
+    visibility = ["//visibility:public"],
+)
 
 cc_library(
     name = "textsort-common",
@@ -22,6 +43,25 @@ cc_library(
     alwayslink = 1,
 )
 
+cc_library(
+    name = "textsort-common-generated",
+    srcs = EXAMPLE_DJINNI_OUTS.get("cpp_srcs", []) + glob([
+        "handwritten-src/cpp/*.cpp",
+    ]),
+    hdrs = EXAMPLE_DJINNI_OUTS["cpp_hdrs"] + glob([
+        "handwritten-src/cpp/*.hpp",
+    ]),
+    includes = [
+        "bazel-generated/example/cpp",
+        "handwritten-src/cpp",
+    ],
+    deps = [
+        "//support-lib:djinni-support-common",
+    ],
+    alwayslink = 1,
+    visibility = ["//visibility:public"],
+)
+
 # ------------------------------------------------------------------
 
 java_library(
@@ -31,6 +71,16 @@ java_library(
         "//support-lib:djinni-support-java",
         "@maven_djinni//:com_google_code_findbugs_jsr305",
     ],
+)
+
+java_library(
+    name = "textsort-java-generated",
+    srcs = EXAMPLE_DJINNI_OUTS["java_srcs"],
+    deps = [
+        "//support-lib:djinni-support-java",
+        "@maven_djinni//:com_google_code_findbugs_jsr305",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -44,6 +94,20 @@ cc_library(
         "//support-lib:djinni-support-android",
     ],
     alwayslink = 1,
+)
+
+cc_library(
+    name = "textsort-jni-generated",
+    srcs = EXAMPLE_DJINNI_OUTS["jni_srcs"],
+    hdrs = EXAMPLE_DJINNI_OUTS["jni_hdrs"],
+    includes = ["bazel-generated/example/jni"],
+    linkopts = ["-lm", "-ldl"],
+    deps = [
+        ":textsort-common-generated",
+        "//support-lib:djinni-support-android",
+    ],
+    alwayslink = 1,
+    visibility = ["//visibility:public"],
 )
 
 # ------------------------------------------------------------------
@@ -87,6 +151,20 @@ cc_binary(
         ":textsort-common",
         "//support-lib:djinni-support-wasm",
     ],
+)
+
+cc_binary(
+    name = "textsort-wasm-generated",
+    srcs = EXAMPLE_DJINNI_OUTS["wasm_srcs"] + EXAMPLE_DJINNI_OUTS["wasm_hdrs"],
+    copts = [
+        "-fexceptions",
+    ],
+    linkopts = EMSCRIPTEN_LINKOPTS,
+    deps = [
+        ":textsort-common-generated",
+        "//support-lib:djinni-support-wasm",
+    ],
+    visibility = ["//visibility:public"],
 )
 
 wasm_cc_binary(

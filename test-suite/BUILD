@@ -2,6 +2,44 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary", "objc_library")
 load("@rules_java//java:defs.bzl", "java_test")
 load("@build_bazel_rules_apple//apple:macos.bzl", "macos_unit_test")
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
+load("//bzl:djinni_codegen.bzl", "djinni_codegen")
+load(":djinni_outputs.bzl", "TESTSUITE_MAIN_DJINNI_OUTS")
+
+djinni_codegen(
+    name = "testsuite-main-djinni-codegen",
+    outs = TESTSUITE_MAIN_DJINNI_OUTS,
+    cpp_extended_record_include_prefix = "../../handwritten-src/cpp/",
+    cpp_namespace = "testsuite",
+    cpp_optional_header = "\"../../handwritten-src/cpp/optional.hpp\"",
+    cpp_optional_template = "std::experimental::optional",
+    ident_cpp_enum_type = "foo_bar",
+    ident_java_field = "mFooBar",
+    ident_jni_class = "NativeFooBar",
+    ident_jni_file = "NativeFooBar",
+    idl = "djinni/all.djinni",
+    idl_include_paths = ["test-suite/djinni/vendor"],
+    java_implement_android_os_parcelable = True,
+    java_nonnull_annotation = "javax.annotation.Nonnull",
+    java_nullable_annotation = "javax.annotation.CheckForNull",
+    java_package = "com.dropbox.djinni.test",
+    java_use_final_for_record = False,
+    jni_use_on_load_initializer = False,
+    objc_type_prefix = "DB",
+    srcs = glob([
+        "djinni/**/*.djinni",
+        "djinni/**/*.yaml",
+    ]) + [
+        "//support-lib:dataref.yaml",
+        "//support-lib:dataview.yaml",
+        "//support-lib:future.yaml",
+        "//support-lib:outcome.yaml",
+    ],
+    ts_module = "test",
+    visibility = ["//visibility:public"],
+    wasm_namespace = "testsuite",
+    yaml_out_file = "yaml-test.yaml",
+    yaml_prefix = "test_",
+)
 
 cc_library(
     name = "djinni-tests-common",

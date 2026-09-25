@@ -1,6 +1,13 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "objc_library")
 load("@rules_java//java:defs.bzl", "java_library")
 
+exports_files([
+    "dataref.yaml",
+    "dataview.yaml",
+    "future.yaml",
+    "outcome.yaml",
+])
+
 cc_library(
     name = "djinni-support-common",
     srcs = glob(["cpp/*.cpp"]),
