@@ -1,374 +1,238 @@
 # Djinni Bazel Code Generation Rules
 
-This document describes the planned Bazel rules for running Djinni code generation during a Bazel build. The first implementation should focus on rule documentation and example BUILD usage, then add the Starlark rules once the API is agreed on.
+Djinni supports two generation workflows: build-time Bazel actions and its existing
+command-line generator. Both use the same compiler and options. The Bazel rules
+write to `bazel-out`; the scripts still write to `generated-src` for projects using
+other build systems. Existing checked-in-source targets remain available.
 
-## Goals
+## External Repository Setup
 
-- Run Djinni as a normal Bazel action instead of using `run_djinni.sh` scripts.
-- Generate C++, JNI, Objective-C, Objective-C++, Java, TypeScript, WASM bridge, and YAML outputs under `bazel-out`.
-- Let generated files feed directly into normal Bazel rules such as `cc_library`, `java_library`, `objc_library`, and `sh_binary`.
-- Keep generated output declarations explicit and reviewable.
-- Provide a manifest verifier so output lists stay in sync with Djinni IDL changes.
-
-## Non-Goals
-
-- The first version does not replace all existing checked-in generated files.
-- The first version does not infer every imported file automatically during Bazel analysis.
-- The first version does not change Djinni's Scala generator behavior unless manifest verification exposes a gap.
-
-## Why Output Manifests Are Required
-
-Bazel needs to know ordinary output files during analysis, before an action runs. Djinni output filenames depend on the parsed IDL, language-specific options, identifier styles, and generated type names. That means a Bazel rule cannot run Djinni, discover arbitrary file names, and then feed those files into `cc_library` or `java_library` in the same analysis phase.
-
-Djinni already supports:
-
-- `--list-in-files`
-- `--list-out-files`
-- `--skip-generation`
-
-The planned rules should use checked-in output manifests for declared outputs, plus a verifier that runs Djinni in manifest mode and fails when the checked-in lists are stale.
-
-## Rule Overview
-
-### `djinni_codegen`
-
-Low-level rule that runs the Djinni binary and returns generated outputs grouped by language.
+The repository currently supports WORKSPACE-based Bazel 5.4.1, as pinned in
+`.bazelversion`. Bzlmod support is not implemented. Add Djinni as an archive pinned
+to a revision and SHA-256, or use a local checkout:
 
 ```python
-load("//bzl:djinni_codegen.bzl", "djinni_codegen")
+local_repository(name = "djinni", path = "/path/to/djinni")
 
-djinni_codegen(
-    name = "example_djinni",
-    idl = "example.djinni",
-    srcs = [
-        "example.djinni",
-    ],
-    generators = [
-        "cpp",
-        "java",
-        "jni",
-        "objc",
-        "objcpp",
-        "wasm",
-        "ts",
-    ],
-    java_package = "com.dropbox.textsort",
-    java_class_access_modifier = "package",
-    java_nullable_annotation = "javax.annotation.CheckForNull",
-    java_nonnull_annotation = "javax.annotation.Nonnull",
-    ident_java_field = "mFooBar",
-    cpp_namespace = "textsort",
-    ident_cpp_enum_type = "foo_bar",
-    ident_jni_class = "NativeFooBar",
-    ident_jni_file = "NativeFooBar",
-    objc_type_prefix = "TXS",
-    objc_swift_bridging_header = "TextSort-Bridging-Header",
-    ts_module = "example",
-    outs = {
-        "cpp": [
-            "generated/example/cpp/item_list.hpp",
-            "generated/example/cpp/sort_items.hpp",
-            "generated/example/cpp/sort_order.hpp",
-            "generated/example/cpp/textbox_listener.hpp",
-        ],
-        "java": [
-            "generated/example/java/com/dropbox/textsort/ItemList.java",
-            "generated/example/java/com/dropbox/textsort/SortItems.java",
-            "generated/example/java/com/dropbox/textsort/SortOrder.java",
-            "generated/example/java/com/dropbox/textsort/TextboxListener.java",
-        ],
-        "jni": [
-            "generated/example/jni/NativeItemList.cpp",
-            "generated/example/jni/NativeItemList.hpp",
-            "generated/example/jni/NativeSortItems.cpp",
-            "generated/example/jni/NativeSortItems.hpp",
-            "generated/example/jni/NativeSortOrder.hpp",
-            "generated/example/jni/NativeTextboxListener.cpp",
-            "generated/example/jni/NativeTextboxListener.hpp",
-        ],
-        "objc": [
-            "generated/example/objc/TXSItemList.h",
-            "generated/example/objc/TXSItemList.mm",
-            "generated/example/objc/TXSItemList+Private.h",
-            "generated/example/objc/TXSItemList+Private.mm",
-            "generated/example/objc/TXSSortItems.h",
-            "generated/example/objc/TXSSortItems+Private.h",
-            "generated/example/objc/TXSSortItems+Private.mm",
-            "generated/example/objc/TXSSortOrder.h",
-            "generated/example/objc/TXSSortOrder+Private.h",
-            "generated/example/objc/TXSTextboxListener.h",
-            "generated/example/objc/TXSTextboxListener+Private.h",
-            "generated/example/objc/TXSTextboxListener+Private.mm",
-            "generated/example/objc/TextSort-Bridging-Header.h",
-        ],
-        "wasm": [
-            "generated/example/wasm/NativeItemList.cpp",
-            "generated/example/wasm/NativeItemList.hpp",
-            "generated/example/wasm/NativeSortItems.cpp",
-            "generated/example/wasm/NativeSortItems.hpp",
-            "generated/example/wasm/NativeSortOrder.cpp",
-            "generated/example/wasm/NativeSortOrder.hpp",
-            "generated/example/wasm/NativeTextboxListener.cpp",
-            "generated/example/wasm/NativeTextboxListener.hpp",
-        ],
-        "ts": [
-            "generated/example/ts/example.ts",
-        ],
-    },
+load("@djinni//bzl:deps.bzl", "djinni_deps")
+djinni_deps()
+load("@djinni//bzl:scala_config.bzl", "djinni_scala_config")
+djinni_scala_config()
+load("@djinni//bzl:setup_deps.bzl", "djinni_setup_deps")
+djinni_setup_deps()
+```
+
+These helpers configure the generator's Scala/JVM dependencies. The consumer
+does not need Djinni's example-only Android, Apple, Kotlin, or Emscripten workspace
+setup. C++ compilation needs a configured C++ toolchain; Java compilation needs
+a Java toolchain. JNI and WASM consumers must also supply their platform toolchains
+and appropriate support-library dependencies.
+
+## Base Declaration and Language Libraries
+
+The API follows the `rules_proto` separation of source declarations, providers,
+and language consumers. `djinni_library` is a Starlark rule. Language library
+macros create a private codegen rule and an ordinary `cc_library`, `java_library`,
+or `cc_binary`, returning the normal language provider to downstream consumers.
+The shared action implementation is internal; each language macro selects only
+its own output categories and runs a separate action.
+
+```python
+load("@djinni//bzl:djinni_codegen.bzl", "cc_djinni_library", "djinni_library", "java_djinni_library")
+
+djinni_library(
+    name = "messages",
+    idl = "messages.djinni",
+    srcs = ["common.djinni"],
+)
+
+OUTPUTS = {
+    "cpp_hdrs": ["generated/cpp/message.hpp", "generated/cpp/common.hpp"],
+    "java_srcs": ["generated/java/Message.java", "generated/java/Common.java"],
+}
+
+cc_djinni_library(
+    name = "messages_cc",
+    deps = [":messages"],
+    outs = OUTPUTS,
+    cpp_namespace = "example",
+    includes = ["generated/cpp"],
+    visibility = ["//visibility:public"],
+)
+
+java_djinni_library(
+    name = "messages_java",
+    deps = [":messages"],
+    outs = OUTPUTS,
+    java_package = "example",
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "app",
+    srcs = ["main.cc"],
+    deps = [":messages_cc"],
 )
 ```
 
-The rule should expose output groups:
+Output names must match the IDL and options. A large manifest can be loaded from
+a checked-in `.bzl` file, as in `examples/djinni_outputs.bzl`. Output declarations
+are package-relative paths, and must not overlap checked-in files or outputs from
+another target. Use distinct output directories for separate option sets.
 
-- `cpp_srcs`
-- `cpp_hdrs`
-- `jni_srcs`
-- `jni_hdrs`
-- `objc_srcs`
-- `objc_hdrs`
-- `java_srcs`
-- `wasm_srcs`
-- `wasm_hdrs`
-- `ts_srcs`
-- `yaml_srcs`
-- `all`
+### `djinni_library`
 
-### `djinni_manifest_test`
+- `idl`: required single root `.djinni` label.
+- `srcs`: additional imported `.djinni`, YAML, or proto file labels.
+- `deps`: other `djinni_library` targets contributing transitive import inputs.
+- `idl_include_paths`: repository-relative search directories. For example,
+  `schemas/vendor` refers to that directory in the repository defining this rule,
+  including when loaded as `@djinni`. Absolute paths and `..` are rejected.
+  Djinni also searches relative to each importing file.
+- `verify`: defaults to `True`; parsing and type resolution run with
+  `--skip-generation true`. Verification outputs are dependencies of language
+  actions. Set to `False` to omit the separate verification action; generation
+  still parses and resolves the IDL.
+- `compiler`: executable label, defaulting to Djinni's `//src:djinni`, resolved
+  relative to the rules repository and built in the execution configuration.
 
-Verifier rule that runs Djinni with `--skip-generation true`, `--list-in-files`, and `--list-out-files`, then compares the result with checked-in manifests.
+`DjinniInfo` carries the root IDL, a depset of transitive source files, a depset
+of execution-root include paths, and a depset of verification outputs. Default
+files contain this target's direct sources and verification outputs.
 
-```python
-load("//bzl:djinni_codegen.bzl", "djinni_manifest_test")
-
-djinni_manifest_test(
-    name = "example_djinni_manifest_test",
-    idl = "example.djinni",
-    srcs = [
-        "example.djinni",
-    ],
-    generators = [
-        "cpp",
-        "java",
-        "jni",
-        "objc",
-        "objcpp",
-        "wasm",
-        "ts",
-    ],
-    java_package = "com.dropbox.textsort",
-    cpp_namespace = "textsort",
-    objc_type_prefix = "TXS",
-    ts_module = "example",
-    expected_in_files = "example_djinni_inputs.txt",
-    expected_out_files = "example_djinni_outputs.txt",
-)
-```
+Imports must be declared through `srcs` or `deps`; include paths do not make files
+action inputs. No host filesystem scanning occurs during analysis. `deps` models
+import availability, rather than compiling imported declarations separately.
 
 ### Language Macros
 
-Language macros should wrap `djinni_codegen` and native Bazel rules. They should be conveniences only; the low-level rule remains the source of truth.
+| Macro | Selected output categories | Consumer |
+| --- | --- | --- |
+| `cc_djinni_library` | `cpp_srcs`, `cpp_hdrs` | `cc_library` |
+| `java_djinni_library` | `java_srcs` | `java_library` |
+| `jni_djinni_library` | `jni_srcs`, `jni_hdrs` | `cc_library` |
+| `wasm_djinni_cc_binary` | `wasm_srcs`, `wasm_hdrs` | `cc_binary` |
+
+Each accepts exactly one base target in `deps`, an `outs` dictionary, and Djinni
+options as keyword arguments. Other known language categories in a shared
+manifest are ignored. Unknown categories fail analysis. Boolean CLI options
+accept Starlark booleans; omission preserves the compiler's default.
+
+Use `cc_deps` or `java_deps` for compilation dependencies, including generated
+libraries referenced by bridges. `srcs` adds handwritten sources; C++ and JNI
+macros also accept `hdrs`. C++/JNI macros accept `includes`, `copts`, `linkopts`,
+and `alwayslink`; WASM accepts `copts` and `linkopts`. All accept `visibility`.
+`testonly`, `tags`, `features`, `deprecation`, and compatibility attributes are
+forwarded to both the private codegen target and its consumer.
+
+Pass additional native language attributes through `library_kwargs`, for example
+`library_kwargs = {"defines": ["MY_FEATURE=1"], "linkstatic": True}` for C++ or
+`library_kwargs = {"javacopts": ["-Xlint"]}` for Java. Do not repeat explicitly
+named macro attributes in this dictionary. `compiler` selects the codegen
+executable independently of the base target's verification compiler; when using
+a custom compiler, set it consistently on both targets.
+
+JNI needs the same C++ namespace/identifier options and Java package/field
+identifier options as its C++ and Java declarations when these differ from
+compiler defaults. WASM also needs matching C++ namespace/identifier options.
+WASM bridge class/file names use `ident_jni_class` and `ident_jni_file`; set them
+to match your WASM output manifest, even when no JNI output is generated.
+Supply C++ and JNI support libraries
+through `cc_deps`; for desktop JNI use `@djinni//support-lib:djinni-support-jni`.
+The WASM macro produces bridge C++ sources; select an Emscripten toolchain through
+your workspace's WASM build setup.
+
+## Low-Level Codegen
+
+`djinni_codegen` remains available for explicit generated-file integration,
+including Objective-C, Objective-C++, TypeScript, and YAML. Dedicated compiled
+library macros for those languages are not implemented yet.
 
 ```python
-load("//bzl:djinni_codegen.bzl", "djinni_cc_library", "djinni_java_library")
-
-djinni_cc_library(
-    name = "textsort-common",
-    idl = "example.djinni",
-    srcs = ["example.djinni"],
-    cpp_namespace = "textsort",
-    ident_cpp_enum_type = "foo_bar",
-    outs = {
-        "srcs": [
-        ],
-        "hdrs": [
-            "generated/example/cpp/item_list.hpp",
-            "generated/example/cpp/sort_items.hpp",
-            "generated/example/cpp/sort_order.hpp",
-            "generated/example/cpp/textbox_listener.hpp",
-        ],
-    },
-    includes = [
-        "generated/example/cpp",
-        "handwritten-src/cpp",
-    ],
-    deps = [
-        "//support-lib:djinni-support-common",
-    ],
-)
-
-djinni_java_library(
-    name = "textsort-java",
-    idl = "example.djinni",
-    srcs = ["example.djinni"],
-    java_package = "com.dropbox.textsort",
-    java_class_access_modifier = "package",
-    java_nullable_annotation = "javax.annotation.CheckForNull",
-    java_nonnull_annotation = "javax.annotation.Nonnull",
-    ident_java_field = "mFooBar",
-    outs = [
-        "generated/example/java/com/dropbox/textsort/ItemList.java",
-        "generated/example/java/com/dropbox/textsort/SortItems.java",
-        "generated/example/java/com/dropbox/textsort/SortOrder.java",
-        "generated/example/java/com/dropbox/textsort/TextboxListener.java",
-    ],
-    deps = [
-        "//support-lib:djinni-support-java",
-        "@maven_djinni//:com_google_code_findbugs_jsr305",
-    ],
-)
-```
-
-## Perftest Example
-
-This mirrors `perftest/run_djinni.sh`.
-
-```python
-load("//bzl:djinni_codegen.bzl", "djinni_codegen")
-load(":benchmark_djinni_outputs.bzl", "BENCHMARK_DJINNI_OUTS")
+load("@djinni//bzl:djinni_codegen.bzl", "djinni_codegen")
 
 djinni_codegen(
-    name = "benchmark_djinni",
-    idl = "djinni_perf_benchmark.djinni",
-    srcs = ["djinni_perf_benchmark.djinni"],
-    generators = [
-        "cpp",
-        "java",
-        "jni",
-        "objc",
-        "objcpp",
-        "wasm",
-        "ts",
-    ],
-    java_package = "com.snapchat.djinni.benchmark",
-    java_class_access_modifier = "package",
-    java_nullable_annotation = "javax.annotation.CheckForNull",
-    java_nonnull_annotation = "javax.annotation.Nonnull",
-    ident_java_field = "mFooBar",
-    cpp_namespace = "snapchat::djinni::benchmark",
-    ident_cpp_enum_type = "foo_bar",
-    ident_jni_class = "NativeFooBar",
-    ident_jni_file = "NativeFooBar",
-    objc_type_prefix = "TXS",
-    objc_swift_bridging_header = "Benchmark-Bridging-Header",
-    wasm_namespace = "benchmark",
-    wasm_omit_namespace_alias = True,
-    ts_module = "perftest",
-    outs = BENCHMARK_DJINNI_OUTS,
+    name = "messages_ts",
+    djinni = ":messages",
+    outs = {"ts_srcs": ["generated/ts/messages.ts"]},
+    ts_module = "messages",
 )
 ```
 
-The `outs` attribute should accept a dictionary. Large targets should prefer loading that dictionary from a `.bzl` manifest so BUILD files stay readable.
+Use either `djinni` (a `DjinniInfo` target) or the legacy `idl` with explicit
+`srcs` and `idl_include_paths`. Supported categories are `cpp_srcs`, `cpp_hdrs`,
+`java_srcs`, `jni_srcs`, `jni_hdrs`, `objc_srcs`, `objc_hdrs`, `objcpp_srcs`,
+`objcpp_hdrs`, `wasm_srcs`, `wasm_hdrs`, `ts_srcs`, and `yaml_srcs`. They are also
+output groups, along with `all`. There is no `generators` attribute: nonempty
+output categories select generators. Each category must use one directory;
+Objective-C, Objective-C++, and WASM source/header pairs each share a directory.
 
-## Test Suite Example
+Actions use declared files, `ctx.actions.args`, and the compiler's
+`FilesToRunProvider` so its runfiles are included. Shell generation scripts are
+not invoked by the rules. Missing declared outputs fail the build; detection of
+extra undeclared outputs and a general `djinni_manifest_test` remain future work.
 
-The test suite currently runs Djinni multiple times with different IDL files and option sets. The Bazel migration should model those as separate `djinni_codegen` targets so each action has one option set.
+## Command-Line Generation
 
-```python
-load(":testsuite_main_djinni_outputs.bzl", "TESTSUITE_MAIN_DJINNI_OUTS")
+For a project using another build system, the existing scripts remain supported:
 
-djinni_codegen(
-    name = "testsuite_main_djinni",
-    idl = "djinni/all.djinni",
-    srcs = [
-        "djinni/all.djinni",
-        "djinni/common.djinni",
-        "djinni/set.djinni",
-        "djinni/vendor/third-party/date.djinni",
-        "djinni/vendor/third-party/date.yaml",
-        "djinni/vendor/third-party/duration.djinni",
-        "djinni/vendor/third-party/duration.yaml",
-        "djinni/vendor/third-party/outcome.djinni",
-        "djinni/vendor/third-party/proto.djinni",
-        "djinni/vendor/third-party/proto.yaml",
-        "djinni/vendor/third-party/proto2.yaml",
-        "//support-lib:future.yaml",
-        "//support-lib:outcome.yaml",
-        "//support-lib:dataref.yaml",
-        "//support-lib:dataview.yaml",
-    ],
-    idl_include_paths = [
-        "djinni/vendor",
-    ],
-    generators = [
-        "cpp",
-        "java",
-        "jni",
-        "objc",
-        "objcpp",
-        "wasm",
-        "ts",
-        "yaml",
-    ],
-    java_package = "com.dropbox.djinni.test",
-    java_nullable_annotation = "javax.annotation.CheckForNull",
-    java_nonnull_annotation = "javax.annotation.Nonnull",
-    java_use_final_for_record = False,
-    java_implement_android_os_parcelable = True,
-    cpp_namespace = "testsuite",
-    cpp_optional_template = "std::experimental::optional",
-    cpp_optional_header = "\"../../handwritten-src/cpp/optional.hpp\"",
-    cpp_extended_record_include_prefix = "../../handwritten-src/cpp/",
-    ident_cpp_enum_type = "foo_bar",
-    jni_use_on_load_initializer = False,
-    ident_jni_class = "NativeFooBar",
-    ident_jni_file = "NativeFooBar",
-    objc_type_prefix = "DB",
-    wasm_namespace = "testsuite",
-    ts_module = "test",
-    yaml_out_file = "yaml-test.yaml",
-    yaml_prefix = "test_",
-    outs = TESTSUITE_MAIN_DJINNI_OUTS,
-)
+```sh
+./examples/run_djinni.sh
+./perftest/run_djinni.sh
+./test-suite/run_djinni.sh
 ```
 
-## Initial Attribute Set
+These scripts use Bazel to build the compiler, then run the CLI and update their
+`generated-src` directories. They do not depend on the new codegen rules.
+For a custom IDL use `./src/run --idl ... --cpp-out ... --java-out ...`.
+`./src/run-assume-built` runs a compiler that has already been built.
 
-The first implementation should support the options currently used by `examples/run_djinni.sh`, `perftest/run_djinni.sh`, and `test-suite/run_djinni.sh`:
+To run generation without Bazel installed on the consuming machine, build the
+standalone JVM artifact once (or distribute it to that machine):
 
-- `idl`
-- `srcs`
-- `idl_include_paths`
-- `generators`
-- `outs`
-- `java_package`
-- `java_class_access_modifier`
-- `java_nullable_annotation`
-- `java_nonnull_annotation`
-- `java_implement_android_os_parcelable`
-- `java_use_final_for_record`
-- `java_gen_interface`
-- `cpp_namespace`
-- `cpp_optional_template`
-- `cpp_optional_header`
-- `cpp_extended_record_include_prefix`
-- `cpp_use_wide_strings`
-- `jni_use_on_load_initializer`
-- `jni_function_prologue_file`
-- `objc_type_prefix`
-- `objc_swift_bridging_header`
-- `objcpp_function_prologue_file`
-- `wasm_namespace`
-- `wasm_omit_namespace_alias`
-- `ts_module`
-- `yaml_out_file`
-- `yaml_prefix`
-- all currently used `ident_*` options
+```sh
+bazel build //src:djinni_deploy.jar
+java -jar bazel-bin/src/djinni_deploy.jar \
+    --idl /path/to/messages.djinni --cpp-out /path/to/generated/cpp
+```
 
-Additional Djinni CLI flags can be added after the first migration target proves the shape.
+This path requires a compatible Java runtime, but no Bazel at generation time.
+Building Djinni from source still requires Bazel. Generated files can be compiled
+with CMake, Gradle, Xcode, or another build system.
 
-## Migration Strategy
+## Verification
 
-1. Add rule documentation and reviewed examples.
-2. Add `bzl/djinni_codegen.bzl` with `djinni_codegen` and `djinni_manifest_test`.
-3. Migrate `examples` to generated-at-build-time outputs.
-4. Migrate `perftest`.
-5. Split the test suite into one `djinni_codegen` target per current Djinni invocation.
-6. Decide whether checked-in `generated-src` should remain as golden outputs or be removed from normal build inputs.
+From the repository root, check analysis and build generated consumers:
 
-## Open Questions
+```sh
+bazel build --nobuild //:djinni-codegen-consumer-verification //test-suite:testsuite-main-djinni-codegen
+bazel build //:djinni-codegen-consumer-verification
+bazel test //bzl/tests:rule_tests
+```
 
-- Should manifests be handwritten `.bzl` files, plain text files generated by `--list-out-files`, or both?
-- Should `djinni_codegen` use one action for all languages or one action per language?
-- Should generated C++ and generated JNI live in separate output roots even when they are produced by one Djinni invocation?
-- Should the first version support tree artifacts for exploratory targets that do not need direct `cc_library` or `java_library` integration?
-- Should input manifests be mandatory, or should `srcs` plus `djinni_manifest_test` be enough?
+The separate `external-test` workspace exercises external rule loads, imported
+IDL from another repository, separate language actions, compilation, and runtime
+field access. Its CLI equivalence test compares ordinary CLI generation with
+Bazel-generated C++/Java output:
+
+```sh
+cd external-test
+bazel test //:consumer_tests
+```
+
+JNI and WASM targets in the root aggregate require their platform setup. The
+generated JNI consumers use desktop JNI support; generated WASM consumers are
+wrapped with `wasm_cc_binary` to select the Emscripten toolchain. The standalone
+consumer tests use C++ and Java only.
+
+On macOS with newer Xcode, Bazel 5's `wrapped_clang` may fail with
+`missing LC_UUID load command`. Validation on Xcode 26.5 used the following
+command-only workarounds for that wrapper and the bundled older zlib:
+
+```sh
+bazel test //:consumer_tests --repo_env=BAZEL_USE_CPP_ONLY_TOOLCHAIN=1 \
+    --host_conlyopt=-std=c90 --host_conlyopt=-Dfdopen=fdopen
+```
+
+Run this from `external-test`. These flags are local compatibility workarounds,
+not requirements of the codegen rules.

@@ -1,5 +1,18 @@
 """Bazel rules for running Djinni code generation."""
 
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_java//java:defs.bzl", "java_library")
+
+DjinniInfo = provider(
+    doc = "Djinni IDL provider.",
+    fields = {
+        "idl": "Root .djinni file.",
+        "transitive_srcs": "Root IDL, imported IDL/YAML/proto sources, and transitive dependency sources.",
+        "idl_include_paths": "Depset of execution-root include paths.",
+        "validation_files": "Depset of IDL verification outputs.",
+    },
+)
+
 def _collect(values):
     result = []
     for value in values:
@@ -38,6 +51,20 @@ def _add_ident_arg(args, flag, value):
     _add_string_arg(args, flag, value)
 
 def _djinni_codegen_impl(ctx):
+    if ctx.attr.djinni:
+        djinni = ctx.attr.djinni[DjinniInfo]
+        idl = djinni.idl
+        input_depsets = [djinni.transitive_srcs, djinni.validation_files]
+        idl_include_paths = djinni.idl_include_paths.to_list() + _include_paths(ctx)
+    else:
+        idl = ctx.file.idl
+        input_depsets = []
+        idl_include_paths = _include_paths(ctx)
+        if not idl:
+            fail("djinni_codegen requires either idl or djinni")
+    if ctx.attr.djinni and ctx.file.idl:
+        fail("Specify only one of djinni or idl")
+
     cpp_files = ctx.outputs.cpp_srcs + ctx.outputs.cpp_hdrs
     jni_files = ctx.outputs.jni_srcs + ctx.outputs.jni_hdrs
     objc_files = ctx.outputs.objc_srcs + ctx.outputs.objc_hdrs
@@ -176,13 +203,13 @@ def _djinni_codegen_impl(ctx):
     _add_ident_arg(args, "--ident-objc-file", ctx.attr.ident_objc_file)
 
     args.add("--idl")
-    args.add(ctx.file.idl.path)
-    for include_path in ctx.attr.idl_include_paths:
+    args.add(idl.path)
+    for include_path in idl_include_paths:
         args.add("--idl-include-path")
         args.add(include_path)
 
     inputs = depset(
-        direct = [ctx.file.idl] + ctx.files.srcs + [
+        direct = ([idl] if not ctx.attr.djinni else []) + ctx.files.srcs + [
             file
             for file in [
                 ctx.file.jni_function_prologue_file,
@@ -190,10 +217,11 @@ def _djinni_codegen_impl(ctx):
             ]
             if file
         ],
+        transitive = input_depsets,
     )
 
     ctx.actions.run(
-        executable = ctx.executable._djinni,
+        executable = ctx.attr.compiler[DefaultInfo].files_to_run,
         arguments = [args],
         inputs = inputs,
         outputs = all_outputs,
@@ -224,7 +252,8 @@ def _djinni_codegen_impl(ctx):
 _djinni_codegen = rule(
     implementation = _djinni_codegen_impl,
     attrs = {
-        "idl": attr.label(allow_single_file = [".djinni"], mandatory = True),
+        "djinni": attr.label(providers = [DjinniInfo]),
+        "idl": attr.label(allow_single_file = [".djinni"]),
         "srcs": attr.label_list(allow_files = [".djinni", ".yaml", ".yml", ".proto"]),
         "idl_include_paths": attr.string_list(),
         "cpp_srcs": attr.output_list(),
@@ -304,11 +333,80 @@ _djinni_codegen = rule(
         "ident_objc_local": attr.string(),
         "ident_objc_const": attr.string(),
         "ident_objc_file": attr.string(),
-        "_djinni": attr.label(
+        "compiler": attr.label(
             default = Label("//src:djinni"),
             executable = True,
             cfg = "exec",
         ),
+    },
+)
+
+def _include_paths(ctx):
+    # Include paths are repository-relative, never relative to the consuming workspace.
+    root = ctx.label.workspace_root
+    result = []
+    for path in ctx.attr.idl_include_paths:
+        if path.startswith("/") or ".." in path.split("/"):
+            fail("idl_include_paths must be repository-relative: %s" % path)
+        result.append(root + "/" + path if root and path else root or path or ".")
+    return result
+
+def _djinni_library_impl(ctx):
+    transitive = [
+        dep[DjinniInfo].transitive_srcs
+        for dep in ctx.attr.deps
+    ]
+    include_paths = depset(
+        direct = _include_paths(ctx),
+        transitive = [dep[DjinniInfo].idl_include_paths for dep in ctx.attr.deps],
+    )
+
+    transitive_srcs = depset(
+        direct = [ctx.file.idl] + ctx.files.srcs,
+        transitive = transitive,
+    )
+
+    validation = []
+    if ctx.attr.verify:
+        validated_inputs = ctx.actions.declare_file(ctx.label.name + ".djinni.inputs")
+        args = ctx.actions.args()
+        args.add("--idl", ctx.file.idl)
+        args.add("--skip-generation", "true")
+        args.add("--list-in-files", validated_inputs)
+        args.add_all(include_paths, before_each = "--idl-include-path")
+        ctx.actions.run(
+            executable = ctx.attr.compiler[DefaultInfo].files_to_run,
+            arguments = [args],
+            inputs = transitive_srcs,
+            outputs = [validated_inputs],
+            mnemonic = "DjinniVerify",
+            progress_message = "Verifying Djinni IDL for %s" % ctx.label,
+        )
+        validation.append(validated_inputs)
+    validation_files = depset(
+        direct = validation,
+        transitive = [dep[DjinniInfo].validation_files for dep in ctx.attr.deps],
+    )
+    return [
+        DefaultInfo(files = depset([ctx.file.idl] + ctx.files.srcs, transitive = [validation_files])),
+        DjinniInfo(
+            idl = ctx.file.idl,
+            transitive_srcs = transitive_srcs,
+            idl_include_paths = include_paths,
+            validation_files = validation_files,
+        ),
+    ]
+
+djinni_library = rule(
+    doc = "Declares one root IDL and its import closure; verifies syntax and types by default.",
+    implementation = _djinni_library_impl,
+    attrs = {
+        "idl": attr.label(allow_single_file = [".djinni"], mandatory = True),
+        "srcs": attr.label_list(allow_files = [".djinni", ".yaml", ".yml", ".proto"]),
+        "deps": attr.label_list(providers = [DjinniInfo]),
+        "idl_include_paths": attr.string_list(),
+        "verify": attr.bool(default = True),
+        "compiler": attr.label(default = Label("//src:djinni"), executable = True, cfg = "exec"),
     },
 )
 
@@ -351,6 +449,9 @@ def djinni_codegen(name, outs, **kwargs):
             ts_srcs, and yaml_srcs.
         **kwargs: Djinni options and input labels.
     """
+    unknown = [key for key in outs if key not in _OUTPUT_KEYS]
+    if unknown:
+        fail("Unknown Djinni output categories: %s" % unknown)
     normalized = _normalize_kwargs(kwargs)
     _djinni_codegen(
         name = name,
@@ -368,4 +469,158 @@ def djinni_codegen(name, outs, **kwargs):
         ts_srcs = _outs(outs, "ts_srcs"),
         yaml_srcs = _outs(outs, "yaml_srcs"),
         **normalized
+    )
+
+def _exactly_one_dep(name, deps):
+    if len(deps) != 1:
+        fail("%s expects exactly one djinni_library dep" % name)
+
+_OUTPUT_KEYS = [
+    "cpp_srcs",
+    "cpp_hdrs",
+    "java_srcs",
+    "jni_srcs",
+    "jni_hdrs",
+    "objc_srcs",
+    "objc_hdrs",
+    "objcpp_srcs",
+    "objcpp_hdrs",
+    "wasm_srcs",
+    "wasm_hdrs",
+    "ts_srcs",
+    "yaml_srcs",
+]
+
+_COMMON_ATTRS = ["testonly", "tags", "compatible_with", "restricted_to", "target_compatible_with", "features", "deprecation"]
+
+def _language_codegen(name, deps, outs, language, kwargs):
+    _exactly_one_dep(name, deps)
+    unknown = [key for key in outs if key not in _OUTPUT_KEYS]
+    if unknown:
+        fail("Unknown Djinni output categories: %s" % unknown)
+    common = {}
+    options = dict(kwargs)
+    for attr_name in _COMMON_ATTRS:
+        if attr_name in options:
+            common[attr_name] = options.pop(attr_name)
+    selected = {key: value for key, value in outs.items() if key.startswith(language + "_")}
+    djinni_codegen(
+        name = name,
+        djinni = deps[0],
+        outs = selected,
+        visibility = ["//visibility:private"],
+        **dict(options, **common)
+    )
+    return common
+
+def _consumer_attrs(library_kwargs, common):
+    attrs = dict(library_kwargs)
+    for key, value in common.items():
+        if key in attrs:
+            fail("Pass common attribute %s on the macro, not in library_kwargs" % key)
+        attrs[key] = value
+    return attrs
+
+def cc_djinni_library(
+        name,
+        deps,
+        outs,
+        srcs = [],
+        hdrs = [],
+        includes = [],
+        cc_deps = [],
+        copts = [],
+        linkopts = [],
+        alwayslink = 0,
+        visibility = None,
+        library_kwargs = {},
+        **kwargs):
+    """Generates C++ from a djinni_library and wraps it in cc_library."""
+    codegen_name = name + "__djinni_cpp_codegen"
+    common = _language_codegen(codegen_name, deps, outs, "cpp", kwargs)
+    cc_library(
+        name = name,
+        srcs = _outs(outs, "cpp_srcs") + srcs,
+        hdrs = _outs(outs, "cpp_hdrs") + hdrs,
+        includes = includes,
+        copts = copts,
+        linkopts = linkopts,
+        deps = cc_deps,
+        alwayslink = alwayslink,
+        visibility = visibility,
+        **_consumer_attrs(library_kwargs, common)
+    )
+
+def java_djinni_library(
+        name,
+        deps,
+        outs,
+        java_deps = [],
+        visibility = None,
+        srcs = [],
+        library_kwargs = {},
+        **kwargs):
+    """Generates Java from a djinni_library and wraps it in java_library."""
+    codegen_name = name + "__djinni_java_codegen"
+    common = _language_codegen(codegen_name, deps, outs, "java", kwargs)
+    java_library(
+        name = name,
+        srcs = _outs(outs, "java_srcs") + srcs,
+        deps = java_deps,
+        visibility = visibility,
+        **_consumer_attrs(library_kwargs, common)
+    )
+
+def jni_djinni_library(
+        name,
+        deps,
+        outs,
+        includes = [],
+        cc_deps = [],
+        copts = [],
+        linkopts = [],
+        alwayslink = 0,
+        visibility = None,
+        srcs = [],
+        hdrs = [],
+        library_kwargs = {},
+        **kwargs):
+    """Generates JNI C++ from a djinni_library and wraps it in cc_library."""
+    codegen_name = name + "__djinni_jni_codegen"
+    common = _language_codegen(codegen_name, deps, outs, "jni", kwargs)
+    cc_library(
+        name = name,
+        srcs = _outs(outs, "jni_srcs") + srcs,
+        hdrs = _outs(outs, "jni_hdrs") + hdrs,
+        includes = includes,
+        copts = copts,
+        linkopts = linkopts,
+        deps = cc_deps,
+        alwayslink = alwayslink,
+        visibility = visibility,
+        **_consumer_attrs(library_kwargs, common)
+    )
+
+def wasm_djinni_cc_binary(
+        name,
+        deps,
+        outs,
+        cc_deps = [],
+        copts = [],
+        linkopts = [],
+        visibility = None,
+        srcs = [],
+        library_kwargs = {},
+        **kwargs):
+    """Generates WASM C++ bridge sources from a djinni_library and wraps them in cc_binary."""
+    codegen_name = name + "__djinni_wasm_codegen"
+    common = _language_codegen(codegen_name, deps, outs, "wasm", kwargs)
+    cc_binary(
+        name = name,
+        srcs = _outs(outs, "wasm_srcs") + _outs(outs, "wasm_hdrs") + srcs,
+        copts = copts,
+        linkopts = linkopts,
+        deps = cc_deps,
+        visibility = visibility,
+        **_consumer_attrs(library_kwargs, common)
     )

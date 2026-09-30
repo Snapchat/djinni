@@ -350,10 +350,15 @@ Q. Do I need to use Bazel to build my project?
 
 A. No. You may use whatever build system or IDE you like. All you need for your
 project is including the generated files in it. We use Bazel to build the code
-generator and unit tests, but it's not needed for building user projects. You
-still need to have Bazel installed if you want to run the code generator though,
-because the run_djinni.sh script indirectly uses it to ensure the code generator
-is built and up to date.
+generator and unit tests, but it's not needed for building user projects.
+The `run_djinni.sh` scripts use Bazel to build the compiler before generation.
+Alternatively, build `//src:djinni_deploy.jar` once and distribute the JAR;
+`java -jar djinni_deploy.jar --idl ... --cpp-out ...` generates code without
+Bazel installed on the consuming machine.
+
+For Bazel projects, [build-time codegen rules](docs/djinni_bazel_codegen_rules.md)
+provide `djinni_library` declarations and per-language generated libraries.
+Both paths use the same Djinni compiler.
 
 Q. Can we include arbitrary bytes in the `string` type?
 
