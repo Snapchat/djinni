@@ -1,5 +1,9 @@
-load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kt_android_library")
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
+load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
+load("@rules_android//rules:rules.bzl", "android_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_java//java:defs.bzl", "java_library")
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 
 cc_library(
     name = "benchmark-common",
@@ -75,7 +79,7 @@ EMSCRIPTEN_LINKOPTS = [
     "--bind",  # Compiles the source code using the Embind bindings to connect C/C++ and JavaScript
     "-s MALLOC=emmalloc",  # Switch to using the much smaller implementation
     "-s MODULARIZE=1",  # Allows us to manually invoke the initialization of wasm
-    "-s WASM_BIGINT=1", # We need to pass int64_t
+    "-s WASM_BIGINT=1",  # We need to pass int64_t
 ]
 
 cc_binary(
@@ -102,6 +106,11 @@ wasm_cc_binary(
 sh_binary(
     name = "server",
     srcs = ["ts/run.sh"],
+    data = glob([
+        "ts/*.html",
+        "ts/*.ts",
+        "ts/*.json",
+        "generated-src/ts/*.ts",
+    ]) + [":wasm"],
     deps = ["//support-lib:djinni-support-ts"],
-    data = glob(["ts/*.html", "ts/*.ts", "ts/*.json", "generated-src/ts/*.ts"]) + [":wasm"]
 )

@@ -1,6 +1,10 @@
 load("@build_bazel_rules_apple//apple:ios.bzl", "ios_application")
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
+load("@rules_android//rules:rules.bzl", "android_binary", "android_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_java//java:defs.bzl", "java_library")
+load("@rules_shell//shell:sh_binary.bzl", "sh_binary")
 
 cc_library(
     name = "textsort-common",
@@ -38,7 +42,10 @@ cc_library(
     srcs = glob(["generated-src/jni/*.cpp"]),
     hdrs = glob(["generated-src/jni/*.hpp"]),
     includes = ["generated-src/jni"],
-    linkopts = ["-lm", "-ldl"],
+    linkopts = [
+        "-lm",
+        "-ldl",
+    ],
     deps = [
         ":textsort-common",
         "//support-lib:djinni-support-android",
@@ -53,15 +60,21 @@ android_library(
     srcs = glob(["handwritten-src/java/com/dropbox/textsort/*.java"]),
     custom_package = "com.dropbox.textsort",
     manifest = "android/app/src/main/AndroidManifest.xml",
-    resource_files = glob(["android/app/src/main/res/**"], exclude=["android/app/src/main/res/.DS_Store"]),
-    deps = [":textsort-java",],
+    resource_files = glob(
+        ["android/app/src/main/res/**"],
+        exclude = ["android/app/src/main/res/.DS_Store"],
+    ),
+    deps = [":textsort-java"],
 )
 
 android_binary(
     name = "android-app",
     custom_package = "com.dropbox.textsort",
     manifest = "android/AndroidManifest.xml",
-    deps = [":textsort-activity", ":textsort-jni"],
+    deps = [
+        ":textsort-activity",
+        ":textsort-jni",
+    ],
 )
 
 # ------------------------------------------------------------------
@@ -70,7 +83,7 @@ EMSCRIPTEN_LINKOPTS = [
     "--bind",  # Compiles the source code using the Embind bindings to connect C/C++ and JavaScript
     "-s MALLOC=emmalloc",  # Switch to using the much smaller implementation
     "-s MODULARIZE=1",  # Allows us to manually invoke the initialization of wasm
-    "-s WASM_BIGINT=1", # We need to pass int64_t
+    "-s WASM_BIGINT=1",  # We need to pass int64_t
 ]
 
 cc_binary(
@@ -97,5 +110,10 @@ wasm_cc_binary(
 sh_binary(
     name = "server",
     srcs = ["ts/run.sh"],
-    data = glob(["ts/*.html", "ts/*.ts", "ts/*.json", "generated-src/ts/*.ts"]) + [":wasm"]
+    data = glob([
+        "ts/*.html",
+        "ts/*.ts",
+        "ts/*.json",
+        "generated-src/ts/*.ts",
+    ]) + [":wasm"],
 )

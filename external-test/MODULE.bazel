@@ -1,0 +1,12 @@
+module(name = "djinni_external_test")
+
+bazel_dep(name = "snap_djinni", repo_name = "djinni")
+local_path_override(
+    module_name = "snap_djinni",
+    path = "..",
+)
+
+bazel_dep(name = "rules_scala", version = "7.1.5")
+
+scala_config = use_extension("@rules_scala//scala/extensions:config.bzl", "scala_config")
+scala_config.settings(scala_versions = ["2.11.12"])

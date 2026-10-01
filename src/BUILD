@@ -4,10 +4,11 @@ scala_binary(
     name = "djinni",
     srcs = glob(["source/**/*.scala"]),
     main_class = "djinni.Main",
+    scala_version = "2.11.12",
+    visibility = ["//visibility:public"],
     deps = [
         "@maven_djinni//:com_github_scopt_scopt_2_11",
         "@maven_djinni//:org_scala_lang_modules_scala_parser_combinators_2_11",
         "@maven_djinni//:org_yaml_snakeyaml",
     ],
-    visibility = ["//visibility:public"],
 )
