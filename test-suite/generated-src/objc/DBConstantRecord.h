@@ -12,8 +12,8 @@
 + (nonnull instancetype)constantRecordWithSomeInteger:(int32_t)someInteger
                                            someString:(nonnull NSString *)someString;
 
-@property (nonatomic, readonly) int32_t someInteger;
+@property (nonatomic) int32_t someInteger;
 
-@property (nonatomic, readonly, nonnull) NSString * someString;
+@property (nonatomic, copy, nonnull) NSString * someString;
 
 @end

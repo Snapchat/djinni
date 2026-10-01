@@ -33,3 +33,20 @@ wasm:
 ts:
   typename: 'Uint8Array'
   module: ''
+valdi:
+  translator: '::djinni::valdi::NativeDataView'
+  header: '"$DataView_valdi.hpp"'
+swift:
+  typename: 'NSData'
+  module: 'Foundation'
+  generic: false
+  translator: 'DataViewMarshaller'
+  translator.module: 'DjinniSupport'
+swiftxx:
+  translator: '::djinni::swift::DataViewAdaptor'
+  header: '"Data_swift.hpp"'
+c:
+  typename: 'djinni_binary_ref'
+  translator: '::djinni::c_api::DataViewTranslator'
+  public_header: '"$djinni_c.h"'
+  private_header: '"$DataView_c_translator.hpp"'

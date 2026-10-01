@@ -12,10 +12,13 @@ djinni_library(
 
 cc_library(
     name = "textsort-common",
-    srcs = glob([
-        "generated-src/cpp/*.cpp",
-        "handwritten-src/cpp/*.cpp",
-    ]),
+    srcs = glob(
+        [
+            "generated-src/cpp/*.cpp",
+            "handwritten-src/cpp/*.cpp",
+        ],
+        allow_empty = True,
+    ),
     hdrs = glob([
         "generated-src/cpp/*.hpp",
         "handwritten-src/cpp/*.hpp",
@@ -24,6 +27,7 @@ cc_library(
         "generated-src/cpp",
         "handwritten-src/cpp",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//support-lib:djinni-support-common",
     ],
@@ -150,6 +154,7 @@ EMSCRIPTEN_LINKOPTS = [
     "-s MALLOC=emmalloc",  # Switch to using the much smaller implementation
     "-s MODULARIZE=1",  # Allows us to manually invoke the initialization of wasm
     "-s WASM_BIGINT=1",  # We need to pass int64_t
+    "-s EXPORTED_RUNTIME_METHODS=HEAPU8,HEAP8,HEAPU16,HEAP16,HEAPU32,HEAP32,HEAPF32,HEAPF64",  # Export heap views for memory access (required in Emscripten 4.x)
 ]
 
 cc_binary(
@@ -207,4 +212,70 @@ sh_binary(
         "ts/*.json",
         "generated-src/ts/*.ts",
     ]) + [":wasm"],
+)
+
+# ------------------------------------------------------------------
+
+swift_private_files = "generated-src/swift/*+Private.swift"
+
+swift_library(
+    name = "textsort-swift",
+    srcs = glob(
+        [
+            "generated-src/swift/*.swift",
+        ],
+        exclude = [swift_private_files],
+    ),
+    copts = [
+        "-cxx-interoperability-mode=default",
+        "-Xcc",
+        "-std=c++20",
+    ],
+    module_name = "TextSort",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//support-lib:djinni-support-swift",
+    ],
+)
+
+swift_library(
+    name = "textsort-swift-bridge",
+    srcs = glob([swift_private_files]),
+    copts = [
+        "-cxx-interoperability-mode=default",
+        "-Xcc",
+        "-std=c++20",
+    ],
+    module_name = "TextSortBridge",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":textsort-common",
+        ":textsort-swift",
+        ":textsort-swiftxx",
+        "//support-lib:djinni-support-swift",
+        "//support-lib:djinni-support-swiftxx",
+    ],
+)
+
+cc_library(
+    name = "textsort-swiftxx",
+    srcs = glob([
+        "generated-src/swiftxx/*.cpp",
+    ]),
+    hdrs = glob([
+        "generated-src/swiftxx/*.hpp",
+    ]),
+    copts = ["-std=c++20"],
+    includes = [
+        ".",
+        "generated-src/swiftxx",
+    ],
+    tags = ["swift_module=TextSortCxx"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":textsort-common",
+        ":textsort-swift",
+        "//support-lib:djinni-support-common",
+        "//support-lib:djinni-support-swiftxx",
+    ],
 )

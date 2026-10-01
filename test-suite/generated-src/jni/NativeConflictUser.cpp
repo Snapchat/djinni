@@ -32,7 +32,7 @@ CJNIEXPORT jboolean JNICALL Java_com_dropbox_djinni_test_ConflictUser_00024CppPr
 {
     try {
         const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::ConflictUser>(nativeRef);
-        auto r = ref->conflict_arg(::djinni::Set<::djinni_generated::NativeConflict>::toCpp(jniEnv, j_cs));
+        auto r = ref->conflict_arg(::djinni::List<::djinni_generated::NativeConflict>::toCpp(jniEnv, j_cs));
         return ::djinni::release(::djinni::Bool::fromCpp(jniEnv, r));
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }

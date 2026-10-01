@@ -1,5 +1,5 @@
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
-load("@io_bazel_rules_kotlin//kotlin:kotlin.bzl", "kt_android_library")
+load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("//bzl:djinni_codegen.bzl", "cc_djinni_library", "djinni_library", "java_djinni_library", "jni_djinni_library", "wasm_djinni_cc_binary")
 load(":djinni_outputs.bzl", "BENCHMARK_DJINNI_OUTS")
 
@@ -15,10 +15,13 @@ djinni_library(
 
 cc_library(
     name = "benchmark-common",
-    srcs = glob([
-        "generated-src/cpp/*.cpp",
-        "handwritten-src/cpp/*.cpp",
-    ]),
+    srcs = glob(
+        [
+            "generated-src/cpp/*.cpp",
+            "handwritten-src/cpp/*.cpp",
+        ],
+        allow_empty = True,
+    ),
     hdrs = glob([
         "generated-src/cpp/*.hpp",
         "handwritten-src/cpp/*.hpp",
@@ -150,6 +153,7 @@ EMSCRIPTEN_LINKOPTS = [
     "-s MALLOC=emmalloc",  # Switch to using the much smaller implementation
     "-s MODULARIZE=1",  # Allows us to manually invoke the initialization of wasm
     "-s WASM_BIGINT=1",  # We need to pass int64_t
+    "-s EXPORTED_RUNTIME_METHODS=HEAPU8,HEAP8,HEAPU16,HEAP16,HEAPU32,HEAP32,HEAPF32,HEAPF64",  # Export heap views for memory access (required in Emscripten 4.x)
 ]
 
 cc_binary(

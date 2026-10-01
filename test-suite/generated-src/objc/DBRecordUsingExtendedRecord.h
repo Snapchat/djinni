@@ -12,7 +12,7 @@
 + (nonnull instancetype)recordUsingExtendedRecordWithEr:(nonnull DBExtendedRecord *)er;
 
 + (DBRecordUsingExtendedRecord * __nonnull)cr;
-@property (nonatomic, readonly, nonnull) DBExtendedRecord * er;
+@property (nonatomic, nonnull) DBExtendedRecord * er;
 
 @end
 

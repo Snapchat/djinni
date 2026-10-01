@@ -10,6 +10,17 @@ developing it here.
 This file only covers the parts that have been changed.  Please see the
 [original dropbox readme](README.dropbox.md) for the full Djinni documentation.
 
+## Requirements
+
+### Core Requirements
+- **C++20** or later
+- **Bazel 8.5.0+** (use [Bazelisk](https://github.com/bazelbuild/bazelisk) for automatic version management)
+- **JVM (Java 8+)** (for building Java tests and the Scala-based code generator)
+
+### Additional Requirements (for building example apps only)
+- **Xcode 13+** (for iOS/macOS examples)
+- **Android SDK and NDK** (for Android examples, set `ANDROID_HOME` and `ANDROID_NDK_HOME` environment variables)
+
 ## Building
 
 ![Bazel Build](https://github.com/Snapchat/djinni/workflows/Build%20and%20Test/badge.svg)
@@ -26,8 +37,8 @@ to build and run Objective-C and Java tests.
 
 ### Building and running the mobile example apps
 
-You need to install the Android SDK 30.0.2 and the NDK 21.4.7075529. You need both `ANDROID_SDK_HOME` and `ANDROID_NDK_HOME` env variables set.
-The Android example app can be build with bazel: `bazel build //examples:android-app`, 
+You need to install the Android SDK and NDK. Set both `ANDROID_HOME` and `ANDROID_NDK_HOME` environment variables.
+The Android example app can be built with bazel: `bazel build //examples:android-app`, 
 and then install to a device with `adb install bazel-bin/examples/android-app.apk`
 
 The iOS example app are built with Xcode. Simply open the project in Xcode and
@@ -67,6 +78,8 @@ verify the build and binary from the command line.
  - DataView for copy free data passing
  - DataRef for copy free data passing with ownership
  - Generating string names for C++ enums
+ - Omit optional parameters from record constructors
+ - Records are default mutable across all platforms
  - Bug fixes
 
 ## Using new features
@@ -341,8 +354,40 @@ Java and ObjC djinni support library. In Javascript, `future<>` is mapped to the
 builtin `Promise` type (and therefore supports the `await` syntax).
 
 The C++ `Future` type has optional support for coroutines. If coroutines are
-availble (eg. compiling with C++20 or C++17 with -fcoroutines-ts), then you can
+available (eg. compiling with C++20 with coroutine support), then you can
 use `co_await` on future objects.
+
+## Requiring Optional Parameters in Individual Records
+- By default, optionals will be omitted from the constructor in Djinni
+- The Djinni code generator will generate two constructors for a record with optionals: one with all values and one with optionals omitted. This will minimize code disruption
+- Optional behavior will be able to be switched via a usage flag for each platform. 
+- A new [deriving method](https://github.com/dropbox/djinni#derived-methods) specifier will be implemented so that individual records can still require all parameters
+
+### Deriving Record
+Any record can be made to have all parameters be required by specifying it as a `req` deriving record:
+```
+MyClass = record {
+  required: string;
+  optional: optional<string>;
+} deriving(req)
+```
+
+### Omitting Convenience Constructors
+Extra convenience constructors which require all parameters can be removed from optional ObjC records with a new compiler flag:
+```
+--objc-omit-full-convenience-constructor
+```
+
+## Reverting to Legacy Record Behavior
+Djinni records are now mutable and do not require optionals in reocrd constructors by default. In order to reverse this behavior and make Java and ObjC records immutable with full constructors only, the following generation flags can be used:
+
+```
+--cpp-legacy-records
+--java-legacy-records
+--objc-legacy-records
+```
+
+Note that for C++, the legacy flag will only remove the optional-omitting constructor. Records were already mutable within C++.
 
 ## FAQ
 

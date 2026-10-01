@@ -12,15 +12,15 @@ import javax.annotation.Nonnull;
 public class EnumUsageRecord implements android.os.Parcelable {
 
 
-    /*package*/ final Color mE;
+    /*package*/ Color mE;
 
-    /*package*/ final Color mO;
+    /*package*/ /*optional*/ Color mO;
 
-    /*package*/ final ArrayList<Color> mL;
+    /*package*/ ArrayList<Color> mL;
 
-    /*package*/ final HashSet<Color> mS;
+    /*package*/ HashSet<Color> mS;
 
-    /*package*/ final HashMap<Color, Color> mM;
+    /*package*/ HashMap<Color, Color> mM;
 
     public EnumUsageRecord(
             @Nonnull Color e,
@@ -35,9 +35,25 @@ public class EnumUsageRecord implements android.os.Parcelable {
         this.mM = m;
     }
 
+    public EnumUsageRecord(
+            @Nonnull Color e,
+            @Nonnull ArrayList<Color> l,
+            @Nonnull HashSet<Color> s,
+            @Nonnull HashMap<Color, Color> m) {
+        this(e,
+             null,
+             l,
+             s,
+             m);
+    }
+
     @Nonnull
     public Color getE() {
         return mE;
+    }
+
+    public void setE(@Nonnull Color e) {
+        this.mE = e;
     }
 
     @CheckForNull
@@ -45,9 +61,17 @@ public class EnumUsageRecord implements android.os.Parcelable {
         return mO;
     }
 
+    public void setO(Color o) {
+        this.mO = o;
+    }
+
     @Nonnull
     public ArrayList<Color> getL() {
         return mL;
+    }
+
+    public void setL(@Nonnull ArrayList<Color> l) {
+        this.mL = l;
     }
 
     @Nonnull
@@ -55,9 +79,17 @@ public class EnumUsageRecord implements android.os.Parcelable {
         return mS;
     }
 
+    public void setS(@Nonnull HashSet<Color> s) {
+        this.mS = s;
+    }
+
     @Nonnull
     public HashMap<Color, Color> getM() {
         return mM;
+    }
+
+    public void setM(@Nonnull HashMap<Color, Color> m) {
+        this.mM = m;
     }
 
     @Override

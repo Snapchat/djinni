@@ -11,8 +11,8 @@
 + (nonnull instancetype)setRecordWithSet:(nonnull NSSet<NSString *> *)set
                                     iset:(nonnull NSSet<NSNumber *> *)iset;
 
-@property (nonatomic, readonly, nonnull) NSSet<NSString *> * set;
+@property (nonatomic, copy, nonnull) NSSet<NSString *> * set;
 
-@property (nonatomic, readonly, nonnull) NSSet<NSNumber *> * iset;
+@property (nonatomic, copy, nonnull) NSSet<NSNumber *> * iset;
 
 @end

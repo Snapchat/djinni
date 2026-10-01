@@ -25,8 +25,9 @@ private:
     friend ::djinni::JniClass<NativePrimitiveList>;
 
     const ::djinni::GlobalRef<jclass> clazz { ::djinni::jniFindClass("com/dropbox/djinni/test/PrimitiveList") };
-    const jmethodID jconstructor { ::djinni::jniGetMethodID(clazz.get(), "<init>", "(Ljava/util/ArrayList;)V") };
+    const jmethodID jconstructor { ::djinni::jniGetMethodID(clazz.get(), "<init>", "(Ljava/util/ArrayList;Ljava/util/ArrayList;)V") };
     const jfieldID field_mList { ::djinni::jniGetFieldID(clazz.get(), "mList", "Ljava/util/ArrayList;") };
+    const jfieldID field_mOptionalList { ::djinni::jniGetFieldID(clazz.get(), "mOptionalList", "Ljava/util/ArrayList;") };
 };
 
 } // namespace djinni_generated

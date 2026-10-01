@@ -36,3 +36,20 @@ ts:
   typename: 'Outcome'
   module: '@djinni_support/Outcome'
   generic: true
+valdi:
+  translator: '::djinni::valdi::Outcome'
+  header: '"$Outcome_valdi.hpp"'
+swift:
+  typename: 'Result'
+  generic: true
+  translator: 'OutcomeMarshaller'
+  translator.module: 'DjinniSupport'
+swiftxx:
+  translator: '::djinni::swift::OutcomeAdaptor'
+  header: '"Outcome_swift.hpp"'
+c:
+  typename: 'djinni_outcome_ref'
+  translator: '::djinni::c_api::OutcomeTranslator'
+  public_header: '"$Outcome_c.h"'
+  private_header: '"$Outcome_c_translator.hpp"'
+

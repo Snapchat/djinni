@@ -1,6 +1,6 @@
 @extern "../../support-lib/future.yaml"
 
-async_interface = interface +j +o +w {
+async_interface = interface +nc {
   future_roundtrip(f: future<i32>): future<string>;
 }
 
@@ -73,7 +73,7 @@ test_helpers = interface +c {
 # (Second line of multi-line documentation.
 #   Indented third line of multi-line documentation.)
 empty_record = record {
-    
+
 }
 
 # Test for conflict of method name with an interface name.
@@ -82,7 +82,7 @@ Conflict = interface +c {
 }
 conflict_user = interface +c {
     Conflict(): Conflict;
-    conflict_arg(cs: set<Conflict>): bool;
+    conflict_arg(cs: list<Conflict>): bool;
 }
 
 # we need to test optional interface

@@ -7,32 +7,29 @@ other build systems. Existing checked-in-source targets remain available.
 
 ## External Repository Setup
 
-The repository currently supports WORKSPACE-based Bazel 5.4.1, as pinned in
-`.bazelversion`. A standalone Bzlmod module is not implemented. Add Djinni as an archive pinned
-to a revision and SHA-256, or use a local checkout:
+The internal release branch uses Bazel 8.5.0, as pinned in `.bazelversion`,
+and Bzlmod. For a local checkout, add the following to the consumer's
+`MODULE.bazel`:
 
 ```python
-local_repository(name = "djinni", path = "/path/to/djinni")
+bazel_dep(name = "snap_djinni", version = "1.0.0", repo_name = "djinni")
+local_path_override(module_name = "snap_djinni", path = "/path/to/djinni")
 
-load("@djinni//bzl:deps.bzl", "djinni_deps")
-djinni_deps()
-load("@djinni//bzl:scala_config.bzl", "djinni_scala_config")
-djinni_scala_config()
-load("@djinni//bzl:setup_deps.bzl", "djinni_setup_deps")
-djinni_setup_deps()
+bazel_dep(name = "rules_scala", version = "7.1.5")
+scala_config = use_extension("@rules_scala//scala/extensions:config.bzl", "scala_config")
+scala_config.settings(scala_version = "2.11.12")
 ```
 
-These helpers configure the generator's Scala/JVM dependencies. The consumer
-does not need Djinni's example-only Android, Apple, Kotlin, or Emscripten workspace
-setup. C++ compilation needs a configured C++ toolchain; Java compilation needs
+Djinni's module configures its Scala/JVM dependencies. Scala configuration tags
+are read from the root module, so consumers must select Scala 2.11.12 as above.
+The local override can be replaced with an `archive_override` pinned to a
+revision and integrity hash. C++ compilation needs a configured C++ toolchain; Java compilation needs
 a Java toolchain. JNI and WASM consumers must also supply their platform toolchains
 and appropriate support-library dependencies.
 
-Bzlmod consumers can load these `.bzl` rules through a local/archive repository
-and supply an independently configured `compiler` executable on both the base
-and language targets. The caller must map `rules_cc` and `rules_java` into the
-rules repository and provide the compiler's Scala/JVM dependencies. This is
-rules-only integration, not automatic module/toolchain setup.
+Consumers that use their own compiler can supply a `compiler` executable on
+both the base and language targets. See `external-test/MODULE.bazel` for a
+working external-module setup and explicit C++/Java rule dependencies.
 
 ## Base Declaration and Language Libraries
 
@@ -248,7 +245,7 @@ bazel build //:djinni-codegen-consumer-verification
 bazel test //bzl/tests:rule_tests
 ```
 
-The separate `external-test` workspace exercises external rule loads, imported
+The separate `external-test` module exercises external rule loads, imported
 IDL from another repository, separate language actions, compilation, and runtime
 field access. Its CLI equivalence test compares ordinary CLI generation with
 Bazel-generated C++/Java output:
@@ -263,14 +260,5 @@ generated JNI consumers use desktop JNI support; generated WASM consumers are
 wrapped with `wasm_cc_binary` to select the Emscripten toolchain. The standalone
 consumer tests use C++ and Java only.
 
-On macOS with newer Xcode, Bazel 5's `wrapped_clang` may fail with
-`missing LC_UUID load command`. Validation on Xcode 26.5 used the following
-command-only workarounds for that wrapper and the bundled older zlib:
-
-```sh
-bazel test //:consumer_tests --repo_env=BAZEL_USE_CPP_ONLY_TOOLCHAIN=1 \
-    --host_conlyopt=-std=c90 --host_conlyopt=-Dfdopen=fdopen
-```
-
-Run this from `external-test`. These flags are local compatibility workarounds,
-not requirements of the codegen rules.
+The existing Swift consumers and non-Bazel scripts remain unchanged. These
+rules do not yet provide Swift library macros.

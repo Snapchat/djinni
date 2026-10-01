@@ -1,6 +1,6 @@
 External Test
 -------------
-This folder provides a standalone workspace to mimic consuming Djinni from an external repository via Bazel.
+This folder provides a standalone Bzlmod module to mimic consuming Djinni from an external repository via Bazel.
 Run `bazel test //:consumer_tests` from this folder. The tests generate C++ and
 Java at build time, compile consumers, and exercise record and enum field values.
 The schema imports IDL from the Djinni repository through a transitive provider

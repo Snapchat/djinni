@@ -9,6 +9,6 @@
 - (nonnull instancetype)initWithSetList:(nonnull NSArray<NSSet<NSString *> *> *)setList NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)nestedCollectionWithSetList:(nonnull NSArray<NSSet<NSString *> *> *)setList;
 
-@property (nonatomic, readonly, nonnull) NSArray<NSSet<NSString *> *> * setList;
+@property (nonatomic, copy, nonnull) NSArray<NSSet<NSString *> *> * setList;
 
 @end

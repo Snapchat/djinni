@@ -6,15 +6,23 @@ package com.dropbox.djinni.test;
 public final class TestOptionalExternInterfaceRecord {
 
 
-    /*package*/ final com.dropbox.djinni.test.SampleInterface mSampleInterface;
+    /*package*/ /*optional*/ com.dropbox.djinni.test.SampleInterface mSampleInterface;
 
     public TestOptionalExternInterfaceRecord(
             com.dropbox.djinni.test.SampleInterface sampleInterface) {
         this.mSampleInterface = sampleInterface;
     }
 
+    public TestOptionalExternInterfaceRecord() {
+        this(null);
+    }
+
     public com.dropbox.djinni.test.SampleInterface getSampleInterface() {
         return mSampleInterface;
+    }
+
+    public void setSampleInterface(com.dropbox.djinni.test.SampleInterface sampleInterface) {
+        this.mSampleInterface = sampleInterface;
     }
 
     @Override

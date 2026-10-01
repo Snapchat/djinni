@@ -18,6 +18,15 @@
     return self;
 }
 
+- (nonnull instancetype)initWithRecordId:(int64_t)recordId
+                                 content:(nonnull NSString *)content
+{
+    self = [self initWithRecordId:recordId
+                          content:content
+                             misc:nil];
+    return self;
+}
+
 + (nonnull instancetype)clientReturnedRecordWithRecordId:(int64_t)recordId
                                                  content:(nonnull NSString *)content
                                                     misc:(nullable NSString *)misc
@@ -25,6 +34,13 @@
     return [[self alloc] initWithRecordId:recordId
                                   content:content
                                      misc:misc];
+}
+
++ (nonnull instancetype)clientReturnedRecordWithRecordId:(int64_t)recordId
+                                                 content:(nonnull NSString *)content
+{
+    return [[self alloc] initWithRecordId:recordId
+                                  content:content];
 }
 
 #ifndef DJINNI_DISABLE_DESCRIPTION_METHODS
