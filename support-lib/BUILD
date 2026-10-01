@@ -3,6 +3,14 @@ load("@rules_java//java:defs.bzl", "java_library")
 load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 load("@build_bazel_rules_swift//swift:swift_interop_hint.bzl", "swift_interop_hint")
 
+exports_files([
+    "dataref.yaml",
+    "dataview.yaml",
+    "future.yaml",
+    "outcome.yaml",
+    "provider.yaml",
+])
+
 cc_library(
     name = "djinni-support-common",
     srcs = glob(["cpp/*.cpp"]),
