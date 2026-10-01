@@ -1,7 +1,7 @@
 """Analysis tests for Djinni's source provider and language action contracts."""
 
 load("@bazel_skylib//lib:unittest.bzl", "analysistest", "asserts")
-load("//bzl:djinni_codegen.bzl", "DjinniInfo", "cc_djinni_library", "djinni_codegen", "djinni_library", "java_djinni_library")
+load("//bzl:djinni_codegen.bzl", "DjinniInfo", "cc_djinni_library", "djinni_codegen", "djinni_language_codegen", "djinni_library", "java_djinni_library")
 
 def _provider_test_impl(ctx):
     env = analysistest.begin(ctx)
@@ -46,6 +46,22 @@ def _failure_test_impl(ctx):
     return analysistest.end(env)
 
 _failure_test = analysistest.make(_failure_test_impl, expect_failure = True, attrs = {"message": attr.string()})
+
+def _compatibility_test_impl(ctx):
+    env = analysistest.begin(ctx)
+    actions = analysistest.target_actions(env)
+    asserts.equals(env, 1, len(actions))
+    action = actions[0]
+    for flag in ctx.attr.flags:
+        asserts.true(env, flag in action.argv, "Missing option: " + flag)
+    asserts.false(env, "--java-out" in action.argv)
+    asserts.equals(env, ctx.attr.tree_count, len([f for f in action.outputs.to_list() if f.is_directory]))
+    return analysistest.end(env)
+
+_compatibility_test = analysistest.make(_compatibility_test_impl, attrs = {
+    "flags": attr.string_list(),
+    "tree_count": attr.int(),
+})
 
 def rule_tests(name):
     """Creates rule contract tests without executing the Scala compiler.
@@ -109,7 +125,26 @@ def rule_tests(name):
         target_under_test = ":invalid_include",
         message = "idl_include_paths must be repository-relative",
     )
+    for language, outputs, options, flags, trees in [
+        ("c", {"c_srcs": ["analysis/c/shared.cpp"], "c_hdrs": ["analysis/c/include/shared.h"]}, {"c_namespace": "snap_", "cpp_legacy_records": True}, ["--c-out", "--c-header-out", "--cpp-legacy-records", "true"], 0),
+        ("objc", {"objc_hdrs": ["analysis/objc/Shared.h"], "objcpp_srcs": ["analysis/objc/Shared+Private.mm"]}, {"objcpp_function_prologue_file": "utils/DjinniPrologue.hpp"}, ["--objc-out", "--objcpp-out", "utils/DjinniPrologue.hpp"], 0),
+        ("yaml", {"yaml_srcs": ["analysis/yaml/shared.yaml"]}, {"yaml_metadata_languages": ["c", "wasm"]}, ["--yaml-out", "--c-out", "--wasm-out"], 2),
+    ]:
+        djinni_language_codegen(
+            name = "compatibility_" + language,
+            deps = [":shared-schema"],
+            outs = dict(outputs, java_srcs = ["unused/Shared.java"]),
+            language = language,
+            tags = ["manual"],
+            **options
+        )
+        _compatibility_test(
+            name = language + "_compatibility_test",
+            target_under_test = ":compatibility_" + language,
+            flags = flags,
+            tree_count = trees,
+        )
     native.test_suite(
         name = name,
-        tests = [":provider_test", ":cpp_action_test", ":java_action_test", ":ambiguous_input_test", ":invalid_include_test"],
+        tests = [":provider_test", ":cpp_action_test", ":java_action_test", ":ambiguous_input_test", ":invalid_include_test", ":c_compatibility_test", ":objc_compatibility_test", ":yaml_compatibility_test"],
     )

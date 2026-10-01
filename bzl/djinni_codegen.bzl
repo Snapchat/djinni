@@ -42,11 +42,6 @@ def _add_bool_arg(args, flag, value):
         args.add(flag)
         args.add(value)
 
-def _add_label_path_arg(args, flag, file):
-    if file:
-        args.add(flag)
-        args.add(file.path)
-
 def _add_ident_arg(args, flag, value):
     _add_string_arg(args, flag, value)
 
@@ -66,12 +61,14 @@ def _djinni_codegen_impl(ctx):
         fail("Specify only one of djinni or idl")
 
     cpp_files = ctx.outputs.cpp_srcs + ctx.outputs.cpp_hdrs
+    c_files = ctx.outputs.c_srcs + ctx.outputs.c_hdrs
     jni_files = ctx.outputs.jni_srcs + ctx.outputs.jni_hdrs
     objc_files = ctx.outputs.objc_srcs + ctx.outputs.objc_hdrs
     objcpp_files = ctx.outputs.objcpp_srcs + ctx.outputs.objcpp_hdrs
     wasm_files = ctx.outputs.wasm_srcs + ctx.outputs.wasm_hdrs
     all_outputs = _collect([
         cpp_files,
+        c_files,
         ctx.outputs.java_srcs,
         jni_files,
         objc_files,
@@ -89,6 +86,8 @@ def _djinni_codegen_impl(ctx):
     java_dir = _single_output_dir(ctx.outputs.java_srcs, "java")
     cpp_src_dir = _single_output_dir(ctx.outputs.cpp_srcs, "cpp source")
     cpp_hdr_dir = _single_output_dir(ctx.outputs.cpp_hdrs, "cpp header")
+    c_src_dir = _single_output_dir(ctx.outputs.c_srcs, "C wrapper source")
+    c_hdr_dir = _single_output_dir(ctx.outputs.c_hdrs, "C header")
     jni_src_dir = _single_output_dir(ctx.outputs.jni_srcs, "jni source")
     jni_hdr_dir = _single_output_dir(ctx.outputs.jni_hdrs, "jni header")
     objc_dir = _single_output_dir(objc_files, "objc")
@@ -96,6 +95,22 @@ def _djinni_codegen_impl(ctx):
     wasm_dir = _single_output_dir(wasm_files, "wasm")
     ts_dir = _single_output_dir(ctx.outputs.ts_srcs, "ts")
     yaml_dir = _single_output_dir(ctx.outputs.yaml_srcs, "yaml")
+
+    # Older compilers gate YAML metadata on enabled output folders. Declare the
+    # auxiliary generated trees so metadata remains complete and cacheable.
+    for language in ctx.attr.yaml_metadata_languages:
+        if language not in ["c", "wasm"]:
+            fail("yaml_metadata_languages supports only c and wasm")
+        if not yaml_dir:
+            fail("yaml_metadata_languages requires yaml_srcs")
+        if language == "c" and not (c_src_dir or c_hdr_dir):
+            tree = ctx.actions.declare_directory(ctx.label.name + ".metadata/c")
+            all_outputs.append(tree)
+            c_src_dir = tree.path
+        elif language == "wasm" and not wasm_dir:
+            tree = ctx.actions.declare_directory(ctx.label.name + ".metadata/wasm")
+            all_outputs.append(tree)
+            wasm_dir = tree.path
 
     if java_dir:
         args.add("--java-out")
@@ -107,6 +122,7 @@ def _djinni_codegen_impl(ctx):
     _add_bool_arg(args, "--java-implement-android-os-parcelable", ctx.attr.java_implement_android_os_parcelable)
     _add_bool_arg(args, "--java-use-final-for-record", ctx.attr.java_use_final_for_record)
     _add_bool_arg(args, "--java-gen-interface", ctx.attr.java_gen_interface)
+    _add_bool_arg(args, "--java-legacy-records", ctx.attr.java_legacy_records)
 
     if cpp_src_dir or cpp_hdr_dir:
         cpp_out_dir = cpp_src_dir or cpp_hdr_dir
@@ -122,6 +138,17 @@ def _djinni_codegen_impl(ctx):
     _add_string_arg(args, "--cpp-optional-header", ctx.attr.cpp_optional_header)
     _add_string_arg(args, "--cpp-extended-record-include-prefix", ctx.attr.cpp_extended_record_include_prefix)
     _add_bool_arg(args, "--cpp-use-wide-strings", ctx.attr.cpp_use_wide_strings)
+    _add_bool_arg(args, "--cpp-legacy-records", ctx.attr.cpp_legacy_records)
+
+    if c_src_dir or c_hdr_dir:
+        args.add("--c-out", c_src_dir or c_hdr_dir)
+        if c_hdr_dir and c_hdr_dir != (c_src_dir or c_hdr_dir):
+            args.add("--c-header-out", c_hdr_dir)
+    _add_string_arg(args, "--c-namespace", ctx.attr.c_namespace)
+    _add_string_arg(args, "--c-include-prefix", ctx.attr.c_include_prefix)
+    _add_string_arg(args, "--c-base-lib-include-prefix", ctx.attr.c_base_lib_include_prefix)
+    _add_string_arg(args, "--c-wrapper-cpp-namespace", ctx.attr.c_wrapper_cpp_namespace)
+    _add_bool_arg(args, "--c-wrapper-use-dlsym", ctx.attr.c_wrapper_use_dlsym)
 
     if jni_src_dir or jni_hdr_dir:
         jni_out_dir = jni_src_dir or jni_hdr_dir
@@ -135,19 +162,21 @@ def _djinni_codegen_impl(ctx):
     _add_string_arg(args, "--jni-include-cpp-prefix", ctx.attr.jni_include_cpp_prefix)
     _add_string_arg(args, "--jni-base-lib-include-prefix", ctx.attr.jni_base_lib_include_prefix)
     _add_bool_arg(args, "--jni-use-on-load-initializer", ctx.attr.jni_use_on_load_initializer)
-    _add_label_path_arg(args, "--jni-function-prologue-file", ctx.file.jni_function_prologue_file)
+    _add_string_arg(args, "--jni-function-prologue-file", ctx.attr.jni_function_prologue_file)
 
     if objc_dir:
         args.add("--objc-out")
         args.add(objc_dir)
     _add_string_arg(args, "--objc-type-prefix", ctx.attr.objc_type_prefix)
     _add_string_arg(args, "--objc-include-prefix", ctx.attr.objc_include_prefix)
+    _add_string_arg(args, "--objc-base-lib-include-prefix", ctx.attr.objc_base_lib_include_prefix)
     _add_string_arg(args, "--objc-extended-record-include-prefix", ctx.attr.objc_extended_record_include_prefix)
     _add_string_arg(args, "--objc-swift-bridging-header", ctx.attr.objc_swift_bridging_header)
     _add_bool_arg(args, "--objc-gen-protocol", ctx.attr.objc_gen_protocol)
     _add_bool_arg(args, "--objc-disable-class-ctor", ctx.attr.objc_disable_class_ctor)
     _add_bool_arg(args, "--objc-closed-enums", ctx.attr.objc_closed_enums)
     _add_bool_arg(args, "--objc-strict-protocols", ctx.attr.objc_strict_protocols)
+    _add_bool_arg(args, "--objc-legacy-records", ctx.attr.objc_legacy_records)
 
     if objcpp_dir:
         args.add("--objcpp-out")
@@ -156,7 +185,7 @@ def _djinni_codegen_impl(ctx):
     _add_string_arg(args, "--objcpp-include-prefix", ctx.attr.objcpp_include_prefix)
     _add_string_arg(args, "--objcpp-include-cpp-prefix", ctx.attr.objcpp_include_cpp_prefix)
     _add_string_arg(args, "--objcpp-include-objc-prefix", ctx.attr.objcpp_include_objc_prefix)
-    _add_label_path_arg(args, "--objcpp-function-prologue-file", ctx.file.objcpp_function_prologue_file)
+    _add_string_arg(args, "--objcpp-function-prologue-file", ctx.attr.objcpp_function_prologue_file)
     _add_bool_arg(args, "--objcpp-disable-exception-translation", ctx.attr.objcpp_disable_exception_translation)
 
     if wasm_dir:
@@ -209,14 +238,7 @@ def _djinni_codegen_impl(ctx):
         args.add(include_path)
 
     inputs = depset(
-        direct = ([idl] if not ctx.attr.djinni else []) + ctx.files.srcs + [
-            file
-            for file in [
-                ctx.file.jni_function_prologue_file,
-                ctx.file.objcpp_function_prologue_file,
-            ]
-            if file
-        ],
+        direct = ([idl] if not ctx.attr.djinni else []) + ctx.files.srcs + ctx.files.idl_include_files,
         transitive = input_depsets,
     )
 
@@ -235,6 +257,8 @@ def _djinni_codegen_impl(ctx):
             all = depset(all_outputs),
             cpp_srcs = depset(ctx.outputs.cpp_srcs),
             cpp_hdrs = depset(ctx.outputs.cpp_hdrs),
+            c_srcs = depset(ctx.outputs.c_srcs),
+            c_hdrs = depset(ctx.outputs.c_hdrs),
             java_srcs = depset(ctx.outputs.java_srcs),
             jni_srcs = depset(ctx.outputs.jni_srcs),
             jni_hdrs = depset(ctx.outputs.jni_hdrs),
@@ -256,8 +280,11 @@ _djinni_codegen = rule(
         "idl": attr.label(allow_single_file = [".djinni"]),
         "srcs": attr.label_list(allow_files = [".djinni", ".yaml", ".yml", ".proto"]),
         "idl_include_paths": attr.string_list(),
+        "idl_include_files": attr.label_list(allow_files = True),
         "cpp_srcs": attr.output_list(),
         "cpp_hdrs": attr.output_list(),
+        "c_srcs": attr.output_list(),
+        "c_hdrs": attr.output_list(),
         "java_srcs": attr.output_list(),
         "jni_srcs": attr.output_list(),
         "jni_hdrs": attr.output_list(),
@@ -276,6 +303,7 @@ _djinni_codegen = rule(
         "java_implement_android_os_parcelable": attr.string(),
         "java_use_final_for_record": attr.string(),
         "java_gen_interface": attr.string(),
+        "java_legacy_records": attr.string(),
         "cpp_namespace": attr.string(),
         "cpp_include_prefix": attr.string(),
         "cpp_base_lib_include_prefix": attr.string(),
@@ -283,25 +311,33 @@ _djinni_codegen = rule(
         "cpp_optional_header": attr.string(),
         "cpp_extended_record_include_prefix": attr.string(),
         "cpp_use_wide_strings": attr.string(),
+        "cpp_legacy_records": attr.string(),
+        "c_namespace": attr.string(),
+        "c_include_prefix": attr.string(),
+        "c_base_lib_include_prefix": attr.string(),
+        "c_wrapper_cpp_namespace": attr.string(),
+        "c_wrapper_use_dlsym": attr.string(),
         "jni_namespace": attr.string(),
         "jni_include_prefix": attr.string(),
         "jni_include_cpp_prefix": attr.string(),
         "jni_base_lib_include_prefix": attr.string(),
         "jni_use_on_load_initializer": attr.string(),
-        "jni_function_prologue_file": attr.label(allow_single_file = True),
+        "jni_function_prologue_file": attr.string(),
         "objc_type_prefix": attr.string(),
         "objc_include_prefix": attr.string(),
+        "objc_base_lib_include_prefix": attr.string(),
         "objc_extended_record_include_prefix": attr.string(),
         "objc_swift_bridging_header": attr.string(),
         "objc_gen_protocol": attr.string(),
         "objc_disable_class_ctor": attr.string(),
         "objc_closed_enums": attr.string(),
         "objc_strict_protocols": attr.string(),
+        "objc_legacy_records": attr.string(),
         "objcpp_namespace": attr.string(),
         "objcpp_include_prefix": attr.string(),
         "objcpp_include_cpp_prefix": attr.string(),
         "objcpp_include_objc_prefix": attr.string(),
-        "objcpp_function_prologue_file": attr.label(allow_single_file = True),
+        "objcpp_function_prologue_file": attr.string(),
         "objcpp_disable_exception_translation": attr.string(),
         "wasm_namespace": attr.string(),
         "wasm_include_prefix": attr.string(),
@@ -312,6 +348,7 @@ _djinni_codegen = rule(
         "ts_module": attr.string(),
         "yaml_out_file": attr.string(),
         "yaml_prefix": attr.string(),
+        "yaml_metadata_languages": attr.string_list(),
         "ident_java_enum": attr.string(),
         "ident_java_field": attr.string(),
         "ident_java_type": attr.string(),
@@ -349,7 +386,7 @@ def _include_paths(ctx):
         if path.startswith("/") or ".." in path.split("/"):
             fail("idl_include_paths must be repository-relative: %s" % path)
         result.append(root + "/" + path if root and path else root or path or ".")
-    return result
+    return result + [file.dirname for file in ctx.files.idl_include_files]
 
 def _djinni_library_impl(ctx):
     transitive = [
@@ -362,7 +399,7 @@ def _djinni_library_impl(ctx):
     )
 
     transitive_srcs = depset(
-        direct = [ctx.file.idl] + ctx.files.srcs,
+        direct = [ctx.file.idl] + ctx.files.srcs + ctx.files.idl_include_files,
         transitive = transitive,
     )
 
@@ -388,7 +425,7 @@ def _djinni_library_impl(ctx):
         transitive = [dep[DjinniInfo].validation_files for dep in ctx.attr.deps],
     )
     return [
-        DefaultInfo(files = depset([ctx.file.idl] + ctx.files.srcs, transitive = [validation_files])),
+        DefaultInfo(files = depset([ctx.file.idl] + ctx.files.srcs + ctx.files.idl_include_files, transitive = [validation_files])),
         DjinniInfo(
             idl = ctx.file.idl,
             transitive_srcs = transitive_srcs,
@@ -405,6 +442,7 @@ djinni_library = rule(
         "srcs": attr.label_list(allow_files = [".djinni", ".yaml", ".yml", ".proto"]),
         "deps": attr.label_list(providers = [DjinniInfo]),
         "idl_include_paths": attr.string_list(),
+        "idl_include_files": attr.label_list(allow_files = True),
         "verify": attr.bool(default = True),
         "compiler": attr.label(default = Label("//src:djinni"), executable = True, cfg = "exec"),
     },
@@ -426,6 +464,10 @@ _BOOL_ATTRS = [
     "objcpp_disable_exception_translation",
     "wasm_omit_constants",
     "wasm_omit_namespace_alias",
+    "java_legacy_records",
+    "cpp_legacy_records",
+    "objc_legacy_records",
+    "c_wrapper_use_dlsym",
 ]
 
 def _normalize_kwargs(kwargs):
@@ -444,7 +486,7 @@ def djinni_codegen(name, outs, **kwargs):
     Args:
         name: Rule name.
         outs: Dictionary keyed by output category. Supported keys are
-            cpp_srcs, cpp_hdrs, java_srcs, jni_srcs, jni_hdrs, objc_srcs,
+            cpp_srcs, cpp_hdrs, c_srcs, c_hdrs, java_srcs, jni_srcs, jni_hdrs, objc_srcs,
             objc_hdrs, objcpp_srcs, objcpp_hdrs, wasm_srcs, wasm_hdrs,
             ts_srcs, and yaml_srcs.
         **kwargs: Djinni options and input labels.
@@ -457,6 +499,8 @@ def djinni_codegen(name, outs, **kwargs):
         name = name,
         cpp_srcs = _outs(outs, "cpp_srcs"),
         cpp_hdrs = _outs(outs, "cpp_hdrs"),
+        c_srcs = _outs(outs, "c_srcs"),
+        c_hdrs = _outs(outs, "c_hdrs"),
         java_srcs = _outs(outs, "java_srcs"),
         jni_srcs = _outs(outs, "jni_srcs"),
         jni_hdrs = _outs(outs, "jni_hdrs"),
@@ -478,6 +522,8 @@ def _exactly_one_dep(name, deps):
 _OUTPUT_KEYS = [
     "cpp_srcs",
     "cpp_hdrs",
+    "c_srcs",
+    "c_hdrs",
     "java_srcs",
     "jni_srcs",
     "jni_hdrs",
@@ -503,15 +549,31 @@ def _language_codegen(name, deps, outs, language, kwargs):
     for attr_name in _COMMON_ATTRS:
         if attr_name in options:
             common[attr_name] = options.pop(attr_name)
-    selected = {key: value for key, value in outs.items() if key.startswith(language + "_")}
+    languages = [language, "objcpp"] if language == "objc" else [language]
+    selected = {key: value for key, value in outs.items() if key.split("_")[0] in languages}
+    visibility = options.pop("visibility", ["//visibility:private"])
     djinni_codegen(
         name = name,
         djinni = deps[0],
         outs = selected,
-        visibility = ["//visibility:private"],
+        visibility = visibility,
         **dict(options, **common)
     )
     return common
+
+def djinni_language_codegen(name, deps, outs, language, **kwargs):
+    """Generates one language for integration with custom compilation macros.
+
+    Args:
+        name: Target name.
+        deps: Exactly one djinni_library target.
+        outs: Shared or language-specific output manifest.
+        language: cpp, c, java, jni, objc (including objcpp), wasm, ts, or yaml.
+        **kwargs: Compiler options and common rule attributes.
+    """
+    if language not in ["cpp", "c", "java", "jni", "objc", "wasm", "ts", "yaml"]:
+        fail("Unsupported Djinni language: %s" % language)
+    _language_codegen(name, deps, outs, language, kwargs)
 
 def _consumer_attrs(library_kwargs, common):
     attrs = dict(library_kwargs)

@@ -13,6 +13,7 @@ djinni_library(
     name = "shared-schema",
     srcs = ["idl/nested.djinni"],
     idl = "idl/shared.djinni",
+    idl_include_files = ["idl/nested.djinni"],
     idl_include_paths = ["bzl/tests/idl"],
     visibility = ["//visibility:public"],
 )

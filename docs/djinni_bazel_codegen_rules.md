@@ -8,7 +8,7 @@ other build systems. Existing checked-in-source targets remain available.
 ## External Repository Setup
 
 The repository currently supports WORKSPACE-based Bazel 5.4.1, as pinned in
-`.bazelversion`. Bzlmod support is not implemented. Add Djinni as an archive pinned
+`.bazelversion`. A standalone Bzlmod module is not implemented. Add Djinni as an archive pinned
 to a revision and SHA-256, or use a local checkout:
 
 ```python
@@ -27,6 +27,12 @@ does not need Djinni's example-only Android, Apple, Kotlin, or Emscripten worksp
 setup. C++ compilation needs a configured C++ toolchain; Java compilation needs
 a Java toolchain. JNI and WASM consumers must also supply their platform toolchains
 and appropriate support-library dependencies.
+
+Bzlmod consumers can load these `.bzl` rules through a local/archive repository
+and supply an independently configured `compiler` executable on both the base
+and language targets. The caller must map `rules_cc` and `rules_java` into the
+rules repository and provide the compiler's Scala/JVM dependencies. This is
+rules-only integration, not automatic module/toolchain setup.
 
 ## Base Declaration and Language Libraries
 
@@ -84,6 +90,9 @@ another target. Use distinct output directories for separate option sets.
 
 - `idl`: required single root `.djinni` label.
 - `srcs`: additional imported `.djinni`, YAML, or proto file labels.
+- `idl_include_files`: file labels whose parent directories are import search
+  roots. These files are also declared action inputs. Use this for external
+  repository or generated imports without hardcoding execution-root paths.
 - `deps`: other `djinni_library` targets contributing transitive import inputs.
 - `idl_include_paths`: repository-relative search directories. For example,
   `schemas/vendor` refers to that directory in the repository defining this rule,
@@ -100,7 +109,7 @@ another target. Use distinct output directories for separate option sets.
 of execution-root include paths, and a depset of verification outputs. Default
 files contain this target's direct sources and verification outputs.
 
-Imports must be declared through `srcs` or `deps`; include paths do not make files
+Imports must be declared through `srcs`, `idl_include_files`, or `deps`; string include paths do not make files
 action inputs. No host filesystem scanning occurs during analysis. `deps` models
 import availability, rather than compiling imported declarations separately.
 
@@ -117,6 +126,35 @@ Each accepts exactly one base target in `deps`, an `outs` dictionary, and Djinni
 options as keyword arguments. Other known language categories in a shared
 manifest are ignored. Unknown categories fail analysis. Boolean CLI options
 accept Starlark booleans; omission preserves the compiler's default.
+
+For custom compilation macros, `djinni_language_codegen` exposes the same
+language action without creating a native library:
+
+```python
+djinni_language_codegen(
+    name = "messages_objc_codegen",
+    deps = [":messages"],
+    language = "objc",
+    outs = {
+        "objc_hdrs": ["generated/objc/Messages.h"],
+        "objcpp_hdrs": ["generated/objc/Messages+Private.h"],
+        "objcpp_srcs": ["generated/objc/Messages+Private.mm"],
+    },
+)
+```
+
+Supported languages are `cpp`, `c`, `java`, `jni`, `objc`, `wasm`, `ts`, and
+`yaml`. `objc` selects both Objective-C and Objective-C++ output categories.
+The prologue options `jni_function_prologue_file` and
+`objcpp_function_prologue_file` take emitted include strings, not file labels.
+The generated consumers must declare the compilation dependency providing that
+header. C backend options and `*_legacy_records` require a compiler revision
+that supports those CLI flags; omission does not enable them.
+
+For compiler versions that gate C/WASM YAML metadata on enabled output folders,
+set `yaml_metadata_languages = ["c", "wasm"]` on the YAML action. It declares
+auxiliary tree outputs and enables those generators within that action. Consume
+the `yaml_srcs` output group to select only YAML, not the auxiliary trees.
 
 Use `cc_deps` or `java_deps` for compilation dependencies, including generated
 libraries referenced by bridges. `srcs` adds handwritten sources; C++ and JNI
@@ -161,7 +199,7 @@ djinni_codegen(
 
 Use either `djinni` (a `DjinniInfo` target) or the legacy `idl` with explicit
 `srcs` and `idl_include_paths`. Supported categories are `cpp_srcs`, `cpp_hdrs`,
-`java_srcs`, `jni_srcs`, `jni_hdrs`, `objc_srcs`, `objc_hdrs`, `objcpp_srcs`,
+`c_srcs`, `c_hdrs`, `java_srcs`, `jni_srcs`, `jni_hdrs`, `objc_srcs`, `objc_hdrs`, `objcpp_srcs`,
 `objcpp_hdrs`, `wasm_srcs`, `wasm_hdrs`, `ts_srcs`, and `yaml_srcs`. They are also
 output groups, along with `all`. There is no `generators` attribute: nonempty
 output categories select generators. Each category must use one directory;
