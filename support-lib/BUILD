@@ -1,10 +1,14 @@
 load("@rules_cc//cc:defs.bzl", "cc_library", "objc_library")
 load("@rules_java//java:defs.bzl", "java_library")
+load("@rules_shell//shell:sh_library.bzl", "sh_library")
 
 cc_library(
     name = "djinni-support-common",
     srcs = glob(["cpp/*.cpp"]),
-    hdrs = glob(["*.hpp", "cpp/*.hpp"]),
+    hdrs = glob([
+        "*.hpp",
+        "cpp/*.hpp",
+    ]),
     includes = ["cpp"],
     visibility = ["//visibility:public"],
 )
@@ -13,8 +17,8 @@ cc_library(
     name = "djinni-support-jni",
     srcs = glob(["jni/*.cpp"]),
     hdrs = glob(["jni/*.hpp"]),
-    includes = ["jni"],
     defines = ["DATAREF_JNI=1"],
+    includes = ["jni"],
     linkstatic = True,
     visibility = ["//visibility:public"],
     deps = [
@@ -28,8 +32,8 @@ cc_library(
     name = "djinni-support-android",
     srcs = glob(["jni/*.cpp"]),
     hdrs = glob(["jni/*.hpp"]),
-    includes = ["jni"],
     defines = ["DATAREF_JNI=1"],
+    includes = ["jni"],
     visibility = ["//visibility:public"],
     deps = [
         "//support-lib:djinni-support-common",
@@ -39,13 +43,19 @@ cc_library(
 
 objc_library(
     name = "djinni-support-objc",
-    srcs = glob(["objc/*.mm", "objc/*.cpp"]),
-    hdrs = glob(["objc/*.h", "objc/*.hpp"]),
+    srcs = glob([
+        "objc/*.mm",
+        "objc/*.cpp",
+    ]),
+    hdrs = glob([
+        "objc/*.h",
+        "objc/*.hpp",
+    ]),
     copts = [
         "-ObjC++",
     ],
-    includes = ["objc"],
     defines = ["DATAREF_OBJC=1"],
+    includes = ["objc"],
     visibility = ["//visibility:public"],
     deps = ["//support-lib:djinni-support-common"],
 )
@@ -60,12 +70,12 @@ cc_library(
     name = "djinni-support-wasm",
     srcs = glob(["wasm/*.cpp"]),
     hdrs = glob(["wasm/*.hpp"]),
-    includes = ["wasm"],
-    defines = ["DATAREF_WASM=1"],
-    visibility = ["//visibility:public"],
     copts = [
         "-fexceptions",
     ],
+    defines = ["DATAREF_WASM=1"],
+    includes = ["wasm"],
+    visibility = ["//visibility:public"],
     deps = [
         "//support-lib:djinni-support-common",
     ],

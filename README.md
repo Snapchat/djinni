@@ -17,6 +17,34 @@ This file only covers the parts that have been changed.  Please see the
 Both the Djinni code generator and test suite are built with Bazel. You can use
 either plain Bazel or [Bazelisk](https://github.com/bazelbuild/bazelisk).
 
+The repository pins Bazel 8.8.1 in `.bazelversion` and uses Bzlmod exclusively.
+Dependencies and toolchains are declared in `MODULE.bazel`; the lockfiles are
+checked in. WORKSPACE dependency setup is no longer supported. The generator
+still uses Scala 2.11.12 and the existing Maven artifact versions.
+
+To use the compiler from another Bazel module with a local checkout:
+
+```python
+bazel_dep(name = "snap_djinni", repo_name = "djinni")
+local_path_override(module_name = "snap_djinni", path = "/path/to/djinni")
+
+bazel_dep(name = "rules_scala", version = "7.1.5")
+scala_config = use_extension("@rules_scala//scala/extensions:config.bzl", "scala_config")
+scala_config.settings(scala_versions = ["2.11.12"])
+```
+
+`rules_scala` configuration belongs to the root module. Add 2.11.12 to an
+existing `scala_versions` list, or keep an existing `scala_version = "2.11.12"`
+setting. Djinni explicitly requests that version without changing other Scala
+targets. Run `bazel run @djinni//src:djinni -- --help` to check the integration;
+`external-test/` exercises this setup. Example-only platform dependencies are
+development dependencies and are not imported into consumers.
+
+Existing `run_djinni.sh` scripts remain supported. A standalone compiler can be
+built with `bazel build //src:djinni_deploy.jar` and run with
+`java -jar bazel-bin/src/djinni_deploy.jar --help`, without Bazel at generation
+time.
+
 ### Building and running the test suite
 
 `./ci/generate.sh` generates the examples sources.
@@ -24,10 +52,17 @@ either plain Bazel or [Bazelisk](https://github.com/bazelbuild/bazelisk).
 Use `bazel test //test-suite:djinni-objc-tests //test-suite:djinni-java-tests`
 to build and run Objective-C and Java tests.
 
+The test suite generates its C++, Java, and Objective-C Protobuf bindings at
+build time using the same Protobuf module as its runtime. Checked-in Protobuf
+snapshots are not compilation inputs.
+
 ### Building and running the mobile example apps
 
-You need to install the Android SDK 30.0.2 and the NDK 21.4.7075529. You need both `ANDROID_SDK_HOME` and `ANDROID_NDK_HOME` env variables set.
-The Android example app can be build with bazel: `bazel build //examples:android-app`, 
+Android builds require SDK build tools 35.0.0 or newer, an installed SDK platform,
+and an NDK supported by `rules_android_ndk`. Set `ANDROID_HOME` and
+`ANDROID_NDK_HOME`; SDK discovery is provided by `rules_android`.
+NDK toolchains are opt-in so building the compiler does not require an NDK.
+Build with `bazel build --extra_toolchains=@androidndk//:all //examples:android-app`,
 and then install to a device with `adb install bazel-bin/examples/android-app.apk`
 
 The iOS example app are built with Xcode. Simply open the project in Xcode and
@@ -41,7 +76,7 @@ You can load the project via Bazel
 - Configure the bazel binary. If you use Bazelisk, set it as the binary in the IDEA bazel settings.
 - In Intellij, import a new Bazel project.
     - Workspace directory: `/Users/$HOME/path-to-djinni-directory`
-    - Import project view file: `WORKSPACE/bzl/ide/djinni.bazelproject`
+    - Import project view file: `bzl/ide/djinni.bazelproject`
 - Similarly you can also use CLion if you wish to edit the C++ code
     - You can set up any of the cc_* targets after importing the workspace.
 

@@ -1,2 +1,2 @@
-# Use a separate workspace for the external tests to replicate external consumption
+# Use a separate module for the external tests to replicate external consumption.
 external-test

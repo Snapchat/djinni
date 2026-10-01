@@ -1,0 +1,54 @@
+module(name = "snap_djinni")
+
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
+bazel_dep(name = "rules_cc", version = "0.2.20")
+bazel_dep(name = "rules_java", version = "9.3.0")
+bazel_dep(name = "rules_jvm_external", version = "6.9")
+bazel_dep(name = "rules_scala", version = "7.1.5", repo_name = "io_bazel_rules_scala")
+bazel_dep(name = "rules_shell", version = "0.6.1")
+
+scala_config = use_extension("@io_bazel_rules_scala//scala/extensions:config.bzl", "scala_config")
+scala_config.settings(scala_version = "2.11.12")
+
+scala_deps = use_extension("@io_bazel_rules_scala//scala/extensions:deps.bzl", "scala_deps")
+scala_deps.scala()
+use_repo(scala_deps, "io_bazel_rules_scala_scala_compiler", "io_bazel_rules_scala_scala_library", "io_bazel_rules_scala_scala_reflect")
+
+maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
+maven.install(
+    name = "maven_djinni",
+    artifacts = [
+        "com.google.code.findbugs:jsr305:3.0.2",
+        "junit:junit:4.12",
+        "org.scala-lang.modules:scala-parser-combinators_2.11:1.0.1",
+        "org.yaml:snakeyaml:1.15",
+        "com.github.scopt:scopt_2.11:3.2.0",
+        "io.reactivex.rxjava2:rxjava:2.2.21",
+    ],
+    repositories = ["https://repo.maven.apache.org/maven2"],
+)
+use_repo(maven, "maven_djinni")
+
+# Platform dependencies are only needed by this repository's examples and tests.
+bazel_dep(name = "protobuf", version = "34.0.bcr.1", dev_dependency = True, repo_name = "com_google_protobuf")
+bazel_dep(name = "apple_support", version = "2.5.4", dev_dependency = True, repo_name = "build_bazel_apple_support")
+bazel_dep(name = "rules_apple", version = "4.5.3", dev_dependency = True, repo_name = "build_bazel_rules_apple")
+bazel_dep(name = "rules_swift", version = "3.5.0", dev_dependency = True, repo_name = "build_bazel_rules_swift")
+bazel_dep(name = "rules_kotlin", version = "2.3.10", dev_dependency = True, repo_name = "io_bazel_rules_kotlin")
+bazel_dep(name = "rules_android", version = "0.7.1", dev_dependency = True)
+bazel_dep(name = "rules_android_ndk", version = "0.1.5", dev_dependency = True)
+bazel_dep(name = "emsdk", version = "4.0.13", dev_dependency = True)
+
+emscripten_deps = use_extension("@emsdk//:emscripten_deps.bzl", "emscripten_deps", dev_dependency = True)
+emscripten_deps.config(version = "4.0.13")
+
+apple_cc = use_extension("@build_bazel_apple_support//crosstool:setup.bzl", "apple_cc_configure_extension", dev_dependency = True)
+use_repo(apple_cc, "local_config_apple_cc", "local_config_apple_cc_toolchains")
+
+register_toolchains(
+    "@local_config_apple_cc_toolchains//:all",
+    dev_dependency = True,
+)
+
+android_ndk = use_extension("@rules_android_ndk//:extension.bzl", "android_ndk_repository_extension", dev_dependency = True)
+use_repo(android_ndk, "androidndk")
