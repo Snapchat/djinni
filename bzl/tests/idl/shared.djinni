@@ -1,0 +1,6 @@
+@import "nested.djinni"
+
+shared = record {
+    status: status;
+    value: i32;
+}

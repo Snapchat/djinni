@@ -46,6 +46,14 @@ jobs:
       - name: Test
         run: ./ci/run-tests.sh
 
+      - name: Codegen Rule Tests
+        run: bazel test --test_output=errors //bzl/tests:rule_tests
+
+      - name: Generated Consumers
+        run: bazel build //:djinni-codegen-consumer-verification //test-suite:testsuite-main-djinni-codegen
+
       - name: External Test
         working-directory: external-test
-        run: bazel run @snap_djinni//src:djinni -- --help
+        run: |
+          bazel run @djinni//src:djinni -- --help
+          bazel test --test_output=errors //:consumer_tests
