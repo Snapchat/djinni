@@ -1,0 +1,20 @@
+"""Optional Swift runtime; importing core Djinni does not import this module."""
+
+module(
+    name = "snap_djinni_apple",
+    version = "1.0.0",
+)
+
+bazel_dep(name = "snap_djinni", version = "1.0.0", repo_name = "djinni_rules")
+bazel_dep(name = "rules_cc", version = "0.1.1")
+bazel_dep(name = "rules_swift", version = "2.4.0", repo_name = "build_bazel_rules_swift")
+
+http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+
+http_archive(
+    name = "apple_swift_protobuf",
+    build_file = "//:swift_protobuf.BUILD",
+    sha256 = "d086deab3ca0b74751fcc1905d268697b0d471e747fb50eced94941f28b35fb8",
+    strip_prefix = "swift-protobuf-1.28.2",
+    urls = ["https://github.com/apple/swift-protobuf/archive/refs/tags/1.28.2.tar.gz"],
+)

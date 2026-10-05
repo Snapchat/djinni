@@ -2,7 +2,7 @@
 .idea/
 .vscode
 # bazel
-/bazel-*
+bazel-*
 .ijwb/
 .clwb/
 # djinni output directories
