@@ -27,10 +27,66 @@ revision and integrity hash. C++ compilation needs a configured C++ toolchain; J
 a Java toolchain. JNI and WASM consumers must also supply their platform toolchains
 and appropriate support-library dependencies.
 
-Djinni's example SDK/NDK, Apple CC, and Emscripten toolchain registrations are
-development dependencies: they apply when Djinni is the root module, not when
-it is a dependency. Codegen consumers do not need `ANDROID_NDK_HOME` just to
-compile or run the generator. Consumers own the toolchains for generated code.
+Codegen consumers do not need `ANDROID_NDK_HOME` just to compile or run the
+generator. Core Djinni never configures or registers an Android SDK/NDK.
+Consumers own the toolchains for generated code; existing parent toolchains
+are selected by Bazel's normal platform/toolchain resolution.
+
+## Platform Modules
+
+Platform examples are separate Bzlmod roots, ignored by the core workspace's
+recursive builds. Their `MODULE.bazel` files import core Djinni by local path
+and configure only the platform they need:
+
+| Root | Targets | Toolchain configuration |
+| --- | --- | --- |
+| `examples/android` | `//:android-app`, `//:perftest` | Android SDK/NDK; `ANDROID_HOME`, `ANDROID_NDK_HOME` |
+| `examples/ios` | `//:textsort-swift-bridge` | Apple CC and Swift; requires Xcode |
+| `examples/wasm` | `//:wasm-generated`, `//:perftest-wasm-generated` | Emscripten |
+
+Run Bazel from the selected root, not the repository root. For example:
+
+```sh
+cd examples/android
+bazel build //:android-app
+```
+
+The Swift example builds bridge libraries; the existing Xcode application
+project remains available. WASM has `//:codegen-consumer-verification` for both
+generated consumers and `//:server` / `//:perftest-server` for the web demos.
+These platform targets replace the previous root `//examples` application,
+Swift, and WASM-wrapper targets and root `//perftest` application/WASM wrappers.
+Core C++/Java/JNI generated-library targets retain their existing labels.
+
+Swift runtime support is an optional companion module. A source-checkout
+consumer can add this alongside its existing core dependency:
+
+```python
+bazel_dep(name = "snap_djinni_apple", version = "1.0.0", repo_name = "djinni_apple")
+local_path_override(module_name = "snap_djinni_apple", path = "/path/to/djinni/support-lib/apple")
+```
+
+Use `@djinni_apple//:djinni-support-swift` and
+`@djinni_apple//:djinni-support-swiftxx`. The companion module supplies Swift
+Protobuf but does not register an Android NDK or override the parent's Apple
+toolchains. The core repository's old Swift support labels remain aliases for
+root-workspace tests only; external Swift consumers use the companion directly.
+Neither module is assumed to be published in BCR; use checkout overrides or
+pinned archives with the appropriate `strip_prefix` for each module root.
+
+Apple and Emscripten dependencies used by the legacy root test suite are
+development-only. Run Apple tests with `--config=apple` and WASM test targets
+with `--config=wasm`. For a core-only root build, use `--ignore_dev_dependency`.
+The ordinary CLI and source-tree generation scripts are unchanged.
+
+### Isolation Verification
+
+`bash ci/test-external-consumer.sh` verifies a real external consumer with empty
+Android SDK/NDK repository environment values, builds common/Java/desktop JNI
+support, and runs C++/Java consumer and CLI-equivalence tests. It also rejects
+NDK, Swift, Apple application-rule, and Emscripten modules in the dependency
+graph. JVM tooling may include Android rule definitions for AAR support; that
+does not configure an Android SDK or NDK. CI runs this check on macOS and Linux.
 
 Consumers that use their own compiler can supply a `compiler` executable on
 both the base and language targets. See `external-test/MODULE.bazel` for a

@@ -215,10 +215,10 @@ java_test(
         ":djinni-tests-jni-static",
         "//support-lib:djinni-support-java",
         "@com_google_protobuf//java/core",
-        "@maven_djinni//:com_google_code_findbugs_jsr305",
-        "@maven_djinni//:io_reactivex_rxjava2_rxjava",
         "@maven_djinni//:javax_inject_javax_inject",
-        "@maven_djinni//:junit_junit",
+        "@maven_djinni_tests//:com_google_code_findbugs_jsr305",
+        "@maven_djinni_tests//:io_reactivex_rxjava2_rxjava",
+        "@maven_djinni_tests//:junit_junit",
     ],
 )
 

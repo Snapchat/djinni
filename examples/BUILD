@@ -1,6 +1,3 @@
-load("@build_bazel_rules_apple//apple:ios.bzl", "ios_application")
-load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
-load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
 load("//bzl:djinni_codegen.bzl", "cc_djinni_library", "djinni_library", "java_djinni_library", "jni_djinni_library", "wasm_djinni_cc_binary")
 load(":djinni_outputs.bzl", "EXAMPLE_DJINNI_OUTS")
 
@@ -62,6 +59,7 @@ cc_djinni_library(
 java_library(
     name = "textsort-java",
     srcs = glob(["generated-src/java/**/*.java"]),
+    visibility = ["//visibility:public"],
     deps = [
         "//support-lib:djinni-support-java",
         "@maven_djinni//:com_google_code_findbugs_jsr305",
@@ -93,6 +91,7 @@ cc_library(
         "-lm",
         "-ldl",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":textsort-common",
         "//support-lib:djinni-support-android",
@@ -125,30 +124,6 @@ jni_djinni_library(
 
 # ------------------------------------------------------------------
 
-android_library(
-    name = "textsort-activity",
-    srcs = glob(["handwritten-src/java/com/dropbox/textsort/*.java"]),
-    custom_package = "com.dropbox.textsort",
-    manifest = "android/app/src/main/AndroidManifest.xml",
-    resource_files = glob(
-        ["android/app/src/main/res/**"],
-        exclude = ["android/app/src/main/res/.DS_Store"],
-    ),
-    deps = [":textsort-java"],
-)
-
-android_binary(
-    name = "android-app",
-    custom_package = "com.dropbox.textsort",
-    manifest = "android/AndroidManifest.xml",
-    deps = [
-        ":textsort-activity",
-        ":textsort-jni",
-    ],
-)
-
-# ------------------------------------------------------------------
-
 EMSCRIPTEN_LINKOPTS = [
     "--bind",  # Compiles the source code using the Embind bindings to connect C/C++ and JavaScript
     "-s MALLOC=emmalloc",  # Switch to using the much smaller implementation
@@ -167,6 +142,7 @@ cc_binary(
         "-fexceptions",
     ],
     linkopts = EMSCRIPTEN_LINKOPTS,
+    visibility = ["//visibility:public"],
     deps = [
         ":textsort-common",
         "//support-lib:djinni-support-wasm",
@@ -192,90 +168,55 @@ wasm_djinni_cc_binary(
     deps = [":example-djinni"],
 )
 
-wasm_cc_binary(
-    name = "wasm",
-    cc_target = ":textsort-wasm",
-)
-
-wasm_cc_binary(
-    name = "wasm-generated",
-    cc_target = ":textsort-wasm-generated",
+filegroup(
+    name = "activity-sources",
+    srcs = glob(["handwritten-src/java/com/dropbox/textsort/*.java"]),
     visibility = ["//visibility:public"],
 )
 
-sh_binary(
-    name = "server",
-    srcs = ["ts/run.sh"],
-    data = glob([
+filegroup(
+    name = "swift-sources",
+    srcs = glob(
+        ["generated-src/swift/*.swift"],
+        exclude = ["generated-src/swift/*+Private.swift"],
+    ),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "swift-bridge-sources",
+    srcs = glob(["generated-src/swift/*+Private.swift"]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "swiftxx-headers",
+    srcs = glob(["generated-src/swiftxx/*.hpp"]),
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "textsort-swiftxx-core",
+    srcs = glob(["generated-src/swiftxx/*.cpp"]),
+    hdrs = glob(["generated-src/swiftxx/*.hpp"]),
+    copts = ["-std=c++20"],
+    includes = ["generated-src/swiftxx"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":textsort-common",
+        "//support-lib:djinni-support-swiftxx-core",
+    ],
+)
+
+filegroup(
+    name = "web-sources",
+    srcs = glob([
         "ts/*.html",
         "ts/*.ts",
         "ts/*.json",
         "generated-src/ts/*.ts",
-    ]) + [":wasm"],
-)
-
-# ------------------------------------------------------------------
-
-swift_private_files = "generated-src/swift/*+Private.swift"
-
-swift_library(
-    name = "textsort-swift",
-    srcs = glob(
-        [
-            "generated-src/swift/*.swift",
-        ],
-        exclude = [swift_private_files],
-    ),
-    copts = [
-        "-cxx-interoperability-mode=default",
-        "-Xcc",
-        "-std=c++20",
-    ],
-    module_name = "TextSort",
-    visibility = ["//visibility:public"],
-    deps = [
-        "//support-lib:djinni-support-swift",
-    ],
-)
-
-swift_library(
-    name = "textsort-swift-bridge",
-    srcs = glob([swift_private_files]),
-    copts = [
-        "-cxx-interoperability-mode=default",
-        "-Xcc",
-        "-std=c++20",
-    ],
-    module_name = "TextSortBridge",
-    visibility = ["//visibility:public"],
-    deps = [
-        ":textsort-common",
-        ":textsort-swift",
-        ":textsort-swiftxx",
-        "//support-lib:djinni-support-swift",
-        "//support-lib:djinni-support-swiftxx",
-    ],
-)
-
-cc_library(
-    name = "textsort-swiftxx",
-    srcs = glob([
-        "generated-src/swiftxx/*.cpp",
     ]),
-    hdrs = glob([
-        "generated-src/swiftxx/*.hpp",
-    ]),
-    copts = ["-std=c++20"],
-    includes = [
-        ".",
-        "generated-src/swiftxx",
-    ],
-    tags = ["swift_module=TextSortCxx"],
     visibility = ["//visibility:public"],
-    deps = [
-        ":textsort-common",
-        ":textsort-swift",
-        "//support-lib:djinni-support-common",
-        "//support-lib:djinni-support-swiftxx",
-    ],
 )
+
+exports_files(["ts/run.sh"])

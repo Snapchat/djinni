@@ -32,17 +32,23 @@ either plain Bazel or [Bazelisk](https://github.com/bazelbuild/bazelisk).
 
 `./ci/generate.sh` generates the examples sources.
 
-Use `bazel test //test-suite:djinni-objc-tests //test-suite:djinni-java-tests`
+Use `bazel test --config=apple //test-suite:djinni-objc-tests //test-suite:djinni-java-tests`
 to build and run Objective-C and Java tests.
 
 ### Building and running the mobile example apps
 
 You need to install the Android SDK and NDK. Set both `ANDROID_HOME` and `ANDROID_NDK_HOME` environment variables.
-The Android example app can be built with bazel: `bazel build //examples:android-app`, 
-and then install to a device with `adb install bazel-bin/examples/android-app.apk`
+Run `bazel build //:android-app` from `examples/android/`, then install with
+`adb install bazel-bin/android-app.apk`. The benchmark app is `//:perftest`
+in the same module. SDK/NDK setup belongs to that module, not the core compiler.
 
 The iOS example app are built with Xcode. Simply open the project in Xcode and
 it should work.
+
+The Swift bridge can also be built with `bazel build //:textsort-swift-bridge`
+from `examples/ios/`. WASM examples have their own module at `examples/wasm/`.
+See [the Bazel rule documentation](docs/djinni_bazel_codegen_rules.md#platform-modules)
+for platform setup and the optional Swift runtime module.
 
 ### Working on the Djinni code generator
 
@@ -315,11 +321,14 @@ Notable differences when comparing to the Java/ObjC support:
   easily add extension methods (by add functions to prototype) without having to
   derive from a base class.
 
-Use `bazel run //test-suite:server-ts` to run the Wasm/TypeScript unit tests.
+Use `bazel run --config=wasm //test-suite:server-ts` to run the Wasm/TypeScript unit tests.
 You will need `npm` and run `npm install` in the `test-suite` folder.
 You need as well the `tsc` compiler and the `browserify` tool to run these tests.
 
-To run the examples server: `bazel run //examples:server`
+Run `bazel run //:server` from `examples/wasm/` for the textsort demo, or
+`bazel run //:perftest-server` for the benchmark demo. Both require `tsc`,
+`browserify`, and Python 3. They compile web assets in a temporary directory,
+leaving the checked-in sources and Bazel runfiles unchanged.
 
 ## Async interface support
 

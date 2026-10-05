@@ -1,0 +1,19 @@
+module(
+    name = "djinni_wasm_example",
+    version = "0.1",
+)
+
+bazel_dep(name = "snap_djinni", version = "1.0.0", repo_name = "djinni_rules")
+local_path_override(
+    module_name = "snap_djinni",
+    path = "../..",
+)
+
+bazel_dep(name = "rules_scala", version = "7.1.5")
+
+scala_config = use_extension("@rules_scala//scala/extensions:config.bzl", "scala_config")
+scala_config.settings(scala_version = "2.11.12")
+
+bazel_dep(name = "emsdk", version = "4.0.17")
+
+register_toolchains("@emsdk//emscripten_toolchain:all")

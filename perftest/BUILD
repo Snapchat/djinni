@@ -1,5 +1,3 @@
-load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
-load("@io_bazel_rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("//bzl:djinni_codegen.bzl", "cc_djinni_library", "djinni_library", "java_djinni_library", "jni_djinni_library", "wasm_djinni_cc_binary")
 load(":djinni_outputs.bzl", "BENCHMARK_DJINNI_OUTS")
 
@@ -30,6 +28,7 @@ cc_library(
         "generated-src/cpp",
         "handwritten-src/cpp",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//support-lib:djinni-support-common",
     ],
@@ -64,6 +63,7 @@ cc_djinni_library(
 java_library(
     name = "benchmark-java",
     srcs = glob(["generated-src/java/**/*.java"]),
+    visibility = ["//visibility:public"],
     deps = [
         "//support-lib:djinni-support-java",
         "@maven_djinni//:com_google_code_findbugs_jsr305",
@@ -95,6 +95,7 @@ cc_library(
         "-lm",
         "-ldl",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         ":benchmark-common",
         "//support-lib:djinni-support-android",
@@ -127,27 +128,6 @@ jni_djinni_library(
 
 # ------------------------------------------------------------------
 
-kt_android_library(
-    name = "benchmark-activity",
-    srcs = glob(["android/app/src/main/java/com/snapchat/djinni/benchmark/*.kt"]),
-    custom_package = "com.snapchat.djinni.benchmark",
-    manifest = "android/app/src/main/AndroidManifest.xml",
-    resource_files = glob(["android/app/src/main/res/**"]),
-    deps = [":benchmark-java"],
-)
-
-android_binary(
-    name = "perftest",
-    custom_package = "com.snapchat.djinni.benchmark",
-    manifest = "android/AndroidManifest.xml",
-    deps = [
-        ":benchmark-activity",
-        ":benchmark-jni",
-    ],
-)
-
-# ------------------------------------------------------------------
-
 EMSCRIPTEN_LINKOPTS = [
     "--bind",  # Compiles the source code using the Embind bindings to connect C/C++ and JavaScript
     "-s MALLOC=emmalloc",  # Switch to using the much smaller implementation
@@ -166,6 +146,7 @@ cc_binary(
         "-fexceptions",
     ],
     linkopts = EMSCRIPTEN_LINKOPTS,
+    visibility = ["//visibility:public"],
     deps = [
         ":benchmark-common",
         "//support-lib:djinni-support-wasm",
@@ -193,25 +174,32 @@ wasm_djinni_cc_binary(
     deps = [":benchmark-djinni"],
 )
 
-wasm_cc_binary(
-    name = "wasm",
-    cc_target = ":perftest-wasm",
-)
-
-wasm_cc_binary(
-    name = "wasm-generated",
-    cc_target = ":perftest-wasm-generated",
+filegroup(
+    name = "activity-sources",
+    srcs = glob(["android/app/src/main/java/com/snapchat/djinni/benchmark/*.kt"]),
     visibility = ["//visibility:public"],
 )
 
-sh_binary(
-    name = "server",
-    srcs = ["ts/run.sh"],
-    data = glob([
+exports_files([
+    "android/app/src/main/AndroidManifest.xml",
+    "android/AndroidManifest.xml",
+])
+
+filegroup(
+    name = "android-resources",
+    srcs = glob(["android/app/src/main/res/**"]),
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "web-sources",
+    srcs = glob([
         "ts/*.html",
         "ts/*.ts",
         "ts/*.json",
         "generated-src/ts/*.ts",
-    ]) + [":wasm"],
-    deps = ["//support-lib:djinni-support-ts"],
+    ]),
+    visibility = ["//visibility:public"],
 )
+
+exports_files(["ts/run.sh"])

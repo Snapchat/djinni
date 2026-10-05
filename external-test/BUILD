@@ -45,7 +45,10 @@ cc_test(
     name = "cpp_consumer_test",
     size = "small",
     srcs = ["consumer_test.cc"],
-    deps = [":schema_cc"],
+    deps = [
+        ":schema_cc",
+        "@djinni//support-lib:djinni-support-common",
+    ],
 )
 
 java_test(
@@ -79,5 +82,14 @@ test_suite(
         ":cli_equivalence_test",
         ":cpp_consumer_test",
         ":java_consumer_test",
+    ],
+)
+
+filegroup(
+    name = "runtime_support_verification",
+    srcs = [
+        "@djinni//support-lib:djinni-support-common",
+        "@djinni//support-lib:djinni-support-java",
+        "@djinni//support-lib:djinni-support-jni",
     ],
 )
