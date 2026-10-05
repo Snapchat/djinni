@@ -27,12 +27,12 @@ bazel_dep(name = "rules_android_ndk", version = "0.1.2")
 bazel_dep(name = "rules_kotlin", version = "1.9.6", repo_name = "io_bazel_rules_kotlin")
 bazel_dep(name = "rules_python", version = "1.3.0")  # Required by rules_android_ndk
 
-# Configure Android SDK via Bzlmod extension
-android_sdk_repository_extension = use_extension("@rules_android//rules/android_sdk_repository:rule.bzl", "android_sdk_repository_extension")
+# Example toolchains belong to the root project, not downstream codegen consumers.
+android_sdk_repository_extension = use_extension("@rules_android//rules/android_sdk_repository:rule.bzl", "android_sdk_repository_extension", dev_dependency = True)
 use_repo(android_sdk_repository_extension, "androidsdk")
 
 # Configure Android NDK via Bzlmod extension
-android_ndk_repository_extension = use_extension("@rules_android_ndk//:extension.bzl", "android_ndk_repository_extension")
+android_ndk_repository_extension = use_extension("@rules_android_ndk//:extension.bzl", "android_ndk_repository_extension", dev_dependency = True)
 use_repo(android_ndk_repository_extension, "androidndk")
 
 # Register Android toolchains
@@ -40,6 +40,7 @@ register_toolchains(
     "@androidsdk//:sdk-toolchain",
     "@androidsdk//:all",
     "@androidndk//:all",
+    dev_dependency = True,
 )
 
 # Scala support - rules_scala 7.1.5 with Bzlmod (officially supports Bazel 8.x)
@@ -61,12 +62,13 @@ bazel_dep(name = "rules_apple", version = "4.0.0", repo_name = "build_bazel_rule
 bazel_dep(name = "rules_swift", version = "2.4.0", repo_name = "build_bazel_rules_swift")
 
 # Configure Apple CC toolchain for ObjC builds
-apple_cc_configure = use_extension("@build_bazel_apple_support//crosstool:setup.bzl", "apple_cc_configure_extension")
+apple_cc_configure = use_extension("@build_bazel_apple_support//crosstool:setup.bzl", "apple_cc_configure_extension", dev_dependency = True)
 use_repo(apple_cc_configure, "local_config_apple_cc", "local_config_apple_cc_toolchains")
 
 # Register Apple toolchains
 register_toolchains(
     "@local_config_apple_cc_toolchains//:all",
+    dev_dependency = True,
 )
 
 # Testing support
@@ -110,4 +112,5 @@ use_repo(
 # Register Emscripten toolchain for WASM
 register_toolchains(
     "@emsdk//emscripten_toolchain:all",
+    dev_dependency = True,
 )

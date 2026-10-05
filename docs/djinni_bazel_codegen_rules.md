@@ -27,6 +27,11 @@ revision and integrity hash. C++ compilation needs a configured C++ toolchain; J
 a Java toolchain. JNI and WASM consumers must also supply their platform toolchains
 and appropriate support-library dependencies.
 
+Djinni's example SDK/NDK, Apple CC, and Emscripten toolchain registrations are
+development dependencies: they apply when Djinni is the root module, not when
+it is a dependency. Codegen consumers do not need `ANDROID_NDK_HOME` just to
+compile or run the generator. Consumers own the toolchains for generated code.
+
 Consumers that use their own compiler can supply a `compiler` executable on
 both the base and language targets. See `external-test/MODULE.bazel` for a
 working external-module setup and explicit C++/Java rule dependencies.
