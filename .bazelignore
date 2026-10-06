@@ -1,2 +1,6 @@
 # Use a separate workspace for the external tests to replicate external consumption
 external-test
+examples/android
+examples/ios
+examples/wasm
+support-lib/apple

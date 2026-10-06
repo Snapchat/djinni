@@ -1,0 +1,70 @@
+BENCHMARK_DJINNI_OUTS = {
+    "cpp_hdrs": [
+        "bazel-generated/benchmark/cpp/EnumSixValue.hpp",
+        "bazel-generated/benchmark/cpp/ObjectNative.hpp",
+        "bazel-generated/benchmark/cpp/ObjectPlatform.hpp",
+        "bazel-generated/benchmark/cpp/RecordSixInt.hpp",
+        "bazel-generated/benchmark/cpp/djinni_perf_benchmark.hpp",
+    ],
+    "java_srcs": [
+        "bazel-generated/benchmark/java/com/snapchat/djinni/benchmark/DjinniPerfBenchmark.java",
+        "bazel-generated/benchmark/java/com/snapchat/djinni/benchmark/EnumSixValue.java",
+        "bazel-generated/benchmark/java/com/snapchat/djinni/benchmark/ObjectNative.java",
+        "bazel-generated/benchmark/java/com/snapchat/djinni/benchmark/ObjectPlatform.java",
+        "bazel-generated/benchmark/java/com/snapchat/djinni/benchmark/RecordSixInt.java",
+    ],
+    "jni_srcs": [
+        "bazel-generated/benchmark/jni/NativeDjinniPerfBenchmark.cpp",
+        "bazel-generated/benchmark/jni/NativeObjectNative.cpp",
+        "bazel-generated/benchmark/jni/NativeObjectPlatform.cpp",
+        "bazel-generated/benchmark/jni/NativeRecordSixInt.cpp",
+    ],
+    "jni_hdrs": [
+        "bazel-generated/benchmark/jni/NativeDjinniPerfBenchmark.hpp",
+        "bazel-generated/benchmark/jni/NativeEnumSixValue.hpp",
+        "bazel-generated/benchmark/jni/NativeObjectNative.hpp",
+        "bazel-generated/benchmark/jni/NativeObjectPlatform.hpp",
+        "bazel-generated/benchmark/jni/NativeRecordSixInt.hpp",
+    ],
+    "objc_srcs": [
+        "bazel-generated/benchmark/objc/TXSRecordSixInt.mm",
+    ],
+    "objc_hdrs": [
+        "bazel-generated/benchmark/objc/Benchmark-Bridging-Header.h",
+        "bazel-generated/benchmark/objc/TXSDjinniPerfBenchmark.h",
+        "bazel-generated/benchmark/objc/TXSEnumSixValue.h",
+        "bazel-generated/benchmark/objc/TXSObjectNative.h",
+        "bazel-generated/benchmark/objc/TXSObjectPlatform.h",
+        "bazel-generated/benchmark/objc/TXSRecordSixInt.h",
+    ],
+    "objcpp_srcs": [
+        "bazel-generated/benchmark/objc/TXSDjinniPerfBenchmark+Private.mm",
+        "bazel-generated/benchmark/objc/TXSObjectNative+Private.mm",
+        "bazel-generated/benchmark/objc/TXSObjectPlatform+Private.mm",
+        "bazel-generated/benchmark/objc/TXSRecordSixInt+Private.mm",
+    ],
+    "objcpp_hdrs": [
+        "bazel-generated/benchmark/objc/TXSDjinniPerfBenchmark+Private.h",
+        "bazel-generated/benchmark/objc/TXSEnumSixValue+Private.h",
+        "bazel-generated/benchmark/objc/TXSObjectNative+Private.h",
+        "bazel-generated/benchmark/objc/TXSObjectPlatform+Private.h",
+        "bazel-generated/benchmark/objc/TXSRecordSixInt+Private.h",
+    ],
+    "wasm_srcs": [
+        "bazel-generated/benchmark/wasm/NativeDjinniPerfBenchmark.cpp",
+        "bazel-generated/benchmark/wasm/NativeEnumSixValue.cpp",
+        "bazel-generated/benchmark/wasm/NativeObjectNative.cpp",
+        "bazel-generated/benchmark/wasm/NativeObjectPlatform.cpp",
+        "bazel-generated/benchmark/wasm/NativeRecordSixInt.cpp",
+    ],
+    "wasm_hdrs": [
+        "bazel-generated/benchmark/wasm/NativeDjinniPerfBenchmark.hpp",
+        "bazel-generated/benchmark/wasm/NativeEnumSixValue.hpp",
+        "bazel-generated/benchmark/wasm/NativeObjectNative.hpp",
+        "bazel-generated/benchmark/wasm/NativeObjectPlatform.hpp",
+        "bazel-generated/benchmark/wasm/NativeRecordSixInt.hpp",
+    ],
+    "ts_srcs": [
+        "bazel-generated/benchmark/ts/perftest.ts",
+    ],
+}

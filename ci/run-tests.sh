@@ -10,8 +10,8 @@ trap "rm -f $TEST_LOG" EXIT
 
 # Run bazel test, save output to file, and show it in real-time
 set +e
-bazel test --test_output=all //test-suite:djinni-java-tests //test-suite:djinni-objc-tests //test-suite:djinni-tests-c 2>&1 | tee "$TEST_LOG"
-TEST_EXIT_CODE=$?
+bazel test --config=apple --test_output=all //test-suite:djinni-java-tests //test-suite:djinni-objc-tests //test-suite:djinni-tests-c 2>&1 | tee "$TEST_LOG"
+TEST_EXIT_CODE=${PIPESTATUS[0]}
 set -e
 
 echo ""
