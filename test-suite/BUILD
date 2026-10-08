@@ -4,6 +4,45 @@ load("@build_bazel_rules_swift//swift:swift_interop_hint.bzl", "swift_interop_hi
 load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "objc_library")
 load("@rules_java//java:defs.bzl", "java_test")
+load("//bzl:djinni_codegen.bzl", "djinni_codegen")
+load(":djinni_outputs.bzl", "TESTSUITE_MAIN_DJINNI_OUTS")
+
+djinni_codegen(
+    name = "testsuite-main-djinni-codegen",
+    srcs = glob([
+        "djinni/**/*.djinni",
+        "djinni/**/*.yaml",
+    ]) + [
+        "//support-lib:dataref.yaml",
+        "//support-lib:dataview.yaml",
+        "//support-lib:future.yaml",
+        "//support-lib:outcome.yaml",
+        "//support-lib:provider.yaml",
+    ],
+    outs = TESTSUITE_MAIN_DJINNI_OUTS,
+    cpp_extended_record_include_prefix = "../../handwritten-src/cpp/",
+    cpp_namespace = "testsuite",
+    cpp_optional_header = "\"../../handwritten-src/cpp/optional.hpp\"",
+    cpp_optional_template = "std::experimental::optional",
+    ident_cpp_enum_type = "foo_bar",
+    ident_java_field = "mFooBar",
+    ident_jni_class = "NativeFooBar",
+    ident_jni_file = "NativeFooBar",
+    idl = "djinni/all.djinni",
+    idl_include_paths = ["test-suite/djinni/vendor"],
+    java_implement_android_os_parcelable = True,
+    java_nonnull_annotation = "javax.annotation.Nonnull",
+    java_nullable_annotation = "javax.annotation.CheckForNull",
+    java_package = "com.dropbox.djinni.test",
+    java_use_final_for_record = False,
+    jni_use_on_load_initializer = False,
+    objc_type_prefix = "DB",
+    ts_module = "test",
+    visibility = ["//visibility:public"],
+    wasm_namespace = "testsuite",
+    yaml_out_file = "yaml-test.yaml",
+    yaml_prefix = "test_",
+)
 
 cc_library(
     name = "djinni-tests-common",
@@ -48,24 +87,24 @@ cc_library(
     includes = [
         "generated-src/c",
     ],
+    linkstatic = 1,
     deps = [
         ":djinni-tests-common",
         "@gtest",
     ] + select({
         "@platforms//os:macos": ["//support-lib:djinni-support-objc"],
     }),
-    linkstatic = 1,
 )
 
 cc_test(
     name = "djinni-tests-c",
-    linkstatic = 1,
-    visibility = ["//visibility:public"],
     srcs = glob(
         [
             "handwritten-src/c/tests/*.cpp",
         ],
     ),
+    linkstatic = 1,
+    visibility = ["//visibility:public"],
     deps = [
         ":djinni-tests-c-lib",
         "@gtest//:gtest_main",
@@ -119,10 +158,13 @@ objc_library(
 
 objc_library(
     name = "djinni-tests-objc",
-    srcs = glob([
-        "generated-src/objc/**/*.m",
-        "handwritten-src/objc/**/*.m",
-    ], allow_empty = True),
+    srcs = glob(
+        [
+            "generated-src/objc/**/*.m",
+            "handwritten-src/objc/**/*.m",
+        ],
+        allow_empty = True,
+    ),
     hdrs = glob([
         "generated-src/objc/**/*.h",
         "handwritten-src/objc/**/*.h",
@@ -173,10 +215,10 @@ java_test(
         ":djinni-tests-jni-static",
         "//support-lib:djinni-support-java",
         "@com_google_protobuf//java/core",
-        "@maven_djinni//:com_google_code_findbugs_jsr305",
         "@maven_djinni//:javax_inject_javax_inject",
-        "@maven_djinni//:io_reactivex_rxjava2_rxjava",
-        "@maven_djinni//:junit_junit",
+        "@maven_djinni_tests//:com_google_code_findbugs_jsr305",
+        "@maven_djinni_tests//:io_reactivex_rxjava2_rxjava",
+        "@maven_djinni_tests//:junit_junit",
     ],
 )
 
@@ -185,8 +227,8 @@ macos_unit_test(
     minimum_os_version = "10.10",
     deps = [
         "djinni-tests-objc",
-        "djinni-tests-objcxx",
         "djinni-tests-objc-proto",
+        "djinni-tests-objcxx",
     ],
 )
 
@@ -222,14 +264,17 @@ wasm_cc_binary(
 sh_binary(
     name = "server-ts",
     srcs = ["handwritten-src/ts/run.sh"],
-    data = glob([
-        "handwritten-src/ts/*.html",
-        "handwritten-src/ts/*.ts",
-        "handwritten-src/ts/*.json",
-        "djinni/vendor/third-party/proto/ts/*.ts",
-        "node_modules/**",
-        "generated-src/ts/*.ts",
-    ], allow_empty = True) + [":wasm"],
+    data = glob(
+        [
+            "handwritten-src/ts/*.html",
+            "handwritten-src/ts/*.ts",
+            "handwritten-src/ts/*.json",
+            "djinni/vendor/third-party/proto/ts/*.ts",
+            "node_modules/**",
+            "generated-src/ts/*.ts",
+        ],
+        allow_empty = True,
+    ) + [":wasm"],
     deps = ["//support-lib:djinni-support-ts"],
 )
 
@@ -316,12 +361,12 @@ cc_library(
         ["generated-src/swiftxx/*.hpp"],
         exclude = ["generated-src/swiftxx/*Lazy*.hpp"],  # Legacy - provider types use *Provider*
     ),
+    aspect_hints = [":test-swiftxx_hint"],
     copts = ["-std=c++20"],
     includes = [
         ".",
         "generated-src/swiftxx",
     ],
-    aspect_hints = [":test-swiftxx_hint"],
     visibility = ["//visibility:public"],
     deps = [
         ":djinni-tests-common",
