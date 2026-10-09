@@ -28,14 +28,18 @@ wchar_in_relative="djinni/wchar_test.djinni"
 prologue_in_relative="djinni/function_prologue.djinni"
 ident_explicit_in_relative="djinni/ident_explicit.djinni"
 interface_and_abstract_class_in_relative="djinni/interface_and_abstract_class.djinni"
+optional_in_relative="djinni/optionals.djinni"
 temp_out_relative="djinni-output-temp"
 
 cpp_out="$base_dir/generated-src/cpp"
+c_out="$base_dir/generated-src/c"
 jni_out="$base_dir/generated-src/jni"
 objc_out="$base_dir/generated-src/objc"
 java_out="$base_dir/generated-src/java/com/dropbox/djinni/test"
 wasm_out="$base_dir/generated-src/wasm"
 ts_out="$base_dir/generated-src/ts"
+swift_out="$base_dir/generated-src/swift"
+swiftxx_out="$base_dir/generated-src/swiftxx"
 yaml_out="$base_dir/generated-src/yaml"
 
 java_package="com.dropbox.djinni.test"
@@ -51,7 +55,7 @@ elif [ $# -eq 1 ]; then
         echo "Unexpected arguemnt: \"$command\"." 1>&2
         exit 1
     fi
-    for dir in "$temp_out" "$cpp_out" "$jni_out" "$java_out"; do
+    for dir in "$temp_out" "$cpp_out" "$c_out" "$jni_out" "$java_out"; do
         if [ -e "$dir" ]; then
             echo "Deleting \"$dir\"..."
             rm -r "$dir"
@@ -81,6 +85,7 @@ fi
     --ident-cpp-enum-type foo_bar \
     --cpp-optional-template "std::experimental::optional" \
     --cpp-optional-header "\"../../handwritten-src/cpp/optional.hpp\"" \
+    --cpp-nullopt-value "std::experimental::nullopt" \
     --cpp-extended-record-include-prefix "../../handwritten-src/cpp/" \
     --cpp-use-wide-strings true \
     \
@@ -96,6 +101,13 @@ fi
     --wasm-namespace "testsuite" \
     --ts-out "$temp_out_relative/ts" \
     --ts-module "test_wchar" \
+    \
+    --swift-out "$temp_out_relative/swift" \
+    --swift-module "TestSuite" \
+    --swift-private-in-same-module \
+    --swiftxx-out "$temp_out_relative/swiftxx" \
+    --ident-swiftxx-class NativeFooBar \
+    --ident-swiftxx-file NativeFooBar \
     \
     --yaml-out "$temp_out_relative/yaml" \
     --yaml-out-file "yaml-test.yaml" \
@@ -116,6 +128,7 @@ fi
     --ident-cpp-enum-type foo_bar \
     --cpp-optional-template "std::experimental::optional" \
     --cpp-optional-header "\"../../handwritten-src/cpp/optional.hpp\"" \
+    --cpp-nullopt-value "std::experimental::nullopt" \
     --cpp-extended-record-include-prefix "../../handwritten-src/cpp/" \
     \
     --jni-out "$temp_out_relative/jni" \
@@ -131,6 +144,16 @@ fi
     --wasm-namespace "testsuite" \
     --ts-out "$temp_out_relative/ts" \
     --ts-module "test" \
+    \
+    --swift-out "$temp_out_relative/swift" \
+    --swift-module "TestSuite" \
+    --swift-private-in-same-module \
+    --swiftxx-out "$temp_out_relative/swiftxx" \
+    --ident-swiftxx-class NativeFooBar \
+    --ident-swiftxx-file NativeFooBar \
+    \
+    --c-out "$temp_out_relative/c" \
+    --c-namespace "testsuite_" \
     \
     --list-in-files "./generated-src/inFileList.txt" \
     --list-out-files "./generated-src/outFileList.txt"\
@@ -154,6 +177,7 @@ fi
     --ident-cpp-enum-type foo_bar \
     --cpp-optional-template "std::experimental::optional" \
     --cpp-optional-header "\"../../handwritten-src/cpp/optional.hpp\"" \
+    --cpp-nullopt-value "std::experimental::nullopt" \
     --cpp-extended-record-include-prefix "../../handwritten-src/cpp/" \
     \
     --jni-out "$temp_out_relative/jni" \
@@ -182,6 +206,7 @@ fi
     --ident-cpp-enum-type foo_bar! \
     --cpp-optional-template "std::experimental::optional" \
     --cpp-optional-header "\"../../handwritten-src/cpp/optional.hpp\"" \
+    --cpp-nullopt-value "std::experimental::nullopt" \
     --cpp-extended-record-include-prefix "../../handwritten-src/cpp/" \
     \
     --jni-out "$temp_out_relative/jni" \
@@ -204,6 +229,36 @@ fi
     --java-nullable-annotation "javax.annotation.CheckForNull" \
     --java-nonnull-annotation "javax.annotation.Nonnull" \
     --java-use-final-for-record false \
+    --ident-java-field mFooBar \
+    \
+    --cpp-out "$temp_out_relative/cpp" \
+    --cpp-namespace testsuite \
+    --ident-cpp-enum-type foo_bar \
+    --cpp-optional-template "std::experimental::optional" \
+    --cpp-optional-header "\"../../handwritten-src/cpp/optional.hpp\"" \
+    --cpp-nullopt-value "std::experimental::nullopt" \
+    --cpp-extended-record-include-prefix "../../handwritten-src/cpp/" \
+    \
+    --jni-out "$temp_out_relative/jni" \
+    --ident-jni-class NativeFooBar \
+    --ident-jni-file NativeFooBar \
+    \
+    --objc-out "$temp_out_relative/objc" \
+    --objcpp-out "$temp_out_relative/objc" \
+    --objc-type-prefix DB \
+    \
+    --wasm-out "$temp_out_relative/wasm" \
+    --wasm-namespace "testsuite" \
+    --ts-out "$temp_out_relative/ts" \
+    --ts-module "test_optional" \
+    \
+    --idl "$optional_in_relative" && \
+"$base_dir/../src/run-assume-built" \
+    --java-out "$temp_out_relative/java" \
+    --java-package $java_package \
+    --java-nullable-annotation "javax.annotation.CheckForNull" \
+    --java-nonnull-annotation "javax.annotation.Nonnull" \
+    --java-use-final-for-record false \
     --java-implement-android-os-parcelable true \
     --java-gen-interface true \
     --ident-java-field mFooBar \
@@ -213,6 +268,7 @@ fi
     --ident-cpp-enum-type foo_bar \
     --cpp-optional-template "std::experimental::optional" \
     --cpp-optional-header "\"../../handwritten-src/cpp/optional.hpp\"" \
+    --cpp-nullopt-value "std::experimental::nullopt" \
     --cpp-extended-record-include-prefix "../../handwritten-src/cpp/" \
     \
     --jni-out "$temp_out_relative/jni" \
@@ -223,6 +279,7 @@ fi
     --objc-out "$temp_out_relative/objc" \
     --objcpp-out "$temp_out_relative/objc" \
     --objc-type-prefix DB \
+    --objc-omit-full-convenience-constructor true \
     \
     --yaml-out "$temp_out_relative/yaml" \
     --yaml-out-file "yaml-interface-test.yaml" \
@@ -244,6 +301,7 @@ cp "$base_dir/djinni/yaml-test.djinni" "$temp_out/yaml"
     --ident-cpp-enum-type foo_bar \
     --cpp-optional-template "std::experimental::optional" \
     --cpp-optional-header "\"../../handwritten-src/cpp/optional.hpp\"" \
+    --cpp-nullopt-value "std::experimental::nullopt" \
     \
     --jni-out "$temp_out_relative/jni" \
     --jni-use-on-load-initializer false \
@@ -253,11 +311,19 @@ cp "$base_dir/djinni/yaml-test.djinni" "$temp_out/yaml"
     --objc-out "$temp_out_relative/objc" \
     --objcpp-out "$temp_out_relative/objc" \
     --objc-type-prefix DB \
+    --objc-omit-full-convenience-constructor true \
     \
     --wasm-out "$temp_out_relative/wasm" \
     --wasm-namespace "testsuite" \
     --ts-out "$temp_out_relative/ts" \
     --ts-module "test_yaml" \
+    \
+    --swift-out "$temp_out_relative/swift" \
+    --swift-module "TestSuite" \
+    --swift-private-in-same-module \
+    --swiftxx-out "$temp_out_relative/swiftxx" \
+    --ident-swiftxx-class NativeFooBar \
+    --ident-swiftxx-file NativeFooBar \
     \
     --idl "$temp_out_relative/yaml/yaml-test.djinni" \
 )
@@ -279,6 +345,9 @@ mirror "jni" "$temp_out/jni" "$jni_out"
 mirror "objc" "$temp_out/objc" "$objc_out"
 mirror "wasm" "$temp_out/wasm" "$wasm_out"
 mirror "ts" "$temp_out/ts" "$ts_out"
+mirror "swift" "$temp_out/swift" "$swift_out"
+mirror "swiftxx" "$temp_out/swiftxx" "$swiftxx_out"
+mirror "c" "$temp_out/c" "$c_out"
 
 date > "$gen_stamp"
 

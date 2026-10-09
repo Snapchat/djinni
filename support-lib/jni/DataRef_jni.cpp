@@ -15,6 +15,7 @@
   */
 
 #include "../cpp/DataRef.hpp"
+#include "DataRef_jni.hpp"
 
 #if DATAREF_JNI
 
@@ -122,7 +123,7 @@ public:
         return _readonly ? nullptr : _buf;
     }
 
-    PlatformObject platformObj() const override {
+    PlatformObject platformObj() const {
         return _data.get();
     }
 
@@ -217,6 +218,15 @@ static const JNINativeMethod kNativeMethods[] = {{
 // NOLINTNEXTLINE
 static auto sRegisterMethods =
     JNIMethodLoadAutoRegister("com/snapchat/djinni/DataRefHelper", kNativeMethods);
+
+::djinni::LocalRef<jobject> NativeDataRef::fromCpp(JNIEnv* jniEnv, const CppType& c) {
+    auto impl = std::dynamic_pointer_cast<DataRefJNI>(c.impl());
+    if (!impl) {
+        throw std::invalid_argument("DataRef impl is not compatible with JVM");
+    }
+    auto obj = reinterpret_cast<jobject>(impl->platformObj());
+    return ::djinni::LocalRef<JniType>(jniEnv->NewLocalRef(obj));
+}
 
 } // namespace djinni
 

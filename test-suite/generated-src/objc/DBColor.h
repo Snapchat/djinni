@@ -3,6 +3,7 @@
 
 #import <Foundation/Foundation.h>
 
+/** This is a test */
 typedef NS_ENUM(NSInteger, DBColor)
 {
     DBColorRed = 0,

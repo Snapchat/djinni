@@ -1,0 +1,41 @@
+# Blank interface used for testing
+optional_interface = interface +c {
+}
+
+# Base record with a required value
+base_record = record {
+    val: i32;
+}
+
+# Record with a mix of optional and required values
+mixed_record = record {
+    interfaceVal: optional<optional_interface>;
+    reqInt: i32;
+    optRecord: optional<base_record>;
+    reqRecord: base_record;
+}
+
+# Record containing only optional values
+optional_record = record {
+    optInt: optional<i32>;
+    optInterface: optional<optional_interface>;
+    optRecord: optional<base_record>;
+}
+
+# Overridden optional record
+override_record = record {
+    optInt: optional<i32>;
+    optFloat: optional<f32>;
+    reqInt: i32;
+    optDouble: optional<f64>;
+} deriving(req)
+
+optional_test_helpers = interface +c {
+  static get_base_record() : base_record;
+  static optional_interface() : optional_interface;
+  static get_mixed_record() : mixed_record;
+  static get_optional_record() : optional_record;
+
+  # Checks that translation occurs properly
+  static mixed_record_id(i: mixed_record) : mixed_record;
+}

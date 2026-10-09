@@ -86,21 +86,34 @@ private object IdlParser extends RegexParsers {
   }
 
   def ext(default: Ext) = (rep1("+" ~> ident) >> checkExts) | success(default)
-  def extRecord = ext(Ext(false, false, false, false))
-  def extInterface = ext(Ext(true, true, true, true))
-  def supportLang = ext(Ext(true, true, true, true))
+  def extRecord = ext(Ext(false, false, false, false, false, false))
+  def extInterface = ext(Ext(true, true, true, true, true, true))
+  def supportLang = ext(Ext(true, true, true, true, true, true))
 
   def checkExts(parts: List[Ident]): Parser[Ext] = {
     var foundCpp = false
+    var foundC = false
     var foundJava = false
     var foundObjc = false
     var foundJavascript = false
+    var foundSwift = false
 
     for (part <- parts)
       part.name match {
+        case "nc" => {
+          foundJava = true
+          foundObjc = true
+          foundJavascript = true
+          foundSwift = true
+          foundC = true
+        }
         case "c" => {
           if (foundCpp) return err("Found multiple \"c\" modifiers.")
           foundCpp = true
+        }
+        case "cc"=> {
+          if (foundC) return err("Found multiple \"cc\" modifiers.")
+          foundC = true
         }
         case "j" => {
           if (foundJava) return err("Found multiple \"j\" modifiers.")
@@ -111,12 +124,21 @@ private object IdlParser extends RegexParsers {
           foundObjc = true
         }
         case "w" => {
-          if (foundJavascript) return err("Found multiple \"w\" modifiers.")
+          if (foundJavascript) return err("Found multiple \"js\" modifiers.")
           foundJavascript = true
+        }
+        // +js is an alias for +w for both wasm and valdi
+        case "js" => {
+          if (foundJavascript) return err("Found multiple \"js\" modifiers.")
+          foundJavascript = true
+        }
+        case "sw" => {
+          if (foundSwift) return err("Found multiple \"sw\" modifiers.")
+          foundSwift = true
         }
         case _ => return err("Invalid modifier \"" + part.name + "\"")
       }
-    success(Ext(foundJava, foundCpp, foundObjc, foundJavascript))
+    success(Ext(foundJava, foundCpp, foundC, foundObjc, foundJavascript, foundSwift))
   }
 
   def typeDef: Parser[TypeDef] = record | enum | flags | interface
@@ -139,6 +161,11 @@ private object IdlParser extends RegexParsers {
       case "ord" => Record.DerivingType.Ord
       case "parcelable" => Record.DerivingType.AndroidParcelable
       case "nscopying" => Record.DerivingType.NSCopying
+      case "req" => Record.DerivingType.Req
+      case "hashable" => Record.DerivingType.Hashable
+      case "sendable" => Record.DerivingType.Sendable
+      case "codable" => Record.DerivingType.Codable
+      case "error" => Record.DerivingType.Error
       case _ => return err( s"""Unrecognized deriving type "${ident.name}"""")
     }).toSet
   }
@@ -363,6 +390,14 @@ def parseProtobufManifest(origin: String, in: java.io.Reader): Either[Error, Seq
       case Some(properties) => {
         val p = properties.asInstanceOf[JMap[String, String]].toMap
         Some(ProtobufMessage.Ts(p("module"), p("namespace")))
+      }
+      case None => None
+    },
+    // Swift is optional
+    Option(doc.get("swift")) match {
+      case Some(properties) => {
+        val p = properties.asInstanceOf[JMap[String, String]].toMap
+        Some(ProtobufMessage.Swift(p("module"), p("prefix")))
       }
       case None => None
     }

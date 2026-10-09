@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 public class RecordWithFlags {
 
 
-    /*package*/ final EnumSet<AccessFlags> mAccess;
+    /*package*/ EnumSet<AccessFlags> mAccess;
 
     public RecordWithFlags(
             @Nonnull EnumSet<AccessFlags> access) {
@@ -20,6 +20,10 @@ public class RecordWithFlags {
     @Nonnull
     public EnumSet<AccessFlags> getAccess() {
         return mAccess;
+    }
+
+    public void setAccess(@Nonnull EnumSet<AccessFlags> access) {
+        this.mAccess = access;
     }
 
     @Override

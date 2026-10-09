@@ -14,9 +14,9 @@
 + (nonnull instancetype)externRecordWithDerivingsWithMember:(nonnull DBRecordWithDerivings *)member
                                                           e:(DBColor)e;
 
-@property (nonatomic, readonly, nonnull) DBRecordWithDerivings * member;
+@property (nonatomic, nonnull) DBRecordWithDerivings * member;
 
-@property (nonatomic, readonly) DBColor e;
+@property (nonatomic) DBColor e;
 
 - (NSComparisonResult)compare:(nonnull DBExternRecordWithDerivings *)other;
 

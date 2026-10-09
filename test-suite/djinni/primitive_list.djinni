@@ -1,3 +1,4 @@
 primitive_list = record {
     list: list<i64>;
+    optional_list: optional<list<optional<i64>>>;
 }

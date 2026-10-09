@@ -1,0 +1,10 @@
+--- a/third_party/utf8_range/BUILD.bazel
++++ b/third_party/utf8_range/BUILD.bazel
+@@ -46,6 +46,7 @@ cc_library(
+         "utf8_range.c",
+     ],
+     hdrs = ["utf8_range.h"],
++    copts = ["-std=c99"],
+     strip_include_prefix = "/third_party/utf8_range",
+ )
+ 

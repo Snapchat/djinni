@@ -33,18 +33,12 @@
 #endif
 #endif
 
+// C++20 standard coroutines
 #if defined(__cpp_impl_coroutine) && defined(__cpp_lib_coroutine)
     #include <coroutine>
     namespace djinni::detail {
         template <typename Promise = void> using CoroutineHandle = std::coroutine_handle<Promise>;
         using SuspendNever = std::suspend_never;
-    }
-    #define DJINNI_FUTURE_HAS_COROUTINE_SUPPORT 1
-#elif defined(__cpp_coroutines) && __has_include(<experimental/coroutine>)
-    #include <experimental/coroutine>
-    namespace djinni::detail {
-        template <typename Promise = void> using CoroutineHandle = std::experimental::coroutine_handle<Promise>;
-        using SuspendNever = std::experimental::suspend_never;
     }
     #define DJINNI_FUTURE_HAS_COROUTINE_SUPPORT 1
 #endif
@@ -376,7 +370,7 @@ public:
     }
     bool await_suspend(detail::CoroutineHandle<> h) {
         this->then([h, this] (Future<T> x) mutable {
-            std::atomic_store(&_sharedState, x._sharedState);
+            std::atomic_store(&_sharedState, std::atomic_load(&x._sharedState));
             h();
         });
         return true;

@@ -11,8 +11,8 @@
 + (nonnull instancetype)mapRecordWithMap:(nonnull NSDictionary<NSString *, NSNumber *> *)map
                                     imap:(nonnull NSDictionary<NSNumber *, NSNumber *> *)imap;
 
-@property (nonatomic, readonly, nonnull) NSDictionary<NSString *, NSNumber *> * map;
+@property (nonatomic, copy, nonnull) NSDictionary<NSString *, NSNumber *> * map;
 
-@property (nonatomic, readonly, nonnull) NSDictionary<NSNumber *, NSNumber *> * imap;
+@property (nonatomic, copy, nonnull) NSDictionary<NSNumber *, NSNumber *> * imap;
 
 @end

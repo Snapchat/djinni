@@ -14,8 +14,7 @@ import javax.annotation.Nonnull;
 public class EmptyRecord {
 
 
-    public EmptyRecord(
-            ) {
+    public EmptyRecord() {
     }
 
     @Override

@@ -30,6 +30,17 @@ struct EnumUsageRecord final {
     , s(std::move(s_))
     , m(std::move(m_))
     {}
+
+    EnumUsageRecord(color e_,
+                    std::vector<color> l_,
+                    std::unordered_set<color> s_,
+                    std::unordered_map<color, color> m_)
+    : EnumUsageRecord(std::move(e_),
+                      std::experimental::nullopt,
+                      std::move(l_),
+                      std::move(s_),
+                      std::move(m_))
+    {}
 };
 
 } // namespace testsuite

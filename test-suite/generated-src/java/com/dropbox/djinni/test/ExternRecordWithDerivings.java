@@ -7,9 +7,9 @@ package com.dropbox.djinni.test;
 public final class ExternRecordWithDerivings implements Comparable<ExternRecordWithDerivings> {
 
 
-    /*package*/ final com.dropbox.djinni.test.RecordWithDerivings mMember;
+    /*package*/ com.dropbox.djinni.test.RecordWithDerivings mMember;
 
-    /*package*/ final com.dropbox.djinni.test.Color mE;
+    /*package*/ com.dropbox.djinni.test.Color mE;
 
     public ExternRecordWithDerivings(
             com.dropbox.djinni.test.RecordWithDerivings member,
@@ -22,8 +22,16 @@ public final class ExternRecordWithDerivings implements Comparable<ExternRecordW
         return mMember;
     }
 
+    public void setMember(com.dropbox.djinni.test.RecordWithDerivings member) {
+        this.mMember = member;
+    }
+
     public com.dropbox.djinni.test.Color getE() {
         return mE;
+    }
+
+    public void setE(com.dropbox.djinni.test.Color e) {
+        this.mE = e;
     }
 
     @Override

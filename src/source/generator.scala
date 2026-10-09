@@ -42,6 +42,7 @@ package object generatorTools {
                    javaImplementAndroidOsParcelable: Boolean,
                    javaUseFinalForRecord: Boolean,
                    javaGenInterface: Boolean,
+                   javaLegacyRecords: Boolean,
                    cppOutFolder: Option[File],
                    cppHeaderOutFolder: Option[File],
                    cppIncludePrefix: String,
@@ -52,11 +53,13 @@ package object generatorTools {
                    cppBaseLibIncludePrefix: String,
                    cppOptionalTemplate: String,
                    cppOptionalHeader: String,
+                   cppNulloptValue: String,
                    cppEnumHashWorkaround: Boolean,
                    cppNnHeader: Option[String],
                    cppNnType: Option[String],
                    cppNnCheckExpression: Option[String],
                    cppUseWideStrings: Boolean,
+                   cppLegacyRecords: Boolean,
                    jniOutFolder: Option[File],
                    jniHeaderOutFolder: Option[File],
                    jniIncludePrefix: String,
@@ -90,6 +93,8 @@ package object generatorTools {
                    objcDisableClassCtor: Boolean,
                    objcClosedEnums: Boolean,
                    objcStrictProtocol: Boolean,
+                   objcLegacyRecords: Boolean,
+                   objcOmitFullConvenienceConstructor: Boolean,
                    wasmOutFolder: Option[File],
                    wasmIncludePrefix: String,
                    wasmIncludeCppPrefix: String,
@@ -100,6 +105,33 @@ package object generatorTools {
                    jsIdentStyle: JsIdentStyle,
                    tsOutFolder: Option[File],
                    tsModule: String,
+                   valdiOutFolder: Option[File],
+                   valdiIncludePrefix: String,
+                   valdiIncludeCppPrefix: String,
+                   valdiBaseLibIncludePrefix: String,
+                   valdiNamespace: String,
+                   valdiClassIdentStyle: IdentConverter,
+                   valdiFileIdentStyle: IdentConverter,
+                   valdiTsOutFolder: Option[File],
+                   cOutFolder: Option[File],
+                   cHeaderOutFolder: Option[File],
+                   cNamespace: String,
+                   cBaseLibIncludePrefix: String,
+                   cIncludePrefix: String,
+                   cWrapperCppNamespace: Option[String],
+                   cWrapperUseDlsym: Boolean,
+                   swiftOutFolder: Option[File],
+                   swiftIdentStyle: SwiftIdentStyle,
+                   swiftModule: String,
+                   swiftPrivateInSameModule: Boolean,
+                   swiftxxOutFolder: Option[File],
+                   swiftxxNamespace: String,
+                   swiftxxIncludePrefix: String,
+                   swiftxxBaseLibModule: String,
+                   swiftxxClassIdentStyle: IdentConverter,
+                   swiftxxFileIdentStyle: IdentConverter,
+                   swiftxxIncludeCppPrefix: String,
+                   swiftxxBaseLibIncludePrefix: String,
                    outFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],
@@ -148,6 +180,9 @@ package object generatorTools {
   case class JsIdentStyle(ty: IdentConverter, typeParam: IdentConverter,
                           method: IdentConverter, field: IdentConverter, local: IdentConverter,
                           enum: IdentConverter, const: IdentConverter)
+  case class SwiftIdentStyle(ty: IdentConverter, typeParam: IdentConverter,
+                             method: IdentConverter, field: IdentConverter, local: IdentConverter,
+                             enum: IdentConverter, const: IdentConverter)
 
   object IdentStyle {
     private val camelUpperStrict = (s: String) => {
@@ -159,6 +194,15 @@ package object generatorTools {
     }
     private val underLowerStrict = (s: String) => s.toLowerCase
     private val underUpperStrict = (s: String) => s.split('_').map(leadingUpperStrict).mkString("_")
+
+    private val avoidKeywords = (keywords: List[String], converter: IdentConverter) => (s: String) => {
+      val ident = converter(s)
+      if (keywords.contains(ident))
+        ident + "_"
+      else
+        ident
+    }
+    private val swiftKeywords = List("protocol")
 
     val camelUpper = (s: String) => s.split("[-_]").map(firstUpper).mkString
     val camelLower = (s: String) => {
@@ -174,6 +218,7 @@ package object generatorTools {
     val cppDefault = CppIdentStyle(camelUpper, camelUpper, camelUpper, underLower, underLower, underLower, underCaps, underCaps)
     val objcDefault = ObjcIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, camelUpper, camelUpper)
     val jsDefault = JsIdentStyle(camelUpper, camelUpper, camelLower, camelLower, camelLower, underCaps, underCaps)
+    val swiftDefault = SwiftIdentStyle(camelUpper, camelUpper, avoidKeywords(swiftKeywords, camelLower), avoidKeywords(swiftKeywords, camelLower), camelLower, camelLower, camelLower)
 
     val styles = Map(
       "FooBar" -> camelUpper,
@@ -290,11 +335,42 @@ package object generatorTools {
         }
         new WasmGenerator(spec).generate(idl)
       }
+      if (spec.valdiOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("Valdi", spec.valdiOutFolder.get)
+        }
+        new ValdiGenerator(spec).generate(idl)
+      }
+      if (spec.cOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("C", spec.cOutFolder.get)
+          createFolder("C header", spec.cHeaderOutFolder.get)
+        }
+        new CGenerator(spec).generate(idl)
+      }
       if (spec.tsOutFolder.isDefined) {
         if (!spec.skipGeneration) {
           createFolder("TypeScript", spec.tsOutFolder.get)
         }
-        new TsGenerator(spec).generate(idl)
+        new TsGenerator(spec, false).generate(idl)
+      }
+      if (spec.valdiTsOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("Valdi TypeScript", spec.valdiTsOutFolder.get)
+        }
+        new TsGenerator(spec, true).generate(idl)
+      }
+      if (spec.swiftOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("Swift", spec.swiftOutFolder.get)
+        }
+        new SwiftGenerator(spec).generate(idl)
+      }
+      if (spec.swiftxxOutFolder.isDefined) {
+        if (!spec.skipGeneration) {
+          createFolder("Swift/C++ interop", spec.swiftxxOutFolder.get)
+        }
+        new SwiftxxGenerator(spec).generate(idl)
       }
       if (spec.yamlOutFolder.isDefined) {
         if (!spec.skipGeneration) {
@@ -311,6 +387,7 @@ package object generatorTools {
 
   sealed abstract class SymbolReference
   case class ImportRef(arg: String) extends SymbolReference // Already contains <> or "" in C contexts
+  case class PrivateImportRef(arg: String) extends SymbolReference
   case class DeclRef(decl: String, namespace: Option[String]) extends SymbolReference
 }
 
@@ -356,6 +433,7 @@ abstract class Generator(spec: Spec)
   val idJava = spec.javaIdentStyle
   val idObjc = spec.objcIdentStyle
   val idJs = spec.jsIdentStyle
+  val idSwift = spec.swiftIdentStyle
 
   def wrapNamespace(w: IndentWriter, ns: String, f: IndentWriter => Unit) {
     ns match {
@@ -417,13 +495,20 @@ abstract class Generator(spec: Spec)
 
   def generate(idl: Seq[TypeDecl]) {
     val decls = idl.collect { case itd: InternTypeDecl => itd }
-    for (td <- decls) td.body match {
-      case e: Enum =>
-        assert(td.params.isEmpty)
-        generateEnum(td.origin, td.ident, td.doc, e)
-      case r: Record => generateRecord(td.origin, td.ident, td.doc, td.params, r)
-      case i: Interface => generateInterface(td.origin, td.ident, td.doc, td.params, i)
-      case p: ProtobufMessage => // never need to generate files for protobuf types
+    for (td <- decls) {
+      try {
+        td.body match {
+          case e: Enum =>
+            assert(td.params.isEmpty)
+            generateEnum(td.origin, td.ident, td.doc, e)
+          case r: Record => generateRecord(td.origin, td.ident, td.doc, td.params, r)
+          case i: Interface => generateInterface(td.origin, td.ident, td.doc, td.params, i)
+          case p: ProtobufMessage => // never need to generate files for protobuf types
+        }
+      } catch {
+        case t: Throwable => throw new RuntimeException("Failed to process " + td.ident.name, t)
+      }
+
     }
     generateModule(decls.filter(td => td.body.isInstanceOf[Interface]))
   }
@@ -470,35 +555,35 @@ abstract class Generator(spec: Spec)
 
   def normalEnumOptions(e: Enum) = e.options.filter(_.specialFlag == None)
 
-  def writeEnumOptionNone(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=") {
+  def writeEnumOptionNone(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=", prefix: String = "", lineEnd: String = ",") {
     for (o <- e.options.find(_.specialFlag == Some(Enum.SpecialFlag.NoFlags))) {
       writeDoc(w, o.doc)
-      w.wl(ident(o.ident.name) + s" $delim 0,")
+      w.wl(prefix + ident(o.ident.name) + s" $delim 0$lineEnd")
     }
   }
 
-  def writeEnumOptions(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=") {
+  def writeEnumOptions(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=", prefix: String = "", lineEnd: String = ",") {
     var shift = 0
     for (o <- normalEnumOptions(e)) {
       writeDoc(w, o.doc)
-      w.wl(ident(o.ident.name) + (if(e.flags) s" $delim 1 << $shift" else s" $delim $shift") + ",")
+      w.wl(prefix + ident(o.ident.name) + (if(e.flags) s" $delim 1 << $shift" else s" $delim $shift") + lineEnd)
       shift += 1
     }
   }
 
-  def writeEnumOptionAll(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=") {
+  def writeEnumOptionAll(w: IndentWriter, e: Enum, ident: IdentConverter, delim: String = "=", prefix: String = "", lineEnd: String = ",") {
     for (
       o <- e.options.find(_.specialFlag.contains(Enum.SpecialFlag.AllFlags))
     ) {
       writeDoc(w, o.doc)
-      w.w(ident(o.ident.name) + s" $delim ")
+      w.w(prefix + ident(o.ident.name) + s" $delim ")
       w.w(
         normalEnumOptions(e)
           .zipWithIndex
           .map{case(o, i) => s"(1 << $i)"}
           .fold("0")((acc, o) => acc + " | " + o)
       )
-      w.wl(",")
+      w.wl(lineEnd)
     }
   }
 

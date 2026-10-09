@@ -9,6 +9,6 @@
 
 - (nullable DBConflict *)Conflict;
 
-- (BOOL)conflictArg:(nonnull NSSet<DBConflict *> *)cs;
+- (BOOL)conflictArg:(nonnull NSArray<DBConflict *> *)cs;
 
 @end

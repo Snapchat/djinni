@@ -10,6 +10,6 @@
 - (nonnull instancetype)initWithO:(nonnull DJOutcome<NSNumber *, NSString *> *)o NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)nestedOutcomeWithO:(nonnull DJOutcome<NSNumber *, NSString *> *)o;
 
-@property (nonatomic, readonly, nonnull) DJOutcome<NSNumber *, NSString *> * o;
+@property (nonatomic, nonnull) DJOutcome<NSNumber *, NSString *> * o;
 
 @end

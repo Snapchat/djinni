@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 public class NestedOutcome {
 
 
-    /*package*/ final com.snapchat.djinni.Outcome<Integer, String> mO;
+    /*package*/ com.snapchat.djinni.Outcome<Integer, String> mO;
 
     public NestedOutcome(
             @Nonnull com.snapchat.djinni.Outcome<Integer, String> o) {
@@ -19,6 +19,10 @@ public class NestedOutcome {
     @Nonnull
     public com.snapchat.djinni.Outcome<Integer, String> getO() {
         return mO;
+    }
+
+    public void setO(@Nonnull com.snapchat.djinni.Outcome<Integer, String> o) {
+        this.mO = o;
     }
 
     @Override

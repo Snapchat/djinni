@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 public class SupportCopying {
 
 
-    /*package*/ final int mX;
+    /*package*/ int mX;
 
     public SupportCopying(
             int x) {
@@ -18,6 +18,10 @@ public class SupportCopying {
 
     public int getX() {
         return mX;
+    }
+
+    public void setX(int x) {
+        this.mX = x;
     }
 
     @Override

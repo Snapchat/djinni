@@ -5,7 +5,7 @@
 
 using namespace testsuite;
 
-static NestedCollection cppNestedCollection { { {u8"String1", u8"String2"}, {u8"StringA", u8"StringB"} } };
+static NestedCollection cppNestedCollection { { {"String1", "String2"}, {"StringA", "StringB"} } };
 static DBNestedCollection *objcNestedCollection = [DBNestedCollection nestedCollectionWithSetList:@[
             [NSSet setWithArray:@[ @"String1", @"String2" ]],
             [NSSet setWithArray:@[ @"StringA", @"StringB" ]],

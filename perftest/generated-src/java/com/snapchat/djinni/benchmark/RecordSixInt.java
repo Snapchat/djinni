@@ -9,17 +9,17 @@ import javax.annotation.Nonnull;
 /*package*/ final class RecordSixInt {
 
 
-    /*package*/ final long mI1;
+    /*package*/ long mI1;
 
-    /*package*/ final long mI2;
+    /*package*/ long mI2;
 
-    /*package*/ final long mI3;
+    /*package*/ long mI3;
 
-    /*package*/ final long mI4;
+    /*package*/ long mI4;
 
-    /*package*/ final long mI5;
+    /*package*/ long mI5;
 
-    /*package*/ final long mI6;
+    /*package*/ long mI6;
 
     public RecordSixInt(
             long i1,
@@ -40,24 +40,48 @@ import javax.annotation.Nonnull;
         return mI1;
     }
 
+    public void setI1(long i1) {
+        this.mI1 = i1;
+    }
+
     public long getI2() {
         return mI2;
+    }
+
+    public void setI2(long i2) {
+        this.mI2 = i2;
     }
 
     public long getI3() {
         return mI3;
     }
 
+    public void setI3(long i3) {
+        this.mI3 = i3;
+    }
+
     public long getI4() {
         return mI4;
+    }
+
+    public void setI4(long i4) {
+        this.mI4 = i4;
     }
 
     public long getI5() {
         return mI5;
     }
 
+    public void setI5(long i5) {
+        this.mI5 = i5;
+    }
+
     public long getI6() {
         return mI6;
+    }
+
+    public void setI6(long i6) {
+        this.mI6 = i6;
     }
 
     @Override
