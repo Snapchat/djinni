@@ -666,7 +666,7 @@
     "@@rules_android+//rules/android_sdk_repository:rule.bzl%android_sdk_repository_extension": {
       "general": {
         "bzlTransitiveDigest": "NAy+0M15JNVEBb8Tny6t7j3lKqTnsAMjoBB6LJ+C370=",
-        "usagesDigest": "YG3KxS8SmTUlaQcAgCmzOiD1EL0k9+bYJ7WkW5MQk0k=",
+        "usagesDigest": "sVl+MraZp+o4hR4jzsE3b1J92Su4VYK1wNZw3kpnm/w=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -682,7 +682,7 @@
     "@@rules_android_ndk+//:extension.bzl%android_ndk_repository_extension": {
       "general": {
         "bzlTransitiveDigest": "oV/TPZWCXAAcpJG/DBV/lNiWCISUTk5ba0KRjUb7adg=",
-        "usagesDigest": "GQ0RCmyoQ1kk1Z1etiq2M42pnfACT70EEzXYmG+ADKs=",
+        "usagesDigest": "dt+sBElG3byLMHVi+gi+6vVzEEPT/yztV59Aq+R7OqE=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
