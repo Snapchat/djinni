@@ -9,6 +9,6 @@
 - (nonnull instancetype)initWithDatesById:(nonnull NSDictionary<NSString *, NSDate *> *)datesById NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)mapDateRecordWithDatesById:(nonnull NSDictionary<NSString *, NSDate *> *)datesById;
 
-@property (nonatomic, readonly, nonnull) NSDictionary<NSString *, NSDate *> * datesById;
+@property (nonatomic, copy, nonnull) NSDictionary<NSString *, NSDate *> * datesById;
 
 @end

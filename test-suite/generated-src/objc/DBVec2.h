@@ -11,8 +11,8 @@
 + (nonnull instancetype)vec2WithX:(int32_t)x
                                 y:(int32_t)y;
 
-@property (nonatomic, readonly) int32_t x;
+@property (nonatomic) int32_t x;
 
-@property (nonatomic, readonly) int32_t y;
+@property (nonatomic) int32_t y;
 
 @end

@@ -21,6 +21,7 @@ package djinni.ast
 import java.io.File
 import djinni.ast.Record.DerivingType.DerivingType
 import djinni.meta.MExpr
+import djinni.meta.isOptional
 import djinni.syntax.Loc
 
 case class IdlFile(imports: Seq[FileRef], typeDecls: Seq[TypeDecl], flags: Seq[String])
@@ -50,9 +51,10 @@ case class InternTypeDecl(override val ident: Ident, override val params: Seq[Ty
 case class ExternTypeDecl(override val ident: Ident, override val params: Seq[TypeParam], override val body: TypeDef, properties: Map[String, Any], override val origin: String) extends TypeDecl
 case class ProtobufTypeDecl(override val ident: Ident, override val params: Seq[TypeParam], override val body: TypeDef, override val origin: String) extends TypeDecl
 
-case class Ext(java: Boolean, cpp: Boolean, objc: Boolean, js: Boolean) {
+// `Ext.js` is shared by both wasm and valdi
+case class Ext(java: Boolean, cpp: Boolean, cc: Boolean, objc: Boolean, js: Boolean, swift: Boolean) {
   def any(): Boolean = {
-    java || cpp || objc || js
+    java || cpp || cc || objc || js || swift
   }
 }
 
@@ -75,11 +77,16 @@ object Enum {
   case class Option(ident: Ident, doc: Doc, specialFlag: scala.Option[SpecialFlag])
 }
 
-case class Record(ext: Ext, fields: Seq[Field], consts: Seq[Const], derivingTypes: Set[DerivingType]) extends TypeDef
+case class Record(ext: Ext, fields: Seq[Field], consts: Seq[Const], derivingTypes: Set[DerivingType]) extends TypeDef {
+  // Returns only non-optional fields contained in the record
+  def reqFields = {
+    fields.filterNot(f => isOptional(f.ty.resolved))
+  }
+}
 object Record {
   object DerivingType extends Enumeration {
     type DerivingType = Value
-    val Eq, Ord, AndroidParcelable, NSCopying = Value
+    val Eq, Ord, AndroidParcelable, NSCopying, Req, Hashable, Sendable, Codable, Error = Value
   }
 }
 
@@ -90,10 +97,11 @@ object Interface {
 
 case class Field(ident: Ident, ty: TypeRef, doc: Doc)
 
-case class ProtobufMessage(cpp: ProtobufMessage.Cpp, java: ProtobufMessage.Java, objc: Option[ProtobufMessage.Objc], ts: Option[ProtobufMessage.Ts]) extends TypeDef
+case class ProtobufMessage(cpp: ProtobufMessage.Cpp, java: ProtobufMessage.Java, objc: Option[ProtobufMessage.Objc], ts: Option[ProtobufMessage.Ts], swift: Option[ProtobufMessage.Swift]) extends TypeDef
 object ProtobufMessage {
   case class Cpp(header: String, ns: String)
   case class Java(pkg: String, jniClass: Option[String], jniHeader: Option[String])
   case class Objc(header: String, prefix: String)
   case class Ts(module: String, ns: String)
+  case class Swift(module: String, prefix: String)
 }

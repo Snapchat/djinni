@@ -24,3 +24,5 @@ test-suite/djinni/vendor/third-party/proto/ts/*.js
 /project
 /target
 /.metals
+# Added by Snap Cursor Rules extension
+.cursor/rules/remote

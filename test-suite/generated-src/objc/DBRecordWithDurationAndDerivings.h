@@ -9,7 +9,7 @@
 - (nonnull instancetype)initWithDt:(NSTimeInterval)dt NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)recordWithDurationAndDerivingsWithDt:(NSTimeInterval)dt;
 
-@property (nonatomic, readonly) NSTimeInterval dt;
+@property (nonatomic) NSTimeInterval dt;
 
 - (NSComparisonResult)compare:(nonnull DBRecordWithDurationAndDerivings *)other;
 

@@ -9,7 +9,7 @@
 - (nonnull instancetype)initWithCreatedAt:(nonnull NSDate *)createdAt NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)dateRecordWithCreatedAt:(nonnull NSDate *)createdAt;
 
-@property (nonatomic, readonly, nonnull) NSDate * createdAt;
+@property (nonatomic, nonnull) NSDate * createdAt;
 
 - (NSComparisonResult)compare:(nonnull DBDateRecord *)other;
 

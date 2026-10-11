@@ -25,12 +25,14 @@ public class AllTests extends TestSuite {
         mySuite.addTestSuite(WcharTest.class);
         mySuite.addTestSuite(AndroidParcelableTest.class);
         mySuite.addTestSuite(FunctionPrologueTest.class);
+        mySuite.addTestSuite(ProviderTest.class);
         mySuite.addTestSuite(OutcomeTest.class);
         mySuite.addTestSuite(ProtoTest.class);
         mySuite.addTestSuite(ArrayTest.class);
         mySuite.addTestSuite(DataTest.class);
         mySuite.addTestSuite(AsyncTest.class);
         mySuite.addTestSuite(InterfaceAndAbstractClass.class);
+        mySuite.addTestSuite(OptionalsTest.class);
         return mySuite;
     }
 

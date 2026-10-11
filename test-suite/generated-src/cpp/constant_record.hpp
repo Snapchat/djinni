@@ -14,6 +14,9 @@ struct ConstantRecord final {
     int32_t some_integer;
     std::string some_string;
 
+    friend bool operator==(const ConstantRecord& lhs, const ConstantRecord& rhs);
+    friend bool operator!=(const ConstantRecord& lhs, const ConstantRecord& rhs);
+
     ConstantRecord(int32_t some_integer_,
                    std::string some_string_)
     : some_integer(std::move(some_integer_))

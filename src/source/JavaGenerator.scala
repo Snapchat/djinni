@@ -275,27 +275,46 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
         generateJavaConstants(w, r.consts)
         // Field definitions.
         for (f <- r.fields) {
+          var fieldFinal = if (spec.javaLegacyRecords) "final " else if (r.derivingTypes.contains(DerivingType.Req) || !isOptional(f.ty.resolved)) "" else "/*optional*/ "
           w.wl
-          w.wl(s"/*package*/ final ${marshal.fieldType(f.ty)} ${idJava.field(f.ident)};")
+          w.wl(s"/*package*/ ${fieldFinal}${marshal.fieldType(f.ty)} ${idJava.field(f.ident)};")
         }
 
-        // Constructor.
-        w.wl
-        w.wl(s"public $self(").nestedN(2) {
-          val skipFirst = SkipFirst()
-          for (f <- r.fields) {
-            skipFirst { w.wl(",") }
-            marshal.nullityAnnotation(f.ty).map(annotation => w.w(annotation + " "))
-            w.w(marshal.paramType(f.ty) + " " + idJava.local(f.ident))
+        def writeConstructor(reqFields: Seq[Field]) {
+          w.wl
+          if (reqFields.isEmpty)
+            w.wl(s"public $self() {")
+          else
+            w.wl(s"public $self(").nestedN(2) {
+              val skipFirst = SkipFirst()
+              for (f <- reqFields) {
+                skipFirst { w.wl(",") }
+                marshal.nullityAnnotation(f.ty).map(annotation => w.w(annotation + " "))
+                w.w(marshal.paramType(f.ty) + " " + idJava.local(f.ident))
+              }
+              w.wl(") {")
+            }
+          w.nested {
+            // Optional constructor or full constructor
+            if (reqFields.size != r.fields.size) {
+              writeAlignedCall(w, "this(", r.fields, ");", f=> if (isOptional(f.ty.resolved)) "null" else idJava.local(f.ident))
+              w.wl
+            } else {
+              for (f <- reqFields) {
+                w.wl(s"this.${idJava.field(f.ident)} = ${idJava.local(f.ident)};")
+              }
+            }
           }
-          w.wl(") {")
+          w.wl("}")
         }
-        w.nested {
-          for (f <- r.fields) {
-            w.wl(s"this.${idJava.field(f.ident)} = ${idJava.local(f.ident)};")
-          }
+
+        // Constructor, requiring all parameters, used for marshaling
+        writeConstructor(r.fields)
+
+        // Constructor, not requiring optionals, generated if necessary
+        if (!spec.javaLegacyRecords && !r.derivingTypes.contains(DerivingType.Req) && r.fields.size != r.reqFields.size) {
+          writeConstructor(r.reqFields)
         }
-        w.wl("}")
 
         // Accessors
         for (f <- r.fields) {
@@ -304,6 +323,16 @@ class JavaGenerator(spec: Spec) extends Generator(spec) {
           marshal.nullityAnnotation(f.ty).foreach(w.wl)
           w.w("public " + marshal.returnType(Some(f.ty)) + " " + idJava.method("get_" + f.ident.name) + "()").braced {
             w.wl("return " + idJava.field(f.ident) + ";")
+          }
+
+          if (!spec.javaLegacyRecords) {
+            w.wl
+            // Check for null for setters used on required parameters
+            var nullability = if (isOptional(f.ty.resolved)) "" else marshal.nullityAnnotation(f.ty).map(_ + "").getOrElse("")
+            nullability = if (nullability.isEmpty) "" else nullability + " "
+            w.w("public void " + idJava.method("set_" + f.ident.name) + "(" + nullability + marshal.paramType(f.ty) + " " + idJava.local(f.ident) + ")").braced {
+              w.wl(s"this.${idJava.field(f.ident)} = ${idJava.local(f.ident)};")
+            }
           }
         }
 

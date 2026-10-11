@@ -9,9 +9,9 @@ import javax.annotation.Nonnull;
 public class Vec2 {
 
 
-    /*package*/ final int mX;
+    /*package*/ int mX;
 
-    /*package*/ final int mY;
+    /*package*/ int mY;
 
     public Vec2(
             int x,
@@ -24,8 +24,16 @@ public class Vec2 {
         return mX;
     }
 
+    public void setX(int x) {
+        this.mX = x;
+    }
+
     public int getY() {
         return mY;
+    }
+
+    public void setY(int y) {
+        this.mY = y;
     }
 
     @Override

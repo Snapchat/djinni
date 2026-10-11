@@ -9,6 +9,6 @@
 - (nonnull instancetype)initWithS:(nonnull NSString *)s NS_DESIGNATED_INITIALIZER;
 + (nonnull instancetype)wcharTestRecWithS:(nonnull NSString *)s;
 
-@property (nonatomic, readonly, nonnull) NSString * s;
+@property (nonatomic, copy, nonnull) NSString * s;
 
 @end

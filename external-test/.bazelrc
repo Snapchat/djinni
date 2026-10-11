@@ -1,1 +1,3 @@
-build --cxxopt=-std=c++17 --host_cxxopt=-std=c++17 --incompatible_java_common_parameters=false --define=android_dexmerger_tool=d8_dexmerger --define=android_incremental_dexing_tool=d8_dexbuilder --nouse_workers_with_dexbuilder
+# External test uses Bzlmod to test consuming djinni as a dependency
+# Import parent .bazelrc for consistency
+import %workspace%/../.bazelrc

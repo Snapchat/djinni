@@ -9,33 +9,33 @@ import javax.annotation.Nonnull;
 public class AssortedPrimitives implements android.os.Parcelable {
 
 
-    /*package*/ final boolean mB;
+    /*package*/ boolean mB;
 
-    /*package*/ final byte mEight;
+    /*package*/ byte mEight;
 
-    /*package*/ final short mSixteen;
+    /*package*/ short mSixteen;
 
-    /*package*/ final int mThirtytwo;
+    /*package*/ int mThirtytwo;
 
-    /*package*/ final long mSixtyfour;
+    /*package*/ long mSixtyfour;
 
-    /*package*/ final float mFthirtytwo;
+    /*package*/ float mFthirtytwo;
 
-    /*package*/ final double mFsixtyfour;
+    /*package*/ double mFsixtyfour;
 
-    /*package*/ final Boolean mOB;
+    /*package*/ /*optional*/ Boolean mOB;
 
-    /*package*/ final Byte mOEight;
+    /*package*/ /*optional*/ Byte mOEight;
 
-    /*package*/ final Short mOSixteen;
+    /*package*/ /*optional*/ Short mOSixteen;
 
-    /*package*/ final Integer mOThirtytwo;
+    /*package*/ /*optional*/ Integer mOThirtytwo;
 
-    /*package*/ final Long mOSixtyfour;
+    /*package*/ /*optional*/ Long mOSixtyfour;
 
-    /*package*/ final Float mOFthirtytwo;
+    /*package*/ /*optional*/ Float mOFthirtytwo;
 
-    /*package*/ final Double mOFsixtyfour;
+    /*package*/ /*optional*/ Double mOFsixtyfour;
 
     public AssortedPrimitives(
             boolean b,
@@ -68,32 +68,84 @@ public class AssortedPrimitives implements android.os.Parcelable {
         this.mOFsixtyfour = oFsixtyfour;
     }
 
+    public AssortedPrimitives(
+            boolean b,
+            byte eight,
+            short sixteen,
+            int thirtytwo,
+            long sixtyfour,
+            float fthirtytwo,
+            double fsixtyfour) {
+        this(b,
+             eight,
+             sixteen,
+             thirtytwo,
+             sixtyfour,
+             fthirtytwo,
+             fsixtyfour,
+             null,
+             null,
+             null,
+             null,
+             null,
+             null,
+             null);
+    }
+
     public boolean getB() {
         return mB;
+    }
+
+    public void setB(boolean b) {
+        this.mB = b;
     }
 
     public byte getEight() {
         return mEight;
     }
 
+    public void setEight(byte eight) {
+        this.mEight = eight;
+    }
+
     public short getSixteen() {
         return mSixteen;
+    }
+
+    public void setSixteen(short sixteen) {
+        this.mSixteen = sixteen;
     }
 
     public int getThirtytwo() {
         return mThirtytwo;
     }
 
+    public void setThirtytwo(int thirtytwo) {
+        this.mThirtytwo = thirtytwo;
+    }
+
     public long getSixtyfour() {
         return mSixtyfour;
+    }
+
+    public void setSixtyfour(long sixtyfour) {
+        this.mSixtyfour = sixtyfour;
     }
 
     public float getFthirtytwo() {
         return mFthirtytwo;
     }
 
+    public void setFthirtytwo(float fthirtytwo) {
+        this.mFthirtytwo = fthirtytwo;
+    }
+
     public double getFsixtyfour() {
         return mFsixtyfour;
+    }
+
+    public void setFsixtyfour(double fsixtyfour) {
+        this.mFsixtyfour = fsixtyfour;
     }
 
     @CheckForNull
@@ -101,9 +153,17 @@ public class AssortedPrimitives implements android.os.Parcelable {
         return mOB;
     }
 
+    public void setOB(Boolean oB) {
+        this.mOB = oB;
+    }
+
     @CheckForNull
     public Byte getOEight() {
         return mOEight;
+    }
+
+    public void setOEight(Byte oEight) {
+        this.mOEight = oEight;
     }
 
     @CheckForNull
@@ -111,9 +171,17 @@ public class AssortedPrimitives implements android.os.Parcelable {
         return mOSixteen;
     }
 
+    public void setOSixteen(Short oSixteen) {
+        this.mOSixteen = oSixteen;
+    }
+
     @CheckForNull
     public Integer getOThirtytwo() {
         return mOThirtytwo;
+    }
+
+    public void setOThirtytwo(Integer oThirtytwo) {
+        this.mOThirtytwo = oThirtytwo;
     }
 
     @CheckForNull
@@ -121,14 +189,26 @@ public class AssortedPrimitives implements android.os.Parcelable {
         return mOSixtyfour;
     }
 
+    public void setOSixtyfour(Long oSixtyfour) {
+        this.mOSixtyfour = oSixtyfour;
+    }
+
     @CheckForNull
     public Float getOFthirtytwo() {
         return mOFthirtytwo;
     }
 
+    public void setOFthirtytwo(Float oFthirtytwo) {
+        this.mOFthirtytwo = oFthirtytwo;
+    }
+
     @CheckForNull
     public Double getOFsixtyfour() {
         return mOFsixtyfour;
+    }
+
+    public void setOFsixtyfour(Double oFsixtyfour) {
+        this.mOFsixtyfour = oFsixtyfour;
     }
 
     @Override

@@ -1,0 +1,38 @@
+@extern "../../../../support-lib/provider.yaml"
+
+# Simple object interface for provider testing
+simple_object = interface +c {
+    get_value(): i32;
+    get_name(): string;
+}
+
+nested_provider = record {
+  s: provider<i32>;
+}
+
+nested_provider_interface = record {
+  obj: provider<simple_object>;
+}
+
+test_provider = interface +c {
+	# Simple type provider tests
+	static getProviderString(): provider<string>;
+	static getProviderInt(): provider<i32>;
+
+    static callProviderString(x: provider<string>): string;
+	static callProviderInt(x: provider<i32>): i32;
+
+	static getNestedProvider(): nested_provider;
+    static callNestedProvider(x: nested_provider): i32;
+
+	# Interface provider tests - main use case for deferred expensive object creation
+	static getProviderObject(): provider<simple_object>;
+	static callProviderObject(x: provider<simple_object>): i32;
+	static callProviderObjectGetName(x: provider<simple_object>): string;
+
+	static getNestedProviderInterface(): nested_provider_interface;
+	static callNestedProviderInterface(x: nested_provider_interface): i32;
+
+	# Helper to create simple_object for testing
+	static createSimpleObject(value: i32, name: string): simple_object;
+}

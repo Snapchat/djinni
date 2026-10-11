@@ -5,11 +5,10 @@
 #import <Foundation/Foundation.h>
 
 @interface DBTestOptionalExternInterfaceRecord : NSObject
-- (nonnull instancetype)init NS_UNAVAILABLE;
-+ (nonnull instancetype)new NS_UNAVAILABLE;
 - (nonnull instancetype)initWithSampleInterface:(nullable DBSampleInterface *)sampleInterface NS_DESIGNATED_INITIALIZER;
-+ (nonnull instancetype)testOptionalExternInterfaceRecordWithSampleInterface:(nullable DBSampleInterface *)sampleInterface;
+- (nonnull instancetype)init;
++ (nonnull instancetype)testOptionalExternInterfaceRecord;
 
-@property (nonatomic, readonly, nullable) DBSampleInterface * sampleInterface;
+@property (nonatomic, nullable) DBSampleInterface * sampleInterface;
 
 @end

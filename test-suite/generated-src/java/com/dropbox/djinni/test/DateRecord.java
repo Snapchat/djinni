@@ -9,7 +9,7 @@ import javax.annotation.Nonnull;
 public class DateRecord implements Comparable<DateRecord>, android.os.Parcelable {
 
 
-    /*package*/ final java.util.Date mCreatedAt;
+    /*package*/ java.util.Date mCreatedAt;
 
     public DateRecord(
             @Nonnull java.util.Date createdAt) {
@@ -19,6 +19,10 @@ public class DateRecord implements Comparable<DateRecord>, android.os.Parcelable
     @Nonnull
     public java.util.Date getCreatedAt() {
         return mCreatedAt;
+    }
+
+    public void setCreatedAt(@Nonnull java.util.Date createdAt) {
+        this.mCreatedAt = createdAt;
     }
 
     @Override

@@ -28,10 +28,7 @@ struct NativeDataRef {
         return DataRef(data);
     }
 
-    static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c) {
-        auto obj = reinterpret_cast<jobject>(c.platformObj());
-        return ::djinni::LocalRef<JniType>(jniEnv->NewLocalRef(obj));
-    }
+    static ::djinni::LocalRef<JniType> fromCpp(JNIEnv* jniEnv, const CppType& c);
 
     using Boxed = NativeDataRef;
 };

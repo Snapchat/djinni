@@ -17,15 +17,23 @@
                                            l:(nonnull NSArray<NSNumber *> *)l
                                            s:(nonnull NSSet<NSNumber *> *)s
                                            m:(nonnull NSDictionary<NSNumber *, NSNumber *> *)m;
+- (nonnull instancetype)initWithE:(DBColor)e
+                                l:(nonnull NSArray<NSNumber *> *)l
+                                s:(nonnull NSSet<NSNumber *> *)s
+                                m:(nonnull NSDictionary<NSNumber *, NSNumber *> *)m;
++ (nonnull instancetype)enumUsageRecordWithE:(DBColor)e
+                                           l:(nonnull NSArray<NSNumber *> *)l
+                                           s:(nonnull NSSet<NSNumber *> *)s
+                                           m:(nonnull NSDictionary<NSNumber *, NSNumber *> *)m;
 
-@property (nonatomic, readonly) DBColor e;
+@property (nonatomic) DBColor e;
 
-@property (nonatomic, readonly, nullable) NSNumber * o;
+@property (nonatomic, nullable) NSNumber * o;
 
-@property (nonatomic, readonly, nonnull) NSArray<NSNumber *> * l;
+@property (nonatomic, copy, nonnull) NSArray<NSNumber *> * l;
 
-@property (nonatomic, readonly, nonnull) NSSet<NSNumber *> * s;
+@property (nonatomic, copy, nonnull) NSSet<NSNumber *> * s;
 
-@property (nonatomic, readonly, nonnull) NSDictionary<NSNumber *, NSNumber *> * m;
+@property (nonatomic, copy, nonnull) NSDictionary<NSNumber *, NSNumber *> * m;
 
 @end

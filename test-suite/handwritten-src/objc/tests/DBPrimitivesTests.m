@@ -46,6 +46,23 @@
     (void)[DBEmptyRecord emptyRecord];
 }
 
+- (void)testOptionalRecord
+{
+    DBAssortedPrimitives * p = [DBAssortedPrimitives assortedPrimitivesWithB:YES
+                                                                       eight:(int8_t)123
+                                                                     sixteen:(int16_t)20000
+                                                                   thirtytwo:(int32_t)1000000000
+                                                                   sixtyfour:(int64_t)1234567890123456789L
+                                                                  fthirtytwo:(float)1.23
+                                                                  fsixtyfour:1.23];
+
+    // Set a few of the optional values
+    p.oB = [NSNumber numberWithBool:YES];
+    p.oSixteen = [NSNumber numberWithShort:20000];
+
+    XCTAssertEqualObjects(p, [DBTestHelpers assortedPrimitivesId:p]);
+}
+
 - (void)testObjcToCppConverter
 {
 }

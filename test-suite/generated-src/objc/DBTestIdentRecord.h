@@ -11,9 +11,9 @@
 + (nonnull instancetype)testIdentRecordWithFirstValue:(int32_t)FirstValue
                                           secondValue:(nonnull NSString *)secondValue;
 
-@property (nonatomic, readonly) int32_t FirstValue;
+@property (nonatomic) int32_t FirstValue;
 
-@property (nonatomic, readonly, nonnull) NSString * secondValue;
+@property (nonatomic, copy, nonnull) NSString * secondValue;
 
 @end
 

@@ -10,9 +10,9 @@ import javax.annotation.Nonnull;
 public class ConstantRecord {
 
 
-    /*package*/ final int mSomeInteger;
+    /*package*/ int mSomeInteger;
 
-    /*package*/ final String mSomeString;
+    /*package*/ String mSomeString;
 
     public ConstantRecord(
             int someInteger,
@@ -25,9 +25,36 @@ public class ConstantRecord {
         return mSomeInteger;
     }
 
+    public void setSomeInteger(int someInteger) {
+        this.mSomeInteger = someInteger;
+    }
+
     @Nonnull
     public String getSomeString() {
         return mSomeString;
+    }
+
+    public void setSomeString(@Nonnull String someString) {
+        this.mSomeString = someString;
+    }
+
+    @Override
+    public boolean equals(@CheckForNull Object obj) {
+        if (!(obj instanceof ConstantRecord)) {
+            return false;
+        }
+        ConstantRecord other = (ConstantRecord) obj;
+        return this.mSomeInteger == other.mSomeInteger &&
+                this.mSomeString.equals(other.mSomeString);
+    }
+
+    @Override
+    public int hashCode() {
+        // Pick an arbitrary non-zero starting value
+        int hashCode = 17;
+        hashCode = hashCode * 31 + mSomeInteger;
+        hashCode = hashCode * 31 + mSomeString.hashCode();
+        return hashCode;
     }
 
     @Override

@@ -15,4 +15,8 @@ struct TestOptionalExternInterfaceRecord final {
     TestOptionalExternInterfaceRecord(/*nullable*/ std::shared_ptr<::testsuite::SampleInterface> sample_interface_)
     : sample_interface(std::move(sample_interface_))
     {}
+
+    TestOptionalExternInterfaceRecord()
+    : TestOptionalExternInterfaceRecord(nullptr)
+    {}
 };

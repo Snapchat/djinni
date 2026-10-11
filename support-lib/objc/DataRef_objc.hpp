@@ -32,9 +32,7 @@ struct NativeDataRef {
         }
     }
 
-    static ObjcType fromCpp(const CppType& c) {
-        return (__bridge NSData*)c.platformObj();
-    }
+    static ObjcType fromCpp(const CppType& c);
 
     using Boxed = NativeDataRef;
 };

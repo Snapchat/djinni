@@ -12,7 +12,7 @@
   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   * See the License for the specific language governing permissions and
   * limitations under the License.
-  * 
+  *
   * This file has been modified by Snap, Inc.
   */
 
@@ -35,11 +35,13 @@ object Main {
     var cppBaseLibIncludePrefix: String = ""
     var cppOptionalTemplate: String = "std::optional"
     var cppOptionalHeader: String = "<optional>"
+    var cppNulloptValue: String = "std::nullopt"
     var cppEnumHashWorkaround : Boolean = true
     var cppNnHeader: Option[String] = None
     var cppNnType: Option[String] = None
     var cppNnCheckExpression: Option[String] = None
     var cppUseWideStrings: Boolean = false
+    var cppLegacyRecords: Boolean = false
     var javaOutFolder: Option[File] = None
     var javaPackage: Option[String] = None
     var javaClassAccessModifier: JavaAccessModifier.Value = JavaAccessModifier.Public
@@ -49,6 +51,7 @@ object Main {
     var javaNonnullAnnotation: Option[String] = None
     var javaImplementAndroidOsParcelable : Boolean = false
     var javaUseFinalForRecord: Boolean = true
+    var javaLegacyRecords: Boolean = false
     var javaGenInterface: Boolean = false
     var jniOutFolder: Option[File] = None
     var jniHeaderOutFolderOptional: Option[File] = None
@@ -86,6 +89,8 @@ object Main {
     var objcppDisableExceptionTranslation: Boolean = false
     var objcFileIdentStyleOptional: Option[IdentConverter] = None
     var objcStrictProtocol: Boolean = true
+    var objcLegacyRecords: Boolean = false
+    var objcOmitFullConvenienceConstructor: Boolean = false
     var objcppNamespace: String = "djinni_generated"
     var objcBaseLibIncludePrefix: String = ""
     var wasmOutFolder: Option[File] = None
@@ -95,9 +100,36 @@ object Main {
     var wasmOmitConstants: Boolean = false
     var wasmNamespace: Option[String] = None
     var wasmOmitNsAlias: Boolean = false
+    var valdiNamespace: String = "djinni_generated"
+    var valdiClassIdentStyleOptional: Option[IdentConverter] = None
+    var valdiFileIdentStyleOptional: Option[IdentConverter] = None
+    var valdiTsOutFolder: Option[File] = None
     var jsIdentStyle = IdentStyle.jsDefault
     var tsOutFolder: Option[File] = None
     var tsModule: String = "module"
+    var valdiOutFolder: Option[File] = None
+    var valdiIncludePrefix: String = ""
+    var valdiIncludeCppPrefix: String = ""
+    var valdiBaseLibIncludePrefix: String = ""
+    var cOutFolder: Option[File] = None
+    var cHeaderOutFolderOptional: Option[File] = None
+    var cNamespace: String = ""
+    var cBaseLibIncludePrefix: String = ""
+    var cIncludePrefix: String = ""
+    var cWrapperCppNamespace: Option[String] = None
+    var cWrapperUseDlsym: Boolean = false
+    var swiftOutFolder: Option[File] = None
+    var swiftModule: String = "Module"
+    var swiftPrivateInSameModule: Boolean = false
+    var swiftIdentStyle = IdentStyle.swiftDefault
+    var swiftxxOutFolder: Option[File] = None
+    var swiftxxNamespace: String = "djinni_generated"
+    var swiftxxIncludePrefix: String = ""
+    var swiftxxBaseLibModule: String = "DjinniSupportCxx"
+    var swiftxxClassIdentStyleOptional: Option[IdentConverter] = None
+    var swiftxxFileIdentStyleOptional: Option[IdentConverter] = None
+    var swiftxxIncludeCppPrefix: String = ""
+    var swiftxxBaseLibIncludePrefix: String = ""
     var inFileListPath: Option[File] = None
     var outFileListPath: Option[File] = None
     var skipGeneration: Boolean = false
@@ -141,6 +173,8 @@ object Main {
         .text("all generated java classes will implement the interface android.os.Parcelable")
       opt[Boolean]("java-use-final-for-record").valueName("<use-final-for-record>").foreach(x => javaUseFinalForRecord = x)
         .text("Whether generated Java classes for records should be marked 'final' (default: true). ")
+      opt[Boolean]("java-legacy-records").valueName("<legacy-records>").foreach(x => javaLegacyRecords = x)
+        .text("Use legacy record behavior for Java code (default: false)")
       opt[Boolean]("java-gen-interface").valueName("<true/false>").foreach(x => javaGenInterface = x)
         .text("Generate Java interface instead of abstract class.")
       note("")
@@ -158,10 +192,18 @@ object Main {
         .text("The filename extension for C++ files (default: \"cpp\").")
       opt[String]("hpp-ext").valueName("<ext>").foreach(cppHeaderExt = _)
         .text("The filename extension for C++ header files (default: \"hpp\").")
-      opt[String]("cpp-optional-template").valueName("<template>").foreach(x => cppOptionalTemplate = x)
-        .text("The template to use for optional values (default: \"std::optional\")")
-      opt[String]("cpp-optional-header").valueName("<header>").foreach(x => cppOptionalHeader = x)
-        .text("The header to use for optional values (default: \"<optional>\")")
+      opt[String]("cpp-optional-template").valueName("<template>").foreach { x =>
+        System.err.println("Warning: --cpp-optional-template is deprecated. std::optional is standard in C++17+.")
+        cppOptionalTemplate = x
+      }.text("DEPRECATED: The template to use for optional values (default: \"std::optional\")")
+      opt[String]("cpp-optional-header").valueName("<header>").foreach { x =>
+        System.err.println("Warning: --cpp-optional-header is deprecated. std::optional is standard in C++17+.")
+        cppOptionalHeader = x
+      }.text("DEPRECATED: The header to use for optional values (default: \"<optional>\")")
+      opt[String]("cpp-nullopt-value").valueName("<value>").foreach { x =>
+        System.err.println("Warning: --cpp-nullopt-value is deprecated. std::optional is standard in C++17+.")
+        cppNulloptValue = x
+      }.text("DEPRECATED: The value to use for nullopt defaults of optional values (default: \"std::nullopt\")")
       opt[Boolean]("cpp-enum-hash-workaround").valueName("<true/false>").foreach(x => cppEnumHashWorkaround = x)
         .text("Work around LWG-2148 by generating std::hash specializations for C++ enums (default: true)")
       opt[String]("cpp-nn-header").valueName("<header>").foreach(x => cppNnHeader = Some(x))
@@ -172,6 +214,8 @@ object Main {
         .text("The expression to use for building non-nullable pointers")
       opt[Boolean]( "cpp-use-wide-strings").valueName("<true/false>").foreach(x => cppUseWideStrings = x)
         .text("Use wide strings in C++ code (default: false)")
+      opt[Boolean]( "cpp-legacy-records").valueName("<true/false>").foreach(x => cppLegacyRecords = x)
+        .text("Use legacy record behavior for C++ code (default: false)")
       note("")
       opt[File]("jni-out").valueName("<out-folder>").foreach(x => jniOutFolder = Some(x))
         .text("The folder for the JNI C++ output files (Generator disabled if unspecified).")
@@ -209,7 +253,13 @@ object Main {
       opt[Boolean]("objc-strict-protocols")
         .valueName("<true/false>").foreach(x => objcStrictProtocol = x)
         .text("All generated @protocol will implement <NSObject> (default: true). ")
+      opt[Boolean]("objc-legacy-records")
+        .valueName("<true/false>").foreach(x => objcLegacyRecords = x)
+        .text("Use legacy record behavior for ObjC code (default: false)")
       note("")
+      opt[Boolean]("objc-omit-full-convenience-constructor")
+        .valueName("<omit-full-constructor>").foreach(x => objcOmitFullConvenienceConstructor = x)
+        .text("Skips generation of the convenience constructor requiring all record parameters, if possible (default: false)")
       opt[File]("objcpp-out").valueName("<out-folder>").foreach(x => objcppOutFolder = Some(x))
         .text("The output folder for private Objective-C++ files (Generator disabled if unspecified).")
       opt[String]("objcpp-ext").valueName("<ext>").foreach(objcppExt = _)
@@ -252,6 +302,48 @@ object Main {
       opt[String]("ts-module").valueName("<name>").foreach(tsModule = _)
         .text("TypeScript declaration module name (default: \"module\").")
       note("")
+      opt[File]("valdi-out").valueName("<out-folder>").foreach(x => valdiOutFolder = Some(x))
+        .text("The output for the Valdi bridge C++ files (Generator disabled if unspecified).")
+      opt[String]("valdi-include-prefix").valueName("<prefix>").foreach(valdiIncludePrefix = _)
+        .text("The prefix for #includes of Valdi header files from Valdi C++ files.")
+      opt[String]("valdi-include-cpp-prefix").valueName("<prefix>").foreach(valdiIncludeCppPrefix = _)
+        .text("The prefix for #includes of the main header files from Valdi C++ files.")
+      opt[String]("valdi-base-lib-include-prefix").valueName("...").foreach(x => valdiBaseLibIncludePrefix = x)
+        .text("The Valdi base library's include path, relative to the Valdi C++ classes.")
+      opt[String]("valdi-namespace").valueName("...").foreach(x => valdiNamespace = x)
+        .text("The namespace name to use for generated Valdi C++ classes.")
+      opt[File]("valdi-ts-out").valueName("<out-folder>").foreach(x => valdiTsOutFolder = Some(x))
+        .text("The output for the Valdi TypeScript interface files (Generator disabled if unspecified).")
+      note("")
+      opt[File]("c-out").valueName("<out-folder>").foreach(x => cOutFolder = Some(x))
+        .text("The output for the C files (Generated disabled if unspecified).")
+      opt[String]("c-namespace").valueName("<namespace.").foreach(x => cNamespace = x)
+        .text("The C namespace, used as function prefixes for generated functions")
+      opt[File]("c-header-out").valueName("<out-folder>").foreach(x => cHeaderOutFolderOptional = Some(x))
+        .text("The output folder for C header files (default: the same as --c-out).")
+      opt[String]("c-base-lib-include-prefix").valueName("...").foreach(x => cBaseLibIncludePrefix = x)
+        .text("The C base library's include path, relative to the C files.")
+      opt[String]("c-include-prefix").valueName("...").foreach(x => cIncludePrefix = x)
+        .text("The prefix for #includes of header files from C++ files.")
+      opt[String]("c-wrapper-cpp-namespace").valueName("...").foreach(x => cWrapperCppNamespace = Some(x))
+        .text("The C++ namespace to use for C API wrapper convenience classes.")
+      opt[Boolean]( "c-wrapper-use-dlsym").valueName("<true/false>").foreach(x => cWrapperUseDlsym = x)
+        .text("In C wrapper, resolve functions at runtime using dlsym() instead of directly linking at build-time. (default: false)")
+      opt[File]("swift-out").valueName("<out-folder>").foreach(x => swiftOutFolder = Some(x))
+        .text("The output folder for Swift files (Generator disabled if unspecified).")
+      opt[String]("swift-module").valueName("<name>").foreach(swiftModule = _)
+        .text("Swift module name (default: \"Module\").")
+      opt[Unit]("swift-private-in-same-module").foreach(_ => swiftPrivateInSameModule = true)
+        .text("Omit 'import <module>' in +Private Swift files (use when those files are compiled in the same module to avoid 'ignoring import' warnings).")
+      opt[File]("swiftxx-out").valueName("<out-folder>").foreach(x => swiftxxOutFolder = Some(x))
+        .text("The output folder for private Swift/C++ interop files (Generator disabled if unspecified).")
+      opt[String]("swiftxx-include-prefix").valueName("<prefix>").foreach(swiftxxIncludePrefix = _)
+        .text("The prefix for #includes of Swift C++ header files.")
+      opt[String]("swiftxx-include-cpp-prefix").valueName("<prefix>").foreach(swiftxxIncludeCppPrefix = _)
+        .text("The prefix for #includes of the main header files from Swift C++ files.")
+      opt[String]("swiftxx-base-lib-include-prefix").valueName("...").foreach(x => swiftxxBaseLibIncludePrefix = x)
+        .text("The Swift C++ base library's include path, relative to the Swift C++ classes.")
+      note("")
       opt[File]("yaml-out").valueName("<out-folder>").foreach(x => yamlOutFolder = Some(x))
         .text("The output folder for YAML files (Generator disabled if unspecified).")
       opt[String]("yaml-out-file").valueName("<out-file>").foreach(x => yamlOutFile = Some(x))
@@ -288,6 +380,10 @@ object Main {
       identStyle("ident-objc-local",      c => { objcIdentStyle = objcIdentStyle.copy(local = c) })
       identStyle("ident-objc-const",      c => { objcIdentStyle = objcIdentStyle.copy(const = c) })
       identStyle("ident-objc-file",       c => { objcFileIdentStyleOptional = Some(c) })
+      identStyle("ident-valdi-class", c => { valdiClassIdentStyleOptional = Some(c)})
+      identStyle("ident-valdi-file",  c => { valdiFileIdentStyleOptional = Some(c)})
+      identStyle("ident-swiftxx-class", c => { swiftxxClassIdentStyleOptional = Some(c)})
+      identStyle("ident-swiftxx-file",  c => { swiftxxFileIdentStyleOptional = Some(c)})
     }
 
     if (!argParser.parse(args)) {
@@ -295,6 +391,7 @@ object Main {
     }
 
     val cppHeaderOutFolder = if (cppHeaderOutFolderOptional.isDefined) cppHeaderOutFolderOptional else cppOutFolder
+    val cHeaderOutFolder = if (cHeaderOutFolderOptional.isDefined) cHeaderOutFolderOptional else cOutFolder
     val jniHeaderOutFolder = if (jniHeaderOutFolderOptional.isDefined) jniHeaderOutFolderOptional else jniOutFolder
     val jniClassIdentStyle = jniClassIdentStyleOptional.getOrElse(cppIdentStyle.ty)
     val jniBaseLibClassIdentStyle = jniBaseLibClassIdentStyleOptional.getOrElse(jniClassIdentStyle)
@@ -306,9 +403,15 @@ object Main {
     objcIdentStyle = objcIdentStyle.copy(ty = IdentStyle.prefix(objcTypePrefix,objcIdentStyle.ty))
     objcFileIdentStyle = IdentStyle.prefix(objcTypePrefix, objcFileIdentStyle)
 
+    val valdiClassIdentStyle = valdiClassIdentStyleOptional.getOrElse(cppIdentStyle.ty)
+    val valdiFileIdentStyle = valdiFileIdentStyleOptional.getOrElse(cppFileIdentStyle)
+
     if (cppTypeEnumIdentStyle != null) {
       cppIdentStyle = cppIdentStyle.copy(enumType = cppTypeEnumIdentStyle)
     }
+
+    val swiftxxClassIdentStyle = swiftxxClassIdentStyleOptional.getOrElse(cppIdentStyle.ty)
+    val swiftxxFileIdentStyle = swiftxxFileIdentStyleOptional.getOrElse(cppFileIdentStyle)
 
     // Parse IDL file.
     System.out.println("Parsing...")
@@ -377,6 +480,7 @@ object Main {
       javaImplementAndroidOsParcelable,
       javaUseFinalForRecord,
       javaGenInterface,
+      javaLegacyRecords,
       cppOutFolder,
       cppHeaderOutFolder,
       cppIncludePrefix,
@@ -387,11 +491,13 @@ object Main {
       cppBaseLibIncludePrefix,
       cppOptionalTemplate,
       cppOptionalHeader,
+      cppNulloptValue,
       cppEnumHashWorkaround,
       cppNnHeader,
       cppNnType,
       cppNnCheckExpression,
       cppUseWideStrings,
+      cppLegacyRecords,
       jniOutFolder,
       jniHeaderOutFolder,
       jniIncludePrefix,
@@ -425,6 +531,8 @@ object Main {
       objcDisableClassCtor,
       objcClosedEnums,
       objcStrictProtocol,
+      objcLegacyRecords,
+      objcOmitFullConvenienceConstructor,
       wasmOutFolder,
       wasmIncludePrefix,
       wasmIncludeCppPrefix,
@@ -435,6 +543,33 @@ object Main {
       jsIdentStyle,
       tsOutFolder,
       tsModule,
+      valdiOutFolder,
+      valdiIncludePrefix,
+      valdiIncludeCppPrefix,
+      valdiBaseLibIncludePrefix,
+      valdiNamespace,
+      valdiClassIdentStyle,
+      valdiFileIdentStyle,
+      valdiTsOutFolder,
+      cOutFolder,
+      cHeaderOutFolder,
+      cNamespace,
+      cBaseLibIncludePrefix,
+      cIncludePrefix,
+      cWrapperCppNamespace,
+      cWrapperUseDlsym,
+      swiftOutFolder,
+      swiftIdentStyle,
+      swiftModule,
+      swiftPrivateInSameModule,
+      swiftxxOutFolder,
+      swiftxxNamespace,
+      swiftxxIncludePrefix,
+      swiftxxBaseLibModule,
+      swiftxxClassIdentStyle,
+      swiftxxFileIdentStyle,
+      swiftxxIncludeCppPrefix,
+      swiftxxBaseLibIncludePrefix,
       outFileListWriter,
       skipGeneration,
       yamlOutFolder,

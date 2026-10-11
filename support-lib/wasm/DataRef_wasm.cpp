@@ -15,6 +15,7 @@
   */
 
 #include "../cpp/DataRef.hpp"
+#include "DataRef_wasm.hpp"
 
 #if DATAREF_WASM
 
@@ -72,7 +73,7 @@ public:
         return reinterpret_cast<uint8_t*>(_data["byteOffset"].as<unsigned>());
     }
 
-    PlatformObject platformObj() const override {
+    PlatformObject platformObj() const {
         return _data;
     }
 
@@ -102,6 +103,14 @@ DataRef::DataRef(std::string&& str) {
 
 DataRef::DataRef(PlatformObject platformObj) {
     _impl = std::make_shared<DataRefWasm>(platformObj);
+}
+
+em::val NativeDataRef::fromCpp(const DataRef& c) {
+    auto impl = std::dynamic_pointer_cast<DataRefWasm>(c.impl());
+    if (!impl) {
+        throw std::invalid_argument("DataRef impl is not compatible with WASM");
+    }
+    return impl->platformObj();
 }
 
 } // namespace djinni

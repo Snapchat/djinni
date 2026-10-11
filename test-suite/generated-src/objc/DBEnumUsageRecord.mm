@@ -22,6 +22,19 @@
     return self;
 }
 
+- (nonnull instancetype)initWithE:(DBColor)e
+                                l:(nonnull NSArray<NSNumber *> *)l
+                                s:(nonnull NSSet<NSNumber *> *)s
+                                m:(nonnull NSDictionary<NSNumber *, NSNumber *> *)m
+{
+    self = [self initWithE:e
+                         o:nil
+                         l:l
+                         s:s
+                         m:m];
+    return self;
+}
+
 + (nonnull instancetype)enumUsageRecordWithE:(DBColor)e
                                            o:(nullable NSNumber *)o
                                            l:(nonnull NSArray<NSNumber *> *)l
@@ -30,6 +43,17 @@
 {
     return [[self alloc] initWithE:e
                                  o:o
+                                 l:l
+                                 s:s
+                                 m:m];
+}
+
++ (nonnull instancetype)enumUsageRecordWithE:(DBColor)e
+                                           l:(nonnull NSArray<NSNumber *> *)l
+                                           s:(nonnull NSSet<NSNumber *> *)s
+                                           m:(nonnull NSDictionary<NSNumber *, NSNumber *> *)m
+{
+    return [[self alloc] initWithE:e
                                  l:l
                                  s:s
                                  m:m];

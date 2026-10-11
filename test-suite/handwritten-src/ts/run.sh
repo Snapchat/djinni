@@ -3,6 +3,7 @@ set -eu
 cd test-suite/handwritten-src/ts
 tsc
 browserify main.js -o bundle.js
-cp -f ../../wasm/{test-wasm.js,test-wasm.wasm} ./
+mkdir -p serve
+cp -f test.html bundle.js ../../wasm/test-wasm.js ../../wasm/test-wasm.wasm serve/
 sleep 1 && python3 -mwebbrowser http://localhost:8000/test.html &
-python3 -m http.server
+cd serve && python3 -m http.server

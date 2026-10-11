@@ -866,7 +866,7 @@ namespace std
   template <typename T>
   struct hash<std::experimental::optional<T>>
   {
-    typedef typename hash<T>::result_type result_type;
+    typedef std::size_t result_type;
     typedef std::experimental::optional<T> argument_type;
 
     constexpr result_type operator()(argument_type const& arg) const {
@@ -877,7 +877,7 @@ namespace std
   template <typename T>
   struct hash<std::experimental::optional<T&>>
   {
-    typedef typename hash<T>::result_type result_type;
+    typedef std::size_t result_type;
     typedef std::experimental::optional<T&> argument_type;
 
     constexpr result_type operator()(argument_type const& arg) const {

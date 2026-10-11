@@ -12,7 +12,7 @@
 + (nonnull instancetype)extendedRecordWithFoo:(BOOL)foo;
 
 + (DBExtendedRecord * __nonnull)extendedRecordConst;
-@property (nonatomic, readonly) BOOL foo;
+@property (nonatomic) BOOL foo;
 
 @end
 
