@@ -4,6 +4,7 @@
 #include "djinni_c_ref.hpp"
 #include "djinni_c_types.hpp"
 #include "Future_c.h"
+#include <cstring>
 
 namespace djinni::c_api {
 
@@ -67,7 +68,7 @@ template <typename Tr> struct FutureTranslator {
 
       } catch (const std::exception &exc) {
         const auto *what = exc.what();
-        auto errorMessage = Ref(djinni_string_new(what, strlen(what)));
+        auto errorMessage = Ref(djinni_string_new(what, std::strlen(what)));
         djinni_promise_reject(promise.get(), errorMessage.get());
       }
     });
