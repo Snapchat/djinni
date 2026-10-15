@@ -1033,8 +1033,8 @@
     },
     "@@rules_python+//python/extensions:pip.bzl%pip": {
       "general": {
-        "bzlTransitiveDigest": "TOhHovS2QjQZVfyzuaBNhX0Um+lcj5/8B8flApEpNBs=",
-        "usagesDigest": "UxqFvWOy3LGpKK28JzcsX5Z95hXLFrHPylB/JVaZxZc=",
+        "bzlTransitiveDigest": "uqDHykhGVLDY1jSEMOn4/JX/XdbFj/UxygJrkLPOf3M=",
+        "usagesDigest": "fztm9ST3ki9E77tct2ZwJe0w38LvfMY8mRYp+YHxXQE=",
         "recordedFileInputs": {
           "@@protobuf+//python/requirements.txt": "983be60d3cec4b319dcab6d48aeb3f5b2f7c3350f26b3a9e97486c37967c73c5",
           "@@rules_fuzzing+//fuzzing/requirements.txt": "ab04664be026b632a0d2a2446c4f65982b7654f5b6851d2f9d399a19b7242a5b",
