@@ -15,17 +15,6 @@ DjinniInfo = provider(
         "cpp_base_lib_include_prefix": "Default C++ runtime include prefix.",
         "cpp_optional_template": "Default C++ optional template.",
         "cpp_optional_header": "Default C++ optional header.",
-        "cpp_extended_record_include_prefix": "Default extended-record include prefix.",
-        "cpp_use_wide_strings": "Default wide-string setting.",
-        "cpp_legacy_records": "Default legacy-record setting.",
-        "ident_cpp_enum": "Default C++ enum identifier style.",
-        "ident_cpp_field": "Default C++ field identifier style.",
-        "ident_cpp_method": "Default C++ method identifier style.",
-        "ident_cpp_type": "Default C++ type identifier style.",
-        "ident_cpp_enum_type": "Default C++ enum type identifier style.",
-        "ident_cpp_type_param": "Default C++ type parameter identifier style.",
-        "ident_cpp_local": "Default C++ local identifier style.",
-        "ident_cpp_file": "Default C++ file identifier style.",
     },
 )
 
@@ -153,9 +142,9 @@ def _djinni_codegen_impl(ctx):
     _add_string_arg(args, "--cpp-base-lib-include-prefix", _cpp_string_option(ctx.attr.cpp_base_lib_include_prefix, idl_defaults.cpp_base_lib_include_prefix if idl_defaults else ""))
     _add_string_arg(args, "--cpp-optional-template", _cpp_string_option(ctx.attr.cpp_optional_template, idl_defaults.cpp_optional_template if idl_defaults else ""))
     _add_string_arg(args, "--cpp-optional-header", _cpp_string_option(ctx.attr.cpp_optional_header, idl_defaults.cpp_optional_header if idl_defaults else ""))
-    _add_string_arg(args, "--cpp-extended-record-include-prefix", _cpp_string_option(ctx.attr.cpp_extended_record_include_prefix, idl_defaults.cpp_extended_record_include_prefix if idl_defaults else ""))
-    _add_bool_arg(args, "--cpp-use-wide-strings", _cpp_bool_option(ctx.attr.cpp_use_wide_strings, idl_defaults.cpp_use_wide_strings if idl_defaults else False))
-    _add_bool_arg(args, "--cpp-legacy-records", _cpp_bool_option(ctx.attr.cpp_legacy_records, idl_defaults.cpp_legacy_records if idl_defaults else False))
+    _add_string_arg(args, "--cpp-extended-record-include-prefix", ctx.attr.cpp_extended_record_include_prefix)
+    _add_bool_arg(args, "--cpp-use-wide-strings", ctx.attr.cpp_use_wide_strings)
+    _add_bool_arg(args, "--cpp-legacy-records", ctx.attr.cpp_legacy_records)
 
     if c_src_dir or c_hdr_dir:
         args.add("--c-out", c_src_dir or c_hdr_dir)
@@ -229,14 +218,14 @@ def _djinni_codegen_impl(ctx):
     _add_ident_arg(args, "--ident-java-enum", ctx.attr.ident_java_enum)
     _add_ident_arg(args, "--ident-java-field", ctx.attr.ident_java_field)
     _add_ident_arg(args, "--ident-java-type", ctx.attr.ident_java_type)
-    _add_ident_arg(args, "--ident-cpp-enum", _cpp_string_option(ctx.attr.ident_cpp_enum, idl_defaults.ident_cpp_enum if idl_defaults else ""))
-    _add_ident_arg(args, "--ident-cpp-field", _cpp_string_option(ctx.attr.ident_cpp_field, idl_defaults.ident_cpp_field if idl_defaults else ""))
-    _add_ident_arg(args, "--ident-cpp-method", _cpp_string_option(ctx.attr.ident_cpp_method, idl_defaults.ident_cpp_method if idl_defaults else ""))
-    _add_ident_arg(args, "--ident-cpp-type", _cpp_string_option(ctx.attr.ident_cpp_type, idl_defaults.ident_cpp_type if idl_defaults else ""))
-    _add_ident_arg(args, "--ident-cpp-enum-type", _cpp_string_option(ctx.attr.ident_cpp_enum_type, idl_defaults.ident_cpp_enum_type if idl_defaults else ""))
-    _add_ident_arg(args, "--ident-cpp-type-param", _cpp_string_option(ctx.attr.ident_cpp_type_param, idl_defaults.ident_cpp_type_param if idl_defaults else ""))
-    _add_ident_arg(args, "--ident-cpp-local", _cpp_string_option(ctx.attr.ident_cpp_local, idl_defaults.ident_cpp_local if idl_defaults else ""))
-    _add_ident_arg(args, "--ident-cpp-file", _cpp_string_option(ctx.attr.ident_cpp_file, idl_defaults.ident_cpp_file if idl_defaults else ""))
+    _add_ident_arg(args, "--ident-cpp-enum", ctx.attr.ident_cpp_enum)
+    _add_ident_arg(args, "--ident-cpp-field", ctx.attr.ident_cpp_field)
+    _add_ident_arg(args, "--ident-cpp-method", ctx.attr.ident_cpp_method)
+    _add_ident_arg(args, "--ident-cpp-type", ctx.attr.ident_cpp_type)
+    _add_ident_arg(args, "--ident-cpp-enum-type", ctx.attr.ident_cpp_enum_type)
+    _add_ident_arg(args, "--ident-cpp-type-param", ctx.attr.ident_cpp_type_param)
+    _add_ident_arg(args, "--ident-cpp-local", ctx.attr.ident_cpp_local)
+    _add_ident_arg(args, "--ident-cpp-file", ctx.attr.ident_cpp_file)
     _add_ident_arg(args, "--ident-jni-class", ctx.attr.ident_jni_class)
     _add_ident_arg(args, "--ident-jni-file", ctx.attr.ident_jni_file)
     _add_ident_arg(args, "--ident-objc-enum", ctx.attr.ident_objc_enum)
@@ -453,17 +442,6 @@ def _djinni_library_impl(ctx):
             cpp_base_lib_include_prefix = ctx.attr.cpp_base_lib_include_prefix,
             cpp_optional_template = ctx.attr.cpp_optional_template,
             cpp_optional_header = ctx.attr.cpp_optional_header,
-            cpp_extended_record_include_prefix = ctx.attr.cpp_extended_record_include_prefix,
-            cpp_use_wide_strings = ctx.attr.cpp_use_wide_strings,
-            cpp_legacy_records = ctx.attr.cpp_legacy_records,
-            ident_cpp_enum = ctx.attr.ident_cpp_enum,
-            ident_cpp_field = ctx.attr.ident_cpp_field,
-            ident_cpp_method = ctx.attr.ident_cpp_method,
-            ident_cpp_type = ctx.attr.ident_cpp_type,
-            ident_cpp_enum_type = ctx.attr.ident_cpp_enum_type,
-            ident_cpp_type_param = ctx.attr.ident_cpp_type_param,
-            ident_cpp_local = ctx.attr.ident_cpp_local,
-            ident_cpp_file = ctx.attr.ident_cpp_file,
         ),
     ]
 
@@ -483,17 +461,6 @@ djinni_library = rule(
         "cpp_base_lib_include_prefix": attr.string(default = ""),
         "cpp_optional_template": attr.string(default = ""),
         "cpp_optional_header": attr.string(default = ""),
-        "cpp_extended_record_include_prefix": attr.string(default = ""),
-        "cpp_use_wide_strings": attr.bool(default = False),
-        "cpp_legacy_records": attr.bool(default = False),
-        "ident_cpp_enum": attr.string(default = ""),
-        "ident_cpp_field": attr.string(default = ""),
-        "ident_cpp_method": attr.string(default = ""),
-        "ident_cpp_type": attr.string(default = ""),
-        "ident_cpp_enum_type": attr.string(default = ""),
-        "ident_cpp_type_param": attr.string(default = ""),
-        "ident_cpp_local": attr.string(default = ""),
-        "ident_cpp_file": attr.string(default = ""),
     },
 )
 
@@ -590,11 +557,6 @@ _COMMON_ATTRS = ["testonly", "tags", "compatible_with", "restricted_to", "target
 
 def _cpp_string_option(language_value, idl_value):
     return language_value if language_value else idl_value
-
-def _cpp_bool_option(language_value, idl_value):
-    if language_value != "":
-        return language_value
-    return "true" if idl_value else ""
 
 def _language_codegen(name, deps, outs, language, kwargs):
     _exactly_one_dep(name, deps)

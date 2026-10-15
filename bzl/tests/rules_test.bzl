@@ -102,7 +102,6 @@ def rule_tests(name):
         deps = [":shared-schema"],
         outs = {"cpp_hdrs": ["analysis/cpp_override/shared.hpp"]},
         cpp_namespace = "override::namespace",
-        cpp_legacy_records = False,
         tags = ["manual"],
     )
     java_djinni_library(
@@ -174,10 +173,10 @@ def rule_tests(name):
         other_output_flag = "--java-out",
         expected_options = {
             "--cpp-namespace": "shared::defaults",
+            "--cpp-include-prefix": "shared/",
+            "--cpp-base-lib-include-prefix": "djinni/cpp/",
             "--cpp-optional-template": "std::optional",
             "--cpp-optional-header": "<optional>",
-            "--cpp-legacy-records": "true",
-            "--ident-cpp-enum-type": "foo_bar",
         },
     )
     _codegen_test(
@@ -188,7 +187,6 @@ def rule_tests(name):
         expected_options = {
             "--cpp-namespace": "override::namespace",
             "--cpp-optional-template": "std::optional",
-            "--cpp-legacy-records": "false",
         },
     )
     _codegen_test(
@@ -210,6 +208,7 @@ def rule_tests(name):
             target_under_test = target,
             output_flag = flag,
             other_output_flag = "--java-out",
+            expected_options = {"--cpp-namespace": "shared::defaults"},
         )
     djinni_codegen(
         name = "invalid_codegen",
