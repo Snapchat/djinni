@@ -1,0 +1,29 @@
+module(
+    name = "djinni_android_example",
+    version = "0.1",
+)
+
+bazel_dep(name = "snap_djinni", version = "1.0.0", repo_name = "djinni_rules")
+local_path_override(
+    module_name = "snap_djinni",
+    path = "../..",
+)
+
+bazel_dep(name = "rules_scala", version = "7.1.5")
+
+scala_config = use_extension("@rules_scala//scala/extensions:config.bzl", "scala_config")
+scala_config.settings(scala_version = "2.11.12")
+
+bazel_dep(name = "rules_android", version = "0.6.4")
+bazel_dep(name = "rules_android_ndk", version = "0.1.2")
+bazel_dep(name = "rules_cc", version = "0.1.1")
+bazel_dep(name = "rules_kotlin", version = "2.2.2", repo_name = "io_bazel_rules_kotlin")
+
+sdk = use_extension("@rules_android//rules/android_sdk_repository:rule.bzl", "android_sdk_repository_extension")
+use_repo(sdk, "androidsdk")
+
+ndk = use_extension("@rules_android_ndk//:extension.bzl", "android_ndk_repository_extension")
+ndk.configure(api_level = 21)
+use_repo(ndk, "androidndk")
+
+register_toolchains("@androidsdk//:sdk-toolchain", "@androidsdk//:all", "@androidndk//:all")

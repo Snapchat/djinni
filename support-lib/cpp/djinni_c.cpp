@@ -1,6 +1,7 @@
 #include "djinni_c.h"
 #include "djinni_c_types.hpp"
 #include <cstdio>
+#include <cstring>
 
 using namespace djinni;
 
@@ -34,7 +35,7 @@ static void djinni_binary_malloc_release(uint8_t *data, size_t length,
 djinni_binary_ref djinni_binary_new_with_bytes_copy(const uint8_t *data,
                                                     size_t length) {
   auto *mutableData = (uint8_t *)malloc(length);
-  memcpy(mutableData, data, length);
+  std::memcpy(mutableData, data, length);
   return djinni_binary_new_with_bytes(mutableData, length, mutableData,
                                       &djinni_binary_malloc_release);
 }

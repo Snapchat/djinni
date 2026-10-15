@@ -32,17 +32,23 @@ either plain Bazel or [Bazelisk](https://github.com/bazelbuild/bazelisk).
 
 `./ci/generate.sh` generates the examples sources.
 
-Use `bazel test //test-suite:djinni-objc-tests //test-suite:djinni-java-tests`
+Use `bazel test --config=apple //test-suite:djinni-objc-tests //test-suite:djinni-java-tests`
 to build and run Objective-C and Java tests.
 
 ### Building and running the mobile example apps
 
 You need to install the Android SDK and NDK. Set both `ANDROID_HOME` and `ANDROID_NDK_HOME` environment variables.
-The Android example app can be built with bazel: `bazel build //examples:android-app`, 
-and then install to a device with `adb install bazel-bin/examples/android-app.apk`
+Run `bazel build //:android-app` from `examples/android/`, then install with
+`adb install bazel-bin/android-app.apk`. The benchmark app is `//:perftest`
+in the same module. SDK/NDK setup belongs to that module, not the core compiler.
 
 The iOS example app are built with Xcode. Simply open the project in Xcode and
 it should work.
+
+The Swift bridge can also be built with `bazel build //:textsort-swift-bridge`
+from `examples/ios/`. WASM examples have their own module at `examples/wasm/`.
+See [the Bazel rule documentation](docs/djinni_bazel_codegen_rules.md#platform-modules)
+for platform setup and the optional Swift runtime module.
 
 ### Working on the Djinni code generator
 
@@ -315,11 +321,14 @@ Notable differences when comparing to the Java/ObjC support:
   easily add extension methods (by add functions to prototype) without having to
   derive from a base class.
 
-Use `bazel run //test-suite:server-ts` to run the Wasm/TypeScript unit tests.
+Use `bazel run --config=wasm //test-suite:server-ts` to run the Wasm/TypeScript unit tests.
 You will need `npm` and run `npm install` in the `test-suite` folder.
 You need as well the `tsc` compiler and the `browserify` tool to run these tests.
 
-To run the examples server: `bazel run //examples:server`
+Run `bazel run //:server` from `examples/wasm/` for the textsort demo, or
+`bazel run //:perftest-server` for the benchmark demo. Both require `tsc`,
+`browserify`, and Python 3. They compile web assets in a temporary directory,
+leaving the checked-in sources and Bazel runfiles unchanged.
 
 ## Async interface support
 
@@ -395,10 +404,15 @@ Q. Do I need to use Bazel to build my project?
 
 A. No. You may use whatever build system or IDE you like. All you need for your
 project is including the generated files in it. We use Bazel to build the code
-generator and unit tests, but it's not needed for building user projects. You
-still need to have Bazel installed if you want to run the code generator though,
-because the run_djinni.sh script indirectly uses it to ensure the code generator
-is built and up to date.
+generator and unit tests, but it's not needed for building user projects.
+The `run_djinni.sh` scripts use Bazel to build the compiler before generation.
+Alternatively, build `//src:djinni_deploy.jar` once and distribute the JAR;
+`java -jar djinni_deploy.jar --idl ... --cpp-out ...` generates code without
+Bazel installed on the consuming machine.
+
+For Bazel projects, [build-time codegen rules](docs/djinni_bazel_codegen_rules.md)
+provide `djinni_library` declarations and per-language generated libraries.
+Both paths use the same Djinni compiler.
 
 Q. Can we include arbitrary bytes in the `string` type?
 

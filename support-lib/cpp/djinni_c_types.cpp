@@ -1,5 +1,6 @@
 #include "djinni_c_types.hpp"
 #include <cstdio>
+#include <cstring>
 
 namespace djinni {
 

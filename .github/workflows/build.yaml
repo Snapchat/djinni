@@ -46,6 +46,27 @@ jobs:
       - name: Test
         run: ./ci/run-tests.sh
 
+      - name: Codegen Rule Tests
+        run: bazel test --test_output=errors //bzl/tests:rule_tests
+
+      - name: Generated Consumers
+        run: bazel build //:djinni-codegen-consumer-verification //test-suite:testsuite-main-djinni-codegen
+
+      - name: Swift Bridge Consumer
+        working-directory: examples/ios
+        run: bazel build //:textsort-swift-bridge
+
+      - name: WASM Generated Consumers
+        working-directory: examples/wasm
+        run: bazel build //:codegen-consumer-verification
+
       - name: External Test
-        working-directory: external-test
-        run: bazel run @snap_djinni//src:djinni -- --help
+        run: bash ci/test-external-consumer.sh
+
+  external-consumer-linux:
+    name: Platform-neutral external consumer (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: bazel-contrib/setup-bazel@0.15.0
+      - run: bash ci/test-external-consumer.sh

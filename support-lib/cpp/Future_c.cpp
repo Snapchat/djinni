@@ -3,6 +3,7 @@
 #include "Future_c_translator.hpp"
 #include "djinni_c_ref.hpp"
 #include "djinni_c_types.hpp"
+#include <cstring>
 
 namespace djinni::c_api {
 
@@ -101,7 +102,7 @@ void djinni_future_on_complete(djinni_future_ref future, void *opaque,
           callback(opaqueHolder.getOpaque(), ref.get(), nullptr);
         } catch (const std::exception &exc) {
           const auto *what = exc.what();
-          auto errorMessage = Ref(djinni_string_new(what, strlen(what)));
+          auto errorMessage = Ref(djinni_string_new(what, std::strlen(what)));
           callback(opaqueHolder.getOpaque(), nullptr, errorMessage.get());
         }
       });

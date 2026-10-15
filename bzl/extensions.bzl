@@ -4,7 +4,7 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 def _non_module_deps_impl(module_ctx):
     """Module extension to load non-BCR dependencies"""
-    
+
     # Swift Protobuf (not yet in BCR)
     swiftprotobuf_version = "1.28.2"
     http_archive(
@@ -21,16 +21,15 @@ swift_library(
     visibility = ["//visibility:public"],
 )""",
     )
-    
+
     return module_ctx.extension_metadata(
         reproducible = True,
-        root_module_direct_deps = [
+        root_module_direct_dev_deps = [
             "apple_swift_protobuf",
         ],
-        root_module_direct_dev_deps = [],
+        root_module_direct_deps = [],
     )
 
 non_module_deps = module_extension(
     implementation = _non_module_deps_impl,
 )
-

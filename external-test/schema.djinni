@@ -1,0 +1,5 @@
+@import "shared.djinni"
+
+message = record {
+    payload: shared;
+}

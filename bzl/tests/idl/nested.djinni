@@ -1,0 +1,4 @@
+status = enum {
+    ready;
+    done;
+}

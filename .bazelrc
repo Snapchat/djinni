@@ -23,5 +23,9 @@ common --noenable_workspace
 # Apple toolchain configuration for ObjC/Swift (Bazel 8.x + Bzlmod)
 build --incompatible_enable_apple_toolchain_resolution
 
+# Opt-in toolchains for the legacy root test-suite targets.
+build:apple --extra_toolchains=@local_config_apple_cc_toolchains//:all
+build:wasm --extra_toolchains=@emsdk//emscripten_toolchain:all
+
 # Performance and caching
 build --experimental_repository_cache_hardlinks
