@@ -33,11 +33,16 @@ def _codegen_test_impl(ctx):
     if ctx.attr.output_flag == "--java-out":
         index = action.argv.index("--java-use-final-for-record")
         asserts.equals(env, "false", action.argv[index + 1])
+    for flag, value in ctx.attr.expected_options.items():
+        asserts.true(env, flag in action.argv, "Missing inherited option: " + flag)
+        index = action.argv.index(flag)
+        asserts.equals(env, value, action.argv[index + 1])
     return analysistest.end(env)
 
 _codegen_test = analysistest.make(_codegen_test_impl, attrs = {
     "output_flag": attr.string(),
     "other_output_flag": attr.string(),
+    "expected_options": attr.string_dict(default = {}),
 })
 
 def _failure_test_impl(ctx):
@@ -91,6 +96,14 @@ def rule_tests(name):
         testonly = True,
         tags = ["manual"],
         library_kwargs = {"defines": ["ANALYSIS_TEST=1"]},
+    )
+    cc_djinni_library(
+        name = "analysis_cc_override",
+        deps = [":shared-schema"],
+        outs = {"cpp_hdrs": ["analysis/cpp_override/shared.hpp"]},
+        cpp_namespace = "override::namespace",
+        cpp_legacy_records = False,
+        tags = ["manual"],
     )
     java_djinni_library(
         name = "analysis_java",
@@ -159,6 +172,24 @@ def rule_tests(name):
         target_under_test = ":analysis_cc__djinni_cpp_codegen",
         output_flag = "--cpp-out",
         other_output_flag = "--java-out",
+        expected_options = {
+            "--cpp-namespace": "shared::defaults",
+            "--cpp-optional-template": "std::optional",
+            "--cpp-optional-header": "<optional>",
+            "--cpp-legacy-records": "true",
+            "--ident-cpp-enum-type": "foo_bar",
+        },
+    )
+    _codegen_test(
+        name = "cpp_override_test",
+        target_under_test = ":analysis_cc_override__djinni_cpp_codegen",
+        output_flag = "--cpp-out",
+        other_output_flag = "--java-out",
+        expected_options = {
+            "--cpp-namespace": "override::namespace",
+            "--cpp-optional-template": "std::optional",
+            "--cpp-legacy-records": "false",
+        },
     )
     _codegen_test(
         name = "java_action_test",
@@ -224,5 +255,5 @@ def rule_tests(name):
         )
     native.test_suite(
         name = name,
-        tests = [":provider_test", ":cpp_action_test", ":java_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":ts_library_action_test", ":yaml_library_action_test", ":ts_filegroup_test", ":yaml_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":c_compatibility_test", ":objc_compatibility_test", ":yaml_compatibility_test"],
+        tests = [":provider_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":ts_library_action_test", ":yaml_library_action_test", ":ts_filegroup_test", ":yaml_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":c_compatibility_test", ":objc_compatibility_test", ":yaml_compatibility_test"],
     )

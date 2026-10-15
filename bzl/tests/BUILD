@@ -12,6 +12,11 @@ exports_files([
 djinni_library(
     name = "shared-schema",
     srcs = ["idl/nested.djinni"],
+    cpp_legacy_records = True,
+    cpp_namespace = "shared::defaults",
+    cpp_optional_header = "<optional>",
+    cpp_optional_template = "std::optional",
+    ident_cpp_enum_type = "foo_bar",
     idl = "idl/shared.djinni",
     idl_include_files = ["idl/nested.djinni"],
     idl_include_paths = ["bzl/tests/idl"],
