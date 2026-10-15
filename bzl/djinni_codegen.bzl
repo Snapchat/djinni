@@ -1,6 +1,6 @@
 """Bazel rules for running Djinni code generation."""
 
-load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "objc_library")
 load("@rules_java//java:defs.bzl", "java_library")
 
 DjinniInfo = provider(
@@ -613,6 +613,36 @@ def cc_djinni_library(
         **_consumer_attrs(library_kwargs, common)
     )
 
+def c_djinni_library(
+        name,
+        deps,
+        outs,
+        srcs = [],
+        hdrs = [],
+        includes = [],
+        cc_deps = [],
+        copts = [],
+        linkopts = [],
+        alwayslink = 0,
+        visibility = None,
+        library_kwargs = {},
+        **kwargs):
+    """Generates Djinni's C-facing wrapper sources in a cc_library."""
+    codegen_name = name + "__djinni_c_codegen"
+    common = _language_codegen(codegen_name, deps, outs, "c", kwargs)
+    cc_library(
+        name = name,
+        srcs = _outs(outs, "c_srcs") + srcs,
+        hdrs = _outs(outs, "c_hdrs") + hdrs,
+        includes = includes,
+        copts = copts,
+        linkopts = linkopts,
+        deps = cc_deps,
+        alwayslink = alwayslink,
+        visibility = visibility,
+        **_consumer_attrs(library_kwargs, common)
+    )
+
 def java_djinni_library(
         name,
         deps,
@@ -661,6 +691,94 @@ def jni_djinni_library(
         alwayslink = alwayslink,
         visibility = visibility,
         **_consumer_attrs(library_kwargs, common)
+    )
+
+def objc_djinni_library(
+        name,
+        deps,
+        outs,
+        srcs = [],
+        hdrs = [],
+        includes = [],
+        objc_deps = [],
+        copts = [],
+        linkopts = [],
+        sdk_frameworks = [],
+        weak_sdk_frameworks = [],
+        alwayslink = 0,
+        visibility = None,
+        library_kwargs = {},
+        **kwargs):
+    """Generates Objective-C and Objective-C++ sources in an objc_library."""
+    codegen_name = name + "__djinni_objc_codegen"
+    common = _language_codegen(codegen_name, deps, outs, "objc", kwargs)
+    objc_library(
+        name = name,
+        srcs = _outs(outs, "objc_srcs") + _outs(outs, "objcpp_srcs") + srcs,
+        hdrs = _outs(outs, "objc_hdrs") + _outs(outs, "objcpp_hdrs") + hdrs,
+        includes = includes,
+        copts = copts,
+        linkopts = linkopts,
+        deps = objc_deps,
+        sdk_frameworks = sdk_frameworks,
+        weak_sdk_frameworks = weak_sdk_frameworks,
+        alwayslink = alwayslink,
+        visibility = visibility,
+        **_consumer_attrs(library_kwargs, common)
+    )
+
+def wasm_djinni_cc_library(
+        name,
+        deps,
+        outs,
+        srcs = [],
+        hdrs = [],
+        includes = [],
+        cc_deps = [],
+        copts = [],
+        linkopts = [],
+        alwayslink = 0,
+        visibility = None,
+        library_kwargs = {},
+        **kwargs):
+    """Generates WASM bridge sources in a cc_library for caller-owned linking."""
+    codegen_name = name + "__djinni_wasm_codegen"
+    common = _language_codegen(codegen_name, deps, outs, "wasm", kwargs)
+    cc_library(
+        name = name,
+        srcs = _outs(outs, "wasm_srcs") + srcs,
+        hdrs = _outs(outs, "wasm_hdrs") + hdrs,
+        includes = includes,
+        copts = copts,
+        linkopts = linkopts,
+        deps = cc_deps,
+        alwayslink = alwayslink,
+        visibility = visibility,
+        **_consumer_attrs(library_kwargs, common)
+    )
+
+def ts_djinni_filegroup(name, deps, outs, srcs = [], visibility = None, **kwargs):
+    """Generates TypeScript and exposes it as a filegroup."""
+    codegen_name = name + "__djinni_ts_codegen"
+    common = _language_codegen(codegen_name, deps, outs, "ts", kwargs)
+    native.filegroup(
+        name = name,
+        srcs = [":" + codegen_name] + srcs,
+        output_group = "ts_srcs",
+        visibility = visibility or ["//visibility:private"],
+        **common
+    )
+
+def yaml_djinni_filegroup(name, deps, outs, visibility = None, **kwargs):
+    """Generates YAML metadata and exposes only the YAML output group."""
+    codegen_name = name + "__djinni_yaml_codegen"
+    common = _language_codegen(codegen_name, deps, outs, "yaml", kwargs)
+    native.filegroup(
+        name = name,
+        srcs = [":" + codegen_name],
+        output_group = "yaml_srcs",
+        visibility = visibility or ["//visibility:private"],
+        **common
     )
 
 def wasm_djinni_cc_binary(

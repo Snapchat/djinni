@@ -176,14 +176,63 @@ import availability, rather than compiling imported declarations separately.
 | Macro | Selected output categories | Consumer |
 | --- | --- | --- |
 | `cc_djinni_library` | `cpp_srcs`, `cpp_hdrs` | `cc_library` |
+| `c_djinni_library` | `c_srcs`, `c_hdrs` | `cc_library` |
 | `java_djinni_library` | `java_srcs` | `java_library` |
 | `jni_djinni_library` | `jni_srcs`, `jni_hdrs` | `cc_library` |
+| `objc_djinni_library` | `objc_*`, `objcpp_*` | `objc_library` |
+| `wasm_djinni_cc_library` | `wasm_srcs`, `wasm_hdrs` | `cc_library` |
 | `wasm_djinni_cc_binary` | `wasm_srcs`, `wasm_hdrs` | `cc_binary` |
+| `ts_djinni_filegroup` | `ts_srcs` | `filegroup` |
+| `yaml_djinni_filegroup` | `yaml_srcs` output group | `filegroup` |
 
-Each accepts exactly one base target in `deps`, an `outs` dictionary, and Djinni
-options as keyword arguments. Other known language categories in a shared
-manifest are ignored. Unknown categories fail analysis. Boolean CLI options
-accept Starlark booleans; omission preserves the compiler's default.
+Each wrapper accepts exactly one base target in `deps`, an `outs` dictionary, and Djinni
+options as keyword arguments. Other known language categories in a shared manifest are
+ignored. Unknown categories fail analysis. Boolean CLI options accept Starlark booleans;
+omission preserves the compiler's default.
+
+The C, ObjC, and WASM library wrappers compile their generated sources. TS and YAML
+wrappers expose generated artifacts as filegroups; they do not add a compiler or
+consumer dependency:
+
+```python
+c_djinni_library(
+    name = "messages_c",
+    deps = [":messages"],
+    outs = {"c_srcs": ["generated/c/messages.cpp"], "c_hdrs": ["generated/c/messages.h"]},
+    cc_deps = ["//support-lib:djinni-support-common"],
+)
+
+objc_djinni_library(
+    name = "messages_objc",
+    deps = [":messages"],
+    outs = {
+        "objc_hdrs": ["generated/objc/Messages.h"],
+        "objcpp_hdrs": ["generated/objc/Messages+Private.h"],
+        "objcpp_srcs": ["generated/objc/Messages+Private.mm"],
+    },
+    cc_deps = ["//support-lib:djinni-support-objc"],
+)
+
+wasm_djinni_cc_library(
+    name = "messages_wasm",
+    deps = [":messages"],
+    outs = {"wasm_srcs": ["generated/wasm/Messages.cpp"], "wasm_hdrs": ["generated/wasm/Messages.hpp"]},
+    cc_deps = ["//support-lib:djinni-support-wasm"],
+)
+
+ts_djinni_filegroup(
+    name = "messages_ts",
+    deps = [":messages"],
+    outs = {"ts_srcs": ["generated/ts/messages.ts"]},
+    ts_module = "messages",
+)
+
+yaml_djinni_filegroup(
+    name = "messages_yaml",
+    deps = [":messages"],
+    outs = {"yaml_srcs": ["generated/yaml/messages.yaml"]},
+)
+```
 
 For custom compilation macros, `djinni_language_codegen` exposes the same
 language action without creating a native library:
