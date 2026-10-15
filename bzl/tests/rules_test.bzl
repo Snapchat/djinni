@@ -1,7 +1,7 @@
 """Analysis tests for Djinni's source provider and language action contracts."""
 
 load("@bazel_skylib//lib:unittest.bzl", "analysistest", "asserts")
-load("//bzl:djinni_codegen.bzl", "DjinniInfo", "c_djinni_library", "cc_djinni_library", "djinni_codegen", "djinni_language_codegen", "djinni_library", "java_djinni_library", "jni_djinni_library", "objc_djinni_library", "ts_djinni_filegroup", "wasm_djinni_cc_library", "yaml_djinni_filegroup")
+load("//bzl:djinni_codegen.bzl", "DjinniInfo", "c_djinni_library", "cc_djinni_library", "djinni_codegen", "djinni_language_codegen", "djinni_library", "java_djinni_library", "jni_djinni_library", "objc_djinni_library", "ts_djinni_filegroup", "wasm_djinni_cc_library")
 
 def _provider_test_impl(ctx):
     env = analysistest.begin(ctx)
@@ -148,22 +148,10 @@ def rule_tests(name):
         ts_module = "shared",
         tags = ["manual"],
     )
-    yaml_djinni_filegroup(
-        name = "analysis_yaml_files",
-        deps = [":shared-schema"],
-        outs = {"yaml_srcs": ["analysis/yaml_library/shared.yaml"]},
-        yaml_metadata_languages = ["c", "wasm"],
-        tags = ["manual"],
-    )
     _files_test(
         name = "ts_filegroup_test",
         target_under_test = ":analysis_ts_files",
         expected = ["shared.ts"],
-    )
-    _files_test(
-        name = "yaml_filegroup_test",
-        target_under_test = ":analysis_yaml_files",
-        expected = ["shared.yaml"],
     )
     _provider_test(name = "provider_test", target_under_test = ":shared-schema")
     _codegen_test(
@@ -201,7 +189,6 @@ def rule_tests(name):
         ("jni", ":analysis_jni_lib__djinni_jni_codegen", "--jni-out"),
         ("wasm", ":analysis_wasm_lib__djinni_wasm_codegen", "--wasm-out"),
         ("ts", ":analysis_ts_files__djinni_ts_codegen", "--ts-out"),
-        ("yaml", ":analysis_yaml_files__djinni_yaml_codegen", "--yaml-out"),
     ]:
         _codegen_test(
             name = language + "_library_action_test",
@@ -236,7 +223,6 @@ def rule_tests(name):
     for language, outputs, options, flags, trees in [
         ("c", {"c_srcs": ["analysis/c/shared.cpp"], "c_hdrs": ["analysis/c/include/shared.h"]}, {"c_namespace": "snap_", "cpp_legacy_records": True}, ["--c-out", "--c-header-out", "--cpp-legacy-records", "true"], 0),
         ("objc", {"objc_hdrs": ["analysis/objc/Shared.h"], "objcpp_srcs": ["analysis/objc/Shared+Private.mm"]}, {"objcpp_function_prologue_file": "utils/DjinniPrologue.hpp"}, ["--objc-out", "--objcpp-out", "utils/DjinniPrologue.hpp"], 0),
-        ("yaml", {"yaml_srcs": ["analysis/yaml/shared.yaml"]}, {"yaml_metadata_languages": ["c", "wasm"]}, ["--yaml-out", "--c-out", "--wasm-out"], 2),
     ]:
         djinni_language_codegen(
             name = "compatibility_" + language,
@@ -254,5 +240,5 @@ def rule_tests(name):
         )
     native.test_suite(
         name = name,
-        tests = [":provider_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":ts_library_action_test", ":yaml_library_action_test", ":ts_filegroup_test", ":yaml_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":c_compatibility_test", ":objc_compatibility_test", ":yaml_compatibility_test"],
+        tests = [":provider_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":c_compatibility_test", ":objc_compatibility_test"],
     )

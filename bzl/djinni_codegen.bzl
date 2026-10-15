@@ -80,7 +80,6 @@ def _djinni_codegen_impl(ctx):
         objcpp_files,
         wasm_files,
         ctx.outputs.ts_srcs,
-        ctx.outputs.yaml_srcs,
     ])
 
     if not all_outputs:
@@ -99,23 +98,6 @@ def _djinni_codegen_impl(ctx):
     objcpp_dir = _single_output_dir(objcpp_files, "objcpp")
     wasm_dir = _single_output_dir(wasm_files, "wasm")
     ts_dir = _single_output_dir(ctx.outputs.ts_srcs, "ts")
-    yaml_dir = _single_output_dir(ctx.outputs.yaml_srcs, "yaml")
-
-    # Older compilers gate YAML metadata on enabled output folders. Declare the
-    # auxiliary generated trees so metadata remains complete and cacheable.
-    for language in ctx.attr.yaml_metadata_languages:
-        if language not in ["c", "wasm"]:
-            fail("yaml_metadata_languages supports only c and wasm")
-        if not yaml_dir:
-            fail("yaml_metadata_languages requires yaml_srcs")
-        if language == "c" and not (c_src_dir or c_hdr_dir):
-            tree = ctx.actions.declare_directory(ctx.label.name + ".metadata/c")
-            all_outputs.append(tree)
-            c_src_dir = tree.path
-        elif language == "wasm" and not wasm_dir:
-            tree = ctx.actions.declare_directory(ctx.label.name + ".metadata/wasm")
-            all_outputs.append(tree)
-            wasm_dir = tree.path
 
     if java_dir:
         args.add("--java-out")
@@ -209,12 +191,6 @@ def _djinni_codegen_impl(ctx):
         args.add(ts_dir)
     _add_string_arg(args, "--ts-module", ctx.attr.ts_module)
 
-    if yaml_dir:
-        args.add("--yaml-out")
-        args.add(yaml_dir)
-    _add_string_arg(args, "--yaml-out-file", ctx.attr.yaml_out_file)
-    _add_string_arg(args, "--yaml-prefix", ctx.attr.yaml_prefix)
-
     _add_ident_arg(args, "--ident-java-enum", ctx.attr.ident_java_enum)
     _add_ident_arg(args, "--ident-java-field", ctx.attr.ident_java_field)
     _add_ident_arg(args, "--ident-java-type", ctx.attr.ident_java_type)
@@ -275,7 +251,6 @@ def _djinni_codegen_impl(ctx):
             wasm_srcs = depset(ctx.outputs.wasm_srcs),
             wasm_hdrs = depset(ctx.outputs.wasm_hdrs),
             ts_srcs = depset(ctx.outputs.ts_srcs),
-            yaml_srcs = depset(ctx.outputs.yaml_srcs),
         ),
     ]
 
@@ -301,7 +276,6 @@ _djinni_codegen = rule(
         "wasm_srcs": attr.output_list(),
         "wasm_hdrs": attr.output_list(),
         "ts_srcs": attr.output_list(),
-        "yaml_srcs": attr.output_list(),
         "java_package": attr.string(),
         "java_class_access_modifier": attr.string(),
         "java_nullable_annotation": attr.string(),
@@ -352,9 +326,6 @@ _djinni_codegen = rule(
         "wasm_omit_constants": attr.string(),
         "wasm_omit_namespace_alias": attr.string(),
         "ts_module": attr.string(),
-        "yaml_out_file": attr.string(),
-        "yaml_prefix": attr.string(),
-        "yaml_metadata_languages": attr.string_list(),
         "ident_java_enum": attr.string(),
         "ident_java_field": attr.string(),
         "ident_java_type": attr.string(),
@@ -504,7 +475,7 @@ def djinni_codegen(name, outs, **kwargs):
         outs: Dictionary keyed by output category. Supported keys are
             cpp_srcs, cpp_hdrs, c_srcs, c_hdrs, java_srcs, jni_srcs, jni_hdrs, objc_srcs,
             objc_hdrs, objcpp_srcs, objcpp_hdrs, wasm_srcs, wasm_hdrs,
-            ts_srcs, and yaml_srcs.
+            and ts_srcs.
         **kwargs: Djinni options and input labels.
     """
     unknown = [key for key in outs if key not in _OUTPUT_KEYS]
@@ -527,7 +498,6 @@ def djinni_codegen(name, outs, **kwargs):
         wasm_srcs = _outs(outs, "wasm_srcs"),
         wasm_hdrs = _outs(outs, "wasm_hdrs"),
         ts_srcs = _outs(outs, "ts_srcs"),
-        yaml_srcs = _outs(outs, "yaml_srcs"),
         **normalized
     )
 
@@ -550,7 +520,6 @@ _OUTPUT_KEYS = [
     "wasm_srcs",
     "wasm_hdrs",
     "ts_srcs",
-    "yaml_srcs",
 ]
 
 _COMMON_ATTRS = ["testonly", "tags", "compatible_with", "restricted_to", "target_compatible_with", "features", "deprecation"]
@@ -587,10 +556,10 @@ def djinni_language_codegen(name, deps, outs, language, **kwargs):
         name: Target name.
         deps: Exactly one djinni_library target.
         outs: Shared or language-specific output manifest.
-        language: cpp, c, java, jni, objc (including objcpp), wasm, ts, or yaml.
+        language: cpp, c, java, jni, objc (including objcpp), wasm, or ts.
         **kwargs: Compiler options and common rule attributes.
     """
-    if language not in ["cpp", "c", "java", "jni", "objc", "wasm", "ts", "yaml"]:
+    if language not in ["cpp", "c", "java", "jni", "objc", "wasm", "ts"]:
         fail("Unsupported Djinni language: %s" % language)
     _language_codegen(name, deps, outs, language, kwargs)
 
@@ -786,18 +755,6 @@ def ts_djinni_filegroup(name, deps, outs, srcs = [], visibility = None, **kwargs
         name = name,
         srcs = [":" + codegen_name] + srcs,
         output_group = "ts_srcs",
-        visibility = visibility or ["//visibility:private"],
-        **common
-    )
-
-def yaml_djinni_filegroup(name, deps, outs, visibility = None, **kwargs):
-    """Generates YAML metadata and exposes only the YAML output group."""
-    codegen_name = name + "__djinni_yaml_codegen"
-    common = _language_codegen(codegen_name, deps, outs, "yaml", kwargs)
-    native.filegroup(
-        name = name,
-        srcs = [":" + codegen_name],
-        output_group = "yaml_srcs",
         visibility = visibility or ["//visibility:private"],
         **common
     )
