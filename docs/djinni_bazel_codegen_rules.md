@@ -183,15 +183,14 @@ import availability, rather than compiling imported declarations separately.
 | `wasm_djinni_cc_library` | `wasm_srcs`, `wasm_hdrs` | `cc_library` |
 | `wasm_djinni_cc_binary` | `wasm_srcs`, `wasm_hdrs` | `cc_binary` |
 | `ts_djinni_filegroup` | `ts_srcs` | `filegroup` |
-| `yaml_djinni_filegroup` | `yaml_srcs` output group | `filegroup` |
 
 Each wrapper accepts exactly one base target in `deps`, an `outs` dictionary, and Djinni
 options as keyword arguments. Other known language categories in a shared manifest are
 ignored. Unknown categories fail analysis. Boolean CLI options accept Starlark booleans;
 omission preserves the compiler's default.
 
-The C, ObjC, and WASM library wrappers compile their generated sources. TS and YAML
-wrappers expose generated artifacts as filegroups; they do not add a compiler or
+The C, ObjC, and WASM library wrappers compile their generated sources. The TS
+wrapper exposes generated artifacts as a filegroup; it does not add a compiler or
 consumer dependency:
 
 ```python
@@ -226,12 +225,6 @@ ts_djinni_filegroup(
     outs = {"ts_srcs": ["generated/ts/messages.ts"]},
     ts_module = "messages",
 )
-
-yaml_djinni_filegroup(
-    name = "messages_yaml",
-    deps = [":messages"],
-    outs = {"yaml_srcs": ["generated/yaml/messages.yaml"]},
-)
 ```
 
 For custom compilation macros, `djinni_language_codegen` exposes the same
@@ -250,18 +243,13 @@ djinni_language_codegen(
 )
 ```
 
-Supported languages are `cpp`, `c`, `java`, `jni`, `objc`, `wasm`, `ts`, and
-`yaml`. `objc` selects both Objective-C and Objective-C++ output categories.
+Supported languages are `cpp`, `c`, `java`, `jni`, `objc`, `wasm`, and `ts`.
+`objc` selects both Objective-C and Objective-C++ output categories.
 The prologue options `jni_function_prologue_file` and
 `objcpp_function_prologue_file` take emitted include strings, not file labels.
 The generated consumers must declare the compilation dependency providing that
 header. C backend options and `*_legacy_records` require a compiler revision
 that supports those CLI flags; omission does not enable them.
-
-For compiler versions that gate C/WASM YAML metadata on enabled output folders,
-set `yaml_metadata_languages = ["c", "wasm"]` on the YAML action. It declares
-auxiliary tree outputs and enables those generators within that action. Consume
-the `yaml_srcs` output group to select only YAML, not the auxiliary trees.
 
 Use `cc_deps` or `java_deps` for compilation dependencies, including generated
 libraries referenced by bridges. `srcs` adds handwritten sources; C++ and JNI
@@ -290,7 +278,7 @@ your workspace's WASM build setup.
 ## Low-Level Codegen
 
 `djinni_codegen` remains available for explicit generated-file integration,
-including Objective-C, Objective-C++, TypeScript, and YAML. Dedicated compiled
+including Objective-C, Objective-C++, and TypeScript. Dedicated compiled
 library macros for those languages are not implemented yet.
 
 ```python
@@ -307,7 +295,7 @@ djinni_codegen(
 Use either `djinni` (a `DjinniInfo` target) or the legacy `idl` with explicit
 `srcs` and `idl_include_paths`. Supported categories are `cpp_srcs`, `cpp_hdrs`,
 `c_srcs`, `c_hdrs`, `java_srcs`, `jni_srcs`, `jni_hdrs`, `objc_srcs`, `objc_hdrs`, `objcpp_srcs`,
-`objcpp_hdrs`, `wasm_srcs`, `wasm_hdrs`, `ts_srcs`, and `yaml_srcs`. They are also
+`objcpp_hdrs`, `wasm_srcs`, `wasm_hdrs`, and `ts_srcs`. They are also
 output groups, along with `all`. There is no `generators` attribute: nonempty
 output categories select generators. Each category must use one directory;
 Objective-C, Objective-C++, and WASM source/header pairs each share a directory.
@@ -316,6 +304,9 @@ Actions use declared files, `ctx.actions.args`, and the compiler's
 `FilesToRunProvider` so its runfiles are included. Shell generation scripts are
 not invoked by the rules. Missing declared outputs fail the build; detection of
 extra undeclared outputs and a general `djinni_manifest_test` remain future work.
+
+YAML type manifests imported with `@extern` remain ordinary source inputs. The
+Bazel rules do not generate them; create and maintain them separately.
 
 ## Command-Line Generation
 

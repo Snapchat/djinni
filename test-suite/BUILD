@@ -40,8 +40,6 @@ djinni_codegen(
     ts_module = "test",
     visibility = ["//visibility:public"],
     wasm_namespace = "testsuite",
-    yaml_out_file = "yaml-test.yaml",
-    yaml_prefix = "test_",
 )
 
 cc_library(
