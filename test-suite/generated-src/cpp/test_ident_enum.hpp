@@ -23,6 +23,18 @@ constexpr const char* to_string(test_ident_enum e) noexcept {
 
 } // namespace testsuite
 
+namespace djinni {
+
+template<typename T>
+inline constexpr T max_enum_value();
+
+template<>
+inline constexpr ::testsuite::test_ident_enum max_enum_value<::testsuite::test_ident_enum>() {
+    return ::testsuite::test_ident_enum::CAPS_ENUM;
+}
+
+} // namespace djinni
+
 namespace std {
 
 template <>
