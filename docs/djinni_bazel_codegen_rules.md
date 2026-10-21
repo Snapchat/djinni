@@ -209,7 +209,7 @@ objc_djinni_library(
         "objcpp_hdrs": ["generated/objc/Messages+Private.h"],
         "objcpp_srcs": ["generated/objc/Messages+Private.mm"],
     },
-    cc_deps = ["//support-lib:djinni-support-objc"],
+    objc_deps = ["//support-lib:djinni-support-objc"],
 )
 
 wasm_djinni_cc_library(
@@ -251,7 +251,7 @@ The generated consumers must declare the compilation dependency providing that
 header. C backend options and `*_legacy_records` require a compiler revision
 that supports those CLI flags; omission does not enable them.
 
-Use `cc_deps` or `java_deps` for compilation dependencies, including generated
+Use `cc_deps`, `objc_deps`, or `java_deps` for compilation dependencies, including generated
 libraries referenced by bridges. `srcs` adds handwritten sources; C++ and JNI
 macros also accept `hdrs`. C++/JNI macros accept `includes`, `copts`, `linkopts`,
 and `alwayslink`; WASM accepts `copts` and `linkopts`. All accept `visibility`.
