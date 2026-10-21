@@ -268,8 +268,10 @@ a custom compiler, set it consistently on both targets.
 JNI needs the same C++ namespace/identifier options and Java package/field
 identifier options as its C++ and Java declarations when these differ from
 compiler defaults. WASM also needs matching C++ namespace/identifier options.
-WASM bridge class/file names use `ident_jni_class` and `ident_jni_file`; set them
-to match your WASM output manifest, even when no JNI output is generated.
+WASM bridge class/file names use `ident_wasm_class` and `ident_wasm_file`, and
+their C++ namespace uses `wasm_cpp_namespace`. Set them to match your WASM output
+manifest. When omitted, these settings inherit `ident_jni_class`,
+`ident_jni_file`, and `jni_namespace` for compatibility with existing builds.
 Supply C++ and JNI support libraries
 through `cc_deps`; for desktop JNI use `@djinni//support-lib:djinni-support-jni`.
 The WASM macro produces bridge C++ sources; select an Emscripten toolchain through
