@@ -180,6 +180,7 @@ def _djinni_codegen_impl(ctx):
         args.add("--wasm-out")
         args.add(wasm_dir)
     _add_string_arg(args, "--wasm-namespace", ctx.attr.wasm_namespace)
+    _add_string_arg(args, "--wasm-cpp-namespace", ctx.attr.wasm_cpp_namespace)
     _add_string_arg(args, "--wasm-include-prefix", ctx.attr.wasm_include_prefix)
     _add_string_arg(args, "--wasm-include-cpp-prefix", ctx.attr.wasm_include_cpp_prefix)
     _add_string_arg(args, "--wasm-base-lib-include-prefix", ctx.attr.wasm_base_lib_include_prefix)
@@ -204,6 +205,8 @@ def _djinni_codegen_impl(ctx):
     _add_ident_arg(args, "--ident-cpp-file", ctx.attr.ident_cpp_file)
     _add_ident_arg(args, "--ident-jni-class", ctx.attr.ident_jni_class)
     _add_ident_arg(args, "--ident-jni-file", ctx.attr.ident_jni_file)
+    _add_ident_arg(args, "--ident-wasm-class", ctx.attr.ident_wasm_class)
+    _add_ident_arg(args, "--ident-wasm-file", ctx.attr.ident_wasm_file)
     _add_ident_arg(args, "--ident-objc-enum", ctx.attr.ident_objc_enum)
     _add_ident_arg(args, "--ident-objc-field", ctx.attr.ident_objc_field)
     _add_ident_arg(args, "--ident-objc-method", ctx.attr.ident_objc_method)
@@ -320,6 +323,7 @@ _djinni_codegen = rule(
         "objcpp_function_prologue_file": attr.string(),
         "objcpp_disable_exception_translation": attr.string(),
         "wasm_namespace": attr.string(),
+        "wasm_cpp_namespace": attr.string(),
         "wasm_include_prefix": attr.string(),
         "wasm_include_cpp_prefix": attr.string(),
         "wasm_base_lib_include_prefix": attr.string(),
@@ -339,6 +343,8 @@ _djinni_codegen = rule(
         "ident_cpp_file": attr.string(),
         "ident_jni_class": attr.string(),
         "ident_jni_file": attr.string(),
+        "ident_wasm_class": attr.string(),
+        "ident_wasm_file": attr.string(),
         "ident_objc_enum": attr.string(),
         "ident_objc_field": attr.string(),
         "ident_objc_method": attr.string(),

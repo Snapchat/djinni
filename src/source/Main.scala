@@ -100,6 +100,9 @@ object Main {
     var wasmOmitConstants: Boolean = false
     var wasmNamespace: Option[String] = None
     var wasmOmitNsAlias: Boolean = false
+    var wasmCppNamespace: Option[String] = None
+    var wasmClassIdentStyleOptional: Option[IdentConverter] = None
+    var wasmFileIdentStyleOptional: Option[IdentConverter] = None
     var valdiNamespace: String = "djinni_generated"
     var valdiClassIdentStyleOptional: Option[IdentConverter] = None
     var valdiFileIdentStyleOptional: Option[IdentConverter] = None
@@ -295,6 +298,8 @@ object Main {
         .text("Omit the generation of consts and enums in wasm, making them only accessible through TypeScript.")
       opt[String]("wasm-namespace").valueName("...").foreach(x => wasmNamespace = Some(x))
         .text("The namespace to use for generated Wasm classes.")
+      opt[String]("wasm-cpp-namespace").valueName("...").foreach(x => wasmCppNamespace = Some(x))
+        .text("The C++ namespace for generated WASM bridge classes (default: --jni-namespace).")
       opt[Boolean]("wasm-omit-namespace-alias").valueName("<true/false>").foreach(x => wasmOmitNsAlias = x)
         .text("Omit the generation of namespace aliases for classes. Namespaces will be prepended to class names instead.")
       opt[File]("ts-out").valueName("<out-folder>").foreach(x => tsOutFolder = Some(x))
@@ -372,6 +377,8 @@ object Main {
       identStyle("ident-cpp-file",       c => { cppFileIdentStyle = c })
       identStyle("ident-jni-class",      c => { jniClassIdentStyleOptional = Some(c)})
       identStyle("ident-jni-file",       c => { jniFileIdentStyleOptional = Some(c)})
+      identStyle("ident-wasm-class",     c => { wasmClassIdentStyleOptional = Some(c)})
+      identStyle("ident-wasm-file",      c => { wasmFileIdentStyleOptional = Some(c)})
       identStyle("ident-objc-enum",       c => { objcIdentStyle = objcIdentStyle.copy(enum = c) })
       identStyle("ident-objc-field",      c => { objcIdentStyle = objcIdentStyle.copy(field = c) })
       identStyle("ident-objc-method",     c => { objcIdentStyle = objcIdentStyle.copy(method = c) })
@@ -540,6 +547,9 @@ object Main {
       wasmOmitConstants,
       wasmNamespace,
       wasmOmitNsAlias,
+      wasmCppNamespace.getOrElse(jniNamespace),
+      wasmClassIdentStyleOptional.getOrElse(jniClassIdentStyle),
+      wasmFileIdentStyleOptional.getOrElse(jniFileIdentStyle),
       jsIdentStyle,
       tsOutFolder,
       tsModule,

@@ -139,6 +139,9 @@ def rule_tests(name):
         deps = [":shared-schema"],
         outs = {"wasm_srcs": ["analysis/wasm_library/NativeShared.cpp"], "wasm_hdrs": ["analysis/wasm_library/NativeShared.hpp"]},
         cc_deps = ["//support-lib:djinni-support-wasm"],
+        ident_wasm_class = "NativeFooBar",
+        ident_wasm_file = "NativeFooBar",
+        wasm_cpp_namespace = "wasm::bridge",
         tags = ["manual"],
     )
     ts_djinni_filegroup(
@@ -197,6 +200,17 @@ def rule_tests(name):
             other_output_flag = "--java-out",
             expected_options = {"--cpp-namespace": "shared::defaults"},
         )
+    _codegen_test(
+        name = "wasm_naming_action_test",
+        target_under_test = ":analysis_wasm_lib__djinni_wasm_codegen",
+        output_flag = "--wasm-out",
+        other_output_flag = "--jni-out",
+        expected_options = {
+            "--wasm-cpp-namespace": "wasm::bridge",
+            "--ident-wasm-class": "NativeFooBar",
+            "--ident-wasm-file": "NativeFooBar",
+        },
+    )
     djinni_codegen(
         name = "invalid_codegen",
         djinni = ":shared-schema",
@@ -240,5 +254,5 @@ def rule_tests(name):
         )
     native.test_suite(
         name = name,
-        tests = [":provider_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":c_compatibility_test", ":objc_compatibility_test"],
+        tests = [":provider_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":c_compatibility_test", ":objc_compatibility_test"],
     )
