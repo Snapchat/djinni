@@ -101,6 +101,17 @@ or `cc_binary`, returning the normal language provider to downstream consumers.
 The shared action implementation is internal; each language macro selects only
 its own output categories and runs a separate action.
 
+The WIP directory-backed mode omits `outs`. `djinni_library` writes a resolved
+declaration manifest, and each language action checks it before generating into a
+declared directory. Djinni also writes its exact output list for the action.
+C++, C, JNI, and WASM compile discovered sources through a generated unity file;
+Java packages discovered sources into a source JAR. Objective-C uses a generated
+`.mm` unity file. TypeScript copies its module file from the directory so callers
+still receive one `.ts` artifact. Existing `outs` calls continue to use explicit
+outputs. Unity compilation can change diagnostics or expose definitions that
+were isolated in separate source files, so it needs broader validation before
+replacing the explicit-output path.
+
 ```python
 load("@djinni//bzl:djinni_codegen.bzl", "cc_djinni_library", "djinni_library", "java_djinni_library")
 
@@ -110,24 +121,16 @@ djinni_library(
     srcs = ["common.djinni"],
 )
 
-OUTPUTS = {
-    "cpp_hdrs": ["generated/cpp/message.hpp", "generated/cpp/common.hpp"],
-    "java_srcs": ["generated/java/Message.java", "generated/java/Common.java"],
-}
-
 cc_djinni_library(
     name = "messages_cc",
     deps = [":messages"],
-    outs = OUTPUTS,
     cpp_namespace = "example",
-    includes = ["generated/cpp"],
     visibility = ["//visibility:public"],
 )
 
 java_djinni_library(
     name = "messages_java",
     deps = [":messages"],
-    outs = OUTPUTS,
     java_package = "example",
     visibility = ["//visibility:public"],
 )
@@ -139,7 +142,7 @@ cc_binary(
 )
 ```
 
-Output names must match the IDL and options. A large manifest can be loaded from
+When `outs` is supplied, output names must match the IDL and options. A large manifest can be loaded from
 a checked-in `.bzl` file, as in `examples/djinni_outputs.bzl`. Output declarations
 are package-relative paths, and must not overlap checked-in files or outputs from
 another target. Use distinct output directories for separate option sets.
@@ -164,8 +167,9 @@ another target. Use distinct output directories for separate option sets.
   relative to the rules repository and built in the execution configuration.
 
 `DjinniInfo` carries the root IDL, a depset of transitive source files, a depset
-of execution-root include paths, and a depset of verification outputs. Default
-files contain this target's direct sources and verification outputs.
+of execution-root include paths, the declaration manifest, and a depset of
+verification outputs. Default files contain this target's direct sources,
+manifest, and verification outputs.
 
 Imports must be declared through `srcs`, `idl_include_files`, or `deps`; string include paths do not make files
 action inputs. No host filesystem scanning occurs during analysis. `deps` models
@@ -176,14 +180,56 @@ import availability, rather than compiling imported declarations separately.
 | Macro | Selected output categories | Consumer |
 | --- | --- | --- |
 | `cc_djinni_library` | `cpp_srcs`, `cpp_hdrs` | `cc_library` |
+| `c_djinni_library` | `c_srcs`, `c_hdrs` | `cc_library` |
 | `java_djinni_library` | `java_srcs` | `java_library` |
 | `jni_djinni_library` | `jni_srcs`, `jni_hdrs` | `cc_library` |
+| `objc_djinni_library` | `objc_*`, `objcpp_*` | `objc_library` |
+| `wasm_djinni_cc_library` | `wasm_srcs`, `wasm_hdrs` | `cc_library` |
 | `wasm_djinni_cc_binary` | `wasm_srcs`, `wasm_hdrs` | `cc_binary` |
+| `ts_djinni_filegroup` | `ts_srcs` | `filegroup` |
 
-Each accepts exactly one base target in `deps`, an `outs` dictionary, and Djinni
-options as keyword arguments. Other known language categories in a shared
-manifest are ignored. Unknown categories fail analysis. Boolean CLI options
-accept Starlark booleans; omission preserves the compiler's default.
+Each wrapper accepts exactly one base target in `deps`, an `outs` dictionary, and Djinni
+options as keyword arguments. Other known language categories in a shared manifest are
+ignored. Unknown categories fail analysis. Boolean CLI options accept Starlark booleans;
+omission preserves the compiler's default.
+
+The C, ObjC, and WASM library wrappers compile their generated sources. The TS
+wrapper exposes generated artifacts as a filegroup; it does not add a compiler or
+consumer dependency:
+
+```python
+c_djinni_library(
+    name = "messages_c",
+    deps = [":messages"],
+    outs = {"c_srcs": ["generated/c/messages.cpp"], "c_hdrs": ["generated/c/messages.h"]},
+    cc_deps = ["//support-lib:djinni-support-common"],
+)
+
+objc_djinni_library(
+    name = "messages_objc",
+    deps = [":messages"],
+    outs = {
+        "objc_hdrs": ["generated/objc/Messages.h"],
+        "objcpp_hdrs": ["generated/objc/Messages+Private.h"],
+        "objcpp_srcs": ["generated/objc/Messages+Private.mm"],
+    },
+    objc_deps = ["//support-lib:djinni-support-objc"],
+)
+
+wasm_djinni_cc_library(
+    name = "messages_wasm",
+    deps = [":messages"],
+    outs = {"wasm_srcs": ["generated/wasm/Messages.cpp"], "wasm_hdrs": ["generated/wasm/Messages.hpp"]},
+    cc_deps = ["//support-lib:djinni-support-wasm"],
+)
+
+ts_djinni_filegroup(
+    name = "messages_ts",
+    deps = [":messages"],
+    outs = {"ts_srcs": ["generated/ts/messages.ts"]},
+    ts_module = "messages",
+)
+```
 
 For custom compilation macros, `djinni_language_codegen` exposes the same
 language action without creating a native library:
@@ -201,20 +247,15 @@ djinni_language_codegen(
 )
 ```
 
-Supported languages are `cpp`, `c`, `java`, `jni`, `objc`, `wasm`, `ts`, and
-`yaml`. `objc` selects both Objective-C and Objective-C++ output categories.
+Supported languages are `cpp`, `c`, `java`, `jni`, `objc`, `wasm`, and `ts`.
+`objc` selects both Objective-C and Objective-C++ output categories.
 The prologue options `jni_function_prologue_file` and
 `objcpp_function_prologue_file` take emitted include strings, not file labels.
 The generated consumers must declare the compilation dependency providing that
 header. C backend options and `*_legacy_records` require a compiler revision
 that supports those CLI flags; omission does not enable them.
 
-For compiler versions that gate C/WASM YAML metadata on enabled output folders,
-set `yaml_metadata_languages = ["c", "wasm"]` on the YAML action. It declares
-auxiliary tree outputs and enables those generators within that action. Consume
-the `yaml_srcs` output group to select only YAML, not the auxiliary trees.
-
-Use `cc_deps` or `java_deps` for compilation dependencies, including generated
+Use `cc_deps`, `objc_deps`, or `java_deps` for compilation dependencies, including generated
 libraries referenced by bridges. `srcs` adds handwritten sources; C++ and JNI
 macros also accept `hdrs`. C++/JNI macros accept `includes`, `copts`, `linkopts`,
 and `alwayslink`; WASM accepts `copts` and `linkopts`. All accept `visibility`.
@@ -231,8 +272,10 @@ a custom compiler, set it consistently on both targets.
 JNI needs the same C++ namespace/identifier options and Java package/field
 identifier options as its C++ and Java declarations when these differ from
 compiler defaults. WASM also needs matching C++ namespace/identifier options.
-WASM bridge class/file names use `ident_jni_class` and `ident_jni_file`; set them
-to match your WASM output manifest, even when no JNI output is generated.
+WASM bridge class/file names use `ident_wasm_class` and `ident_wasm_file`, and
+their C++ namespace uses `wasm_cpp_namespace`. Set them to match your WASM output
+manifest. When omitted, these settings inherit `ident_jni_class`,
+`ident_jni_file`, and `jni_namespace` for compatibility with existing builds.
 Supply C++ and JNI support libraries
 through `cc_deps`; for desktop JNI use `@djinni//support-lib:djinni-support-jni`.
 The WASM macro produces bridge C++ sources; select an Emscripten toolchain through
@@ -241,7 +284,7 @@ your workspace's WASM build setup.
 ## Low-Level Codegen
 
 `djinni_codegen` remains available for explicit generated-file integration,
-including Objective-C, Objective-C++, TypeScript, and YAML. Dedicated compiled
+including Objective-C, Objective-C++, and TypeScript. Dedicated compiled
 library macros for those languages are not implemented yet.
 
 ```python
@@ -258,7 +301,7 @@ djinni_codegen(
 Use either `djinni` (a `DjinniInfo` target) or the legacy `idl` with explicit
 `srcs` and `idl_include_paths`. Supported categories are `cpp_srcs`, `cpp_hdrs`,
 `c_srcs`, `c_hdrs`, `java_srcs`, `jni_srcs`, `jni_hdrs`, `objc_srcs`, `objc_hdrs`, `objcpp_srcs`,
-`objcpp_hdrs`, `wasm_srcs`, `wasm_hdrs`, `ts_srcs`, and `yaml_srcs`. They are also
+`objcpp_hdrs`, `wasm_srcs`, `wasm_hdrs`, and `ts_srcs`. They are also
 output groups, along with `all`. There is no `generators` attribute: nonempty
 output categories select generators. Each category must use one directory;
 Objective-C, Objective-C++, and WASM source/header pairs each share a directory.
@@ -267,6 +310,9 @@ Actions use declared files, `ctx.actions.args`, and the compiler's
 `FilesToRunProvider` so its runfiles are included. Shell generation scripts are
 not invoked by the rules. Missing declared outputs fail the build; detection of
 extra undeclared outputs and a general `djinni_manifest_test` remain future work.
+
+YAML type manifests imported with `@extern` remain ordinary source inputs. The
+Bazel rules do not generate them; create and maintain them separately.
 
 ## Command-Line Generation
 
