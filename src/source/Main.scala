@@ -135,6 +135,8 @@ object Main {
     var swiftxxBaseLibIncludePrefix: String = ""
     var inFileListPath: Option[File] = None
     var outFileListPath: Option[File] = None
+    var declarationManifestPath: Option[File] = None
+    var verifyDeclarationManifestPath: Option[File] = None
     var skipGeneration: Boolean = false
     var yamlOutFolder: Option[File] = None
     var yamlOutFile: Option[String] = None
@@ -360,6 +362,10 @@ object Main {
         .text("Optional file in which to write the list of input files parsed.")
       opt[File]("list-out-files").valueName("<list-out-files>").foreach(x => outFileListPath = Some(x))
         .text("Optional file in which to write the list of output files produced.")
+      opt[File]("list-declarations").valueName("<list-declarations>").foreach(x => declarationManifestPath = Some(x))
+        .text("Write internal type names, kinds, and generation-relevant properties as TSV.")
+      opt[File]("verify-declarations").valueName("<verify-declarations>").foreach(x => verifyDeclarationManifestPath = Some(x))
+        .text("Verify the resolved declarations against a manifest.")
       opt[Boolean]("skip-generation").valueName("<true/false>").foreach(x => skipGeneration = x)
         .text("Way of specifying if file generation should be skipped (default: false)")
 
@@ -456,6 +462,32 @@ object Main {
         System.err.println(err)
         System.exit(1); return
       case _ =>
+    }
+
+    if (declarationManifestPath.isDefined || verifyDeclarationManifestPath.isDefined) {
+      val declarations = idl.collect { case td: ast.InternTypeDecl => td }.map { td =>
+        val (kind, hasConstants, hasDerivings, extensions) = td.body match {
+          case e: ast.Enum => (if (e.flags) "flags" else "enum", false, false, "")
+          case r: ast.Record => ("record", r.consts.nonEmpty, r.derivingTypes.nonEmpty, Seq(r.ext.java, r.ext.cpp, r.ext.cc, r.ext.objc, r.ext.js, r.ext.swift).mkString(","))
+          case i: ast.Interface => ("interface", i.consts.nonEmpty, false, Seq(i.ext.java, i.ext.cpp, i.ext.cc, i.ext.objc, i.ext.js, i.ext.swift).mkString(","))
+          case _: ast.ProtobufMessage => ("protobuf", false, false, "")
+        }
+        Seq(td.ident.name, kind, td.params.length.toString, hasConstants.toString, hasDerivings.toString, extensions).mkString("\t")
+      }.mkString("", "\n", "\n")
+      verifyDeclarationManifestPath.foreach { path =>
+        val existing = scala.io.Source.fromFile(path, "UTF-8")
+        try {
+          if (existing.mkString != declarations) {
+            System.err.println("Declaration manifest does not match resolved IDL: " + path)
+            System.exit(1)
+          }
+        } finally existing.close()
+      }
+      declarationManifestPath.foreach { path =>
+        if (path.getParentFile != null) createFolder("declaration manifest", path.getParentFile)
+        val writer = new BufferedWriter(new FileWriter(path))
+        try writer.write(declarations) finally writer.close()
+      }
     }
 
     System.out.println("Generating...")
@@ -589,7 +621,10 @@ object Main {
 
     try {
       val r = generate(idl, outSpec)
-      r.foreach(e => System.err.println("Error generating output: " + e))
+      r.foreach { e =>
+        System.err.println("Error generating output: " + e)
+        System.exit(1)
+      }
     }
     finally {
       if (outFileListWriter.isDefined) {
