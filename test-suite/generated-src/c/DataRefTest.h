@@ -25,6 +25,8 @@ djinni_binary_ref testsuite_DataRefTest_dataFromVec(testsuite_DataRefTest_ref in
 
 djinni_binary_ref testsuite_DataRefTest_dataFromStr(testsuite_DataRefTest_ref instance);
 
+djinni_binary_ref testsuite_DataRefTest_generateDataPreferNative(testsuite_DataRefTest_ref instance, int32_t len);
+
 djinni_binary_ref testsuite_DataRefTest_sendDataView(testsuite_DataRefTest_ref instance, djinni_binary_ref data);
 
 djinni_binary_ref testsuite_DataRefTest_recvDataView(testsuite_DataRefTest_ref instance);

@@ -26,6 +26,9 @@ public abstract class DataRefTest {
     public abstract java.nio.ByteBuffer dataFromStr();
 
     @Nonnull
+    public abstract java.nio.ByteBuffer generateDataPreferNative(int len);
+
+    @Nonnull
     public abstract byte[] sendDataView(@Nonnull java.nio.ByteBuffer data);
 
     @Nonnull
@@ -94,6 +97,14 @@ public abstract class DataRefTest {
             return native_dataFromStr(this.nativeRef);
         }
         private native java.nio.ByteBuffer native_dataFromStr(long _nativeRef);
+
+        @Override
+        public java.nio.ByteBuffer generateDataPreferNative(int len)
+        {
+            assert !this.destroyed.get() : "trying to use a destroyed object";
+            return native_generateDataPreferNative(this.nativeRef, len);
+        }
+        private native java.nio.ByteBuffer native_generateDataPreferNative(long _nativeRef, int len);
 
         @Override
         public byte[] sendDataView(java.nio.ByteBuffer data)
