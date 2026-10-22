@@ -73,6 +73,13 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
+- (nonnull NSData *)generateDataPreferNative:(int32_t)len {
+    try {
+        auto objcpp_result_ = _cppRefHandle.get()->generateDataPreferNative(::djinni::I32::toCpp(len));
+        return ::djinni::NativeDataRef::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
 - (nonnull NSData *)sendDataView:(nonnull NSData *)data {
     try {
         auto objcpp_result_ = _cppRefHandle.get()->sendDataView(::djinni::NativeDataView::toCpp(data));

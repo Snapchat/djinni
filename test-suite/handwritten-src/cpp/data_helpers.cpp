@@ -40,6 +40,10 @@ public:
         return DataRef(std::move(buf));
     }
 
+    DataRef generateDataPreferNative(int32_t len) override {
+        return DataRef(static_cast<size_t>(len), DataRef::PreferNativeMemory{});
+    }
+
     std::vector<uint8_t> sendDataView(const DataView& data) override {
         return {data.buf(), data.buf() + data.len()};
     }

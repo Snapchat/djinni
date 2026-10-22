@@ -10,6 +10,7 @@ public protocol DataRefTest: AnyObject {
     func generateData() throws -> Foundation.NSData
     func dataFromVec() throws -> Foundation.NSData
     func dataFromStr() throws -> Foundation.NSData
+    func generateDataPreferNative(_ len: Int32) throws -> Foundation.NSData
     func sendDataView(_ data: Foundation.NSData) throws -> Data
     func recvDataView() throws -> Foundation.NSData
 }

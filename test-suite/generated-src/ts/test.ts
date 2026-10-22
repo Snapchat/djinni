@@ -127,6 +127,7 @@ export interface DataRefTest {
     generateData(): Uint8Array;
     dataFromVec(): Uint8Array;
     dataFromStr(): Uint8Array;
+    generateDataPreferNative(len: number): Uint8Array;
     sendDataView(data: Uint8Array): Uint8Array;
     recvDataView(): Uint8Array;
 }

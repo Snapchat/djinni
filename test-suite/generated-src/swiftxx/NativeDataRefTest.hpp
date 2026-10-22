@@ -16,6 +16,7 @@ djinni::swift::AnyValue DataRefTest_sendMutableData(const djinni::swift::Paramet
 djinni::swift::AnyValue DataRefTest_generateData(const djinni::swift::ParameterList* params);
 djinni::swift::AnyValue DataRefTest_dataFromVec(const djinni::swift::ParameterList* params);
 djinni::swift::AnyValue DataRefTest_dataFromStr(const djinni::swift::ParameterList* params);
+djinni::swift::AnyValue DataRefTest_generateDataPreferNative(const djinni::swift::ParameterList* params);
 djinni::swift::AnyValue DataRefTest_sendDataView(const djinni::swift::ParameterList* params);
 djinni::swift::AnyValue DataRefTest_recvDataView(const djinni::swift::ParameterList* params);
 djinni::swift::AnyValue DataRefTest_create(const djinni::swift::ParameterList* params);

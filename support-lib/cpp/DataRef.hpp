@@ -63,8 +63,17 @@ public:
     
     explicit DataRef(const std::shared_ptr<Impl>& impl): _impl(impl) {}
 
+    struct PreferNativeMemory {};
+
     // initialize with empty buffer
     explicit DataRef(size_t len);
+    // Empty buffer that may live outside the managed heap; on JNI its ByteBuffer has no array().
+    // Opt in only when no Java reader calls ByteBuffer.array().
+#if DATAREF_JNI
+    DataRef(size_t len, PreferNativeMemory /*unused*/);
+#else
+    DataRef(size_t len, PreferNativeMemory /*unused*/) : DataRef(len) {}
+#endif
     // initialize with data
     DataRef(const void* data, size_t len);
     // initialize with copying vector
