@@ -7,6 +7,27 @@ load("@rules_java//java:defs.bzl", "java_test")
 load("//bzl:djinni_codegen.bzl", "djinni_codegen")
 load(":djinni_outputs.bzl", "TESTSUITE_MAIN_DJINNI_OUTS")
 
+exports_files(["djinni/all.djinni"], visibility = ["//visibility:public"])
+
+cc_library(
+    name = "complex-handwritten-headers",
+    hdrs = glob(["handwritten-src/cpp/*.hpp"]),
+    includes = ["handwritten-src/cpp"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "complex-schema-inputs",
+    srcs = glob(["djinni/**/*.djinni", "djinni/**/*.yaml"]) + [
+        "//support-lib:dataref.yaml",
+        "//support-lib:dataview.yaml",
+        "//support-lib:future.yaml",
+        "//support-lib:outcome.yaml",
+        "//support-lib:provider.yaml",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 djinni_codegen(
     name = "testsuite-main-djinni-codegen",
     srcs = glob([

@@ -101,6 +101,17 @@ or `cc_binary`, returning the normal language provider to downstream consumers.
 The shared action implementation is internal; each language macro selects only
 its own output categories and runs a separate action.
 
+The WIP directory-backed mode omits `outs`. `djinni_library` writes a resolved
+declaration manifest, and each language action checks it before generating into a
+declared directory. Djinni also writes its exact output list for the action.
+C++, C, JNI, and WASM compile discovered sources through a generated unity file;
+Java packages discovered sources into a source JAR. Objective-C uses a generated
+`.mm` unity file. TypeScript copies its module file from the directory so callers
+still receive one `.ts` artifact. Existing `outs` calls continue to use explicit
+outputs. Unity compilation can change diagnostics or expose definitions that
+were isolated in separate source files, so it needs broader validation before
+replacing the explicit-output path.
+
 ```python
 load("@djinni//bzl:djinni_codegen.bzl", "cc_djinni_library", "djinni_library", "java_djinni_library")
 
@@ -110,24 +121,16 @@ djinni_library(
     srcs = ["common.djinni"],
 )
 
-OUTPUTS = {
-    "cpp_hdrs": ["generated/cpp/message.hpp", "generated/cpp/common.hpp"],
-    "java_srcs": ["generated/java/Message.java", "generated/java/Common.java"],
-}
-
 cc_djinni_library(
     name = "messages_cc",
     deps = [":messages"],
-    outs = OUTPUTS,
     cpp_namespace = "example",
-    includes = ["generated/cpp"],
     visibility = ["//visibility:public"],
 )
 
 java_djinni_library(
     name = "messages_java",
     deps = [":messages"],
-    outs = OUTPUTS,
     java_package = "example",
     visibility = ["//visibility:public"],
 )
@@ -139,7 +142,7 @@ cc_binary(
 )
 ```
 
-Output names must match the IDL and options. A large manifest can be loaded from
+When `outs` is supplied, output names must match the IDL and options. A large manifest can be loaded from
 a checked-in `.bzl` file, as in `examples/djinni_outputs.bzl`. Output declarations
 are package-relative paths, and must not overlap checked-in files or outputs from
 another target. Use distinct output directories for separate option sets.
@@ -164,8 +167,9 @@ another target. Use distinct output directories for separate option sets.
   relative to the rules repository and built in the execution configuration.
 
 `DjinniInfo` carries the root IDL, a depset of transitive source files, a depset
-of execution-root include paths, and a depset of verification outputs. Default
-files contain this target's direct sources and verification outputs.
+of execution-root include paths, the declaration manifest, and a depset of
+verification outputs. Default files contain this target's direct sources,
+manifest, and verification outputs.
 
 Imports must be declared through `srcs`, `idl_include_files`, or `deps`; string include paths do not make files
 action inputs. No host filesystem scanning occurs during analysis. `deps` models
