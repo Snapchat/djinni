@@ -9,6 +9,7 @@ DataRefTest = interface +c {
   generateData(): DataRef;
   dataFromVec() : DataRef;
   dataFromStr() : DataRef;
+  generateDataPreferNative(len: i32): DataRef;
 
   sendDataView(data: DataView): binary;
   recvDataView(): DataView;

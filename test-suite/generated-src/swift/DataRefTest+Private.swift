@@ -50,6 +50,14 @@ final class DataRefTestCppProxy: DjinniSupport.CppProxy, TestSuite.DataRefTest {
         try handleCppErrors(&ret)
         return DjinniSupport.DataRefMarshaller.fromCpp(ret)
     }
+    func generateDataPreferNative(_ len: Int32) throws -> Foundation.NSData {
+        var _params = djinni.swift.ParameterList()
+        _params.addValue(inst)
+        _params.addValue(I32Marshaller.toCpp(len))
+        var ret = djinni_generated.DataRefTest_generateDataPreferNative(&_params)
+        try handleCppErrors(&ret)
+        return DjinniSupport.DataRefMarshaller.fromCpp(ret)
+    }
     func sendDataView(_ data: Foundation.NSData) throws -> Data {
         var _params = djinni.swift.ParameterList()
         _params.addValue(inst)
