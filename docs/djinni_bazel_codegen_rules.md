@@ -104,6 +104,9 @@ its own output categories and runs a separate action.
 The WIP directory-backed mode omits `outs`. `djinni_library` writes a resolved
 declaration manifest, and each language action checks it before generating into a
 declared directory. Djinni also writes its exact output list for the action.
+C++/JNI/WASM headers and sources use the configured include prefix inside the
+directory. C sources stay at its root while C headers use the C include prefix;
+Java files use the package path beneath the directory.
 C++, C, JNI, and WASM compile discovered sources through a generated unity file;
 Java packages discovered sources into a source JAR. Objective-C uses a generated
 `.mm` unity file. TypeScript copies its module file from the directory so callers
@@ -150,6 +153,8 @@ another target. Use distinct output directories for separate option sets.
 ### `djinni_library`
 
 - `idl`: required single root `.djinni` label.
+- `project_name`: optional consumer project name carried in `DjinniInfo` for
+  wrappers that derive package names, namespaces, and output paths from it.
 - `srcs`: additional imported `.djinni`, YAML, or proto file labels.
 - `idl_include_files`: file labels whose parent directories are import search
   roots. These files are also declared action inputs. Use this for external
@@ -166,8 +171,8 @@ another target. Use distinct output directories for separate option sets.
 - `compiler`: executable label, defaulting to Djinni's `//src:djinni`, resolved
   relative to the rules repository and built in the execution configuration.
 
-`DjinniInfo` carries the root IDL, a depset of transitive source files, a depset
-of execution-root include paths, the declaration manifest, and a depset of
+`DjinniInfo` carries the root IDL, project name, a depset of transitive source
+files, a depset of execution-root include paths, the declaration manifest, and a depset of
 verification outputs. Default files contain this target's direct sources,
 manifest, and verification outputs.
 

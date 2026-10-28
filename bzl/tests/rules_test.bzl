@@ -11,6 +11,7 @@ def _provider_test_impl(ctx):
     asserts.equals(env, ["nested.djinni", "shared.djinni"], sorted([f.basename for f in info.transitive_srcs.to_list()]))
     asserts.equals(env, ["bzl/tests/idl"], info.idl_include_paths.to_list())
     asserts.equals(env, "shared-schema.declarations.tsv", info.declarations_manifest.basename)
+    asserts.equals(env, "shared", info.project_name)
     actions = analysistest.target_actions(env)
     asserts.equals(env, 1, len(actions))
     asserts.equals(env, "DjinniDeclarations", actions[0].mnemonic)
@@ -104,6 +105,18 @@ def rule_tests(name):
         outs = {"cpp_hdrs": ["analysis/cpp_override/shared.hpp"]},
         cpp_namespace = "override::namespace",
         tags = ["manual"],
+    )
+    djinni_codegen(
+        name = "invalid_project_name",
+        djinni = ":shared-schema",
+        project_name = "other",
+        outs = {"cpp_hdrs": ["invalid_project/shared.hpp"]},
+        tags = ["manual"],
+    )
+    _failure_test(
+        name = "project_name_mismatch_test",
+        target_under_test = ":invalid_project_name",
+        message = "does not match djinni_library project_name",
     )
     java_djinni_library(
         name = "analysis_java",
@@ -255,5 +268,5 @@ def rule_tests(name):
         )
     native.test_suite(
         name = name,
-        tests = [":provider_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":c_compatibility_test", ":objc_compatibility_test"],
+        tests = [":provider_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":project_name_mismatch_test", ":c_compatibility_test", ":objc_compatibility_test"],
     )

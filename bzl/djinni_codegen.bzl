@@ -11,6 +11,7 @@ DjinniInfo = provider(
         "idl_include_paths": "Depset of execution-root include paths.",
         "validation_files": "Depset of IDL verification outputs.",
         "declarations_manifest": "Resolved internal declarations produced by Djinni.",
+        "project_name": "Consumer project name for language-specific defaults.",
         "cpp_namespace": "Default C++ namespace.",
         "cpp_include_prefix": "Default generated C++ include prefix.",
         "cpp_base_lib_include_prefix": "Default C++ runtime include prefix.",
@@ -54,6 +55,8 @@ def _add_ident_arg(args, flag, value):
 def _djinni_codegen_impl(ctx):
     if ctx.attr.djinni:
         djinni = ctx.attr.djinni[DjinniInfo]
+        if ctx.attr.project_name and djinni.project_name and ctx.attr.project_name != djinni.project_name:
+            fail("project_name %s does not match djinni_library project_name %s" % (ctx.attr.project_name, djinni.project_name))
         idl = djinni.idl
         input_depsets = [djinni.transitive_srcs, djinni.validation_files, depset([djinni.declarations_manifest])]
         idl_include_paths = djinni.idl_include_paths.to_list() + _include_paths(ctx)
@@ -102,14 +105,15 @@ def _djinni_codegen_impl(ctx):
 
     args = ctx.actions.args()
 
-    java_dir = tree_outputs["java"].path if "java" in tree_outputs else _single_output_dir(ctx.outputs.java_srcs, "java")
+    java_package_path = ctx.attr.java_package.replace(".", "/")
+    java_dir = (tree_outputs["java"].path + "/" + java_package_path if java_package_path else tree_outputs["java"].path) if "java" in tree_outputs else _single_output_dir(ctx.outputs.java_srcs, "java")
     cpp_prefix = ctx.attr.cpp_include_prefix or (ctx.attr.djinni[DjinniInfo].cpp_include_prefix if ctx.attr.djinni else "")
     cpp_tree_dir = tree_outputs["cpp"].path + "/" + cpp_prefix.rstrip("/") if "cpp" in tree_outputs and cpp_prefix else (tree_outputs["cpp"].path if "cpp" in tree_outputs else None)
     cpp_src_dir = cpp_tree_dir if cpp_tree_dir else _single_output_dir(ctx.outputs.cpp_srcs, "cpp source")
     cpp_hdr_dir = cpp_tree_dir if cpp_tree_dir else _single_output_dir(ctx.outputs.cpp_hdrs, "cpp header")
     c_prefix = ctx.attr.c_include_prefix.rstrip("/")
     c_tree_dir = tree_outputs["c"].path + "/" + c_prefix if "c" in tree_outputs and c_prefix else (tree_outputs["c"].path if "c" in tree_outputs else None)
-    c_src_dir = c_tree_dir if c_tree_dir else _single_output_dir(ctx.outputs.c_srcs, "C wrapper source")
+    c_src_dir = tree_outputs["c"].path if "c" in tree_outputs else _single_output_dir(ctx.outputs.c_srcs, "C wrapper source")
     c_hdr_dir = c_tree_dir if c_tree_dir else _single_output_dir(ctx.outputs.c_hdrs, "C header")
     jni_prefix = ctx.attr.jni_include_prefix.rstrip("/")
     jni_tree_dir = tree_outputs["jni"].path + "/" + jni_prefix if "jni" in tree_outputs and jni_prefix else (tree_outputs["jni"].path if "jni" in tree_outputs else None)
@@ -300,6 +304,7 @@ _djinni_codegen = rule(
     implementation = _djinni_codegen_impl,
     attrs = {
         "djinni": attr.label(providers = [DjinniInfo]),
+        "project_name": attr.string(),
         "idl": attr.label(allow_single_file = [".djinni"]),
         "srcs": attr.label_list(allow_files = [".djinni", ".yaml", ".yml", ".proto"]),
         "idl_include_paths": attr.string_list(),
@@ -455,6 +460,7 @@ def _djinni_library_impl(ctx):
             idl_include_paths = include_paths,
             validation_files = validation_files,
             declarations_manifest = declarations_manifest,
+            project_name = ctx.attr.project_name,
             cpp_namespace = ctx.attr.cpp_namespace,
             cpp_include_prefix = ctx.attr.cpp_include_prefix,
             cpp_base_lib_include_prefix = ctx.attr.cpp_base_lib_include_prefix,
@@ -474,6 +480,7 @@ djinni_library = rule(
         "idl_include_files": attr.label_list(allow_files = True),
         "verify": attr.bool(default = True),
         "compiler": attr.label(default = Label("//src:djinni"), executable = True, cfg = "exec"),
+        "project_name": attr.string(default = ""),
         "cpp_namespace": attr.string(default = ""),
         "cpp_include_prefix": attr.string(default = ""),
         "cpp_base_lib_include_prefix": attr.string(default = ""),
