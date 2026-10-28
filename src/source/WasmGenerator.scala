@@ -31,13 +31,13 @@ class WasmGenerator(spec: Spec) extends Generator(spec) {
   val cppMarshal = new CppMarshal(spec)
 
   private def wasmFilenameStyle(name: String): String = {
-    return spec.jniFileIdentStyle(name)
+    return spec.wasmFileIdentStyle(name)
   }
   private def helperNamespace(): String = {
-    return spec.jniNamespace;
+    return spec.wasmCppNamespace;
   }
 
-  private def helperClass(name: String) = spec.jniClassIdentStyle(name)
+  private def helperClass(name: String) = spec.wasmClassIdentStyle(name)
   private def helperClass(tm: MExpr): String = helperName(tm) + helperTemplates(tm)
   def helperName(tm: MExpr): String = tm.base match {
     case d: MDef => withNs(Some(helperNamespace()), helperClass(d.name))

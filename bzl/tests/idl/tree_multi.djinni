@@ -1,0 +1,7 @@
+first = interface +c {
+    static get(): i32;
+}
+
+second = interface +c {
+    static get(): i32;
+}
