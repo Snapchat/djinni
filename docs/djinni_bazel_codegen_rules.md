@@ -236,24 +236,6 @@ ts_djinni_filegroup(
 )
 ```
 
-For custom compilation macros, `djinni_language_codegen` exposes the same
-language action without creating a native library:
-
-```python
-djinni_language_codegen(
-    name = "messages_objc_codegen",
-    deps = [":messages"],
-    language = "objc",
-    outs = {
-        "objc_hdrs": ["generated/objc/Messages.h"],
-        "objcpp_hdrs": ["generated/objc/Messages+Private.h"],
-        "objcpp_srcs": ["generated/objc/Messages+Private.mm"],
-    },
-)
-```
-
-Supported languages are `cpp`, `c`, `java`, `jni`, `objc`, `wasm`, and `ts`.
-`objc` selects both Objective-C and Objective-C++ output categories.
 The prologue options `jni_function_prologue_file` and
 `objcpp_function_prologue_file` take emitted include strings, not file labels.
 The generated consumers must declare the compilation dependency providing that

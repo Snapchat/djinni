@@ -603,23 +603,6 @@ def _language_codegen(name, deps, outs, language, kwargs):
     )
     return common
 
-def djinni_language_codegen(name, deps, outs = None, language = None, **kwargs):
-    """Generates one language for integration with custom compilation macros.
-
-    Args:
-        name: Target name.
-        deps: Exactly one djinni_library target.
-        outs: Shared or language-specific output manifest.
-        language: cpp, c, java, jni, objc (including objcpp), wasm, or ts.
-        **kwargs: Compiler options and common rule attributes.
-    """
-    if language not in ["cpp", "c", "java", "jni", "objc", "wasm", "ts"]:
-        fail("Unsupported Djinni language: %s" % language)
-    if outs == None:
-        kwargs["tree_languages"] = [language]
-        outs = {}
-    _language_codegen(name, deps, outs, language, kwargs)
-
 def _consumer_attrs(library_kwargs, common):
     attrs = dict(library_kwargs)
     for key, value in common.items():

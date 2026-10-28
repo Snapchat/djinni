@@ -1,4 +1,4 @@
-load("//bzl:djinni_codegen.bzl", "c_djinni_library", "cc_djinni_library", "djinni_language_codegen", "djinni_library", "java_djinni_library", "jni_djinni_library", "objc_djinni_library", "ts_djinni_filegroup", "wasm_djinni_cc_library")
+load("//bzl:djinni_codegen.bzl", "c_djinni_library", "cc_djinni_library", "djinni_library", "java_djinni_library", "jni_djinni_library", "objc_djinni_library", "ts_djinni_filegroup", "wasm_djinni_cc_library")
 load(":rules_test.bzl", "rule_tests")
 
 rule_tests(name = "rule_tests")
@@ -73,23 +73,6 @@ cc_djinni_library(
     deps = [":complex-schema"],
 )
 
-djinni_language_codegen(
-    name = "c_tree_probe",
-    testonly = True,
-    c_include_prefix = "shared/",
-    language = "c",
-    deps = [":shared-schema"],
-)
-
-djinni_language_codegen(
-    name = "jni_tree_probe",
-    testonly = True,
-    jni_include_cpp_prefix = "shared/",
-    jni_include_prefix = "shared/",
-    language = "jni",
-    deps = [":shared-schema"],
-)
-
 objc_djinni_library(
     name = "objc_tree_probe",
     testonly = True,
@@ -118,11 +101,5 @@ wasm_djinni_cc_library(
 
 ts_djinni_filegroup(
     name = "ts_tree_probe",
-    deps = [":shared-schema"],
-)
-
-djinni_language_codegen(
-    name = "low_level_tree_probe",
-    language = "cpp",
     deps = [":shared-schema"],
 )
