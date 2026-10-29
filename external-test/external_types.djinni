@@ -1,0 +1,3 @@
+external_type = record {
+    value: i32;
+}
