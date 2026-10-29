@@ -61,18 +61,25 @@ object Main {
       case _: java.util.Map[_, _] | _: scala.collection.Map[_, _] => Some(configMap(value, "configuration").toMap)
       case _ => None
     }
-    (entries(base), entries(overrideValue)) match {
-      case (Some(baseMap), Some(overrideMap)) =>
-        (baseMap.keySet ++ overrideMap.keySet).map { key =>
-          val value = (baseMap.get(key), overrideMap.get(key)) match {
-            case (Some(baseValue), Some(overrideValue)) => mergeConfigValues(baseValue, overrideValue)
-            case (Some(baseValue), None) => baseValue
-            case (None, Some(overrideValue)) => overrideValue
-            case _ => throw new AssertionError("unreachable")
-          }
-          key -> value
-        }.toMap
-      case _ => overrideValue
+    val baseEntries = entries(base)
+    val overrideEntries = entries(overrideValue)
+    if (baseEntries.isDefined && overrideEntries.isDefined) {
+      val baseMap = baseEntries.get
+      val overrideMap = overrideEntries.get
+      (baseMap.keySet ++ overrideMap.keySet).map { key =>
+        val baseValue = baseMap.get(key)
+        val overrideValue = overrideMap.get(key)
+        val value = if (baseValue.isDefined && overrideValue.isDefined) {
+          mergeConfigValues(baseValue.get, overrideValue.get)
+        } else if (overrideValue.isDefined) {
+          overrideValue.get
+        } else {
+          baseValue.get
+        }
+        key -> value
+      }.toMap
+    } else {
+      overrideValue
     }
   }
 
