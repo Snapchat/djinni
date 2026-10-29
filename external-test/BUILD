@@ -69,17 +69,33 @@ sh_test(
         "$(rootpath @djinni//bzl/tests:idl/shared.djinni)",
     ],
     data = [
+        "common_defaults.yaml",
         "schema.djinni",
+        "schema.djinni.yaml",
         "@djinni//bzl/tests:idl/nested.djinni",
         "@djinni//bzl/tests:idl/shared.djinni",
         "@djinni//src:djinni",
     ] + OUTS["cpp_hdrs"] + OUTS["java_srcs"],
 )
 
+sh_test(
+    name = "djinni_extern_config_test",
+    size = "small",
+    srcs = ["djinni_extern_config_test.sh"],
+    args = ["$(rootpath @djinni//src:djinni)"],
+    data = [
+        "external_types.djinni",
+        "external_types.djinni.yaml",
+        "extern_consumer.djinni",
+        "@djinni//src:djinni",
+    ],
+)
+
 test_suite(
     name = "consumer_tests",
     tests = [
         ":cli_equivalence_test",
+        ":djinni_extern_config_test",
         ":cpp_consumer_test",
         ":java_consumer_test",
     ],

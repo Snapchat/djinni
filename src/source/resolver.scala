@@ -34,7 +34,11 @@ package object resolver {
 
 type Scope = immutable.Map[String,Meta]
 
-def resolve(metas: Scope, idl: Seq[TypeDecl]): Option[Error] = {
+def resolve(metas: Scope, idl: Seq[TypeDecl]): Option[Error] = resolve(metas, idl, None)
+
+def resolve(metas: Scope, idl: Seq[TypeDecl], spec: generatorTools.Spec): Option[Error] = resolve(metas, idl, Some(spec))
+
+private def resolve(metas: Scope, idl: Seq[TypeDecl], spec: Option[generatorTools.Spec]): Option[Error] = {
 
   try {
     var topScope = metas
@@ -57,6 +61,11 @@ def resolve(metas: Scope, idl: Seq[TypeDecl]): Option[Error] = {
       topScope = topScope.updated(typeDecl.ident.name, typeDecl match {
         case td: InternTypeDecl => MDef(typeDecl.ident.name, typeDecl.params.length, defType, typeDecl.body)
         case td: ExternTypeDecl => YamlGenerator.metaFromYaml(td)
+        case td: DjinniExternTypeDecl =>
+          try YamlGenerator.metaFromConfig(td, spec.getOrElse(throw new IllegalArgumentException("External Djinni IDL requires a generation config context")))
+          catch {
+            case e: IllegalArgumentException => throw Error(td.ident.loc, e.getMessage).toException
+          }
         case td: ProtobufTypeDecl => MProtobuf(td.ident.name, 0, td.body.asInstanceOf[ProtobufMessage])
       })
     }

@@ -31,6 +31,7 @@ abstract sealed class FileRef {
 }
 case class IdlFileRef(override val file: File) extends FileRef
 case class ExternFileRef(override val file: File) extends FileRef
+case class ExternDjinniFileRef(override val file: File, configFile: File) extends FileRef
 case class ProtobufFileRef(override val file: File) extends FileRef
 
 case class Ident(name: String, file: File, loc: Loc)
@@ -49,6 +50,12 @@ sealed abstract class TypeDecl {
 }
 case class InternTypeDecl(override val ident: Ident, override val params: Seq[TypeParam], override val body: TypeDef, doc: Doc, override val origin: String) extends TypeDecl
 case class ExternTypeDecl(override val ident: Ident, override val params: Seq[TypeParam], override val body: TypeDef, properties: Map[String, Any], override val origin: String) extends TypeDecl
+case class DjinniExternTypeDecl(source: InternTypeDecl, configFile: File, config: Map[String, Any]) extends TypeDecl {
+  override val ident = source.ident
+  override val params = source.params
+  override val body = source.body
+  override val origin = source.origin
+}
 case class ProtobufTypeDecl(override val ident: Ident, override val params: Seq[TypeParam], override val body: TypeDef, override val origin: String) extends TypeDecl
 
 // `Ext.js` is shared by both wasm and valdi

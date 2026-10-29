@@ -53,6 +53,8 @@ fi
 
 [ ! -e "$temp_out" ] || rm -r "$temp_out"
 "$base_dir/../src/run-assume-built" \
+    --config "$base_dir/djinni_perf_benchmark.djinni.yaml" \
+    --verify-config \
     --java-out "$temp_out/java" \
     --java-package $java_package \
     --java-class-access-modifier "package" \

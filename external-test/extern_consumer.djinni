@@ -1,0 +1,5 @@
+@extern "external_types.djinni" config "external_types.djinni.yaml"
+
+consumer = record {
+    value: external_type;
+}

@@ -19,12 +19,263 @@
 package djinni
 
 import java.io.{BufferedWriter, File, FileNotFoundException, FileWriter, IOException}
+import java.io.{FileInputStream, InputStreamReader}
+
+import org.yaml.snakeyaml.Yaml
+import scala.collection.JavaConverters._
+import scala.util.control.NonFatal
 
 import djinni.generatorTools._
 
 object Main {
 
+  private val operationalConfigFlags = Set(
+    "--idl", "--idl-include-path", "--java-out", "--cpp-out", "--cpp-header-out",
+    "--jni-out", "--jni-header-out", "--objc-out", "--objcpp-out", "--wasm-out",
+    "--ts-out", "--swift-out", "--swiftxx-out", "--valdi-out", "--valdi-ts-out",
+    "--c-out", "--c-header-out", "--yaml-out", "--list-in-files", "--list-out-files",
+    "--list-declarations", "--verify-declarations", "--skip-generation"
+  )
+
+  private def configMap(value: Any, context: String): Seq[(String, Any)] = value match {
+    case map: java.util.Map[_, _] =>
+      map.asScala.toSeq.map {
+        case (key: String, item) => (key, item)
+        case (key, _) => throw new IllegalArgumentException(context + " keys must be strings; found " + key)
+      }
+    case map: scala.collection.Map[_, _] =>
+      map.toSeq.map {
+        case (key: String, item) => (key, item)
+        case (key, _) => throw new IllegalArgumentException(context + " keys must be strings; found " + key)
+      }
+    case _ => throw new IllegalArgumentException(context + " must be a YAML mapping")
+  }
+
+  private def readConfig(file: File): Any = {
+    val in = new InputStreamReader(new FileInputStream(file), "UTF-8")
+    try new Yaml().load[Any](in) finally in.close()
+  }
+
+  private def mergeConfigValues(base: Any, overrideValue: Any): Any = {
+    def entries(value: Any): Option[Map[String, Any]] = value match {
+      case _: java.util.Map[_, _] | _: scala.collection.Map[_, _] => Some(configMap(value, "configuration").toMap)
+      case _ => None
+    }
+    val baseEntries = entries(base)
+    val overrideEntries = entries(overrideValue)
+    if (baseEntries.isDefined && overrideEntries.isDefined) {
+      val baseMap = baseEntries.get
+      val overrideMap = overrideEntries.get
+      (baseMap.keySet ++ overrideMap.keySet).map { key =>
+        val baseValue = baseMap.get(key)
+        val overrideValue = overrideMap.get(key)
+        val value = if (baseValue.isDefined && overrideValue.isDefined) {
+          mergeConfigValues(baseValue.get, overrideValue.get)
+        } else if (overrideValue.isDefined) {
+          overrideValue.get
+        } else {
+          baseValue.get
+        }
+        key -> value
+      }.toMap
+    } else {
+      overrideValue
+    }
+  }
+
+  private def validateConfigMappings(value: Any, context: String): Unit = {
+    configMap(value, context).foreach { case (key, nested) =>
+      if (nested.isInstanceOf[java.util.Map[_, _]] || nested.isInstanceOf[scala.collection.Map[_, _]]) {
+        validateConfigMappings(nested, context + "." + key)
+      }
+    }
+  }
+
+  private def readConfigArgs(config: Any): Array[String] = {
+    validateConfigMappings(config, "configuration")
+    val rootEntries = configMap(config, "configuration")
+    if (rootEntries.map(_._1).distinct.length != rootEntries.length) {
+      throw new IllegalArgumentException("configuration contains duplicate keys")
+    }
+    val rootMap = rootEntries.toMap
+    val schemaVersion = rootMap.get("schema_version")
+    if (!schemaVersion.isDefined) {
+      throw new IllegalArgumentException("configuration requires schema_version: 1")
+    }
+    schemaVersion.get match {
+      case version: java.lang.Number if version.intValue() == 1 =>
+      case version => throw new IllegalArgumentException("unsupported schema_version: " + version)
+    }
+    val extraRootKeys = rootMap.keySet -- Set("schema_version", "languages")
+    if (extraRootKeys.nonEmpty) throw new IllegalArgumentException("unknown configuration keys: " + extraRootKeys.toSeq.sorted.mkString(", "))
+
+    val languages = rootMap.getOrElse("languages", throw new IllegalArgumentException("configuration requires languages"))
+    val languageEntries = configMap(languages, "languages")
+    if (languageEntries.map(_._1).distinct.length != languageEntries.length) {
+      throw new IllegalArgumentException("languages contains duplicate keys")
+    }
+    val args = scala.collection.mutable.ArrayBuffer[String]()
+    languageEntries.foreach { case (language, settings) =>
+      val settingEntries = configMap(settings, "languages." + language)
+      if (settingEntries.map(_._1).distinct.length != settingEntries.length) {
+        throw new IllegalArgumentException("languages." + language + " contains duplicate keys")
+      }
+      settingEntries.foreach {
+        case ("identifiers", identifiers) =>
+          val identifierEntries = configMap(identifiers, "languages." + language + ".identifiers")
+          if (identifierEntries.map(_._1).distinct.length != identifierEntries.length) {
+            throw new IllegalArgumentException("languages." + language + ".identifiers contains duplicate keys")
+          }
+          identifierEntries.foreach { case (name, value) =>
+            appendConfigOption(args, "--ident-" + language + "-" + name.replace('_', '-'), value)
+          }
+        case ("output_file", value) if language == "yaml" => appendConfigOption(args, "--yaml-out-file", value)
+        case (name, value) =>
+          appendConfigOption(args, "--" + language + "-" + name.replace('_', '-'), value)
+      }
+    }
+    args.toArray
+  }
+
+  private def appendConfigOption(args: scala.collection.mutable.ArrayBuffer[String], flag: String, value: Any): Unit = value match {
+    case text: String => args ++= Seq(flag, text)
+    case boolean: java.lang.Boolean if flag == "--swift-private-in-same-module" && boolean.booleanValue() => args += flag
+    case boolean: java.lang.Boolean if flag == "--swift-private-in-same-module" =>
+      throw new IllegalArgumentException(flag + " is a presence-only option and cannot be false")
+    case boolean: java.lang.Boolean => args ++= Seq(flag, boolean.toString)
+    case other => throw new IllegalArgumentException(flag + " must have a string or boolean value; found " + other)
+  }
+
+  private def extractConfigArguments(args: Array[String]): (Option[File], Option[File], Boolean, Array[String]) = {
+    var defaults: Option[File] = None
+    var config: Option[File] = None
+    var verify = false
+    val remaining = scala.collection.mutable.ArrayBuffer[String]()
+    var index = 0
+    while (index < args.length) {
+      args(index) match {
+        case "--defaults" =>
+          if (index + 1 >= args.length) throw new IllegalArgumentException("--defaults requires a file path")
+          if (defaults.isDefined) throw new IllegalArgumentException("--defaults may only be specified once")
+          defaults = Some(new File(args(index + 1)))
+          index += 2
+        case "--config" =>
+          if (index + 1 >= args.length) throw new IllegalArgumentException("--config requires a file path")
+          if (config.isDefined) throw new IllegalArgumentException("--config may only be specified once")
+          config = Some(new File(args(index + 1)))
+          index += 2
+        case "--verify-config" =>
+          verify = true
+          index += 1
+        case other =>
+          remaining += other
+          index += 1
+      }
+    }
+    (defaults, config, verify, remaining.toArray)
+  }
+
+  private def optionValues(args: Array[String]): Map[String, String] = {
+    val values = scala.collection.mutable.Map[String, String]()
+    val presenceOnly = Set("--swift-private-in-same-module")
+    var index = 0
+    while (index < args.length) {
+      val flag = args(index)
+      val hasValue = index + 1 < args.length && !args(index + 1).startsWith("--")
+      if (presenceOnly.contains(flag)) {
+        values(flag) = "<enabled>"
+        index += 1
+      } else if (!operationalConfigFlags.contains(flag)) {
+        if (hasValue) {
+          values(flag) = args(index + 1)
+          index += 2
+        } else {
+          values(flag) = "<enabled>"
+          index += 1
+        }
+      } else if (hasValue) {
+        index += 2
+      } else {
+        index += 1
+      }
+    }
+    values.toMap
+  }
+
+  private def mergeConfigAndCommandLine(configArgs: Array[String], cliArgs: Array[String]): Array[String] = {
+    val commandLineFlags = cliArgs.filter(_.startsWith("--")).toSet
+    val merged = scala.collection.mutable.ArrayBuffer[String]()
+    var index = 0
+    while (index < configArgs.length) {
+      val flag = configArgs(index)
+      val hasValue = index + 1 < configArgs.length && !configArgs(index + 1).startsWith("--")
+      if (!commandLineFlags.contains(flag)) {
+        merged += flag
+        if (hasValue) merged += configArgs(index + 1)
+      }
+      index += (if (hasValue) 2 else 1)
+    }
+    merged ++= cliArgs
+    merged.toArray
+  }
+
+  private def operationalArguments(args: Array[String]): Array[String] = {
+    val result = scala.collection.mutable.ArrayBuffer[String]()
+    var index = 0
+    while (index < args.length) {
+      val flag = args(index)
+      val hasValue = index + 1 < args.length && !args(index + 1).startsWith("--")
+      if (operationalConfigFlags.contains(flag)) {
+        result += flag
+        if (hasValue) result += args(index + 1)
+      }
+      index += (if (hasValue) 2 else 1)
+    }
+    result.toArray
+  }
+
+  private def verifyConfigMatches(configArgs: Array[String], cliArgs: Array[String]): Unit = {
+    val fromConfig = optionValues(configArgs)
+    val fromCli = optionValues(cliArgs)
+    val keys = fromConfig.keySet ++ fromCli.keySet
+    val mismatches = keys.toSeq.sorted.flatMap { key =>
+      val configured = fromConfig.get(key)
+      val commandLine = fromCli.get(key)
+      if (configured == commandLine) None
+      else Some("  " + key + ": config=" + configured.getOrElse("<missing>") + ", command line=" + commandLine.getOrElse("<missing>"))
+    }
+    if (mismatches.nonEmpty) {
+      throw new IllegalArgumentException("configuration does not match command-line settings:\n" + mismatches.mkString("\n"))
+    }
+  }
+
   def main(args: Array[String]) {
+    val (defaultsFile, explicitConfigFile, verifyConfig, cliArgs) = try extractConfigArguments(args) catch {
+      case NonFatal(ex) => System.err.println("Configuration error: " + ex.getMessage); System.exit(1); return
+    }
+    if (verifyConfig && defaultsFile.isEmpty && explicitConfigFile.isEmpty) {
+      System.err.println("--verify-config requires --defaults or --config")
+      System.exit(1)
+      return
+    }
+    val configArgs = try {
+      val mergedConfig = Seq(defaultsFile, explicitConfigFile).flatten.foldLeft(Option.empty[Any]) { (current, file) =>
+        Some(current.map(previous => mergeConfigValues(previous, readConfig(file))).getOrElse(readConfig(file)))
+      }
+      mergedConfig.map(readConfigArgs).getOrElse(Array[String]())
+    } catch {
+      case NonFatal(ex) => System.err.println("Error reading configuration file: " + ex.getMessage); System.exit(1); return
+    }
+    if (verifyConfig) {
+      try verifyConfigMatches(configArgs, cliArgs) catch {
+        case NonFatal(ex) => System.err.println(ex.getMessage); System.exit(1); return
+      }
+    }
+    val parseArgs = if (verifyConfig) {
+      operationalArguments(cliArgs) ++ configArgs
+    } else {
+      mergeConfigAndCommandLine(configArgs, cliArgs)
+    }
     var idlFile: File = null
     var idlIncludePaths: List[String] = List("")
     var cppOutFolder: Option[File] = None
@@ -100,6 +351,9 @@ object Main {
     var wasmOmitConstants: Boolean = false
     var wasmNamespace: Option[String] = None
     var wasmOmitNsAlias: Boolean = false
+    var wasmCppNamespace: Option[String] = None
+    var wasmClassIdentStyleOptional: Option[IdentConverter] = None
+    var wasmFileIdentStyleOptional: Option[IdentConverter] = None
     var valdiNamespace: String = "djinni_generated"
     var valdiClassIdentStyleOptional: Option[IdentConverter] = None
     var valdiFileIdentStyleOptional: Option[IdentConverter] = None
@@ -132,6 +386,8 @@ object Main {
     var swiftxxBaseLibIncludePrefix: String = ""
     var inFileListPath: Option[File] = None
     var outFileListPath: Option[File] = None
+    var declarationManifestPath: Option[File] = None
+    var verifyDeclarationManifestPath: Option[File] = None
     var skipGeneration: Boolean = false
     var yamlOutFolder: Option[File] = None
     var yamlOutFile: Option[String] = None
@@ -295,6 +551,8 @@ object Main {
         .text("Omit the generation of consts and enums in wasm, making them only accessible through TypeScript.")
       opt[String]("wasm-namespace").valueName("...").foreach(x => wasmNamespace = Some(x))
         .text("The namespace to use for generated Wasm classes.")
+      opt[String]("wasm-cpp-namespace").valueName("...").foreach(x => wasmCppNamespace = Some(x))
+        .text("The C++ namespace for generated WASM bridge classes (default: --jni-namespace).")
       opt[Boolean]("wasm-omit-namespace-alias").valueName("<true/false>").foreach(x => wasmOmitNsAlias = x)
         .text("Omit the generation of namespace aliases for classes. Namespaces will be prepended to class names instead.")
       opt[File]("ts-out").valueName("<out-folder>").foreach(x => tsOutFolder = Some(x))
@@ -355,6 +613,10 @@ object Main {
         .text("Optional file in which to write the list of input files parsed.")
       opt[File]("list-out-files").valueName("<list-out-files>").foreach(x => outFileListPath = Some(x))
         .text("Optional file in which to write the list of output files produced.")
+      opt[File]("list-declarations").valueName("<list-declarations>").foreach(x => declarationManifestPath = Some(x))
+        .text("Write internal type names, kinds, and generation-relevant properties as TSV.")
+      opt[File]("verify-declarations").valueName("<verify-declarations>").foreach(x => verifyDeclarationManifestPath = Some(x))
+        .text("Verify the resolved declarations against a manifest.")
       opt[Boolean]("skip-generation").valueName("<true/false>").foreach(x => skipGeneration = x)
         .text("Way of specifying if file generation should be skipped (default: false)")
 
@@ -372,6 +634,8 @@ object Main {
       identStyle("ident-cpp-file",       c => { cppFileIdentStyle = c })
       identStyle("ident-jni-class",      c => { jniClassIdentStyleOptional = Some(c)})
       identStyle("ident-jni-file",       c => { jniFileIdentStyleOptional = Some(c)})
+      identStyle("ident-wasm-class",     c => { wasmClassIdentStyleOptional = Some(c)})
+      identStyle("ident-wasm-file",      c => { wasmFileIdentStyleOptional = Some(c)})
       identStyle("ident-objc-enum",       c => { objcIdentStyle = objcIdentStyle.copy(enum = c) })
       identStyle("ident-objc-field",      c => { objcIdentStyle = objcIdentStyle.copy(field = c) })
       identStyle("ident-objc-method",     c => { objcIdentStyle = objcIdentStyle.copy(method = c) })
@@ -386,7 +650,7 @@ object Main {
       identStyle("ident-swiftxx-file",  c => { swiftxxFileIdentStyleOptional = Some(c)})
     }
 
-    if (!argParser.parse(args)) {
+    if (!argParser.parse(parseArgs)) {
       System.exit(1); return
     }
 
@@ -422,8 +686,9 @@ object Main {
     } else {
       None
     }
+    val parser = new Parser(idlIncludePaths)
     val (idl, flags) = try {
-      (new Parser(idlIncludePaths)).parseFile(idlFile, inFileListWriter)
+      parser.parseFile(idlFile, inFileListWriter)
     }
     catch {
       case ex @ (_: FileNotFoundException | _: IOException) =>
@@ -435,20 +700,36 @@ object Main {
         inFileListWriter.get.close()
       }
     }
-
     if (!flags.isEmpty) {
       if (!argParser.parse(flags.map({_.split(" ", 2)}).flatten :+ "--idl" :+ idlFile.getName())) {
         System.exit(1); return
       }
     }
 
-    // Resolve names in IDL file, check types.
-    System.out.println("Resolving...")
-    resolver.resolve(meta.defaults, idl) match {
-      case Some(err) =>
-        System.err.println(err)
-        System.exit(1); return
-      case _ =>
+    if (declarationManifestPath.isDefined || verifyDeclarationManifestPath.isDefined) {
+      val declarations = idl.collect { case td: ast.InternTypeDecl => td }.map { td =>
+        val (kind, hasConstants, hasDerivings, extensions) = td.body match {
+          case e: ast.Enum => (if (e.flags) "flags" else "enum", false, false, "")
+          case r: ast.Record => ("record", r.consts.nonEmpty, r.derivingTypes.nonEmpty, Seq(r.ext.java, r.ext.cpp, r.ext.cc, r.ext.objc, r.ext.js, r.ext.swift).mkString(","))
+          case i: ast.Interface => ("interface", i.consts.nonEmpty, false, Seq(i.ext.java, i.ext.cpp, i.ext.cc, i.ext.objc, i.ext.js, i.ext.swift).mkString(","))
+          case _: ast.ProtobufMessage => ("protobuf", false, false, "")
+        }
+        Seq(td.ident.name, kind, td.params.length.toString, hasConstants.toString, hasDerivings.toString, extensions).mkString("\t")
+      }.mkString("", "\n", "\n")
+      verifyDeclarationManifestPath.foreach { path =>
+        val existing = scala.io.Source.fromFile(path, "UTF-8")
+        try {
+          if (existing.mkString != declarations) {
+            System.err.println("Declaration manifest does not match resolved IDL: " + path)
+            System.exit(1)
+          }
+        } finally existing.close()
+      }
+      declarationManifestPath.foreach { path =>
+        if (path.getParentFile != null) createFolder("declaration manifest", path.getParentFile)
+        val writer = new BufferedWriter(new FileWriter(path))
+        try writer.write(declarations) finally writer.close()
+      }
     }
 
     System.out.println("Generating...")
@@ -540,6 +821,9 @@ object Main {
       wasmOmitConstants,
       wasmNamespace,
       wasmOmitNsAlias,
+      wasmCppNamespace.getOrElse(jniNamespace),
+      wasmClassIdentStyleOptional.getOrElse(jniClassIdentStyle),
+      wasmFileIdentStyleOptional.getOrElse(jniFileIdentStyle),
       jsIdentStyle,
       tsOutFolder,
       tsModule,
@@ -577,9 +861,19 @@ object Main {
       yamlPrefix,
       idlFile.getName.stripSuffix(".djinni"))
 
+    resolver.resolve(meta.defaults, idl, outSpec) match {
+      case Some(err) =>
+        System.err.println(err)
+        System.exit(1); return
+      case _ =>
+    }
+
     try {
       val r = generate(idl, outSpec)
-      r.foreach(e => System.err.println("Error generating output: " + e))
+      r.foreach { e =>
+        System.err.println("Error generating output: " + e)
+        System.exit(1)
+      }
     }
     finally {
       if (outFileListWriter.isDefined) {
