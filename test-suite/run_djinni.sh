@@ -73,6 +73,8 @@ fi
 [ ! -e "$temp_out" ] || rm -r "$temp_out"
 (cd "$base_dir" && \
 "$base_dir/../src/run-assume-built" \
+    --config "$base_dir/djinni/wchar_test.djinni.yaml" \
+    --verify-config \
     --java-out "$temp_out_relative/java" \
     --java-package $java_package \
     --java-nullable-annotation "javax.annotation.CheckForNull" \
@@ -115,6 +117,8 @@ fi
     \
     --idl "$wchar_in_relative" && \
 "$base_dir/../src/run-assume-built" \
+    --config "$base_dir/djinni/all.djinni.yaml" \
+    --verify-config \
     --java-out "$temp_out_relative/java" \
     --java-package $java_package \
     --java-nullable-annotation "javax.annotation.CheckForNull" \
@@ -165,6 +169,8 @@ fi
     --idl "$in_relative" \
     --idl-include-path "djinni/vendor" && \
 "$base_dir/../src/run-assume-built" \
+    --config "$base_dir/djinni/function_prologue.djinni.yaml" \
+    --verify-config \
     --java-out "$temp_out_relative/java" \
     --java-package $java_package \
     --java-nullable-annotation "javax.annotation.CheckForNull" \
@@ -192,6 +198,8 @@ fi
     \
     --idl "$prologue_in_relative" && \
 "$base_dir/../src/run-assume-built" \
+    --config "$base_dir/djinni/ident_explicit.djinni.yaml" \
+    --verify-config \
     --java-out "$temp_out_relative/java" \
     --java-package $java_package \
     --java-nullable-annotation "javax.annotation.CheckForNull" \
@@ -224,6 +232,8 @@ fi
     \
     --idl "$ident_explicit_in_relative" && \
 "$base_dir/../src/run-assume-built" \
+    --config "$base_dir/djinni/optionals.djinni.yaml" \
+    --verify-config \
     --java-out "$temp_out_relative/java" \
     --java-package $java_package \
     --java-nullable-annotation "javax.annotation.CheckForNull" \
@@ -254,6 +264,8 @@ fi
     \
     --idl "$optional_in_relative" && \
 "$base_dir/../src/run-assume-built" \
+    --config "$base_dir/djinni/interface_and_abstract_class.djinni.yaml" \
+    --verify-config \
     --java-out "$temp_out_relative/java" \
     --java-package $java_package \
     --java-nullable-annotation "javax.annotation.CheckForNull" \
@@ -293,6 +305,8 @@ fi
 cp "$base_dir/djinni/yaml-test.djinni" "$temp_out/yaml"
 (cd "$base_dir" && \
 "$base_dir/../src/run-assume-built" \
+    --config "$base_dir/djinni/yaml-test.djinni.yaml" \
+    --verify-config \
     --java-out "$temp_out_relative/java" \
     --java-package $java_package \
     --ident-java-field mFooBar \

@@ -19,12 +19,205 @@
 package djinni
 
 import java.io.{BufferedWriter, File, FileNotFoundException, FileWriter, IOException}
+import java.io.{FileInputStream, InputStreamReader}
+
+import org.yaml.snakeyaml.Yaml
+import scala.collection.JavaConverters._
+import scala.util.control.NonFatal
 
 import djinni.generatorTools._
 
 object Main {
 
+  private val operationalConfigFlags = Set(
+    "--idl", "--idl-include-path", "--java-out", "--cpp-out", "--cpp-header-out",
+    "--jni-out", "--jni-header-out", "--objc-out", "--objcpp-out", "--wasm-out",
+    "--ts-out", "--swift-out", "--swiftxx-out", "--valdi-out", "--valdi-ts-out",
+    "--c-out", "--c-header-out", "--yaml-out", "--list-in-files", "--list-out-files",
+    "--list-declarations", "--verify-declarations", "--skip-generation"
+  )
+
+  private def configMap(value: Any, context: String): Seq[(String, Any)] = value match {
+    case map: java.util.Map[_, _] =>
+      map.asScala.toSeq.map {
+        case (key: String, item) => (key, item)
+        case (key, _) => throw new IllegalArgumentException(context + " keys must be strings; found " + key)
+      }
+    case _ => throw new IllegalArgumentException(context + " must be a YAML mapping")
+  }
+
+  private def readConfigArgs(file: File): Array[String] = {
+    val in = new InputStreamReader(new FileInputStream(file), "UTF-8")
+    val root = try new Yaml().load[Any](in) finally in.close()
+    val rootEntries = configMap(root, "configuration")
+    if (rootEntries.map(_._1).distinct.length != rootEntries.length) {
+      throw new IllegalArgumentException("configuration contains duplicate keys")
+    }
+    val rootMap = rootEntries.toMap
+    rootMap.get("schema_version") match {
+      case Some(version: java.lang.Number) if version.intValue() == 1 =>
+      case Some(version) => throw new IllegalArgumentException("unsupported schema_version: " + version)
+      case None => throw new IllegalArgumentException("configuration requires schema_version: 1")
+    }
+    val extraRootKeys = rootMap.keySet -- Set("schema_version", "languages")
+    if (extraRootKeys.nonEmpty) throw new IllegalArgumentException("unknown configuration keys: " + extraRootKeys.toSeq.sorted.mkString(", "))
+
+    val languages = rootMap.getOrElse("languages", throw new IllegalArgumentException("configuration requires languages"))
+    val languageEntries = configMap(languages, "languages")
+    if (languageEntries.map(_._1).distinct.length != languageEntries.length) {
+      throw new IllegalArgumentException("languages contains duplicate keys")
+    }
+    val args = scala.collection.mutable.ArrayBuffer[String]()
+    languageEntries.foreach { case (language, settings) =>
+      val settingEntries = configMap(settings, "languages." + language)
+      if (settingEntries.map(_._1).distinct.length != settingEntries.length) {
+        throw new IllegalArgumentException("languages." + language + " contains duplicate keys")
+      }
+      settingEntries.foreach {
+        case ("identifiers", identifiers) =>
+          val identifierEntries = configMap(identifiers, "languages." + language + ".identifiers")
+          if (identifierEntries.map(_._1).distinct.length != identifierEntries.length) {
+            throw new IllegalArgumentException("languages." + language + ".identifiers contains duplicate keys")
+          }
+          identifierEntries.foreach { case (name, value) =>
+            appendConfigOption(args, "--ident-" + language + "-" + name.replace('_', '-'), value)
+          }
+        case ("output_file", value) if language == "yaml" => appendConfigOption(args, "--yaml-out-file", value)
+        case (name, value) =>
+          appendConfigOption(args, "--" + language + "-" + name.replace('_', '-'), value)
+      }
+    }
+    args.toArray
+  }
+
+  private def appendConfigOption(args: scala.collection.mutable.ArrayBuffer[String], flag: String, value: Any): Unit = value match {
+    case text: String => args ++= Seq(flag, text)
+    case boolean: java.lang.Boolean if flag == "--swift-private-in-same-module" && boolean.booleanValue() => args += flag
+    case boolean: java.lang.Boolean if flag == "--swift-private-in-same-module" =>
+      throw new IllegalArgumentException(flag + " is a presence-only option and cannot be false")
+    case boolean: java.lang.Boolean => args ++= Seq(flag, boolean.toString)
+    case other => throw new IllegalArgumentException(flag + " must have a string or boolean value; found " + other)
+  }
+
+  private def extractConfigArguments(args: Array[String]): (Option[File], Boolean, Array[String]) = {
+    var config: Option[File] = None
+    var verify = false
+    val remaining = scala.collection.mutable.ArrayBuffer[String]()
+    var index = 0
+    while (index < args.length) {
+      args(index) match {
+        case "--config" =>
+          if (index + 1 >= args.length) throw new IllegalArgumentException("--config requires a file path")
+          if (config.isDefined) throw new IllegalArgumentException("--config may only be specified once")
+          config = Some(new File(args(index + 1)))
+          index += 2
+        case "--verify-config" =>
+          verify = true
+          index += 1
+        case other =>
+          remaining += other
+          index += 1
+      }
+    }
+    (config, verify, remaining.toArray)
+  }
+
+  private def optionValues(args: Array[String]): Map[String, String] = {
+    val values = scala.collection.mutable.Map[String, String]()
+    val presenceOnly = Set("--swift-private-in-same-module")
+    var index = 0
+    while (index < args.length) {
+      val flag = args(index)
+      val hasValue = index + 1 < args.length && !args(index + 1).startsWith("--")
+      if (presenceOnly.contains(flag)) {
+        values(flag) = "<enabled>"
+        index += 1
+      } else if (!operationalConfigFlags.contains(flag)) {
+        if (hasValue) {
+          values(flag) = args(index + 1)
+          index += 2
+        } else {
+          values(flag) = "<enabled>"
+          index += 1
+        }
+      } else if (hasValue) {
+        index += 2
+      } else {
+        index += 1
+      }
+    }
+    values.toMap
+  }
+
+  private def mergeConfigAndCommandLine(configArgs: Array[String], cliArgs: Array[String]): Array[String] = {
+    val commandLineFlags = cliArgs.filter(_.startsWith("--")).toSet
+    val merged = scala.collection.mutable.ArrayBuffer[String]()
+    var index = 0
+    while (index < configArgs.length) {
+      val flag = configArgs(index)
+      val hasValue = index + 1 < configArgs.length && !configArgs(index + 1).startsWith("--")
+      if (!commandLineFlags.contains(flag)) {
+        merged += flag
+        if (hasValue) merged += configArgs(index + 1)
+      }
+      index += (if (hasValue) 2 else 1)
+    }
+    merged ++= cliArgs
+    merged.toArray
+  }
+
+  private def operationalArguments(args: Array[String]): Array[String] = {
+    val result = scala.collection.mutable.ArrayBuffer[String]()
+    var index = 0
+    while (index < args.length) {
+      val flag = args(index)
+      val hasValue = index + 1 < args.length && !args(index + 1).startsWith("--")
+      if (operationalConfigFlags.contains(flag)) {
+        result += flag
+        if (hasValue) result += args(index + 1)
+      }
+      index += (if (hasValue) 2 else 1)
+    }
+    result.toArray
+  }
+
+  private def verifyConfigMatches(configArgs: Array[String], cliArgs: Array[String]): Unit = {
+    val fromConfig = optionValues(configArgs)
+    val fromCli = optionValues(cliArgs)
+    val keys = fromConfig.keySet ++ fromCli.keySet
+    val mismatches = keys.toSeq.sorted.flatMap { key =>
+      val configured = fromConfig.get(key)
+      val commandLine = fromCli.get(key)
+      if (configured == commandLine) None
+      else Some("  " + key + ": config=" + configured.getOrElse("<missing>") + ", command line=" + commandLine.getOrElse("<missing>"))
+    }
+    if (mismatches.nonEmpty) {
+      throw new IllegalArgumentException("configuration does not match command-line settings:\n" + mismatches.mkString("\n"))
+    }
+  }
+
   def main(args: Array[String]) {
+    val (explicitConfigFile, verifyConfig, cliArgs) = try extractConfigArguments(args) catch {
+      case NonFatal(ex) => System.err.println("Configuration error: " + ex.getMessage); System.exit(1); return
+    }
+    if (verifyConfig && explicitConfigFile.isEmpty) {
+      System.err.println("--verify-config requires --config")
+      System.exit(1)
+      return
+    }
+    val configArgs = try explicitConfigFile.map(readConfigArgs).getOrElse(Array[String]()) catch {
+      case NonFatal(ex) => System.err.println("Error reading --config file: " + ex.getMessage); System.exit(1); return
+    }
+    if (verifyConfig) {
+      try verifyConfigMatches(configArgs, cliArgs) catch {
+        case NonFatal(ex) => System.err.println(ex.getMessage); System.exit(1); return
+      }
+    }
+    val parseArgs = if (verifyConfig) {
+      operationalArguments(cliArgs) ++ configArgs
+    } else {
+      mergeConfigAndCommandLine(configArgs, cliArgs)
+    }
     var idlFile: File = null
     var idlIncludePaths: List[String] = List("")
     var cppOutFolder: Option[File] = None
@@ -399,7 +592,7 @@ object Main {
       identStyle("ident-swiftxx-file",  c => { swiftxxFileIdentStyleOptional = Some(c)})
     }
 
-    if (!argParser.parse(args)) {
+    if (!argParser.parse(parseArgs)) {
       System.exit(1); return
     }
 

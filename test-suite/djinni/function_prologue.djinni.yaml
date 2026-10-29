@@ -1,0 +1,27 @@
+schema_version: 1
+
+languages:
+  cpp:
+    namespace: testsuite
+    optional_template: std::experimental::optional
+    optional_header: '"../../handwritten-src/cpp/optional.hpp"'
+    nullopt_value: std::experimental::nullopt
+    extended_record_include_prefix: ../../handwritten-src/cpp/
+    identifiers:
+      enum_type: foo_bar
+  java:
+    package: com.dropbox.djinni.test
+    nullable_annotation: javax.annotation.CheckForNull
+    nonnull_annotation: javax.annotation.Nonnull
+    use_final_for_record: false
+    identifiers:
+      field: mFooBar
+  jni:
+    function_prologue_file: ../../handwritten-src/cpp/jni_prologue.hpp
+    identifiers:
+      class: NativeFooBar
+      file: NativeFooBar
+  objc:
+    type_prefix: DB
+  objcpp:
+    function_prologue_file: ../../handwritten-src/cpp/objcpp-prologue.hpp
