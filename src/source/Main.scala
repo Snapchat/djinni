@@ -690,8 +690,9 @@ object Main {
     } else {
       None
     }
+    val parser = new Parser(idlIncludePaths)
     val (idl, flags) = try {
-      (new Parser(idlIncludePaths)).parseFile(idlFile, inFileListWriter)
+      parser.parseFile(idlFile, inFileListWriter)
     }
     catch {
       case ex @ (_: FileNotFoundException | _: IOException) =>
@@ -703,20 +704,10 @@ object Main {
         inFileListWriter.get.close()
       }
     }
-
     if (!flags.isEmpty) {
       if (!argParser.parse(flags.map({_.split(" ", 2)}).flatten :+ "--idl" :+ idlFile.getName())) {
         System.exit(1); return
       }
-    }
-
-    // Resolve names in IDL file, check types.
-    System.out.println("Resolving...")
-    resolver.resolve(meta.defaults, idl) match {
-      case Some(err) =>
-        System.err.println(err)
-        System.exit(1); return
-      case _ =>
     }
 
     if (declarationManifestPath.isDefined || verifyDeclarationManifestPath.isDefined) {
@@ -873,6 +864,13 @@ object Main {
       yamlOutFile,
       yamlPrefix,
       idlFile.getName.stripSuffix(".djinni"))
+
+    resolver.resolve(meta.defaults, idl, outSpec) match {
+      case Some(err) =>
+        System.err.println(err)
+        System.exit(1); return
+      case _ =>
+    }
 
     try {
       val r = generate(idl, outSpec)
