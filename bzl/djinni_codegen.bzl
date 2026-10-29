@@ -7,9 +7,8 @@ DjinniInfo = provider(
     doc = "Djinni IDL provider.",
     fields = {
         "idl": "Root .djinni file.",
-        "transitive_srcs": "Root IDL, imported IDL/YAML/proto sources, and transitive dependency sources.",
+        "transitive_srcs": "Root IDL and imported IDL/config sources from the transitive dependency closure.",
         "idl_include_paths": "Depset of execution-root include paths.",
-        "validation_files": "Depset of IDL verification outputs.",
         "declarations_manifest": "Resolved internal declarations produced by Djinni.",
         "project_name": "Consumer project name for language-specific defaults.",
         "cpp_namespace": "Default C++ namespace.",
@@ -17,6 +16,11 @@ DjinniInfo = provider(
         "cpp_base_lib_include_prefix": "Default C++ runtime include prefix.",
         "cpp_optional_template": "Default C++ optional template.",
         "cpp_optional_header": "Default C++ optional header.",
+        "defaults_file": "Organization-wide default generation configuration YAML.",
+        "config_file": "IDL-specific generation configuration YAML, applied after defaults.",
+        "yaml_tree": "Generated external-type YAML files for this IDL and its imported declarations.",
+        "yaml_files": "Depset of generated YAML tree artifacts in the import closure.",
+        "input_manifest": "Manifest of IDL files read by this declaration and its imports.",
     },
 )
 
@@ -58,7 +62,7 @@ def _djinni_codegen_impl(ctx):
         if ctx.attr.project_name and djinni.project_name and ctx.attr.project_name != djinni.project_name:
             fail("project_name %s does not match djinni_library project_name %s" % (ctx.attr.project_name, djinni.project_name))
         idl = djinni.idl
-        input_depsets = [djinni.transitive_srcs, djinni.validation_files, depset([djinni.declarations_manifest])]
+        input_depsets = [djinni.transitive_srcs, djinni.yaml_files, depset([djinni.declarations_manifest, djinni.input_manifest])]
         idl_include_paths = djinni.idl_include_paths.to_list() + _include_paths(ctx)
     else:
         idl = ctx.file.idl
@@ -104,6 +108,9 @@ def _djinni_codegen_impl(ctx):
         fail("djinni_codegen requires at least one declared output")
 
     args = ctx.actions.args()
+    defaults_file = djinni.defaults_file if ctx.attr.djinni else ctx.file.defaults_file
+    config_file = djinni.config_file if ctx.attr.djinni else ctx.file.config_file
+    config_files = ([defaults_file] if defaults_file else []) + ([config_file] if config_file else [])
 
     java_package_path = ctx.attr.java_package.replace(".", "/")
     java_dir = (tree_outputs["java"].path + "/" + java_package_path if java_package_path else tree_outputs["java"].path) if "java" in tree_outputs else _single_output_dir(ctx.outputs.java_srcs, "java")
@@ -131,14 +138,15 @@ def _djinni_codegen_impl(ctx):
     if java_dir:
         args.add("--java-out")
         args.add(java_dir)
-    _add_string_arg(args, "--java-package", ctx.attr.java_package)
-    _add_string_arg(args, "--java-class-access-modifier", ctx.attr.java_class_access_modifier)
-    _add_string_arg(args, "--java-nullable-annotation", ctx.attr.java_nullable_annotation)
-    _add_string_arg(args, "--java-nonnull-annotation", ctx.attr.java_nonnull_annotation)
-    _add_bool_arg(args, "--java-implement-android-os-parcelable", ctx.attr.java_implement_android_os_parcelable)
-    _add_bool_arg(args, "--java-use-final-for-record", ctx.attr.java_use_final_for_record)
-    _add_bool_arg(args, "--java-gen-interface", ctx.attr.java_gen_interface)
-    _add_bool_arg(args, "--java-legacy-records", ctx.attr.java_legacy_records)
+    if not config_file:
+        _add_string_arg(args, "--java-package", ctx.attr.java_package)
+        _add_string_arg(args, "--java-class-access-modifier", ctx.attr.java_class_access_modifier)
+        _add_string_arg(args, "--java-nullable-annotation", ctx.attr.java_nullable_annotation)
+        _add_string_arg(args, "--java-nonnull-annotation", ctx.attr.java_nonnull_annotation)
+        _add_bool_arg(args, "--java-implement-android-os-parcelable", ctx.attr.java_implement_android_os_parcelable)
+        _add_bool_arg(args, "--java-use-final-for-record", ctx.attr.java_use_final_for_record)
+        _add_bool_arg(args, "--java-gen-interface", ctx.attr.java_gen_interface)
+        _add_bool_arg(args, "--java-legacy-records", ctx.attr.java_legacy_records)
 
     if cpp_src_dir or cpp_hdr_dir:
         cpp_out_dir = cpp_src_dir or cpp_hdr_dir
@@ -148,24 +156,26 @@ def _djinni_codegen_impl(ctx):
             args.add("--cpp-header-out")
             args.add(cpp_hdr_dir)
     idl_defaults = ctx.attr.djinni[DjinniInfo] if ctx.attr.djinni else None
-    _add_string_arg(args, "--cpp-namespace", _cpp_string_option(ctx.attr.cpp_namespace, idl_defaults.cpp_namespace if idl_defaults else ""))
-    _add_string_arg(args, "--cpp-include-prefix", _cpp_string_option(ctx.attr.cpp_include_prefix, idl_defaults.cpp_include_prefix if idl_defaults else ""))
-    _add_string_arg(args, "--cpp-base-lib-include-prefix", _cpp_string_option(ctx.attr.cpp_base_lib_include_prefix, idl_defaults.cpp_base_lib_include_prefix if idl_defaults else ""))
-    _add_string_arg(args, "--cpp-optional-template", _cpp_string_option(ctx.attr.cpp_optional_template, idl_defaults.cpp_optional_template if idl_defaults else ""))
-    _add_string_arg(args, "--cpp-optional-header", _cpp_string_option(ctx.attr.cpp_optional_header, idl_defaults.cpp_optional_header if idl_defaults else ""))
-    _add_string_arg(args, "--cpp-extended-record-include-prefix", ctx.attr.cpp_extended_record_include_prefix)
-    _add_bool_arg(args, "--cpp-use-wide-strings", ctx.attr.cpp_use_wide_strings)
-    _add_bool_arg(args, "--cpp-legacy-records", ctx.attr.cpp_legacy_records)
+    if not config_file:
+        _add_string_arg(args, "--cpp-namespace", _cpp_string_option(ctx.attr.cpp_namespace, idl_defaults.cpp_namespace if idl_defaults else ""))
+        _add_string_arg(args, "--cpp-include-prefix", _cpp_string_option(ctx.attr.cpp_include_prefix, idl_defaults.cpp_include_prefix if idl_defaults else ""))
+        _add_string_arg(args, "--cpp-base-lib-include-prefix", _cpp_string_option(ctx.attr.cpp_base_lib_include_prefix, idl_defaults.cpp_base_lib_include_prefix if idl_defaults else ""))
+        _add_string_arg(args, "--cpp-optional-template", _cpp_string_option(ctx.attr.cpp_optional_template, idl_defaults.cpp_optional_template if idl_defaults else ""))
+        _add_string_arg(args, "--cpp-optional-header", _cpp_string_option(ctx.attr.cpp_optional_header, idl_defaults.cpp_optional_header if idl_defaults else ""))
+        _add_string_arg(args, "--cpp-extended-record-include-prefix", ctx.attr.cpp_extended_record_include_prefix)
+        _add_bool_arg(args, "--cpp-use-wide-strings", ctx.attr.cpp_use_wide_strings)
+        _add_bool_arg(args, "--cpp-legacy-records", ctx.attr.cpp_legacy_records)
 
     if c_src_dir or c_hdr_dir:
         args.add("--c-out", c_src_dir or c_hdr_dir)
         if c_hdr_dir and c_hdr_dir != (c_src_dir or c_hdr_dir):
             args.add("--c-header-out", c_hdr_dir)
-    _add_string_arg(args, "--c-namespace", ctx.attr.c_namespace)
-    _add_string_arg(args, "--c-include-prefix", ctx.attr.c_include_prefix)
-    _add_string_arg(args, "--c-base-lib-include-prefix", ctx.attr.c_base_lib_include_prefix)
-    _add_string_arg(args, "--c-wrapper-cpp-namespace", ctx.attr.c_wrapper_cpp_namespace)
-    _add_bool_arg(args, "--c-wrapper-use-dlsym", ctx.attr.c_wrapper_use_dlsym)
+    if not config_file:
+        _add_string_arg(args, "--c-namespace", ctx.attr.c_namespace)
+        _add_string_arg(args, "--c-include-prefix", ctx.attr.c_include_prefix)
+        _add_string_arg(args, "--c-base-lib-include-prefix", ctx.attr.c_base_lib_include_prefix)
+        _add_string_arg(args, "--c-wrapper-cpp-namespace", ctx.attr.c_wrapper_cpp_namespace)
+        _add_bool_arg(args, "--c-wrapper-use-dlsym", ctx.attr.c_wrapper_use_dlsym)
 
     if jni_src_dir or jni_hdr_dir:
         jni_out_dir = jni_src_dir or jni_hdr_dir
@@ -174,76 +184,89 @@ def _djinni_codegen_impl(ctx):
         if jni_hdr_dir and jni_hdr_dir != jni_out_dir:
             args.add("--jni-header-out")
             args.add(jni_hdr_dir)
-    _add_string_arg(args, "--jni-namespace", ctx.attr.jni_namespace)
-    _add_string_arg(args, "--jni-include-prefix", ctx.attr.jni_include_prefix)
-    _add_string_arg(args, "--jni-include-cpp-prefix", ctx.attr.jni_include_cpp_prefix)
-    _add_string_arg(args, "--jni-base-lib-include-prefix", ctx.attr.jni_base_lib_include_prefix)
-    _add_bool_arg(args, "--jni-use-on-load-initializer", ctx.attr.jni_use_on_load_initializer)
-    _add_string_arg(args, "--jni-function-prologue-file", ctx.attr.jni_function_prologue_file)
+    if not config_file:
+        _add_string_arg(args, "--jni-namespace", ctx.attr.jni_namespace)
+        _add_string_arg(args, "--jni-include-prefix", ctx.attr.jni_include_prefix)
+        _add_string_arg(args, "--jni-include-cpp-prefix", ctx.attr.jni_include_cpp_prefix)
+        _add_string_arg(args, "--jni-base-lib-include-prefix", ctx.attr.jni_base_lib_include_prefix)
+        _add_bool_arg(args, "--jni-use-on-load-initializer", ctx.attr.jni_use_on_load_initializer)
+        _add_string_arg(args, "--jni-function-prologue-file", ctx.attr.jni_function_prologue_file)
 
     if objc_dir:
         args.add("--objc-out")
         args.add(objc_dir)
-    _add_string_arg(args, "--objc-type-prefix", ctx.attr.objc_type_prefix)
-    _add_string_arg(args, "--objc-include-prefix", ctx.attr.objc_include_prefix)
-    _add_string_arg(args, "--objc-base-lib-include-prefix", ctx.attr.objc_base_lib_include_prefix)
-    _add_string_arg(args, "--objc-extended-record-include-prefix", ctx.attr.objc_extended_record_include_prefix)
-    _add_string_arg(args, "--objc-swift-bridging-header", ctx.attr.objc_swift_bridging_header)
-    _add_bool_arg(args, "--objc-gen-protocol", ctx.attr.objc_gen_protocol)
-    _add_bool_arg(args, "--objc-disable-class-ctor", ctx.attr.objc_disable_class_ctor)
-    _add_bool_arg(args, "--objc-closed-enums", ctx.attr.objc_closed_enums)
-    _add_bool_arg(args, "--objc-strict-protocols", ctx.attr.objc_strict_protocols)
-    _add_bool_arg(args, "--objc-legacy-records", ctx.attr.objc_legacy_records)
+    if not config_file:
+        _add_string_arg(args, "--objc-type-prefix", ctx.attr.objc_type_prefix)
+        _add_string_arg(args, "--objc-include-prefix", ctx.attr.objc_include_prefix)
+        _add_string_arg(args, "--objc-base-lib-include-prefix", ctx.attr.objc_base_lib_include_prefix)
+        _add_string_arg(args, "--objc-extended-record-include-prefix", ctx.attr.objc_extended_record_include_prefix)
+        _add_string_arg(args, "--objc-swift-bridging-header", ctx.attr.objc_swift_bridging_header)
+        _add_bool_arg(args, "--objc-gen-protocol", ctx.attr.objc_gen_protocol)
+        _add_bool_arg(args, "--objc-disable-class-ctor", ctx.attr.objc_disable_class_ctor)
+        _add_bool_arg(args, "--objc-closed-enums", ctx.attr.objc_closed_enums)
+        _add_bool_arg(args, "--objc-strict-protocols", ctx.attr.objc_strict_protocols)
+        _add_bool_arg(args, "--objc-legacy-records", ctx.attr.objc_legacy_records)
 
     if objcpp_dir:
         args.add("--objcpp-out")
         args.add(objcpp_dir)
-    _add_string_arg(args, "--objcpp-namespace", ctx.attr.objcpp_namespace)
-    _add_string_arg(args, "--objcpp-include-prefix", ctx.attr.objcpp_include_prefix)
-    _add_string_arg(args, "--objcpp-include-cpp-prefix", ctx.attr.objcpp_include_cpp_prefix)
-    _add_string_arg(args, "--objcpp-include-objc-prefix", ctx.attr.objcpp_include_objc_prefix)
-    _add_string_arg(args, "--objcpp-function-prologue-file", ctx.attr.objcpp_function_prologue_file)
-    _add_bool_arg(args, "--objcpp-disable-exception-translation", ctx.attr.objcpp_disable_exception_translation)
+    if not config_file:
+        _add_string_arg(args, "--objcpp-namespace", ctx.attr.objcpp_namespace)
+        _add_string_arg(args, "--objcpp-include-prefix", ctx.attr.objcpp_include_prefix)
+        _add_string_arg(args, "--objcpp-include-cpp-prefix", ctx.attr.objcpp_include_cpp_prefix)
+        _add_string_arg(args, "--objcpp-include-objc-prefix", ctx.attr.objcpp_include_objc_prefix)
+        _add_string_arg(args, "--objcpp-function-prologue-file", ctx.attr.objcpp_function_prologue_file)
+        _add_bool_arg(args, "--objcpp-disable-exception-translation", ctx.attr.objcpp_disable_exception_translation)
 
     if wasm_dir:
         args.add("--wasm-out")
         args.add(wasm_dir)
-    _add_string_arg(args, "--wasm-namespace", ctx.attr.wasm_namespace)
-    _add_string_arg(args, "--wasm-cpp-namespace", ctx.attr.wasm_cpp_namespace)
-    _add_string_arg(args, "--wasm-include-prefix", ctx.attr.wasm_include_prefix)
-    _add_string_arg(args, "--wasm-include-cpp-prefix", ctx.attr.wasm_include_cpp_prefix)
-    _add_string_arg(args, "--wasm-base-lib-include-prefix", ctx.attr.wasm_base_lib_include_prefix)
-    _add_bool_arg(args, "--wasm-omit-constants", ctx.attr.wasm_omit_constants)
-    _add_bool_arg(args, "--wasm-omit-namespace-alias", ctx.attr.wasm_omit_namespace_alias)
+    if not config_file:
+        _add_string_arg(args, "--wasm-namespace", ctx.attr.wasm_namespace)
+        _add_string_arg(args, "--wasm-cpp-namespace", ctx.attr.wasm_cpp_namespace)
+        _add_string_arg(args, "--wasm-include-prefix", ctx.attr.wasm_include_prefix)
+        _add_string_arg(args, "--wasm-include-cpp-prefix", ctx.attr.wasm_include_cpp_prefix)
+        _add_string_arg(args, "--wasm-base-lib-include-prefix", ctx.attr.wasm_base_lib_include_prefix)
+        _add_bool_arg(args, "--wasm-omit-constants", ctx.attr.wasm_omit_constants)
+        _add_bool_arg(args, "--wasm-omit-namespace-alias", ctx.attr.wasm_omit_namespace_alias)
 
     if ts_dir:
         args.add("--ts-out")
         args.add(ts_dir)
-    _add_string_arg(args, "--ts-module", ctx.attr.ts_module)
+    if not config_file:
+        _add_string_arg(args, "--ts-module", ctx.attr.ts_module)
 
-    _add_ident_arg(args, "--ident-java-enum", ctx.attr.ident_java_enum)
-    _add_ident_arg(args, "--ident-java-field", ctx.attr.ident_java_field)
-    _add_ident_arg(args, "--ident-java-type", ctx.attr.ident_java_type)
-    _add_ident_arg(args, "--ident-cpp-enum", ctx.attr.ident_cpp_enum)
-    _add_ident_arg(args, "--ident-cpp-field", ctx.attr.ident_cpp_field)
-    _add_ident_arg(args, "--ident-cpp-method", ctx.attr.ident_cpp_method)
-    _add_ident_arg(args, "--ident-cpp-type", ctx.attr.ident_cpp_type)
-    _add_ident_arg(args, "--ident-cpp-enum-type", ctx.attr.ident_cpp_enum_type)
-    _add_ident_arg(args, "--ident-cpp-type-param", ctx.attr.ident_cpp_type_param)
-    _add_ident_arg(args, "--ident-cpp-local", ctx.attr.ident_cpp_local)
-    _add_ident_arg(args, "--ident-cpp-file", ctx.attr.ident_cpp_file)
-    _add_ident_arg(args, "--ident-jni-class", ctx.attr.ident_jni_class)
-    _add_ident_arg(args, "--ident-jni-file", ctx.attr.ident_jni_file)
-    _add_ident_arg(args, "--ident-wasm-class", ctx.attr.ident_wasm_class)
-    _add_ident_arg(args, "--ident-wasm-file", ctx.attr.ident_wasm_file)
-    _add_ident_arg(args, "--ident-objc-enum", ctx.attr.ident_objc_enum)
-    _add_ident_arg(args, "--ident-objc-field", ctx.attr.ident_objc_field)
-    _add_ident_arg(args, "--ident-objc-method", ctx.attr.ident_objc_method)
-    _add_ident_arg(args, "--ident-objc-type", ctx.attr.ident_objc_type)
-    _add_ident_arg(args, "--ident-objc-type-param", ctx.attr.ident_objc_type_param)
-    _add_ident_arg(args, "--ident-objc-local", ctx.attr.ident_objc_local)
-    _add_ident_arg(args, "--ident-objc-const", ctx.attr.ident_objc_const)
-    _add_ident_arg(args, "--ident-objc-file", ctx.attr.ident_objc_file)
+    if not config_file:
+        _add_ident_arg(args, "--ident-java-enum", ctx.attr.ident_java_enum)
+        _add_ident_arg(args, "--ident-java-field", ctx.attr.ident_java_field)
+        _add_ident_arg(args, "--ident-java-type", ctx.attr.ident_java_type)
+        _add_ident_arg(args, "--ident-cpp-enum", ctx.attr.ident_cpp_enum)
+        _add_ident_arg(args, "--ident-cpp-field", ctx.attr.ident_cpp_field)
+        _add_ident_arg(args, "--ident-cpp-method", ctx.attr.ident_cpp_method)
+        _add_ident_arg(args, "--ident-cpp-type", ctx.attr.ident_cpp_type)
+        _add_ident_arg(args, "--ident-cpp-enum-type", ctx.attr.ident_cpp_enum_type)
+        _add_ident_arg(args, "--ident-cpp-type-param", ctx.attr.ident_cpp_type_param)
+        _add_ident_arg(args, "--ident-cpp-local", ctx.attr.ident_cpp_local)
+        _add_ident_arg(args, "--ident-cpp-file", ctx.attr.ident_cpp_file)
+        _add_ident_arg(args, "--ident-jni-class", ctx.attr.ident_jni_class)
+        _add_ident_arg(args, "--ident-jni-file", ctx.attr.ident_jni_file)
+        _add_ident_arg(args, "--ident-wasm-class", ctx.attr.ident_wasm_class)
+        _add_ident_arg(args, "--ident-wasm-file", ctx.attr.ident_wasm_file)
+        _add_ident_arg(args, "--ident-objc-enum", ctx.attr.ident_objc_enum)
+        _add_ident_arg(args, "--ident-objc-field", ctx.attr.ident_objc_field)
+        _add_ident_arg(args, "--ident-objc-method", ctx.attr.ident_objc_method)
+        _add_ident_arg(args, "--ident-objc-type", ctx.attr.ident_objc_type)
+        _add_ident_arg(args, "--ident-objc-type-param", ctx.attr.ident_objc_type_param)
+        _add_ident_arg(args, "--ident-objc-local", ctx.attr.ident_objc_local)
+        _add_ident_arg(args, "--ident-objc-const", ctx.attr.ident_objc_const)
+        _add_ident_arg(args, "--ident-objc-file", ctx.attr.ident_objc_file)
+
+    if defaults_file:
+        args.add("--defaults")
+        args.add(defaults_file.path)
+    if config_file:
+        args.add("--config")
+        args.add(config_file.path)
 
     args.add("--idl")
     args.add(idl.path)
@@ -258,7 +281,7 @@ def _djinni_codegen_impl(ctx):
         args.add(include_path)
 
     inputs = depset(
-        direct = ([idl] if not ctx.attr.djinni else []) + ctx.files.srcs + ctx.files.idl_include_files,
+        direct = ([idl] if not ctx.attr.djinni else []) + ctx.files.srcs + ctx.files.idl_include_files + ([] if ctx.attr.djinni else config_files),
         transitive = input_depsets,
     )
 
@@ -307,6 +330,8 @@ _djinni_codegen = rule(
         "project_name": attr.string(),
         "idl": attr.label(allow_single_file = [".djinni"]),
         "srcs": attr.label_list(allow_files = [".djinni", ".yaml", ".yml", ".proto"]),
+        "defaults_file": attr.label(allow_single_file = [".yaml", ".yml"]),
+        "config_file": attr.label(allow_single_file = [".yaml", ".yml"]),
         "idl_include_paths": attr.string_list(),
         "idl_include_files": attr.label_list(allow_files = True),
         "tree_languages": attr.string_list(),
@@ -421,44 +446,54 @@ def _djinni_library_impl(ctx):
         dep[DjinniInfo].transitive_srcs
         for dep in ctx.attr.deps
     ]
+    dependency_yaml_trees = [dep[DjinniInfo].yaml_tree for dep in ctx.attr.deps]
+    yaml_files = depset(
+        direct = dependency_yaml_trees,
+        transitive = [dep[DjinniInfo].yaml_files for dep in ctx.attr.deps],
+    )
     include_paths = depset(
-        direct = _include_paths(ctx),
+        direct = _include_paths(ctx) + [tree.path for tree in dependency_yaml_trees],
         transitive = [dep[DjinniInfo].idl_include_paths for dep in ctx.attr.deps],
     )
 
+    yaml_tree = ctx.actions.declare_directory(ctx.label.name + ".yaml")
     transitive_srcs = depset(
-        direct = [ctx.file.idl] + ctx.files.srcs + ctx.files.idl_include_files,
+        direct = [ctx.file.idl] + ctx.files.srcs + ctx.files.idl_include_files + ([ctx.file.defaults_file] if ctx.file.defaults_file else []) + ([ctx.file.config_file] if ctx.file.config_file else []),
         transitive = transitive,
     )
 
     declarations_manifest = ctx.actions.declare_file(ctx.label.name + ".declarations.tsv")
     validated_inputs = ctx.actions.declare_file(ctx.label.name + ".djinni.inputs") if ctx.attr.verify else None
     args = ctx.actions.args()
+    defaults_file = ctx.file.defaults_file
+    config_file = ctx.file.config_file
+    config_files = ([defaults_file] if defaults_file else []) + ([config_file] if config_file else [])
+    if defaults_file:
+        args.add("--defaults")
+        args.add(defaults_file.path)
+    if config_file:
+        args.add("--config")
+        args.add(config_file.path)
+    args.add("--yaml-out", yaml_tree.path + "/" + ctx.attr.project_name)
     args.add("--idl", ctx.file.idl)
-    args.add("--skip-generation", "true")
     args.add("--list-declarations", declarations_manifest)
     if validated_inputs:
         args.add("--list-in-files", validated_inputs)
-    args.add_all(include_paths, before_each = "--idl-include-path")
+    args.add_all(include_paths.to_list(), before_each = "--idl-include-path")
     ctx.actions.run(
         executable = ctx.attr.compiler[DefaultInfo].files_to_run,
         arguments = [args],
-        inputs = transitive_srcs,
-        outputs = [declarations_manifest] + ([validated_inputs] if validated_inputs else []),
+        inputs = depset(direct = [ctx.file.idl] + ctx.files.srcs + ctx.files.idl_include_files + config_files, transitive = transitive + [yaml_files]),
+        outputs = [declarations_manifest, yaml_tree] + ([validated_inputs] if validated_inputs else []),
         mnemonic = "DjinniDeclarations",
     )
-    validation = [validated_inputs] if validated_inputs else []
-    validation_files = depset(
-        direct = validation,
-        transitive = [dep[DjinniInfo].validation_files for dep in ctx.attr.deps],
-    )
     return [
-        DefaultInfo(files = depset([ctx.file.idl, declarations_manifest] + ctx.files.srcs + ctx.files.idl_include_files, transitive = [validation_files])),
+        DefaultInfo(files = depset([ctx.file.idl, declarations_manifest, yaml_tree] + ([validated_inputs] if validated_inputs else []) + ctx.files.srcs + ctx.files.idl_include_files + config_files, transitive = [depset(transitive = transitive)])),
+        OutputGroupInfo(yaml_tree = depset([yaml_tree])),
         DjinniInfo(
             idl = ctx.file.idl,
             transitive_srcs = transitive_srcs,
             idl_include_paths = include_paths,
-            validation_files = validation_files,
             declarations_manifest = declarations_manifest,
             project_name = ctx.attr.project_name,
             cpp_namespace = ctx.attr.cpp_namespace,
@@ -466,6 +501,11 @@ def _djinni_library_impl(ctx):
             cpp_base_lib_include_prefix = ctx.attr.cpp_base_lib_include_prefix,
             cpp_optional_template = ctx.attr.cpp_optional_template,
             cpp_optional_header = ctx.attr.cpp_optional_header,
+            defaults_file = defaults_file,
+            config_file = config_file,
+            yaml_tree = yaml_tree,
+            yaml_files = depset(direct = [yaml_tree], transitive = [yaml_files]),
+            input_manifest = validated_inputs,
         ),
     ]
 
@@ -475,6 +515,8 @@ djinni_library = rule(
     attrs = {
         "idl": attr.label(allow_single_file = [".djinni"], mandatory = True),
         "srcs": attr.label_list(allow_files = [".djinni", ".yaml", ".yml", ".proto"]),
+        "defaults_file": attr.label(allow_single_file = [".yaml", ".yml"]),
+        "config_file": attr.label(allow_single_file = [".yaml", ".yml"]),
         "deps": attr.label_list(providers = [DjinniInfo]),
         "idl_include_paths": attr.string_list(),
         "idl_include_files": attr.label_list(allow_files = True),

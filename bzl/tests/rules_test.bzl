@@ -9,14 +9,17 @@ def _provider_test_impl(ctx):
     info = target[DjinniInfo]
     asserts.equals(env, "shared.djinni", info.idl.basename)
     asserts.equals(env, ["nested.djinni", "shared.djinni"], sorted([f.basename for f in info.transitive_srcs.to_list()]))
+    asserts.equals(env, ["shared-schema.yaml"], sorted([f.basename for f in info.yaml_files.to_list()]))
+    asserts.equals(env, "shared-schema.yaml", info.yaml_tree.basename)
     asserts.equals(env, ["bzl/tests/idl"], info.idl_include_paths.to_list())
     asserts.equals(env, "shared-schema.declarations.tsv", info.declarations_manifest.basename)
     asserts.equals(env, "shared", info.project_name)
     actions = analysistest.target_actions(env)
     asserts.equals(env, 1, len(actions))
     asserts.equals(env, "DjinniDeclarations", actions[0].mnemonic)
-    asserts.true(env, "--skip-generation" in actions[0].argv)
-    asserts.equals(env, 1, len(info.validation_files.to_list()))
+    asserts.true(env, "--skip-generation" not in actions[0].argv)
+    asserts.true(env, "--yaml-out" in actions[0].argv)
+    asserts.true(env, any([f.basename == "shared-schema.djinni.inputs" for f in target[DefaultInfo].files.to_list()]))
     return analysistest.end(env)
 
 _provider_test = analysistest.make(_provider_test_impl)
@@ -30,7 +33,7 @@ def _codegen_test_impl(ctx):
     asserts.true(env, ctx.attr.output_flag in action.argv)
     asserts.false(env, ctx.attr.other_output_flag in action.argv)
     inputs = [f.basename for f in action.inputs.to_list()]
-    for basename in ["shared.djinni", "nested.djinni", "shared-schema.djinni.inputs", "shared-schema.declarations.tsv"]:
+    for basename in ["shared.djinni", "nested.djinni", "shared-schema.djinni.inputs", "shared-schema.declarations.tsv", "shared-schema.yaml"]:
         asserts.true(env, basename in inputs, "Missing transitive action input: " + basename)
     if ctx.attr.output_flag == "--java-out":
         index = action.argv.index("--java-use-final-for-record")
