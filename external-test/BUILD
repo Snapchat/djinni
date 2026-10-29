@@ -69,6 +69,7 @@ sh_test(
         "$(rootpath @djinni//bzl/tests:idl/shared.djinni)",
     ],
     data = [
+        "common_defaults.yaml",
         "schema.djinni",
         "schema.djinni.yaml",
         "@djinni//bzl/tests:idl/nested.djinni",

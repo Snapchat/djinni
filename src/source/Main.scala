@@ -43,13 +43,50 @@ object Main {
         case (key: String, item) => (key, item)
         case (key, _) => throw new IllegalArgumentException(context + " keys must be strings; found " + key)
       }
+    case map: scala.collection.Map[_, _] =>
+      map.toSeq.map {
+        case (key: String, item) => (key, item)
+        case (key, _) => throw new IllegalArgumentException(context + " keys must be strings; found " + key)
+      }
     case _ => throw new IllegalArgumentException(context + " must be a YAML mapping")
   }
 
-  private def readConfigArgs(file: File): Array[String] = {
+  private def readConfig(file: File): Any = {
     val in = new InputStreamReader(new FileInputStream(file), "UTF-8")
-    val root = try new Yaml().load[Any](in) finally in.close()
-    val rootEntries = configMap(root, "configuration")
+    try new Yaml().load[Any](in) finally in.close()
+  }
+
+  private def mergeConfigValues(base: Any, overrideValue: Any): Any = {
+    def entries(value: Any): Option[Map[String, Any]] = value match {
+      case _: java.util.Map[_, _] | _: scala.collection.Map[_, _] => Some(configMap(value, "configuration").toMap)
+      case _ => None
+    }
+    (entries(base), entries(overrideValue)) match {
+      case (Some(baseMap), Some(overrideMap)) =>
+        (baseMap.keySet ++ overrideMap.keySet).map { key =>
+          val value = (baseMap.get(key), overrideMap.get(key)) match {
+            case (Some(baseValue), Some(overrideValue)) => mergeConfigValues(baseValue, overrideValue)
+            case (Some(baseValue), None) => baseValue
+            case (None, Some(overrideValue)) => overrideValue
+            case _ => throw new AssertionError("unreachable")
+          }
+          key -> value
+        }.toMap
+      case _ => overrideValue
+    }
+  }
+
+  private def validateConfigMappings(value: Any, context: String): Unit = {
+    configMap(value, context).foreach { case (key, nested) =>
+      if (nested.isInstanceOf[java.util.Map[_, _]] || nested.isInstanceOf[scala.collection.Map[_, _]]) {
+        validateConfigMappings(nested, context + "." + key)
+      }
+    }
+  }
+
+  private def readConfigArgs(config: Any): Array[String] = {
+    validateConfigMappings(config, "configuration")
+    val rootEntries = configMap(config, "configuration")
     if (rootEntries.map(_._1).distinct.length != rootEntries.length) {
       throw new IllegalArgumentException("configuration contains duplicate keys")
     }
@@ -99,13 +136,19 @@ object Main {
     case other => throw new IllegalArgumentException(flag + " must have a string or boolean value; found " + other)
   }
 
-  private def extractConfigArguments(args: Array[String]): (Option[File], Boolean, Array[String]) = {
+  private def extractConfigArguments(args: Array[String]): (Option[File], Option[File], Boolean, Array[String]) = {
+    var defaults: Option[File] = None
     var config: Option[File] = None
     var verify = false
     val remaining = scala.collection.mutable.ArrayBuffer[String]()
     var index = 0
     while (index < args.length) {
       args(index) match {
+        case "--defaults" =>
+          if (index + 1 >= args.length) throw new IllegalArgumentException("--defaults requires a file path")
+          if (defaults.isDefined) throw new IllegalArgumentException("--defaults may only be specified once")
+          defaults = Some(new File(args(index + 1)))
+          index += 2
         case "--config" =>
           if (index + 1 >= args.length) throw new IllegalArgumentException("--config requires a file path")
           if (config.isDefined) throw new IllegalArgumentException("--config may only be specified once")
@@ -119,7 +162,7 @@ object Main {
           index += 1
       }
     }
-    (config, verify, remaining.toArray)
+    (defaults, config, verify, remaining.toArray)
   }
 
   private def optionValues(args: Array[String]): Map[String, String] = {
@@ -197,16 +240,21 @@ object Main {
   }
 
   def main(args: Array[String]) {
-    val (explicitConfigFile, verifyConfig, cliArgs) = try extractConfigArguments(args) catch {
+    val (defaultsFile, explicitConfigFile, verifyConfig, cliArgs) = try extractConfigArguments(args) catch {
       case NonFatal(ex) => System.err.println("Configuration error: " + ex.getMessage); System.exit(1); return
     }
-    if (verifyConfig && explicitConfigFile.isEmpty) {
-      System.err.println("--verify-config requires --config")
+    if (verifyConfig && defaultsFile.isEmpty && explicitConfigFile.isEmpty) {
+      System.err.println("--verify-config requires --defaults or --config")
       System.exit(1)
       return
     }
-    val configArgs = try explicitConfigFile.map(readConfigArgs).getOrElse(Array[String]()) catch {
-      case NonFatal(ex) => System.err.println("Error reading --config file: " + ex.getMessage); System.exit(1); return
+    val configArgs = try {
+      val mergedConfig = Seq(defaultsFile, explicitConfigFile).flatten.foldLeft(Option.empty[Any]) { (current, file) =>
+        Some(current.map(previous => mergeConfigValues(previous, readConfig(file))).getOrElse(readConfig(file)))
+      }
+      mergedConfig.map(readConfigArgs).getOrElse(Array[String]())
+    } catch {
+      case NonFatal(ex) => System.err.println("Error reading configuration file: " + ex.getMessage); System.exit(1); return
     }
     if (verifyConfig) {
       try verifyConfigMatches(configArgs, cliArgs) catch {
