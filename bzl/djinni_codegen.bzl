@@ -7,9 +7,8 @@ DjinniInfo = provider(
     doc = "Djinni IDL provider.",
     fields = {
         "idl": "Root .djinni file.",
-        "transitive_srcs": "Root IDL, imported IDL/YAML/proto sources, and transitive dependency sources.",
+        "transitive_srcs": "Root IDL and imported IDL/config sources from the transitive dependency closure.",
         "idl_include_paths": "Depset of execution-root include paths.",
-        "validation_files": "Depset of IDL verification outputs.",
         "declarations_manifest": "Resolved internal declarations produced by Djinni.",
         "project_name": "Consumer project name for language-specific defaults.",
         "cpp_namespace": "Default C++ namespace.",
@@ -19,6 +18,9 @@ DjinniInfo = provider(
         "cpp_optional_header": "Default C++ optional header.",
         "defaults_file": "Organization-wide default generation configuration YAML.",
         "config_file": "IDL-specific generation configuration YAML, applied after defaults.",
+        "yaml_tree": "Generated external-type YAML files for this IDL and its imported declarations.",
+        "yaml_files": "Depset of generated YAML tree artifacts in the import closure.",
+        "input_manifest": "Manifest of IDL files read by this declaration and its imports.",
     },
 )
 
@@ -60,7 +62,7 @@ def _djinni_codegen_impl(ctx):
         if ctx.attr.project_name and djinni.project_name and ctx.attr.project_name != djinni.project_name:
             fail("project_name %s does not match djinni_library project_name %s" % (ctx.attr.project_name, djinni.project_name))
         idl = djinni.idl
-        input_depsets = [djinni.transitive_srcs, djinni.validation_files, depset([djinni.declarations_manifest])]
+        input_depsets = [djinni.transitive_srcs, djinni.yaml_files, depset([djinni.declarations_manifest, djinni.input_manifest])]
         idl_include_paths = djinni.idl_include_paths.to_list() + _include_paths(ctx)
     else:
         idl = ctx.file.idl
@@ -444,11 +446,17 @@ def _djinni_library_impl(ctx):
         dep[DjinniInfo].transitive_srcs
         for dep in ctx.attr.deps
     ]
+    dependency_yaml_trees = [dep[DjinniInfo].yaml_tree for dep in ctx.attr.deps]
+    yaml_files = depset(
+        direct = dependency_yaml_trees,
+        transitive = [dep[DjinniInfo].yaml_files for dep in ctx.attr.deps],
+    )
     include_paths = depset(
-        direct = _include_paths(ctx),
+        direct = _include_paths(ctx) + [tree.path for tree in dependency_yaml_trees],
         transitive = [dep[DjinniInfo].idl_include_paths for dep in ctx.attr.deps],
     )
 
+    yaml_tree = ctx.actions.declare_directory(ctx.label.name + ".yaml")
     transitive_srcs = depset(
         direct = [ctx.file.idl] + ctx.files.srcs + ctx.files.idl_include_files + ([ctx.file.defaults_file] if ctx.file.defaults_file else []) + ([ctx.file.config_file] if ctx.file.config_file else []),
         transitive = transitive,
@@ -466,31 +474,26 @@ def _djinni_library_impl(ctx):
     if config_file:
         args.add("--config")
         args.add(config_file.path)
+    args.add("--yaml-out", yaml_tree.path + "/" + ctx.attr.project_name)
     args.add("--idl", ctx.file.idl)
-    args.add("--skip-generation", "true")
     args.add("--list-declarations", declarations_manifest)
     if validated_inputs:
         args.add("--list-in-files", validated_inputs)
-    args.add_all(include_paths, before_each = "--idl-include-path")
+    args.add_all(include_paths.to_list(), before_each = "--idl-include-path")
     ctx.actions.run(
         executable = ctx.attr.compiler[DefaultInfo].files_to_run,
         arguments = [args],
-        inputs = transitive_srcs,
-        outputs = [declarations_manifest] + ([validated_inputs] if validated_inputs else []),
+        inputs = depset(direct = [ctx.file.idl] + ctx.files.srcs + ctx.files.idl_include_files + config_files, transitive = transitive + [yaml_files]),
+        outputs = [declarations_manifest, yaml_tree] + ([validated_inputs] if validated_inputs else []),
         mnemonic = "DjinniDeclarations",
     )
-    validation = [validated_inputs] if validated_inputs else []
-    validation_files = depset(
-        direct = validation,
-        transitive = [dep[DjinniInfo].validation_files for dep in ctx.attr.deps],
-    )
     return [
-        DefaultInfo(files = depset([ctx.file.idl, declarations_manifest] + ctx.files.srcs + ctx.files.idl_include_files + config_files, transitive = [validation_files])),
+        DefaultInfo(files = depset([ctx.file.idl, declarations_manifest, yaml_tree] + ([validated_inputs] if validated_inputs else []) + ctx.files.srcs + ctx.files.idl_include_files + config_files, transitive = [depset(transitive = transitive)])),
+        OutputGroupInfo(yaml_tree = depset([yaml_tree])),
         DjinniInfo(
             idl = ctx.file.idl,
             transitive_srcs = transitive_srcs,
             idl_include_paths = include_paths,
-            validation_files = validation_files,
             declarations_manifest = declarations_manifest,
             project_name = ctx.attr.project_name,
             cpp_namespace = ctx.attr.cpp_namespace,
@@ -500,6 +503,9 @@ def _djinni_library_impl(ctx):
             cpp_optional_header = ctx.attr.cpp_optional_header,
             defaults_file = defaults_file,
             config_file = config_file,
+            yaml_tree = yaml_tree,
+            yaml_files = depset(direct = [yaml_tree], transitive = [yaml_files]),
+            input_manifest = validated_inputs,
         ),
     ]
 
