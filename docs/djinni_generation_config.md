@@ -38,10 +38,13 @@ input/output file lists also stay with the invocation.
 settings used by the YAML round-trip tests. It is specific to those test
 profiles and is not a required language section.
 
-The compiler reads a configuration only when given `--config <file>`; the file
-is never discovered implicitly. The `--verify-config` mode checks that language
-customization flags on the CLI exactly match the YAML. The repository's
-generation scripts use that mode for side-by-side comparison:
+The compiler reads YAML only when explicitly provided. `--defaults <file>`
+loads organization-wide defaults, and `--config <file>` loads settings specific
+to the IDL being compiled. When both are provided, nested mappings are merged
+and values in `--config` override matching values in `--defaults`. The
+`--verify-config` mode checks that language customization flags on the CLI
+exactly match the merged YAML. The repository's generation scripts use that
+mode for side-by-side comparison:
 
 An IDL file can also be referenced as an external type source without generating
 its declarations in the current compilation unit. Pair it with the configuration

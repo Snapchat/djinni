@@ -3,6 +3,7 @@ set -euo pipefail
 
 # Exercise the normal CLI, independent of the Starlark generation actions.
 "$1" \
+    --defaults common_defaults.yaml \
     --config schema.djinni.yaml \
     --verify-config \
     --idl schema.djinni \
@@ -16,6 +17,7 @@ set -euo pipefail
 # Run from the YAML alone and compare the generated sources with the
 # command-line invocation above.
 "$1" \
+    --defaults common_defaults.yaml \
     --config schema.djinni.yaml \
     --idl schema.djinni \
     --idl-include-path "$(dirname "$2")" \

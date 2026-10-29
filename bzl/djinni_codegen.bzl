@@ -17,7 +17,8 @@ DjinniInfo = provider(
         "cpp_base_lib_include_prefix": "Default C++ runtime include prefix.",
         "cpp_optional_template": "Default C++ optional template.",
         "cpp_optional_header": "Default C++ optional header.",
-        "config_file": "Optional generation configuration YAML.",
+        "defaults_file": "Organization-wide default generation configuration YAML.",
+        "config_file": "IDL-specific generation configuration YAML, applied after defaults.",
     },
 )
 
@@ -105,7 +106,9 @@ def _djinni_codegen_impl(ctx):
         fail("djinni_codegen requires at least one declared output")
 
     args = ctx.actions.args()
+    defaults_file = djinni.defaults_file if ctx.attr.djinni else ctx.file.defaults_file
     config_file = djinni.config_file if ctx.attr.djinni else ctx.file.config_file
+    config_files = ([defaults_file] if defaults_file else []) + ([config_file] if config_file else [])
 
     java_package_path = ctx.attr.java_package.replace(".", "/")
     java_dir = (tree_outputs["java"].path + "/" + java_package_path if java_package_path else tree_outputs["java"].path) if "java" in tree_outputs else _single_output_dir(ctx.outputs.java_srcs, "java")
@@ -256,6 +259,9 @@ def _djinni_codegen_impl(ctx):
         _add_ident_arg(args, "--ident-objc-const", ctx.attr.ident_objc_const)
         _add_ident_arg(args, "--ident-objc-file", ctx.attr.ident_objc_file)
 
+    if defaults_file:
+        args.add("--defaults")
+        args.add(defaults_file.path)
     if config_file:
         args.add("--config")
         args.add(config_file.path)
@@ -273,7 +279,7 @@ def _djinni_codegen_impl(ctx):
         args.add(include_path)
 
     inputs = depset(
-        direct = ([idl] if not ctx.attr.djinni else []) + ctx.files.srcs + ctx.files.idl_include_files + ([config_file] if config_file and not ctx.attr.djinni else []),
+        direct = ([idl] if not ctx.attr.djinni else []) + ctx.files.srcs + ctx.files.idl_include_files + ([] if ctx.attr.djinni else config_files),
         transitive = input_depsets,
     )
 
@@ -322,6 +328,7 @@ _djinni_codegen = rule(
         "project_name": attr.string(),
         "idl": attr.label(allow_single_file = [".djinni"]),
         "srcs": attr.label_list(allow_files = [".djinni", ".yaml", ".yml", ".proto"]),
+        "defaults_file": attr.label(allow_single_file = [".yaml", ".yml"]),
         "config_file": attr.label(allow_single_file = [".yaml", ".yml"]),
         "idl_include_paths": attr.string_list(),
         "idl_include_files": attr.label_list(allow_files = True),
@@ -443,16 +450,22 @@ def _djinni_library_impl(ctx):
     )
 
     transitive_srcs = depset(
-        direct = [ctx.file.idl] + ctx.files.srcs + ctx.files.idl_include_files + ([ctx.file.config_file] if ctx.file.config_file else []),
+        direct = [ctx.file.idl] + ctx.files.srcs + ctx.files.idl_include_files + ([ctx.file.defaults_file] if ctx.file.defaults_file else []) + ([ctx.file.config_file] if ctx.file.config_file else []),
         transitive = transitive,
     )
 
     declarations_manifest = ctx.actions.declare_file(ctx.label.name + ".declarations.tsv")
     validated_inputs = ctx.actions.declare_file(ctx.label.name + ".djinni.inputs") if ctx.attr.verify else None
     args = ctx.actions.args()
-    if ctx.file.config_file:
+    defaults_file = ctx.file.defaults_file
+    config_file = ctx.file.config_file
+    config_files = ([defaults_file] if defaults_file else []) + ([config_file] if config_file else [])
+    if defaults_file:
+        args.add("--defaults")
+        args.add(defaults_file.path)
+    if config_file:
         args.add("--config")
-        args.add(ctx.file.config_file.path)
+        args.add(config_file.path)
     args.add("--idl", ctx.file.idl)
     args.add("--skip-generation", "true")
     args.add("--list-declarations", declarations_manifest)
@@ -472,7 +485,7 @@ def _djinni_library_impl(ctx):
         transitive = [dep[DjinniInfo].validation_files for dep in ctx.attr.deps],
     )
     return [
-        DefaultInfo(files = depset([ctx.file.idl, declarations_manifest] + ctx.files.srcs + ctx.files.idl_include_files + ([ctx.file.config_file] if ctx.file.config_file else []), transitive = [validation_files])),
+        DefaultInfo(files = depset([ctx.file.idl, declarations_manifest] + ctx.files.srcs + ctx.files.idl_include_files + config_files, transitive = [validation_files])),
         DjinniInfo(
             idl = ctx.file.idl,
             transitive_srcs = transitive_srcs,
@@ -485,7 +498,8 @@ def _djinni_library_impl(ctx):
             cpp_base_lib_include_prefix = ctx.attr.cpp_base_lib_include_prefix,
             cpp_optional_template = ctx.attr.cpp_optional_template,
             cpp_optional_header = ctx.attr.cpp_optional_header,
-            config_file = ctx.file.config_file,
+            defaults_file = defaults_file,
+            config_file = config_file,
         ),
     ]
 
@@ -495,6 +509,7 @@ djinni_library = rule(
     attrs = {
         "idl": attr.label(allow_single_file = [".djinni"], mandatory = True),
         "srcs": attr.label_list(allow_files = [".djinni", ".yaml", ".yml", ".proto"]),
+        "defaults_file": attr.label(allow_single_file = [".yaml", ".yml"]),
         "config_file": attr.label(allow_single_file = [".yaml", ".yml"]),
         "deps": attr.label_list(providers = [DjinniInfo]),
         "idl_include_paths": attr.string_list(),
