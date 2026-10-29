@@ -98,10 +98,13 @@ object Main {
       throw new IllegalArgumentException("configuration contains duplicate keys")
     }
     val rootMap = rootEntries.toMap
-    rootMap.get("schema_version") match {
-      case Some(version: java.lang.Number) if version.intValue() == 1 =>
-      case Some(version) => throw new IllegalArgumentException("unsupported schema_version: " + version)
-      case None => throw new IllegalArgumentException("configuration requires schema_version: 1")
+    val schemaVersion = rootMap.get("schema_version")
+    if (!schemaVersion.isDefined) {
+      throw new IllegalArgumentException("configuration requires schema_version: 1")
+    }
+    schemaVersion.get match {
+      case version: java.lang.Number if version.intValue() == 1 =>
+      case version => throw new IllegalArgumentException("unsupported schema_version: " + version)
     }
     val extraRootKeys = rootMap.keySet -- Set("schema_version", "languages")
     if (extraRootKeys.nonEmpty) throw new IllegalArgumentException("unknown configuration keys: " + extraRootKeys.toSeq.sorted.mkString(", "))
