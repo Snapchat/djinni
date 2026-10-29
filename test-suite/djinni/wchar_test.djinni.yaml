@@ -1,0 +1,39 @@
+schema_version: 1
+
+languages:
+  cpp:
+    namespace: testsuite
+    optional_template: std::experimental::optional
+    optional_header: '"../../handwritten-src/cpp/optional.hpp"'
+    nullopt_value: std::experimental::nullopt
+    extended_record_include_prefix: ../../handwritten-src/cpp/
+    use_wide_strings: true
+    identifiers:
+      enum_type: foo_bar
+  java:
+    package: com.dropbox.djinni.test
+    nullable_annotation: javax.annotation.CheckForNull
+    nonnull_annotation: javax.annotation.Nonnull
+    use_final_for_record: false
+    identifiers:
+      field: mFooBar
+  jni:
+    identifiers:
+      class: NativeFooBar
+      file: NativeFooBar
+  objc:
+    type_prefix: DB
+  wasm:
+    namespace: testsuite
+  ts:
+    module: test_wchar
+  swift:
+    module: TestSuite
+    private_in_same_module: true
+  swiftxx:
+    identifiers:
+      class: NativeFooBar
+      file: NativeFooBar
+  yaml:
+    output_file: yaml-test.yaml
+    prefix: test_

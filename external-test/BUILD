@@ -70,6 +70,7 @@ sh_test(
     ],
     data = [
         "schema.djinni",
+        "schema.djinni.yaml",
         "@djinni//bzl/tests:idl/nested.djinni",
         "@djinni//bzl/tests:idl/shared.djinni",
         "@djinni//src:djinni",

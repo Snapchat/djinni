@@ -1,0 +1,32 @@
+schema_version: 1
+
+languages:
+  cpp:
+    optional_template: std::experimental::optional
+    optional_header: '"../../handwritten-src/cpp/optional.hpp"'
+    nullopt_value: std::experimental::nullopt
+    identifiers:
+      enum_type: foo_bar
+  java:
+    package: com.dropbox.djinni.test
+    identifiers:
+      field: mFooBar
+  jni:
+    use_on_load_initializer: false
+    identifiers:
+      class: NativeFooBar
+      file: NativeFooBar
+  objc:
+    type_prefix: DB
+    omit_full_convenience_constructor: true
+  wasm:
+    namespace: testsuite
+  ts:
+    module: test_yaml
+  swift:
+    module: TestSuite
+    private_in_same_module: true
+  swiftxx:
+    identifiers:
+      class: NativeFooBar
+      file: NativeFooBar
