@@ -1,3 +1,4 @@
+# External data view types used by this fixture.
 @extern "../../support-lib/dataref.yaml"
 @extern "../../support-lib/dataview.yaml"
 

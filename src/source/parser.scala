@@ -45,7 +45,7 @@ private object IdlParser extends RegexParsers {
   def flag(): Parser[String] = "@flag" ~> ("\"" ~> """([^"\\]|\\[\\"])*""".r <~ "\"") ^^ { _.replaceAll("""\\(.)""", "$1") }
 
   def importFileRef(): Parser[FileRef] = {
-    ("@" ~> directive) ~ ("\"" ~> filePath <~ "\"") ^^ {
+    doc ~> (("@" ~> directive) ~ ("\"" ~> filePath <~ "\"")) ^^ {
       case "import" ~ x => {
         new IdlFileRef(importFile(x))
       }
