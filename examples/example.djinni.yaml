@@ -1,0 +1,29 @@
+schema_version: 1
+
+languages:
+  cpp:
+    namespace: textsort
+    identifiers:
+      enum_type: foo_bar
+  java:
+    package: com.dropbox.textsort
+    class_access_modifier: package
+    nullable_annotation: javax.annotation.CheckForNull
+    nonnull_annotation: javax.annotation.Nonnull
+    identifiers:
+      field: mFooBar
+  jni:
+    identifiers:
+      class: NativeFooBar
+      file: NativeFooBar
+  objc:
+    type_prefix: TXS
+    swift_bridging_header: TextSort-Bridging-Header
+  ts:
+    module: example
+  swift:
+    module: TextSort
+  swiftxx:
+    identifiers:
+      class: SwiftFooBar
+      file: SwiftFooBar

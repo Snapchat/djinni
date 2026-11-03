@@ -1,0 +1,8 @@
+schema_version: 1
+
+languages:
+  cpp:
+    namespace: defaults
+  java:
+    package: defaults
+    use_final_for_record: true

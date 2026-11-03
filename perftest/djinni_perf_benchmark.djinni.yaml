@@ -1,0 +1,26 @@
+schema_version: 1
+
+languages:
+  cpp:
+    namespace: snapchat::djinni::benchmark
+    identifiers:
+      enum_type: foo_bar
+  java:
+    package: com.snapchat.djinni.benchmark
+    class_access_modifier: package
+    nullable_annotation: javax.annotation.CheckForNull
+    nonnull_annotation: javax.annotation.Nonnull
+    identifiers:
+      field: mFooBar
+  jni:
+    identifiers:
+      class: NativeFooBar
+      file: NativeFooBar
+  objc:
+    type_prefix: TXS
+    swift_bridging_header: Benchmark-Bridging-Header
+  wasm:
+    namespace: benchmark
+    omit_namespace_alias: true
+  ts:
+    module: perftest

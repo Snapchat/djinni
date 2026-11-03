@@ -1,0 +1,8 @@
+schema_version: 1
+
+languages:
+  cpp:
+    namespace: consumer
+  java:
+    package: consumer
+    use_final_for_record: false
