@@ -1,2 +1,1 @@
-# Import shared consumer options without the root workspace's test toolchains.
-import %workspace%/../../.bazelrc.shared
+import %workspace%/../../.bazelrc

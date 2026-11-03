@@ -1,2 +1,3 @@
-# Import shared consumer options without the root workspace's test toolchains.
-import %workspace%/../.bazelrc.shared
+# External test uses Bzlmod to test consuming djinni as a dependency
+# Import parent .bazelrc for consistency
+import %workspace%/../.bazelrc
