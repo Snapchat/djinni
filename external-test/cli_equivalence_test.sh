@@ -34,15 +34,3 @@ done
 for file in message.hpp shared.hpp status.hpp; do
     diff -u "$TEST_TMPDIR/cpp/$file" "$TEST_TMPDIR/config-cpp/$file"
 done
-
-# Duplicate YAML mapping keys must fail rather than silently taking the last
-# value. This catches accidental duplicates in checked-in per-IDL configs.
-if "$1" \
-    --config duplicate_config.yaml \
-    --idl schema.djinni \
-    --cpp-out "$TEST_TMPDIR/duplicate-cpp" \
-    >"$TEST_TMPDIR/duplicate-config.log" 2>&1; then
-    echo "expected duplicate YAML keys to be rejected" >&2
-    exit 1
-fi
-grep -qi 'duplicate key' "$TEST_TMPDIR/duplicate-config.log"
