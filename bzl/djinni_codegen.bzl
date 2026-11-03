@@ -63,7 +63,10 @@ def _djinni_codegen_impl(ctx):
         if ctx.attr.project_name and djinni.project_name and ctx.attr.project_name != djinni.project_name:
             fail("project_name %s does not match djinni_library project_name %s" % (ctx.attr.project_name, djinni.project_name))
         idl = djinni.idl
-        input_depsets = [djinni.transitive_srcs, djinni.yaml_files, depset([djinni.declarations_manifest, djinni.input_manifest, djinni.output_manifest])]
+        manifests = [djinni.declarations_manifest, djinni.output_manifest]
+        if djinni.input_manifest:
+            manifests.append(djinni.input_manifest)
+        input_depsets = [djinni.transitive_srcs, djinni.yaml_files, depset(manifests)]
         idl_include_paths = djinni.idl_include_paths.to_list() + _include_paths(ctx)
     else:
         idl = ctx.file.idl
@@ -757,9 +760,9 @@ def _generated_unity(name, codegen_name, tree, extensions, testonly, output_exte
     unity_name = name + "__unity"
     native.genrule(
         name = unity_name,
-        srcs = [tree, ":" + codegen_name + "__manifest"],
+        srcs = [tree],
         outs = [name + "__djinni_unity." + output_extension],
-        cmd = "tree=$(location %s); sed 's#^'\"$$tree\"'/##' $(location :%s__manifest) | LC_ALL=C sort | while read f; do case \"$$f\" in %s) printf '#include \"%%s\"\\n' \"$$f\";; esac; done > $@" % (tree, codegen_name, "|".join(["*.%s" % ext for ext in extensions])),
+        cmd = "tree=$(location %s); find \"$$tree\" -type f | sed 's#^'\"$$tree\"'/##' | LC_ALL=C sort | while read f; do case \"$$f\" in %s) printf '#include \"%%s\"\\n' \"$$f\";; esac; done > $@" % (tree, "|".join(["*.%s" % ext for ext in extensions])),
         testonly = testonly,
     )
     return ":" + unity_name

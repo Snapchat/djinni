@@ -33,7 +33,21 @@ cc_djinni_library(
 c_djinni_library(
     name = "c_tree_probe",
     testonly = True,
-    deps = [":shared-schema"],
+    cc_deps = [
+        ":tree_probe",
+        "//support-lib:djinni-support-common",
+    ],
+    tags = ["manual"],
+    deps = [":c-schema"],
+)
+
+djinni_library(
+    name = "c-schema",
+    testonly = True,
+    srcs = ["idl/nested.djinni"],
+    idl = "idl/shared.djinni",
+    idl_include_files = ["idl/nested.djinni"],
+    idl_include_paths = ["bzl/tests/idl"],
 )
 
 cc_test(
@@ -53,6 +67,8 @@ java_djinni_library(
 jni_djinni_library(
     name = "jni_tree_probe",
     testonly = True,
+    cc_deps = ["//support-lib:djinni-support-jni"],
+    tags = ["manual"],
     deps = [":shared-schema"],
 )
 

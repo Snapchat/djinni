@@ -62,8 +62,8 @@ def _inventory_consumer_test_impl(ctx):
     asserts.equals(env, ["DjinniCodegen", "DjinniOutputManifest"], sorted(actions_by_mnemonic.keys()))
     codegen_inputs = [f.basename for f in actions_by_mnemonic["DjinniCodegen"].inputs.to_list()]
     manifest_inputs = [f.basename for f in actions_by_mnemonic["DjinniOutputManifest"].inputs.to_list()]
-    asserts.true(env, "shared-schema.outputs" in codegen_inputs)
-    asserts.true(env, "shared-schema.outputs" in manifest_inputs)
+    asserts.true(env, any([ctx.attr.schema_manifest in basename for basename in codegen_inputs]))
+    asserts.true(env, any([ctx.attr.schema_manifest in basename for basename in manifest_inputs]))
     asserts.equals(env, [ctx.attr.target_name + "." + ctx.attr.language], [f.basename for f in actions_by_mnemonic["DjinniCodegen"].outputs.to_list()])
     asserts.equals(env, [ctx.attr.target_name + ".outputs"], [f.basename for f in actions_by_mnemonic["DjinniOutputManifest"].outputs.to_list()])
     asserts.false(env, "--list-out-files" in actions_by_mnemonic["DjinniCodegen"].argv)
@@ -71,6 +71,7 @@ def _inventory_consumer_test_impl(ctx):
 
 _inventory_consumer_test = analysistest.make(_inventory_consumer_test_impl, attrs = {
     "language": attr.string(),
+    "schema_manifest": attr.string(),
     "target_name": attr.string(),
 })
 
@@ -193,19 +194,20 @@ def rule_tests(name):
         expected = ["shared.ts"],
     )
     _provider_test(name = "provider_test", target_under_test = ":shared-schema")
-    for language, target_name in [
-        ("cpp", "tree_probe__djinni_cpp_codegen"),
-        ("c", "c_tree_probe__djinni_c_codegen"),
-        ("java", "java_tree_probe__djinni_java_codegen"),
-        ("jni", "jni_tree_probe__djinni_jni_codegen"),
-        ("objc", "objc_tree_probe__djinni_objc_codegen"),
-        ("wasm", "wasm_tree_probe__djinni_wasm_codegen"),
-        ("ts", "ts_tree_probe__djinni_ts_codegen"),
+    for language, target_name, schema_manifest in [
+        ("cpp", "tree_probe__djinni_cpp_codegen", "shared-schema"),
+        ("c", "c_tree_probe__djinni_c_codegen", "c-schema"),
+        ("java", "java_tree_probe__djinni_java_codegen", "shared-schema"),
+        ("jni", "jni_tree_probe__djinni_jni_codegen", "shared-schema"),
+        ("objc", "objc_tree_probe__djinni_objc_codegen", "shared-schema"),
+        ("wasm", "wasm_tree_probe__djinni_wasm_codegen", "shared-schema"),
+        ("ts", "ts_tree_probe__djinni_ts_codegen", "shared-schema"),
     ]:
         _inventory_consumer_test(
             name = language + "_inventory_consumer_test",
             target_under_test = "//bzl/tests:" + target_name,
             language = language,
+            schema_manifest = schema_manifest,
             target_name = target_name,
         )
     _explicit_outputs_test(name = "explicit_outputs_test", target_under_test = ":analysis_cc__djinni_cpp_codegen")
