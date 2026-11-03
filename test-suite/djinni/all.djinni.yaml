@@ -17,7 +17,6 @@ languages:
     nonnull_annotation: javax.annotation.Nonnull
     use_final_for_record: false
     implement_android_os_parcelable: true
-    implement_android_os_parcelable: true
     identifiers:
       field: mFooBar
   jni:
@@ -33,7 +32,6 @@ languages:
     module: test
   swift:
     module: TestSuite
-    private_in_same_module: true
     private_in_same_module: true
   swiftxx:
     identifiers:

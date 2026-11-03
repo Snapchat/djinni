@@ -1,0 +1,5 @@
+schema_version: 1
+languages:
+  swift:
+    private_in_same_module: true
+    private_in_same_module: true

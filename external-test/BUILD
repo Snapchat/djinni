@@ -70,6 +70,7 @@ sh_test(
     ],
     data = [
         "common_defaults.yaml",
+        "duplicate_config.yaml",
         "schema.djinni",
         "schema.djinni.yaml",
         "@djinni//bzl/tests:idl/nested.djinni",

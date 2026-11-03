@@ -22,6 +22,8 @@ import java.io.{BufferedWriter, File, FileNotFoundException, FileWriter, IOExcep
 import java.io.{FileInputStream, InputStreamReader}
 
 import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.LoaderOptions
+import org.yaml.snakeyaml.constructor.SafeConstructor
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
@@ -53,7 +55,9 @@ object Main {
 
   private def readConfig(file: File): Any = {
     val in = new InputStreamReader(new FileInputStream(file), "UTF-8")
-    try new Yaml().load[Any](in) finally in.close()
+    val loaderOptions = new LoaderOptions()
+    loaderOptions.setAllowDuplicateKeys(false)
+    try new Yaml(new SafeConstructor(loaderOptions)).load[Any](in) finally in.close()
   }
 
   private def mergeConfigValues(base: Any, overrideValue: Any): Any = {
