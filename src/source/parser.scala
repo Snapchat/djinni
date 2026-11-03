@@ -44,7 +44,7 @@ private object IdlParser extends RegexParsers {
 
   def flag(): Parser[String] = "@flag" ~> ("\"" ~> """([^"\\]|\\[\\"])*""".r <~ "\"") ^^ { _.replaceAll("""\\(.)""", "$1") }
 
-  def importFileRef(): Parser[FileRef] =
+  def importFileRef(): Parser[FileRef] = doc ~> (
     ("@import" ~> ("\"" ~> filePath <~ "\"")) ^^ { x => new IdlFileRef(importFile(x)) } |
     ("@extern" ~> ("\"" ~> filePath <~ "\"") ~ opt("config" ~> ("\"" ~> filePath <~ "\""))) >> {
       case x ~ config if x.endsWith(".djinni") => config match {
@@ -55,6 +55,7 @@ private object IdlParser extends RegexParsers {
       case x ~ None => success(new ExternFileRef(importFile(x)))
     } |
     ("@protobuf" ~> ("\"" ~> filePath <~ "\"")) ^^ { x => new ProtobufFileRef(importFile(x)) }
+  )
 
   def importFile(fileName: String): File = {
     var file: Option[File] = None
