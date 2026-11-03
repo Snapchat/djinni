@@ -10,6 +10,7 @@ DjinniInfo = provider(
         "transitive_srcs": "Root IDL and imported IDL/config sources from the transitive dependency closure.",
         "idl_include_paths": "Depset of execution-root include paths.",
         "declarations_manifest": "Resolved internal declarations produced by Djinni.",
+        "output_manifest": "Per-language generated file inventory produced from the IDL and its configuration.",
         "project_name": "Consumer project name for language-specific defaults.",
         "cpp_namespace": "Default C++ namespace.",
         "cpp_include_prefix": "Default generated C++ include prefix.",
@@ -62,7 +63,7 @@ def _djinni_codegen_impl(ctx):
         if ctx.attr.project_name and djinni.project_name and ctx.attr.project_name != djinni.project_name:
             fail("project_name %s does not match djinni_library project_name %s" % (ctx.attr.project_name, djinni.project_name))
         idl = djinni.idl
-        input_depsets = [djinni.transitive_srcs, djinni.yaml_files, depset([djinni.declarations_manifest, djinni.input_manifest])]
+        input_depsets = [djinni.transitive_srcs, djinni.yaml_files, depset([djinni.declarations_manifest, djinni.input_manifest, djinni.output_manifest])]
         idl_include_paths = djinni.idl_include_paths.to_list() + _include_paths(ctx)
     else:
         idl = ctx.file.idl
@@ -273,7 +274,7 @@ def _djinni_codegen_impl(ctx):
     if ctx.attr.djinni:
         args.add("--verify-declarations")
         args.add(djinni.declarations_manifest.path)
-    if tree_outputs:
+    if tree_outputs and not ctx.attr.djinni:
         args.add("--list-out-files")
         args.add(manifest.path)
     for include_path in idl_include_paths:
@@ -285,14 +286,41 @@ def _djinni_codegen_impl(ctx):
         transitive = input_depsets,
     )
 
+    codegen_outputs = all_outputs[:-1] if tree_outputs and ctx.attr.djinni else all_outputs
     ctx.actions.run(
         executable = ctx.attr.compiler[DefaultInfo].files_to_run,
         arguments = [args],
         inputs = inputs,
-        outputs = all_outputs,
+        outputs = codegen_outputs,
         mnemonic = "DjinniCodegen",
         progress_message = "Generating Djinni sources for %s" % ctx.label,
     )
+
+    if tree_outputs and ctx.attr.djinni:
+        if len(tree_outputs) != 1:
+            fail("A Djinni language codegen target may declare only one tree output language")
+        language_output_roots = {
+            "cpp": [("__djinni_outputs/cpp_src/", cpp_src_dir), ("__djinni_outputs/cpp_hdr/", cpp_hdr_dir)],
+            "java": [("__djinni_outputs/java/", java_dir)],
+            "c": [("__djinni_outputs/c_src/", c_src_dir), ("__djinni_outputs/c_hdr/", c_hdr_dir)],
+            "jni": [("__djinni_outputs/jni_src/", jni_src_dir), ("__djinni_outputs/jni_hdr/", jni_hdr_dir)],
+            "objc": [("__djinni_outputs/objc/", objc_dir), ("__djinni_outputs/objcpp/", objcpp_dir)],
+            "wasm": [("__djinni_outputs/wasm/", wasm_dir)],
+            "ts": [("__djinni_outputs/ts/", tree_outputs["ts"].path if "ts" in tree_outputs else None)],
+        }
+        mapping_args = []
+        for language in tree_outputs:
+            for inventory_root, tree_root in language_output_roots[language]:
+                if tree_root:
+                    mapping_args += [inventory_root, tree_root]
+        ctx.actions.run_shell(
+            inputs = [djinni.output_manifest],
+            outputs = [manifest],
+            arguments = [djinni.output_manifest.path, manifest.path] + mapping_args,
+            command = "input=\"$1\"; output=\"$2\"; shift 2; : > \"$output\"; while [ \"$#\" -ge 2 ]; do root=\"$1\"; tree=\"$2\"; shift 2; while IFS= read -r file; do case \"$file\" in \"$root\"*) relative=${file#\"$root\"}; printf '%s/%s\\n' \"$tree\" \"$relative\" >> \"$output\";; esac; done < \"$input\"; done",
+            mnemonic = "DjinniOutputManifest",
+            progress_message = "Preparing Djinni output manifest for %s" % ctx.label,
+        )
 
     return [
         DefaultInfo(files = depset(all_outputs)),
@@ -463,6 +491,7 @@ def _djinni_library_impl(ctx):
     )
 
     declarations_manifest = ctx.actions.declare_file(ctx.label.name + ".declarations.tsv")
+    output_manifest = ctx.actions.declare_file(ctx.label.name + ".outputs")
     validated_inputs = ctx.actions.declare_file(ctx.label.name + ".djinni.inputs") if ctx.attr.verify else None
     args = ctx.actions.args()
     defaults_file = ctx.file.defaults_file
@@ -487,14 +516,51 @@ def _djinni_library_impl(ctx):
         outputs = [declarations_manifest, yaml_tree] + ([validated_inputs] if validated_inputs else []),
         mnemonic = "DjinniDeclarations",
     )
+
+    # Discover generated filenames once from the root IDL and its merged
+    # configuration. Keep each backend under a stable prefix so downstream
+    # language rules can select their entries from the shared manifest.
+    output_args = ctx.actions.args()
+    if defaults_file:
+        output_args.add("--defaults", defaults_file.path)
+    if config_file:
+        output_args.add("--config", config_file.path)
+    output_args.add("--cpp-out", "__djinni_outputs/cpp_src")
+    output_args.add("--cpp-header-out", "__djinni_outputs/cpp_hdr")
+    output_args.add("--c-out", "__djinni_outputs/c_src")
+    output_args.add("--c-header-out", "__djinni_outputs/c_hdr")
+    output_args.add("--java-out", "__djinni_outputs/java")
+    output_args.add("--jni-out", "__djinni_outputs/jni_src")
+    output_args.add("--jni-header-out", "__djinni_outputs/jni_hdr")
+    output_args.add("--objc-out", "__djinni_outputs/objc")
+    output_args.add("--objcpp-out", "__djinni_outputs/objcpp")
+    output_args.add("--wasm-out", "__djinni_outputs/wasm")
+    output_args.add("--ts-out", "__djinni_outputs/ts")
+    output_args.add("--swift-out", "__djinni_outputs/swift")
+    output_args.add("--swiftxx-out", "__djinni_outputs/swiftxx")
+    output_args.add("--valdi-out", "__djinni_outputs/valdi")
+    output_args.add("--valdi-ts-out", "__djinni_outputs/valdi_ts")
+    output_args.add("--skip-generation", "true")
+    output_args.add("--list-out-files", output_manifest)
+    output_args.add("--idl", ctx.file.idl)
+    output_args.add_all(include_paths.to_list(), before_each = "--idl-include-path")
+    ctx.actions.run(
+        executable = ctx.attr.compiler[DefaultInfo].files_to_run,
+        arguments = [output_args],
+        inputs = depset(direct = [ctx.file.idl] + ctx.files.srcs + ctx.files.idl_include_files + config_files, transitive = transitive + [yaml_files]),
+        outputs = [output_manifest],
+        mnemonic = "DjinniOutputInventory",
+        progress_message = "Listing Djinni outputs for %s" % ctx.label,
+    )
     return [
-        DefaultInfo(files = depset([ctx.file.idl, declarations_manifest, yaml_tree] + ([validated_inputs] if validated_inputs else []) + ctx.files.srcs + ctx.files.idl_include_files + config_files, transitive = [depset(transitive = transitive)])),
+        DefaultInfo(files = depset([ctx.file.idl, declarations_manifest, output_manifest, yaml_tree] + ([validated_inputs] if validated_inputs else []) + ctx.files.srcs + ctx.files.idl_include_files + config_files, transitive = [depset(transitive = transitive)])),
         OutputGroupInfo(yaml_tree = depset([yaml_tree])),
         DjinniInfo(
             idl = ctx.file.idl,
             transitive_srcs = transitive_srcs,
             idl_include_paths = include_paths,
             declarations_manifest = declarations_manifest,
+            output_manifest = output_manifest,
             project_name = ctx.attr.project_name,
             cpp_namespace = ctx.attr.cpp_namespace,
             cpp_include_prefix = ctx.attr.cpp_include_prefix,
@@ -795,18 +861,14 @@ def java_djinni_library(
         outs = {}
     common = _language_codegen(codegen_name, deps, outs, "java", kwargs)
     if tree_mode:
-        native.filegroup(
-            name = codegen_name + "__tree",
-            srcs = [":" + codegen_name],
-            output_group = "java_tree",
-            testonly = kwargs.get("testonly", False),
-        )
+        tree = _generated_tree(name, codegen_name, "java", kwargs.get("testonly", False))
+        _generated_manifest(codegen_name, kwargs.get("testonly", False))
         native.genrule(
             name = name + "__srcjar",
-            srcs = [":" + codegen_name + "__tree"],
+            srcs = [tree, ":" + codegen_name + "__manifest"],
             outs = [name + "__djinni.srcjar"],
             tools = ["@bazel_tools//tools/zip:zipper"],
-            cmd = "zipper=$$(pwd)/$(execpath @bazel_tools//tools/zip:zipper); out=$$(pwd)/$(location %s); cd $(location :%s__tree) && files=$$(find . -name '*.java' -print | LC_ALL=C sort | sed 's#^./##') && $$zipper c $$out $$files" % (name + "__djinni.srcjar", codegen_name),
+            cmd = "tree=$(location %s); zipper=$$(pwd)/$(execpath @bazel_tools//tools/zip:zipper); out=$$(pwd)/$(location %s); files=$$(sed 's#^'\"$$tree\"'/##' $(location :%s__manifest) | LC_ALL=C sort); cd $$tree && $$zipper c $$out $$files" % (codegen_name + "__tree", name + "__djinni.srcjar", codegen_name),
             testonly = kwargs.get("testonly", False),
         )
     java_library(
@@ -947,11 +1009,12 @@ def ts_djinni_filegroup(name, deps, outs = None, srcs = [], visibility = None, *
     common = _language_codegen(codegen_name, deps, outs, "ts", kwargs)
     if tree_mode:
         tree = _generated_tree(name, codegen_name, "ts", kwargs.get("testonly", False))
+        _generated_manifest(codegen_name, kwargs.get("testonly", False))
         native.genrule(
             name = name + "__source",
-            srcs = [tree],
+            srcs = [tree, ":" + codegen_name + "__manifest"],
             outs = [name + ".ts"],
-            cmd = "cp $(location %s)/%s.ts $@" % (tree, kwargs.get("ts_module", "module")),
+            cmd = "tree=$(location %s); file=$$(sed 's#^'\"$$tree\"'/##' $(location :%s__manifest)); cp \"$$tree/$$file\" $@" % (codegen_name + "__tree", codegen_name),
             testonly = kwargs.get("testonly", False),
         )
     native.filegroup(

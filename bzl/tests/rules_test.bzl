@@ -13,12 +13,17 @@ def _provider_test_impl(ctx):
     asserts.equals(env, "shared-schema.yaml", info.yaml_tree.basename)
     asserts.equals(env, ["bzl/tests/idl"], info.idl_include_paths.to_list())
     asserts.equals(env, "shared-schema.declarations.tsv", info.declarations_manifest.basename)
+    asserts.equals(env, "shared-schema.outputs", info.output_manifest.basename)
     asserts.equals(env, "shared", info.project_name)
     actions = analysistest.target_actions(env)
-    asserts.equals(env, 1, len(actions))
-    asserts.equals(env, "DjinniDeclarations", actions[0].mnemonic)
-    asserts.true(env, "--skip-generation" not in actions[0].argv)
-    asserts.true(env, "--yaml-out" in actions[0].argv)
+    actions_by_mnemonic = {action.mnemonic: action for action in actions}
+    asserts.equals(env, ["DjinniDeclarations", "DjinniOutputInventory"], sorted(actions_by_mnemonic.keys()))
+    asserts.true(env, "--skip-generation" not in actions_by_mnemonic["DjinniDeclarations"].argv)
+    asserts.true(env, "--yaml-out" in actions_by_mnemonic["DjinniDeclarations"].argv)
+    asserts.true(env, "--skip-generation" in actions_by_mnemonic["DjinniOutputInventory"].argv)
+    asserts.true(env, "--list-out-files" in actions_by_mnemonic["DjinniOutputInventory"].argv)
+    asserts.true(env, "--cpp-out" in actions_by_mnemonic["DjinniOutputInventory"].argv)
+    asserts.true(env, "--ts-out" in actions_by_mnemonic["DjinniOutputInventory"].argv)
     asserts.true(env, any([f.basename == "shared-schema.djinni.inputs" for f in target[DefaultInfo].files.to_list()]))
     return analysistest.end(env)
 
@@ -33,7 +38,7 @@ def _codegen_test_impl(ctx):
     asserts.true(env, ctx.attr.output_flag in action.argv)
     asserts.false(env, ctx.attr.other_output_flag in action.argv)
     inputs = [f.basename for f in action.inputs.to_list()]
-    for basename in ["shared.djinni", "nested.djinni", "shared-schema.djinni.inputs", "shared-schema.declarations.tsv", "shared-schema.yaml"]:
+    for basename in ["shared.djinni", "nested.djinni", "shared-schema.djinni.inputs", "shared-schema.declarations.tsv", "shared-schema.outputs", "shared-schema.yaml"]:
         asserts.true(env, basename in inputs, "Missing transitive action input: " + basename)
     if ctx.attr.output_flag == "--java-out":
         index = action.argv.index("--java-use-final-for-record")
@@ -49,6 +54,36 @@ _codegen_test = analysistest.make(_codegen_test_impl, attrs = {
     "other_output_flag": attr.string(),
     "expected_options": attr.string_dict(default = {}),
 })
+
+def _inventory_consumer_test_impl(ctx):
+    env = analysistest.begin(ctx)
+    actions = analysistest.target_actions(env)
+    actions_by_mnemonic = {action.mnemonic: action for action in actions}
+    asserts.equals(env, ["DjinniCodegen", "DjinniOutputManifest"], sorted(actions_by_mnemonic.keys()))
+    codegen_inputs = [f.basename for f in actions_by_mnemonic["DjinniCodegen"].inputs.to_list()]
+    manifest_inputs = [f.basename for f in actions_by_mnemonic["DjinniOutputManifest"].inputs.to_list()]
+    asserts.true(env, "shared-schema.outputs" in codegen_inputs)
+    asserts.true(env, "shared-schema.outputs" in manifest_inputs)
+    asserts.equals(env, [ctx.attr.target_name + "." + ctx.attr.language], [f.basename for f in actions_by_mnemonic["DjinniCodegen"].outputs.to_list()])
+    asserts.equals(env, [ctx.attr.target_name + ".outputs"], [f.basename for f in actions_by_mnemonic["DjinniOutputManifest"].outputs.to_list()])
+    asserts.false(env, "--list-out-files" in actions_by_mnemonic["DjinniCodegen"].argv)
+    return analysistest.end(env)
+
+_inventory_consumer_test = analysistest.make(_inventory_consumer_test_impl, attrs = {
+    "language": attr.string(),
+    "target_name": attr.string(),
+})
+
+def _explicit_outputs_test_impl(ctx):
+    env = analysistest.begin(ctx)
+    actions = analysistest.target_actions(env)
+    asserts.equals(env, 1, len(actions))
+    asserts.equals(env, "DjinniCodegen", actions[0].mnemonic)
+    asserts.equals(env, ["shared.hpp", "status.hpp"], sorted([f.basename for f in actions[0].outputs.to_list()]))
+    asserts.false(env, any([f.basename.endswith(".cpp") for f in actions[0].outputs.to_list()]))
+    return analysistest.end(env)
+
+_explicit_outputs_test = analysistest.make(_explicit_outputs_test_impl)
 
 def _failure_test_impl(ctx):
     env = analysistest.begin(ctx)
@@ -158,6 +193,22 @@ def rule_tests(name):
         expected = ["shared.ts"],
     )
     _provider_test(name = "provider_test", target_under_test = ":shared-schema")
+    for language, target_name in [
+        ("cpp", "tree_probe__djinni_cpp_codegen"),
+        ("c", "c_tree_probe__djinni_c_codegen"),
+        ("java", "java_tree_probe__djinni_java_codegen"),
+        ("jni", "jni_tree_probe__djinni_jni_codegen"),
+        ("objc", "objc_tree_probe__djinni_objc_codegen"),
+        ("wasm", "wasm_tree_probe__djinni_wasm_codegen"),
+        ("ts", "ts_tree_probe__djinni_ts_codegen"),
+    ]:
+        _inventory_consumer_test(
+            name = language + "_inventory_consumer_test",
+            target_under_test = "//bzl/tests:" + target_name,
+            language = language,
+            target_name = target_name,
+        )
+    _explicit_outputs_test(name = "explicit_outputs_test", target_under_test = ":analysis_cc__djinni_cpp_codegen")
     _codegen_test(
         name = "cpp_action_test",
         target_under_test = ":analysis_cc__djinni_cpp_codegen",
@@ -237,5 +288,5 @@ def rule_tests(name):
     )
     native.test_suite(
         name = name,
-        tests = [":provider_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":project_name_mismatch_test"],
+        tests = [":provider_test", ":cpp_inventory_consumer_test", ":c_inventory_consumer_test", ":java_inventory_consumer_test", ":jni_inventory_consumer_test", ":objc_inventory_consumer_test", ":wasm_inventory_consumer_test", ":ts_inventory_consumer_test", ":explicit_outputs_test", "//bzl/tests:tree_probe_consumer", "//bzl/tests:java_tree_probe_test", "//bzl/tests:java_explicit_probe_test", "//bzl/tests:ts_outputs_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":project_name_mismatch_test"],
     )

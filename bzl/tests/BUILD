@@ -30,6 +30,12 @@ cc_djinni_library(
     deps = [":shared-schema"],
 )
 
+c_djinni_library(
+    name = "c_tree_probe",
+    testonly = True,
+    deps = [":shared-schema"],
+)
+
 cc_test(
     name = "tree_probe_consumer",
     testonly = True,
@@ -42,6 +48,41 @@ java_djinni_library(
     testonly = True,
     java_package = "example.shared",
     deps = [":shared-schema"],
+)
+
+jni_djinni_library(
+    name = "jni_tree_probe",
+    testonly = True,
+    deps = [":shared-schema"],
+)
+
+java_test(
+    name = "java_tree_probe_test",
+    testonly = True,
+    srcs = ["TreeProbe.java"],
+    main_class = "example.shared.TreeProbe",
+    use_testrunner = False,
+    deps = [":java_tree_probe"],
+)
+
+java_djinni_library(
+    name = "java_explicit_probe",
+    testonly = True,
+    outs = {"java_srcs": [
+        "analysis/java_explicit/Shared.java",
+        "analysis/java_explicit/Status.java",
+    ]},
+    java_package = "example.shared",
+    deps = [":shared-schema"],
+)
+
+java_test(
+    name = "java_explicit_probe_test",
+    testonly = True,
+    srcs = ["ExplicitTreeProbe.java"],
+    main_class = "example.shared.ExplicitTreeProbe",
+    use_testrunner = False,
+    deps = [":java_explicit_probe"],
 )
 
 djinni_library(
@@ -74,6 +115,13 @@ cc_djinni_library(
 )
 
 objc_djinni_library(
+    name = "objc_inventory_probe",
+    testonly = True,
+    tags = ["manual"],
+    deps = [":shared-schema"],
+)
+
+objc_djinni_library(
     name = "objc_tree_probe",
     testonly = True,
     objc_deps = [
@@ -83,6 +131,13 @@ objc_djinni_library(
     objc_include_prefix = "shared/",
     objc_type_prefix = "OBJ",
     objcpp_include_cpp_prefix = "shared/",
+    tags = ["manual"],
+    deps = [":shared-schema"],
+)
+
+wasm_djinni_cc_library(
+    name = "wasm_inventory_probe",
+    testonly = True,
     tags = ["manual"],
     deps = [":shared-schema"],
 )
@@ -102,4 +157,24 @@ wasm_djinni_cc_library(
 ts_djinni_filegroup(
     name = "ts_tree_probe",
     deps = [":shared-schema"],
+)
+
+ts_djinni_filegroup(
+    name = "ts_explicit_probe",
+    outs = {"ts_srcs": ["analysis/ts_explicit/shared.ts"]},
+    ts_module = "shared",
+    deps = [":shared-schema"],
+)
+
+sh_test(
+    name = "ts_outputs_test",
+    srcs = ["ts_outputs_test.sh"],
+    args = [
+        "$(rootpath :ts_tree_probe)",
+        "$(rootpath :ts_explicit_probe)",
+    ],
+    data = [
+        ":ts_explicit_probe",
+        ":ts_tree_probe",
+    ],
 )
