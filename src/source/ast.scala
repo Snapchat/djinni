@@ -31,7 +31,7 @@ abstract sealed class FileRef {
 }
 case class IdlFileRef(override val file: File) extends FileRef
 case class ExternFileRef(override val file: File) extends FileRef
-case class ExternDjinniFileRef(override val file: File, configFile: File) extends FileRef
+case class ExternDjinniFileRef(override val file: File) extends FileRef
 case class ProtobufFileRef(override val file: File) extends FileRef
 
 case class Ident(name: String, file: File, loc: Loc)

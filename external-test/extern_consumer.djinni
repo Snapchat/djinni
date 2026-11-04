@@ -1,4 +1,4 @@
-@extern "external_types.djinni" config "external_types.djinni.yaml"
+@extern "external_types.djinni"
 
 consumer = record {
     value: external_type;

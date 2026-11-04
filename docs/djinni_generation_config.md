@@ -47,18 +47,18 @@ exactly match the merged YAML. The repository's generation scripts use that
 mode for side-by-side comparison:
 
 An IDL file can also be referenced as an external type source without generating
-its declarations in the current compilation unit. Pair it with the configuration
-used to generate that source:
+its declarations in the current compilation unit. Djinni loads the companion
+configuration named by appending `.yaml` to the IDL filename:
 
 ```djinni
-@extern "shared_types.djinni" config "shared_types.djinni.yaml"
+@extern "shared_types.djinni"
 ```
 
 The external declarations are parsed for their type structure, while their
 language names, namespaces, packages, and include paths are derived from the
-companion configuration. The external source and configuration must both be
-declared as build inputs. Existing `@extern "types.yaml"` declarations remain
-supported.
+`shared_types.djinni.yaml` companion. The external source and companion
+configuration must both be declared as build inputs. Existing
+`@extern "types.yaml"` declarations remain supported.
 
 | Profile | Invocation |
 | --- | --- |
