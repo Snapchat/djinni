@@ -27,6 +27,8 @@ import java.util.{Map => JMap}
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 
+import YamlGenerator.QuotedString
+
 class YamlGenerator(spec: Spec) extends Generator(spec) {
 
   val cppMarshal = new CppMarshal(spec)
@@ -41,7 +43,21 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   val swiftxxMarshal = new SwiftxxMarshal(spec)
   val cMarshal = new CGenerator(spec)
 
-  case class QuotedString(str: String) // For anything that migt require escaping
+  def externalProperties(td: InternTypeDecl): Map[String, Any] = {
+    Map[String, Any](
+      "prefix" -> "",
+      "cpp" -> cpp(td),
+      "objc" -> objc(td),
+      "objcpp" -> objcpp(td),
+      "java" -> java(td),
+      "jni" -> jni(td),
+      "wasm" -> wasm(td),
+      "valdi" -> valdi(td),
+      "ts" -> ts(td),
+      "swift" -> swift(td),
+      "swiftxx" -> swiftxx(td),
+      "c" -> c(td))
+  }
 
   private def writeYamlFile(name: String, origin: String, f: IndentWriter => Unit): Unit = {
     createFile(spec.yamlOutFolder.get, name, out => new IndentWriter(out, "  "), w => {
@@ -128,7 +144,7 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     if(s.str.isEmpty) w.wl(q("")) else w.wl("'" + s.str.replaceAllLiterally("'", "''") + "'")
   }
 
-  private def preamble(td: TypeDecl) = Map[String, Any](
+  private[djinni] def preamble(td: TypeDecl) = Map[String, Any](
     "name" -> (spec.yamlPrefix + td.ident.name),
     "typedef" -> QuotedString(typeDef(td)),
     "params" -> td.params.collect { case p: TypeParam => p.ident.name },
@@ -159,13 +175,13 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  private def cpp(td: TypeDecl) = Map[String, Any](
+  private[djinni] def cpp(td: TypeDecl) = Map[String, Any](
     "typename" -> QuotedString(cppMarshal.fqTypename(td.ident, td.body)),
     "header" -> QuotedString(cppMarshal.include(td.ident)),
     "byValue" -> cppMarshal.byValue(td)
   )
 
-  private def objc(td: TypeDecl) = {
+  private[djinni] def objc(td: TypeDecl) = {
     val map = Map[String, Any](
       "typename" -> QuotedString(objcMarshal.fqTypename(td.ident, td.body)),
       "header" -> QuotedString(objcMarshal.include(td.ident)),
@@ -183,12 +199,12 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
-  private def objcpp(td: TypeDecl) = Map[String, Any](
+  private[djinni] def objcpp(td: TypeDecl) = Map[String, Any](
     "translator" -> QuotedString(objcppMarshal.helperName(mexpr(td))),
     "header" -> QuotedString(objcppMarshal.include(meta(td)))
   )
 
-  private def java(td: TypeDecl) = Map[String, Any](
+  private[djinni] def java(td: TypeDecl) = Map[String, Any](
     "typename" -> QuotedString(javaMarshal.fqTypename(td.ident, td.body)),
     "boxed" -> QuotedString(javaMarshal.fqTypename(td.ident, td.body)),
     "reference" -> javaMarshal.isReference(td),
@@ -199,42 +215,42 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
     "readFromParcel" -> QuotedString("new %s(in)")
   )
 
-  private def jni(td: TypeDecl) = Map[String, Any](
+  private[djinni] def jni(td: TypeDecl) = Map[String, Any](
     "translator" -> QuotedString(jniMarshal.helperName(mexpr(td))),
     "header" -> QuotedString(jniMarshal.include(td.ident)),
     "typename" -> jniMarshal.fqParamType(mexpr(td)),
     "typeSignature" -> QuotedString(jniMarshal.fqTypename(td.ident, td.body))
   )
 
-  private def wasm(td: TypeDecl) = Map[String, Any](
+  private[djinni] def wasm(td: TypeDecl) = Map[String, Any](
     "translator" -> QuotedString(wasmMarshal.helperName(mexpr(td))),
     "header" -> QuotedString(wasmMarshal.include(td.ident)),
     "typename" -> wasmMarshal.wasmType(mexpr(td))
   )
 
-  private def valdi(td: TypeDecl) = Map[String, Any](
+  private[djinni] def valdi(td: TypeDecl) = Map[String, Any](
     "translator" -> QuotedString(valdiMarshal.helperName(mexpr(td))),
     "header" -> QuotedString(valdiMarshal.include(td.ident))
   )
 
-  private def ts(td: TypeDecl) = Map[String, Any](
+  private[djinni] def ts(td: TypeDecl) = Map[String, Any](
     "typename" -> tsMarshal.toTsType(mexpr(td), /*addNullability*/ false),
     "module" -> QuotedString("./" + spec.tsModule)
     //, "generic" -> false
   )
 
-  private def swift(td: TypeDecl) = Map[String, Any](
+  private[djinni] def swift(td: TypeDecl) = Map[String, Any](
     "typename" -> QuotedString(swiftMarshal.typename(td.ident, td.body)),
     "module" -> QuotedString(spec.swiftModule),
     "translator" -> QuotedString(swiftMarshal.helperName(mexpr(td))),
     "translator.module" -> QuotedString(spec.swiftModule)
   )
-  private def swiftxx(td: TypeDecl) = Map[String, Any](
+  private[djinni] def swiftxx(td: TypeDecl) = Map[String, Any](
     "translator" -> QuotedString(swiftxxMarshal.helperName(mexpr(td))),
     "header" -> QuotedString(swiftxxMarshal.include(td.ident))
   )
 
-  private def c(td: TypeDecl) = Map[String, Any](
+  private[djinni] def c(td: TypeDecl) = Map[String, Any](
     "typename" -> QuotedString(cMarshal.typename(td)),
     "translator" -> QuotedString(cMarshal.helperName(td)),
     "public_header" -> QuotedString(cMarshal.publicHeader(td)),
@@ -283,6 +299,195 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
 }
 
 object YamlGenerator {
+  case class QuotedString(str: String) // For anything that might require escaping
+
+  def metaFromConfig(td: DjinniExternTypeDecl, consumerSpec: Spec): MExtern = {
+    val config = td.config
+    config.get("schema_version") match {
+      case Some(version: java.lang.Number) if version.intValue() == 1 =>
+      case Some(version) => throw new IllegalArgumentException("unsupported schema_version " + version + " in " + td.configFile)
+      case None => throw new IllegalArgumentException("External Djinni config requires schema_version: 1: " + td.configFile)
+    }
+    val extraKeys = config.keySet -- Set("schema_version", "languages")
+    if (extraKeys.nonEmpty) throw new IllegalArgumentException("unknown config keys in " + td.configFile + ": " + extraKeys.toSeq.sorted.mkString(", "))
+    val languages = config.get("languages") match {
+      case Some(m: JMap[_, _]) => m.collect { case (k: String, v: Any) => k -> v }.toMap
+      case _ => throw new IllegalArgumentException("External Djinni config requires a languages mapping: " + td.configFile)
+    }
+    def settings(language: String): Map[String, Any] = languages.get(language) match {
+      case Some(m: JMap[_, _]) => m.collect { case (k: String, v: Any) => k -> v }.toMap
+      case Some(_) => throw new IllegalArgumentException("languages." + language + " must be a mapping in " + td.configFile)
+      case None => Map.empty[String, Any]
+    }
+    def string(language: String, key: String, default: String): String = settings(language).get(key) match {
+      case Some(value: String) => value
+      case Some(value) => throw new IllegalArgumentException("languages." + language + "." + key + " must be a string in " + td.configFile + "; found " + value)
+      case None => default
+    }
+    def bool(language: String, key: String, default: Boolean): Boolean = settings(language).get(key) match {
+      case Some(value: Boolean) => value
+      case Some(value) => throw new IllegalArgumentException("languages." + language + "." + key + " must be boolean in " + td.configFile + "; found " + value)
+      case None => default
+    }
+    def identifier(language: String, key: String, default: Option[IdentConverter]): Option[IdentConverter] = {
+      val value = settings(language).get("identifiers") match {
+        case Some(m: JMap[_, _]) => m.collect { case (k: String, v) => k -> v }.toMap.get(key) match {
+          case Some(style: String) => Some(style)
+          case Some(value) => throw new IllegalArgumentException("languages." + language + ".identifiers." + key + " must be a string in " + td.configFile + "; found " + value)
+          case None => None
+        }
+        case Some(_) => throw new IllegalArgumentException("languages." + language + ".identifiers must be a mapping in " + td.configFile)
+        case None => None
+      }
+      value match {
+        case Some(style) => IdentStyle.infer(style).orElse(throw new IllegalArgumentException("invalid identifier style " + style + " in " + td.configFile))
+        case None => default
+      }
+    }
+    def languageConfig(language: String): Map[String, Any] = {
+      val config = settings(language)
+      val identifiers = config.get("identifiers") match {
+        case Some(m: JMap[_, _]) => m.collect { case (k: String, v: Any) => k -> v }.toMap
+        case None => Map.empty[String, Any]
+        case _ => throw new IllegalArgumentException("languages." + language + ".identifiers must be a mapping in " + td.configFile)
+      }
+      config ++ identifiers.map { case (key, value) => "identifiers." + key -> value }
+    }
+    def configuredIdent(language: String, name: String, fallback: IdentConverter): IdentConverter =
+      identifier(language, name, Some(fallback)).get
+
+    val cppIdent = IdentStyle.cppDefault.copy(
+      ty = configuredIdent("cpp", "type", IdentStyle.cppDefault.ty),
+      enumType = configuredIdent("cpp", "enum_type", IdentStyle.cppDefault.enumType),
+      typeParam = configuredIdent("cpp", "type_param", IdentStyle.cppDefault.typeParam),
+      method = configuredIdent("cpp", "method", IdentStyle.cppDefault.method),
+      field = configuredIdent("cpp", "field", IdentStyle.cppDefault.field),
+      local = configuredIdent("cpp", "local", IdentStyle.cppDefault.local),
+      enum = configuredIdent("cpp", "enum", IdentStyle.cppDefault.enum),
+      const = configuredIdent("cpp", "const", IdentStyle.cppDefault.const))
+    val javaIdent = IdentStyle.javaDefault.copy(
+      ty = configuredIdent("java", "type", IdentStyle.javaDefault.ty),
+      typeParam = configuredIdent("java", "type_param", IdentStyle.javaDefault.typeParam),
+      method = configuredIdent("java", "method", IdentStyle.javaDefault.method),
+      field = configuredIdent("java", "field", IdentStyle.javaDefault.field),
+      local = configuredIdent("java", "local", IdentStyle.javaDefault.local),
+      enum = configuredIdent("java", "enum", IdentStyle.javaDefault.enum),
+      const = configuredIdent("java", "const", IdentStyle.javaDefault.const))
+    val objcTypePrefix = string("objc", "type_prefix", "")
+    val objcIdent = IdentStyle.objcDefault.copy(
+      ty = IdentStyle.prefix(objcTypePrefix, configuredIdent("objc", "type", IdentStyle.objcDefault.ty)),
+      typeParam = configuredIdent("objc", "type_param", IdentStyle.objcDefault.typeParam),
+      method = configuredIdent("objc", "method", IdentStyle.objcDefault.method),
+      field = configuredIdent("objc", "field", IdentStyle.objcDefault.field),
+      local = configuredIdent("objc", "local", IdentStyle.objcDefault.local),
+      enum = configuredIdent("objc", "enum", IdentStyle.objcDefault.enum),
+      const = configuredIdent("objc", "const", IdentStyle.objcDefault.const))
+    val cppFileIdent = identifier("cpp", "file", None).getOrElse(IdentStyle.underLower)
+    val jniClassIdent = identifier("jni", "class", None).getOrElse(IdentStyle.cppDefault.ty)
+    val jniFileIdent = identifier("jni", "file", None).getOrElse(cppFileIdent)
+    val wasmClassIdent = identifier("wasm", "class", None).getOrElse(jniClassIdent)
+    val wasmFileIdent = identifier("wasm", "file", None).getOrElse(jniFileIdent)
+    val valdiClassIdent = identifier("valdi", "class", None).getOrElse(IdentStyle.cppDefault.ty)
+    val valdiFileIdent = identifier("valdi", "file", None).getOrElse(cppFileIdent)
+    val swiftxxClassIdent = identifier("swiftxx", "class", None).getOrElse(IdentStyle.cppDefault.ty)
+    val swiftxxFileIdent = identifier("swiftxx", "file", None).getOrElse(cppFileIdent)
+    val swiftIdent = IdentStyle.swiftDefault.copy(
+      ty = configuredIdent("swift", "type", IdentStyle.swiftDefault.ty),
+      typeParam = configuredIdent("swift", "type_param", IdentStyle.swiftDefault.typeParam),
+      method = configuredIdent("swift", "method", IdentStyle.swiftDefault.method),
+      field = configuredIdent("swift", "field", IdentStyle.swiftDefault.field),
+      local = configuredIdent("swift", "local", IdentStyle.swiftDefault.local),
+      enum = configuredIdent("swift", "enum", IdentStyle.swiftDefault.enum),
+      const = configuredIdent("swift", "const", IdentStyle.swiftDefault.const))
+    val externalSpec = consumerSpec.copy(
+      javaPackage = Option(string("java", "package", "" )).filter(_.nonEmpty),
+      javaClassAccessModifier = JavaAccessModifier.withName(string("java", "class_access_modifier", "public")),
+      javaIdentStyle = javaIdent,
+      javaCppException = Option(string("java", "cpp_exception", "")).filter(_.nonEmpty),
+      javaAnnotation = Option(string("java", "annotation", "")).filter(_.nonEmpty),
+      javaNullableAnnotation = Option(string("java", "nullable_annotation", "")).filter(_.nonEmpty),
+      javaNonnullAnnotation = Option(string("java", "nonnull_annotation", "")).filter(_.nonEmpty),
+      javaImplementAndroidOsParcelable = bool("java", "implement_android_os_parcelable", false),
+      javaUseFinalForRecord = bool("java", "use_final_for_record", true),
+      javaGenInterface = bool("java", "gen_interface", false),
+      javaLegacyRecords = bool("java", "legacy_records", false),
+      cppIncludePrefix = string("cpp", "include_prefix", ""),
+      cppExtendedRecordIncludePrefix = string("cpp", "extended_record_include_prefix", ""),
+      cppNamespace = string("cpp", "namespace", ""),
+      cppIdentStyle = cppIdent,
+      cppFileIdentStyle = cppFileIdent,
+      cppBaseLibIncludePrefix = string("cpp", "base_lib_include_prefix", ""),
+      cppOptionalTemplate = string("cpp", "optional_template", "std::optional"),
+      cppOptionalHeader = string("cpp", "optional_header", "<optional>"),
+      cppNulloptValue = string("cpp", "nullopt_value", "std::nullopt"),
+      cppExt = string("cpp", "ext", "cpp"),
+      cppHeaderExt = string("cpp", "header_ext", "hpp"),
+      cppUseWideStrings = bool("cpp", "use_wide_strings", false),
+      jniNamespace = string("jni", "namespace", "djinni_generated"),
+      jniIncludePrefix = string("jni", "include_prefix", ""),
+      jniIncludeCppPrefix = string("jni", "include_cpp_prefix", ""),
+      jniBaseLibIncludePrefix = string("jni", "base_lib_include_prefix", ""),
+      jniUseOnLoad = bool("jni", "use_on_load_initializer", false),
+      jniClassIdentStyle = jniClassIdent,
+      jniFileIdentStyle = jniFileIdent,
+      objcIdentStyle = objcIdent,
+      objcIncludePrefix = string("objc", "include_prefix", ""),
+      objcExtendedRecordIncludePrefix = string("objc", "extended_record_include_prefix", ""),
+      objcGenProtocol = bool("objc", "gen_protocol", false),
+      objcDisableClassCtor = bool("objc", "disable_class_ctor", false),
+      objcClosedEnums = bool("objc", "closed_enums", false),
+      objcStrictProtocol = bool("objc", "strict_protocols", true),
+      objcLegacyRecords = bool("objc", "legacy_records", false),
+      objcOmitFullConvenienceConstructor = bool("objc", "omit_full_convenience_constructor", false),
+      objcBaseLibIncludePrefix = string("objc", "base_lib_include_prefix", ""),
+      objcHeaderExt = string("objc", "header_ext", "h"),
+      objcppNamespace = string("objcpp", "namespace", "djinni_generated"),
+      objcppIncludePrefix = string("objcpp", "include_prefix", ""),
+      objcppIncludeCppPrefix = string("objcpp", "include_cpp_prefix", ""),
+      objcppIncludeObjcPrefix = string("objcpp", "include_objc_prefix", string("objcpp", "include_prefix", "")),
+      objcppFunctionPrologueFile = Option(string("objcpp", "function_prologue_file", "")).filter(_.nonEmpty),
+      objcppDisableExceptionTranslation = bool("objcpp", "disable_exception_translation", false),
+      wasmIncludePrefix = string("wasm", "include_prefix", ""),
+      wasmIncludeCppPrefix = string("wasm", "include_cpp_prefix", ""),
+      wasmBaseLibIncludePrefix = string("wasm", "base_lib_include_prefix", ""),
+      wasmOmitConstants = bool("wasm", "omit_constants", false),
+      wasmNamespace = Option(string("wasm", "namespace", "")).filter(_.nonEmpty),
+      wasmOmitNsAlias = bool("wasm", "omit_namespace_alias", false),
+      wasmCppNamespace = string("wasm", "cpp_namespace", string("jni", "namespace", "djinni_generated")),
+      wasmClassIdentStyle = wasmClassIdent,
+      wasmFileIdentStyle = wasmFileIdent,
+      tsModule = string("ts", "module", "module"),
+      swiftModule = string("swift", "module", "Module"),
+      swiftIdentStyle = swiftIdent,
+      swiftPrivateInSameModule = bool("swift", "private_in_same_module", false),
+      swiftxxNamespace = string("swiftxx", "namespace", "djinni_generated"),
+      swiftxxIncludePrefix = string("swiftxx", "include_prefix", ""),
+      swiftxxIncludeCppPrefix = string("swiftxx", "include_cpp_prefix", ""),
+      swiftxxBaseLibIncludePrefix = string("swiftxx", "base_lib_include_prefix", ""),
+      swiftxxClassIdentStyle = swiftxxClassIdent,
+      swiftxxFileIdentStyle = swiftxxFileIdent,
+      valdiNamespace = string("valdi", "namespace", "djinni_generated"),
+      valdiIncludePrefix = string("valdi", "include_prefix", ""),
+      valdiIncludeCppPrefix = string("valdi", "include_cpp_prefix", ""),
+      valdiBaseLibIncludePrefix = string("valdi", "base_lib_include_prefix", ""),
+      valdiClassIdentStyle = valdiClassIdent,
+      valdiFileIdentStyle = valdiFileIdent,
+      cNamespace = string("c", "namespace", ""),
+      cBaseLibIncludePrefix = string("c", "base_lib_include_prefix", ""),
+      cIncludePrefix = string("c", "include_prefix", ""),
+      cWrapperUseDlsym = bool("c", "wrapper_use_dlsym", false))
+
+    val generator = new YamlGenerator(externalSpec)
+    def yamlValue(value: Any): Any = value match {
+      case quoted: YamlGenerator.QuotedString => quoted.str
+      case map: scala.collection.Map[_, _] => map.map { case (key, nestedValue) => key.toString -> yamlValue(nestedValue) }.toMap
+      case other => other
+    }
+    val properties = yamlValue(generator.externalProperties(td.source)).asInstanceOf[Map[String, Any]]
+    val external = ExternTypeDecl(td.ident, td.params, td.body, properties, td.origin)
+    metaFromYaml(external)
+  }
+
   def metaFromYaml(td: ExternTypeDecl) = MExtern(
     td.ident.name.stripPrefix(td.properties("prefix").toString), // Make sure the generator uses this type with its original name for all intents and purposes
     td.params.size,
@@ -347,7 +552,11 @@ object YamlGenerator {
   )
 
   private def nested(td: ExternTypeDecl, key: String) = {
-    td.properties.get(key).collect { case m: JMap[_, _] => m.collect { case (k: String, v: Any) => (k, v) } } getOrElse(Map[String, Any]())
+    td.properties.get(key) match {
+      case Some(m: JMap[_, _]) => m.collect { case (k: String, v: Any) => (k, v) }
+      case Some(m: scala.collection.Map[_, _]) => m.collect { case (k: String, v: Any) if k.isInstanceOf[String] => k.asInstanceOf[String] -> v }.toMap
+      case _ => Map[String, Any]()
+    }
   }
 
   private def getOptionalField[T](td: ExternTypeDecl, key: String, subKey: String, defVal: T) = {

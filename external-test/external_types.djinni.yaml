@@ -1,0 +1,7 @@
+schema_version: 1
+
+languages:
+  cpp:
+    namespace: external
+  java:
+    package: external

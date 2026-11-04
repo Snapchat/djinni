@@ -638,7 +638,4 @@ TESTSUITE_MAIN_DJINNI_OUTS = {
     "ts_srcs": [
         "bazel-generated/testsuite/ts/test.ts",
     ],
-    "yaml_srcs": [
-        "bazel-generated/testsuite/yaml/yaml-test.yaml",
-    ],
 }

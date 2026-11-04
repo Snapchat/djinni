@@ -44,19 +44,14 @@ private object IdlParser extends RegexParsers {
 
   def flag(): Parser[String] = "@flag" ~> ("\"" ~> """([^"\\]|\\[\\"])*""".r <~ "\"") ^^ { _.replaceAll("""\\(.)""", "$1") }
 
-  def importFileRef(): Parser[FileRef] = {
-    doc ~> (("@" ~> directive) ~ ("\"" ~> filePath <~ "\"")) ^^ {
-      case "import" ~ x => {
-        new IdlFileRef(importFile(x))
-      }
-      case "extern" ~ x => {
-        new ExternFileRef(importFile(x))
-      }
-      case "protobuf" ~ x => {
-        new ProtobufFileRef(importFile(x))
-      }
-    }
-  }
+  def importFileRef(): Parser[FileRef] = doc ~> (
+    ("@import" ~> ("\"" ~> filePath <~ "\"")) ^^ { x => new IdlFileRef(importFile(x)) } |
+    ("@extern" ~> ("\"" ~> filePath <~ "\"")) >> {
+      case x if x.endsWith(".djinni") => success(new ExternDjinniFileRef(importFile(x)))
+      case x => success(new ExternFileRef(importFile(x)))
+    } |
+    ("@protobuf" ~> ("\"" ~> filePath <~ "\"")) ^^ { x => new ProtobufFileRef(importFile(x)) }
+  )
 
   def importFile(fileName: String): File = {
     var file: Option[File] = None
@@ -75,11 +70,6 @@ private object IdlParser extends RegexParsers {
   }
 
   def filePath = "[^\"]*".r
-
-  def directive = importDirective | externDirective | protobufDirective
-  def importDirective = "import".r
-  def externDirective = "extern".r
-  def protobufDirective = "protobuf".r
 
   def typeDecl(origin: String): Parser[TypeDecl] = doc ~ ident ~ typeList(ident ^^ TypeParam) ~ "=" ~ typeDef ^^ {
     case doc~ident~typeParams~_~body => InternTypeDecl(ident, typeParams, body, doc, origin)
@@ -464,6 +454,16 @@ def parseFile(idlFile: File, inFileListWriter: Option[Writer]): (Seq[TypeDecl], 
               }
               case ExternFileRef(file) =>
                 types = parseExternFile(normalized, inFileListWriter) ++ types
+              case ExternDjinniFileRef(file) =>
+                val (externTypes, _) = parseFile(normalized, inFileListWriter)
+                val normalizedConfig = normalizePath(new File(normalized.getPath + ".yaml"))
+                if (inFileListWriter.isDefined) inFileListWriter.get.write(normalizedConfig + "\n")
+                val config = parseGenerationConfig(normalizedConfig)
+                val externDecls = externTypes.map {
+                  case td: InternTypeDecl => DjinniExternTypeDecl(td, normalizedConfig, config)
+                  case td => td
+                }
+                types = externDecls ++ types
               case ProtobufFileRef(file) =>
                 types = parseProtobufFile(normalized, inFileListWriter) ++ types
             }
@@ -477,6 +477,20 @@ def parseFile(idlFile: File, inFileListWriter: Option[Writer]): (Seq[TypeDecl], 
     fin.close()
     fileStack.pop()
   }
+}
+
+private def parseGenerationConfig(configFile: File): Map[String, Any] = {
+  val fin = new FileInputStream(configFile)
+  try {
+    val root = new Yaml().load[Any](new InputStreamReader(fin, "UTF-8"))
+    root match {
+      case map: JMap[_, _] => map.collect {
+        case (k: String, v) => (k, v)
+        case (k, _) => throw new IllegalArgumentException("Config keys must be strings in " + configFile + "; found " + k)
+      }.toMap
+      case _ => throw new IllegalArgumentException("Config file must be a YAML mapping: " + configFile)
+    }
+  } finally fin.close()
 }
 
 }
