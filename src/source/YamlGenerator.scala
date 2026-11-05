@@ -154,17 +154,19 @@ class YamlGenerator(spec: Spec) extends Generator(spec) {
   private def typeDef(td: TypeDecl) = {
     def ext(e: Ext): String = (if(e.cpp) " +c" else "") + (if(e.objc) " +o" else "") + (if(e.java) " +j" else "") + (if(e.js) " +w" else "") + (if(e.swift) " +sw" else "") + (if(e.cc) " +cc" else "")
     def deriving(r: Record) = {
-      if(r.derivingTypes.isEmpty) {
-        ""
-      } else {
-        r.derivingTypes.collect {
-          case Record.DerivingType.Eq => "eq"
-          case Record.DerivingType.Ord => "ord"
-          case Record.DerivingType.AndroidParcelable => "parcelable"
-          case Record.DerivingType.NSCopying => "nscopying"
-          case Record.DerivingType.Req => "req"
-        }.mkString(" deriving(", ", ", ")")
+      val types = r.derivingTypes.toSeq.collect {
+        case Record.DerivingType.Eq => "eq"
+        case Record.DerivingType.Ord => "ord"
+        case Record.DerivingType.AndroidParcelable => "parcelable"
+        case Record.DerivingType.NSCopying => "nscopying"
+        case Record.DerivingType.Req => "req"
+        case Record.DerivingType.Hashable => "hashable"
+        case Record.DerivingType.Sendable => "sendable"
+        case Record.DerivingType.Codable => "codable"
+        case Record.DerivingType.Error => "error"
       }
+      // An empty "deriving()" doesn't parse back as an extern typedef.
+      if (types.isEmpty) "" else types.mkString(" deriving(", ", ", ")")
     }
     td.body match {
       case i: Interface => "interface" + ext(i.ext)
