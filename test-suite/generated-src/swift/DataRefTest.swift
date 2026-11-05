@@ -3,14 +3,15 @@
 
 import DjinniSupport
 import Foundation
+import Swift
 
 public protocol DataRefTest: AnyObject {
-    func sendData(_ data: DjinniSupport.DJBinaryData) throws -> Void
+    func sendData(_ data: DjinniSupport.DJDataRef) throws -> Void
     func retriveAsBin() throws -> Data
-    func sendMutableData(_ data: DjinniSupport.DJBinaryData) throws -> Void
-    func generateData() throws -> DjinniSupport.DJBinaryData
-    func dataFromVec() throws -> DjinniSupport.DJBinaryData
-    func dataFromStr() throws -> DjinniSupport.DJBinaryData
-    func sendDataView(_ data: DjinniSupport.DJBinaryData) throws -> Data
-    func recvDataView() throws -> DjinniSupport.DJBinaryData
+    func sendMutableData(_ data: DjinniSupport.DJDataRef) throws -> Void
+    func generateData() throws -> DjinniSupport.DJDataRef
+    func dataFromVec() throws -> DjinniSupport.DJDataRef
+    func dataFromStr() throws -> DjinniSupport.DJDataRef
+    func sendDataView(_ data: Swift.UnsafeRawBufferPointer) throws -> Data
+    func recvDataView() throws -> Swift.UnsafeRawBufferPointer
 }

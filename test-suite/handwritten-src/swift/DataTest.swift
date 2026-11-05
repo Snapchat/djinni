@@ -1,5 +1,6 @@
 import XCTest
 import Foundation
+import DjinniSupport
 @testable import TestSuite
 
 final class DataTest: XCTestCase {
@@ -8,47 +9,48 @@ final class DataTest: XCTestCase {
 
     func testSend() throws {
         let input: [UInt8] = [0, 1, 2, 3]
-        let buf = Data(input)
-        try test.sendData(buf as NSData)
+        try test.sendData(DJDataRef(Data(input)))
         let output = try test.retriveAsBin()
         XCTAssertEqual(Data(input), output)
     }
 
+    // C++ shares the buffer rather than copying it, so its in-place change shows through.
     func testSendMutable() throws {
         let input: [UInt8] = [0, 1, 2, 3]
-        let buf = NSMutableData()
-        buf.append(Data(input))
+        let buf = DJDataRef(Data(input))
         try test.sendMutableData(buf)
-        XCTAssertEqual(Data([3,2,1,0]), buf as Data)
+        XCTAssertEqual(Data([3,2,1,0]), buf.data)
     }
 
     func testGenerateData() throws {
         let buf = try test.generateData()
-        let output = buf as Data
-        XCTAssertEqual(Data([0, 1, 2, 3]), output)
+        XCTAssertEqual(Data([0, 1, 2, 3]), buf.data)
     }
 
     func testDataFromVec() throws {
         let buf = try test.dataFromVec()
-        let output = buf as Data
-        XCTAssertEqual(Data([0, 1, 2, 3]), output)
+        XCTAssertEqual(Data([0, 1, 2, 3]), buf.data)
     }
 
     func testDataFromStr() throws {
         let buf = try test.dataFromStr()
-        let output = buf as Data
-        XCTAssertEqual("abcd".data(using:.utf8)![0...3], output)
+        XCTAssertEqual("abcd".data(using:.utf8)![0...3], buf.data)
     }
-    
+
+    func testDataRefRoundTrip() throws {
+        let buf = try test.generateData()
+        XCTAssertEqual(buf, DJDataRef(Data([0, 1, 2, 3])))
+        XCTAssertEqual(buf.hashValue, DJDataRef(Data([0, 1, 2, 3])).hashValue)
+    }
+
     func testSendDataView() throws {
         let input: [UInt8] = [0, 1, 2, 3]
-        let buf = Data(input)
-        let output = try test.sendDataView(buf as NSData)
-        XCTAssertEqual(buf, output)
+        let output = try input.withUnsafeBytes { try test.sendDataView($0) }
+        XCTAssertEqual(Data(input), output)
     }
 
     func testRecvDataView() throws {
-        let buf = try test.recvDataView() as Data
-        XCTAssertEqual(Data([0, 1, 2, 3]), buf)
+        let buf = try test.recvDataView()
+        XCTAssertEqual(Data([0, 1, 2, 3]), Data(buf))
     }
 }

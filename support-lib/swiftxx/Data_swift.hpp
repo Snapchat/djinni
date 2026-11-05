@@ -22,15 +22,12 @@ public:
     static AnyValue fromCpp(const CppType& c);
 };
 
-#if !DATAREF_OBJC
-// Without CoreFoundation there is no CFData for Swift's NSData to toll-free bridge to, so a DataRef
-// crosses as a heap-held DataRef that the receiver takes over: one from C++ shares its buffer, which
-// Swift's Data wraps without copying and releases when deallocated; one from Swift
-// (makeDataRefValue) holds a copy of its bytes.
-AnyValue makeDataRefValue(const void* bytes, size_t size);
+// A DataRef crosses between C++ and Swift as a heap-held DataRef (sharing its buffer), which Swift's
+// DJDataRef owns. These let Swift make, share, read and release one.
+const void* makeDataRef(const void* bytes, size_t size);
+const void* retainDataRef(const void* holder);
 const void* dataRefBytes(const void* holder);
 size_t dataRefSize(const void* holder);
 void releaseDataRef(const void* holder);
-#endif
 
 }
