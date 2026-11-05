@@ -762,7 +762,7 @@ def _generated_unity(name, codegen_name, tree, extensions, testonly, output_exte
         name = unity_name,
         srcs = [tree],
         outs = [name + "__djinni_unity." + output_extension],
-        cmd = "tree=$(location %s); find \"$$tree\" -type f | sed 's#^'\"$$tree\"'/##' | LC_ALL=C sort | while read f; do case \"$$f\" in %s) printf '#include \"%%s\"\\n' \"$$f\";; esac; done > $@" % (tree, "|".join(["*.%s" % ext for ext in extensions])),
+        cmd = "tree=$(location %s); find -L \"$$tree\" -type f | sed 's#^'\"$$tree\"'/##' | LC_ALL=C sort | while read f; do case \"$$f\" in %s) printf '#include \"%%s\"\\n' \"$$f\";; esac; done > $@" % (tree, "|".join(["*.%s" % ext for ext in extensions])),
         testonly = testonly,
     )
     return ":" + unity_name
