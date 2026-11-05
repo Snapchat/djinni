@@ -32,3 +32,11 @@ swift_library(
         "@apple_swift_protobuf//:swift-protobuf",
     ],
 )
+
+# The SwiftProtobuf DjinniSupport links, for consumers (the test suite) whose own protobuf Swift must
+# link the same copy.
+alias(
+    name = "swift-protobuf",
+    actual = "@apple_swift_protobuf//:swift-protobuf",
+    visibility = ["//visibility:public"],
+)
