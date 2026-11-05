@@ -74,7 +74,9 @@ sealed abstract class TypeDef
 
 case class Const(ident: Ident, ty: TypeRef, value: Any, doc: Doc)
 
-case class Enum(options: Seq[Enum.Option], flags: Boolean) extends TypeDef
+// `derivingTypes` only takes `error` (an `outcome`'s error type in Swift), and doesn't take part in
+// equality or pattern matching.
+case class Enum(options: Seq[Enum.Option], flags: Boolean)(val derivingTypes: Set[DerivingType] = Set()) extends TypeDef
 object Enum {
   object SpecialFlag extends Enumeration {
     type SpecialFlag = Value

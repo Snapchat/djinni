@@ -10,9 +10,9 @@ djinni::swift::AnyValue AsyncInterfaceSwiftProxy::make(void* instance, djinni::s
     return {std::make_shared<AsyncInterfaceSwiftProxy>(instance, dispatcher)};
 }
 ::djinni::Future<std::string> AsyncInterfaceSwiftProxy::future_roundtrip(::djinni::Future<int32_t> f) {
-    djinni::swift::ParameterList params;
-    params.addValue(::djinni::swift::FutureAdaptor<::djinni::swift::I32>::fromCpp(std::move(f)));
-    return ::djinni::swift::FutureAdaptor<::djinni::swift::String>::toCpp(callProtocol(0, &params));
+    djinni::swift::ParameterList djinniParams;
+    djinniParams.addValue(::djinni::swift::FutureAdaptor<::djinni::swift::I32>::fromCpp(std::move(f)));
+    return ::djinni::swift::FutureAdaptor<::djinni::swift::String>::toCpp(callProtocol(0, &djinniParams));
 }
 
 } // namespace djinni_generated

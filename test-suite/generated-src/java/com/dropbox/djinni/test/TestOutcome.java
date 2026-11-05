@@ -31,6 +31,15 @@ public abstract class TestOutcome {
     @Nonnull
     public static native String putNestedErrorOutcome(@Nonnull NestedOutcome x);
 
+    @Nonnull
+    public static native com.snapchat.djinni.Outcome<String, OutcomeError> getEnumErrorOutcome();
+
+    @Nonnull
+    public static native com.snapchat.djinni.Outcome<String, OutcomeErrorInfo> getRecordErrorOutcome();
+
+    @Nonnull
+    public static native com.snapchat.djinni.Outcome<String, OutcomeErrorInfo> getOptionalErrorOutcome();
+
     public static final class CppProxy extends TestOutcome
     {
         private final long nativeRef;

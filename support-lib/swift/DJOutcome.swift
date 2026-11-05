@@ -1,6 +1,10 @@
 import DjinniSupportCxx
 import Foundation
 
+// `outcome<T, E>` is `Result<T, E>`, so its error type must conform to `Error`: records and enums
+// get that conformance from `deriving(error)`. An optional error conforms when its wrapped type does.
+extension Optional: @retroactive Error where Wrapped: Error {}
+
 // `outcome<T>` is marshalled as a composite value
 // 1. If the `outcome` object contains a successful value, then it's the [0]
 //    element in the composite value

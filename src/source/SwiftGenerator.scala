@@ -83,20 +83,56 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
     }
   }
 
+  // A parameter named like the module its marshaller is qualified by (`duplex: duplex.DuplexClient`)
+  // would shadow the module in `duplex.DuplexClientMarshaller.toCpp(duplex)`: keep the label and
+  // give the parameter an internal name.
+  private def paramLocal(p: Field): String = {
+    val n = idSwift.local(p.ident)
+    val shadows = Pattern.compile("(^|[^A-Za-z0-9_])" + Pattern.quote(n) + "\\.").matcher(marshal.toCpp(p.ty, "x")).find()
+    if (shadows) "_" + n else n
+  }
+  private def paramDecl(p: Field, first: Boolean): String = {
+    val n = idSwift.local(p.ident)
+    val local = paramLocal(p)
+    val name = if (first || local == n) local else s"$n $local"
+    s"$name: ${marshal.fqParamType(p.ty)}"
+  }
+  private def paramDecls(params: Seq[Field]): String =
+    params.zipWithIndex.map { case (p, i) => paramDecl(p, i == 0) }.mkString(", ")
+
+  // The swiftxx namespace as Swift names it (C++ `a::b` is `a.b`).
+  private val swiftxxNamespaceInSwift = spec.swiftxxNamespace.replace("::", ".")
+
+  // Swift keywords can't name an enum case unescaped (e.g. a COF system type `Any`).
+  private val swiftKeywords = Set(
+    "Any", "Self", "Type", "Protocol", "associatedtype", "class", "deinit", "enum", "extension",
+    "fileprivate", "func", "import", "init", "inout", "internal", "let", "open", "operator",
+    "private", "protocol", "public", "rethrows", "static", "struct", "subscript", "typealias",
+    "var", "break", "case", "continue", "default", "defer", "do", "else", "fallthrough", "for",
+    "guard", "if", "in", "repeat", "return", "switch", "where", "while", "as", "catch", "false",
+    "is", "nil", "super", "self", "throw", "throws", "true", "try")
+  private def swiftEnumCase(name: String): String = {
+    val n = idSwift.enum(name)
+    if (swiftKeywords.contains(n)) "`" + n + "`" else n
+  }
+
   override def generateEnum(origin: String, ident: Ident, doc: Doc, e: Enum) {
     writeSwiftFile(ident, origin, List[String](), w => {
       val t = marshal.typename(ident, e)
       if (e.flags) {
-        w.w(s"public struct $t: OptionSet").braced {
+        val error = if (e.derivingTypes.contains(DerivingType.Error)) ", Swift.Error" else ""
+        w.w(s"public struct $t: OptionSet$error").braced {
           w.wl("public let rawValue: Int32")
           w.wl("public init(rawValue: Int32) { self.rawValue = rawValue }")
-          writeFlagNone(w, e, idSwift.enum, t)
-          writeFlags(w, e, idSwift.enum, t)
-          writeFlagAll(w, e, idSwift.enum, t)
+          writeFlagNone(w, e, swiftEnumCase, t)
+          writeFlags(w, e, swiftEnumCase, t)
+          writeFlagAll(w, e, swiftEnumCase, t)
         }
       } else {
-        w.w(s"public enum ${marshal.typename(ident, e)}: Int32").braced {
-          writeEnumOptions(w, e, idSwift.enum, "=", "case ", "")
+        // `deriving(error)` lets the enum be an `outcome`'s error (Swift's `Result` requires `Error`).
+        val error = if (e.derivingTypes.contains(DerivingType.Error)) ", Swift.Error" else ""
+        w.w(s"public enum ${marshal.typename(ident, e)}: Int32$error").braced {
+          writeEnumOptions(w, e, swiftEnumCase, "=", "case ", "")
         }
       }
     })
@@ -151,7 +187,9 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
       case d: Double => w.w(d.toString)
       case b: Boolean => w.w(if (b) "true" else "false")
       case s: String => w.w(s)
-      case e: EnumValue =>  w.w(s"${marshal.typename(ty)}.${idSwift.enum(e)}")
+      case e: EnumValue =>
+        val n = idSwift.enum(e)
+        w.w(s"${marshal.typename(ty)}.${if (swiftKeywords.contains(n)) "`" + n + "`" else n}")
       case v: ConstRef => w.w(idSwift.const(v))
       case z: Map[_, _] => { // Value is record
         val recordMdef = ty.resolved.base.asInstanceOf[MDef]
@@ -184,8 +222,9 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
     val hashable = if (deriving.contains(DerivingType.Hashable)) "Hashable" else ""
     val sendable = if (deriving.contains(DerivingType.Sendable)) "Sendable" else ""
     val codable = if (deriving.contains(DerivingType.Codable)) "Codable" else ""
-    val error = if (deriving.contains(DerivingType.Error)) "Error" else ""
-    val conformance = Array(eq, hashable, sendable, codable).filter(_ != "")
+    // Qualified: the type itself may be named `Error`.
+    val error = if (deriving.contains(DerivingType.Error)) "Swift.Error" else ""
+    val conformance = Array(eq, hashable, sendable, codable, error).filter(_ != "")
     if (conformance.nonEmpty) prefix + conformance.mkString(", ") else ""
   }
 
@@ -269,14 +308,14 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
           for (m <- i.methods.filter(!_.static)) {
             w.w(s"func ${swiftMethodName(m.ident)}(")
             if (m.params.nonEmpty) { w.w("_ ") }
-            w.w(m.params.map(p => s"${idSwift.local(p.ident)}: ${marshal.fqParamType(p.ty)}").mkString(", "))
+            w.w(paramDecls(m.params))
             w.w(s") throws -> ${marshal.fqReturnType(m.ret)}").braced {
               w.wl("var _params = djinni.swift.ParameterList()")
               w.wl("_params.addValue(inst)")
               for (p <- m.params) {
-                w.wl(s"_params.addValue(${marshal.toCpp(p.ty, idSwift.local(p.ident))})")
+                w.wl(s"_params.addValue(${marshal.toCpp(p.ty, paramLocal(p))})")
               }
-              w.wl(s"var ret = ${spec.swiftxxNamespace}.${marshal.typename(ident, i)}_${idSwift.method(m.ident)}(&_params)")
+              w.wl(s"var ret = ${swiftxxNamespaceInSwift}.${marshal.typename(ident, i)}_${idSwift.method(m.ident)}(&_params)")
               w.wl("try handleCppErrors(&ret)")
               if (!m.ret.isEmpty) {
                 w.wl(s"return ${marshal.fromCpp(m.ret.get, "ret")}")
@@ -321,7 +360,7 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
           w.wl(s"return cppInterfaceToSwift(c, ${newProxyBlock})")
         }
         w.w("public static func toCpp(_ s: SwiftType) -> djinni.swift.AnyValue").braced {
-          val newProxyBlock = if (i.ext.swift) {s"{ ${spec.swiftxxNamespace}.$swiftProxyClassName.make(ctxPtr(s, ${swiftProxyVtbl}), dispatcherProtocalCall)}"} else {"{ fatalError(\"n/a\") }"}
+          val newProxyBlock = if (i.ext.swift) {s"{ ${swiftxxNamespaceInSwift}.$swiftProxyClassName.make(ctxPtr(s, ${swiftProxyVtbl}), dispatcherProtocalCall)}"} else {"{ fatalError(\"n/a\") }"}
           w.wl(s"return swiftInterfaceToCpp(s, ${newProxyBlock})")
         }
       }
@@ -332,13 +371,13 @@ class SwiftGenerator(spec: Spec) extends Generator(spec) {
           for (m <- staticMethods) {
             w.w(s"public static func ${swiftMethodName(m.ident)}(")
             if (m.params.nonEmpty) { w.w("_ ") }
-            w.w(m.params.map(p => s"${idSwift.local(p.ident)}: ${marshal.fqParamType(p.ty)}").mkString(", "))
+            w.w(paramDecls(m.params))
             w.w(s") throws -> ${marshal.fqReturnType(m.ret)}").braced {
               w.wl("var _params = djinni.swift.ParameterList()")
               for (p <- m.params) {
-                w.wl(s"_params.addValue(${marshal.toCpp(p.ty, idSwift.local(p.ident))})")
+                w.wl(s"_params.addValue(${marshal.toCpp(p.ty, paramLocal(p))})")
               }
-              w.wl(s"var ret = ${spec.swiftxxNamespace}.${marshal.typename(ident, i)}_${idSwift.method(m.ident)}(&_params)")
+              w.wl(s"var ret = ${swiftxxNamespaceInSwift}.${marshal.typename(ident, i)}_${idSwift.method(m.ident)}(&_params)")
               w.wl("try handleCppErrors(&ret)")
               if (!m.ret.isEmpty) {
                 w.wl(s"return ${marshal.fromCpp(m.ret.get, "ret")}")

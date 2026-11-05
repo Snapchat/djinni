@@ -1,6 +1,8 @@
 #include "Data_swift.hpp"
 #include <cassert>
 
+#if DATAREF_OBJC
+
 namespace djinni {
 
 class DataRefSwift : public DataRef::Impl {
@@ -184,3 +186,49 @@ AnyValue DataRefAdaptor::fromCpp(const DataRef& c) {
 }
 
 }
+
+#else // !DATAREF_OBJC
+
+// The C++ DataRef implementation (DataRef.cpp's DataRefCpp) owns the buffers here; see Data_swift.hpp.
+namespace djinni::swift {
+
+DataView DataViewAdaptor::toCpp(const AnyValue& s) {
+    auto range = std::get<RangeValue>(s);
+    return DataView(reinterpret_cast<const uint8_t*>(range.bytes), range.size);
+}
+
+AnyValue DataViewAdaptor::fromCpp(DataView c) {
+    return RangeValue{c.buf(), c.len()};
+}
+
+DataRef DataRefAdaptor::toCpp(const AnyValue& s) {
+    // Take over the holder makeDataRefValue made.
+    auto* holder = const_cast<DataRef*>(reinterpret_cast<const DataRef*>(std::get<RangeValue>(s).bytes));
+    DataRef ref = std::move(*holder);
+    delete holder;
+    return ref;
+}
+
+AnyValue makeDataRefValue(const void* bytes, size_t size) {
+    return RangeValue{new DataRef(bytes, size), 0};
+}
+
+AnyValue DataRefAdaptor::fromCpp(const DataRef& c) {
+    return RangeValue{new DataRef(c), 0};
+}
+
+const void* dataRefBytes(const void* holder) {
+    return reinterpret_cast<const DataRef*>(holder)->buf();
+}
+
+size_t dataRefSize(const void* holder) {
+    return reinterpret_cast<const DataRef*>(holder)->len();
+}
+
+void releaseDataRef(const void* holder) {
+    delete reinterpret_cast<const DataRef*>(holder);
+}
+
+}
+
+#endif // DATAREF_OBJC

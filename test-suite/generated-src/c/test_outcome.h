@@ -6,6 +6,8 @@
 #include "djinni_c.h"
 #include "Outcome_c.h"
 #include "nested_outcome.h"
+#include "outcome_error.h"
+#include "outcome_error_info.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,6 +30,12 @@ testsuite_nested_outcome_ref testsuite_test_outcome_getNestedErrorOutcome();
 int32_t testsuite_test_outcome_putNestedSuccessOutcome(testsuite_nested_outcome_ref x);
 
 djinni_string_ref testsuite_test_outcome_putNestedErrorOutcome(testsuite_nested_outcome_ref x);
+
+djinni_outcome_ref testsuite_test_outcome_getEnumErrorOutcome();
+
+djinni_outcome_ref testsuite_test_outcome_getRecordErrorOutcome();
+
+djinni_outcome_ref testsuite_test_outcome_getOptionalErrorOutcome();
 
 #ifdef __cplusplus
 } // extern "C"

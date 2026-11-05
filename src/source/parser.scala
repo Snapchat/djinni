@@ -165,11 +165,18 @@ private object IdlParser extends RegexParsers {
 
   def enumHeader = "enum".r
   def flagsHeader = "flags".r
-  def enum: Parser[Enum] = enumHeader ~> bracesList(enumOption) ^^ {
-    case items => Enum(items, false)
+  def enum: Parser[Enum] = enumHeader ~> bracesList(enumOption) ~ opt(enumDeriving) ^^ {
+    case items~deriving => Enum(items, false)(deriving.getOrElse(Set()))
   }
-  def flags: Parser[Enum] = flagsHeader ~> bracesList(flagsOption) ^^ {
-    case items => Enum(items, true)
+  def flags: Parser[Enum] = flagsHeader ~> bracesList(flagsOption) ~ opt(enumDeriving) ^^ {
+    case items~deriving => Enum(items, true)(deriving.getOrElse(Set()))
+  }
+  // Enums and flags can only derive `error`.
+  def enumDeriving: Parser[Set[DerivingType]] = deriving ^^ { types =>
+    if (types.exists(_ != Record.DerivingType.Error)) {
+      return err("Enums and flags can only derive \"error\"")
+    }
+    types
   }
 
   def enumOption: Parser[Enum.Option] = doc ~ ident ^^ {
@@ -191,8 +198,8 @@ private object IdlParser extends RegexParsers {
   }
 
   def externTypeDecl: Parser[TypeDef] = externEnum | externFlags | externInterface | externRecord
-  def externEnum: Parser[Enum] = enumHeader ^^ { case _ => Enum(List(), false) }
-  def externFlags: Parser[Enum] = flagsHeader ^^ { case _ => Enum(List(), true) }
+  def externEnum: Parser[Enum] = enumHeader ^^ { case _ => Enum(List(), false)() }
+  def externFlags: Parser[Enum] = flagsHeader ^^ { case _ => Enum(List(), true)() }
   def externRecord: Parser[Record] = recordHeader ~ opt(deriving) ^^ { case ext~deriving => Record(ext, List(), List(), deriving.getOrElse(Set[DerivingType]())) }
   def externInterface: Parser[Interface] = interfaceHeader ^^ { case ext => Interface(ext, List(), List()) }
 

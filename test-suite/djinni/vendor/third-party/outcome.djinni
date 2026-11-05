@@ -4,6 +4,17 @@ nested_outcome = record {
   o: outcome<i32, string>;
 } deriving(eq)
 
+# Error types for an outcome: Swift's Result needs them to conform to Error.
+outcome_error = enum {
+  not_found;
+  denied;
+} deriving(error)
+
+outcome_error_info = record {
+  code: i32;
+  message: string;
+} deriving(eq, error)
+
 test_outcome = interface +c {
 	static getSuccessOutcome(): outcome<string, i32>;
 	static getErrorOutcome(): outcome<string, i32>;
@@ -16,4 +27,8 @@ test_outcome = interface +c {
 
     static putNestedSuccessOutcome(x: nested_outcome): i32;
 	static putNestedErrorOutcome(x: nested_outcome): string;
+
+	static getEnumErrorOutcome(): outcome<string, outcome_error>;
+	static getRecordErrorOutcome(): outcome<string, outcome_error_info>;
+	static getOptionalErrorOutcome(): outcome<string, optional<outcome_error_info>>;
 }

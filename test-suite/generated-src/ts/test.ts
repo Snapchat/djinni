@@ -36,6 +36,17 @@ export interface /*record*/ NestedOutcome {
     o: Outcome<number, string>;
 }
 
+/** Error types for an outcome: Swift's Result needs them to conform to Error. */
+export enum OutcomeError {
+    NOT_FOUND = 0,
+    DENIED = 1,
+}
+
+export interface /*record*/ OutcomeErrorInfo {
+    code: number;
+    message: string;
+}
+
 export interface TestOutcome {
 }
 export interface TestOutcome_statics {
@@ -47,6 +58,9 @@ export interface TestOutcome_statics {
     getNestedErrorOutcome(): NestedOutcome;
     putNestedSuccessOutcome(x: NestedOutcome): number;
     putNestedErrorOutcome(x: NestedOutcome): string;
+    getEnumErrorOutcome(): Outcome<string, OutcomeError>;
+    getRecordErrorOutcome(): Outcome<string, OutcomeErrorInfo>;
+    getOptionalErrorOutcome(): Outcome<string, OutcomeErrorInfo | undefined>;
 }
 
 /** Simple object interface for provider testing */
