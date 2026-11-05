@@ -5,6 +5,8 @@
 #import "DBTestOutcome+Private.h"
 #import "DBTestOutcome.h"
 #import "DBNestedOutcome+Private.h"
+#import "DBOutcomeError+Private.h"
+#import "DBOutcomeErrorInfo+Private.h"
 #import "DJICppWrapperCache+Private.h"
 #import "DJIError.h"
 #import "DJIMarshal+Private.h"
@@ -86,6 +88,20 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     try {
         auto objcpp_result_ = ::testsuite::TestOutcome::putNestedErrorOutcome(::djinni_generated::NestedOutcome::toCpp(x));
         return ::djinni::String::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
++ (nonnull DJOutcome<NSString *, NSNumber *> *)getEnumErrorOutcome {
+    try {
+        auto objcpp_result_ = ::testsuite::TestOutcome::getEnumErrorOutcome();
+        return ::djinni::Outcome<::djinni::String, ::djinni::Enum<::testsuite::outcome_error, DBOutcomeError>>::fromCpp(objcpp_result_);
+    } DJINNI_TRANSLATE_EXCEPTIONS()
+}
+
++ (nonnull DJOutcome<NSString *, DBOutcomeErrorInfo *> *)getRecordErrorOutcome {
+    try {
+        auto objcpp_result_ = ::testsuite::TestOutcome::getRecordErrorOutcome();
+        return ::djinni::Outcome<::djinni::String, ::djinni_generated::OutcomeErrorInfo>::fromCpp(objcpp_result_);
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 

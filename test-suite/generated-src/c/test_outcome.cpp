@@ -6,6 +6,8 @@
 #include "Outcome_c_translator.hpp"
 #include "expected.hpp"
 #include "nested_outcome.hpp"
+#include "outcome_error.hpp"
+#include "outcome_error_info.hpp"
 #include "test_outcome.hpp"
 
 djinni_outcome_ref testsuite_test_outcome_getSuccessOutcome()
@@ -70,6 +72,22 @@ djinni_string_ref testsuite_test_outcome_putNestedErrorOutcome(testsuite_nested_
     auto retValue = ::testsuite::TestOutcome::putNestedErrorOutcome(::djinni::c_api::RecordTranslator<::testsuite::NestedOutcome>::toCpp(x));
     return ::djinni::c_api::StringTranslator::fromCpp(std::move(retValue));
     DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_string_ref)
+}
+
+djinni_outcome_ref testsuite_test_outcome_getEnumErrorOutcome()
+{
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::TestOutcome::getEnumErrorOutcome();
+    return ::djinni::c_api::OutcomeTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::BoxedEnumTranslator<::testsuite::outcome_error>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_outcome_ref)
+}
+
+djinni_outcome_ref testsuite_test_outcome_getRecordErrorOutcome()
+{
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::testsuite::TestOutcome::getRecordErrorOutcome();
+    return ::djinni::c_api::OutcomeTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::RecordTranslator<::testsuite::OutcomeErrorInfo>>::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_outcome_ref)
 }
 
 

@@ -8,7 +8,7 @@ import TestSuiteCxx
 
 final class DataRefTestCppProxy: DjinniSupport.CppProxy, TestSuite.DataRefTest {
     init(_ inst: djinni.swift.AnyValue) { super.init(inst:inst) } 
-    func sendData(_ data: Foundation.NSData) throws -> Void {
+    func sendData(_ data: DjinniSupport.DJDataRef) throws -> Void {
         var _params = djinni.swift.ParameterList()
         _params.addValue(inst)
         _params.addValue(DjinniSupport.DataRefMarshaller.toCpp(data))
@@ -22,35 +22,35 @@ final class DataRefTestCppProxy: DjinniSupport.CppProxy, TestSuite.DataRefTest {
         try handleCppErrors(&ret)
         return BinaryMarshaller.fromCpp(ret)
     }
-    func sendMutableData(_ data: Foundation.NSData) throws -> Void {
+    func sendMutableData(_ data: DjinniSupport.DJDataRef) throws -> Void {
         var _params = djinni.swift.ParameterList()
         _params.addValue(inst)
         _params.addValue(DjinniSupport.DataRefMarshaller.toCpp(data))
         var ret = djinni_generated.DataRefTest_sendMutableData(&_params)
         try handleCppErrors(&ret)
     }
-    func generateData() throws -> Foundation.NSData {
+    func generateData() throws -> DjinniSupport.DJDataRef {
         var _params = djinni.swift.ParameterList()
         _params.addValue(inst)
         var ret = djinni_generated.DataRefTest_generateData(&_params)
         try handleCppErrors(&ret)
         return DjinniSupport.DataRefMarshaller.fromCpp(ret)
     }
-    func dataFromVec() throws -> Foundation.NSData {
+    func dataFromVec() throws -> DjinniSupport.DJDataRef {
         var _params = djinni.swift.ParameterList()
         _params.addValue(inst)
         var ret = djinni_generated.DataRefTest_dataFromVec(&_params)
         try handleCppErrors(&ret)
         return DjinniSupport.DataRefMarshaller.fromCpp(ret)
     }
-    func dataFromStr() throws -> Foundation.NSData {
+    func dataFromStr() throws -> DjinniSupport.DJDataRef {
         var _params = djinni.swift.ParameterList()
         _params.addValue(inst)
         var ret = djinni_generated.DataRefTest_dataFromStr(&_params)
         try handleCppErrors(&ret)
         return DjinniSupport.DataRefMarshaller.fromCpp(ret)
     }
-    func sendDataView(_ data: Foundation.NSData) throws -> Data {
+    func sendDataView(_ data: Swift.UnsafeRawBufferPointer) throws -> Data {
         var _params = djinni.swift.ParameterList()
         _params.addValue(inst)
         _params.addValue(DjinniSupport.DataViewMarshaller.toCpp(data))
@@ -58,7 +58,7 @@ final class DataRefTestCppProxy: DjinniSupport.CppProxy, TestSuite.DataRefTest {
         try handleCppErrors(&ret)
         return BinaryMarshaller.fromCpp(ret)
     }
-    func recvDataView() throws -> Foundation.NSData {
+    func recvDataView() throws -> Swift.UnsafeRawBufferPointer {
         var _params = djinni.swift.ParameterList()
         _params.addValue(inst)
         var ret = djinni_generated.DataRefTest_recvDataView(&_params)

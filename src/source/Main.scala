@@ -599,6 +599,8 @@ object Main {
         .text("Omit 'import <module>' in +Private Swift files (use when those files are compiled in the same module to avoid 'ignoring import' warnings).")
       opt[File]("swiftxx-out").valueName("<out-folder>").foreach(x => swiftxxOutFolder = Some(x))
         .text("The output folder for private Swift/C++ interop files (Generator disabled if unspecified).")
+      opt[String]("swiftxx-namespace").valueName("<namespace>").foreach(swiftxxNamespace = _)
+        .text("The namespace for generated Swift/C++ interop classes (default: djinni_generated).")
       opt[String]("swiftxx-include-prefix").valueName("<prefix>").foreach(swiftxxIncludePrefix = _)
         .text("The prefix for #includes of Swift C++ header files.")
       opt[String]("swiftxx-include-cpp-prefix").valueName("<prefix>").foreach(swiftxxIncludeCppPrefix = _)

@@ -38,4 +38,13 @@ final class OutcomeTest: XCTestCase {
         XCTAssertEqual(try TestOutcome_statics.putNestedSuccessOutcome(NestedOutcome(o:.success(42))), 42)
         XCTAssertEqual(try TestOutcome_statics.putNestedErrorOutcome(NestedOutcome(o:.failure("hello"))), "hello")
     }
+
+    // Enums and records that derive `error` are an outcome's error as they are.
+    func testDerivedErrors() throws {
+        XCTAssertEqual(try TestOutcome_statics.getEnumErrorOutcome(), .failure(.denied))
+        XCTAssertThrowsError(try TestOutcome_statics.getEnumErrorOutcome().get()) { error in
+            XCTAssertEqual(error as? OutcomeError, .denied)
+        }
+        XCTAssertEqual(try TestOutcome_statics.getRecordErrorOutcome(), .failure(OutcomeErrorInfo(code: 404, message: "not found")))
+    }
 }

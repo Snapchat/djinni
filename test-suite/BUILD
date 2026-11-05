@@ -361,7 +361,7 @@ swift_library(
     module_name = "ProtobufTest",
     visibility = ["//visibility:public"],
     deps = [
-        "@apple_swift_protobuf//:swift-protobuf",
+        "@djinni_apple//:swift-protobuf",
     ],
 )
 

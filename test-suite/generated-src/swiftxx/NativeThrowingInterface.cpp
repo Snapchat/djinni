@@ -9,8 +9,8 @@ djinni::swift::AnyValue ThrowingInterfaceSwiftProxy::make(void* instance, djinni
     return {std::make_shared<ThrowingInterfaceSwiftProxy>(instance, dispatcher)};
 }
 void ThrowingInterfaceSwiftProxy::throw_exception() {
-    djinni::swift::ParameterList params;
-    callProtocol(0, &params);
+    djinni::swift::ParameterList djinniParams;
+    callProtocol(0, &djinniParams);
 }
 
 } // namespace djinni_generated

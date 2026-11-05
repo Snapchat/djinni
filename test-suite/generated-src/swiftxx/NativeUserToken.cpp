@@ -17,8 +17,8 @@ djinni::swift::AnyValue UserTokenSwiftProxy::make(void* instance, djinni::swift:
     return {std::make_shared<UserTokenSwiftProxy>(instance, dispatcher)};
 }
 std::string UserTokenSwiftProxy::whoami() {
-    djinni::swift::ParameterList params;
-    return ::djinni::swift::String::toCpp(callProtocol(0, &params));
+    djinni::swift::ParameterList djinniParams;
+    return ::djinni::swift::String::toCpp(callProtocol(0, &djinniParams));
 }
 
 } // namespace djinni_generated

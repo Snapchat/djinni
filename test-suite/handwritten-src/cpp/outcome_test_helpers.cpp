@@ -1,5 +1,7 @@
 #include "test_outcome.hpp"
 #include "nested_outcome.hpp"
+#include "outcome_error.hpp"
+#include "outcome_error_info.hpp"
 #include <string>
 
 namespace testsuite {
@@ -36,6 +38,14 @@ int32_t TestOutcome::putNestedSuccessOutcome(const NestedOutcome& x) {
 
 std::string TestOutcome::putNestedErrorOutcome(const NestedOutcome& x) {
     return x.o.error();
+}
+
+djinni::expected<std::string, outcome_error> TestOutcome::getEnumErrorOutcome() {
+    return djinni::make_unexpected(outcome_error::DENIED);
+}
+
+djinni::expected<std::string, OutcomeErrorInfo> TestOutcome::getRecordErrorOutcome() {
+    return djinni::make_unexpected(OutcomeErrorInfo(404, "not found"));
 }
 
 } // namespace testsuite

@@ -71,4 +71,16 @@ public class TestOutcome_statics {
         try handleCppErrors(&ret)
         return StringMarshaller.fromCpp(ret)
     }
+    public static func getEnumErrorOutcome() throws -> Result<String, TestSuite.OutcomeError> {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestOutcome_getEnumErrorOutcome(&_params)
+        try handleCppErrors(&ret)
+        return DjinniSupport.OutcomeMarshaller<StringMarshaller, OutcomeErrorMarshaller>.fromCpp(ret)
+    }
+    public static func getRecordErrorOutcome() throws -> Result<String, TestSuite.OutcomeErrorInfo> {
+        var _params = djinni.swift.ParameterList()
+        var ret = djinni_generated.TestOutcome_getRecordErrorOutcome(&_params)
+        try handleCppErrors(&ret)
+        return DjinniSupport.OutcomeMarshaller<StringMarshaller, OutcomeErrorInfoMarshaller>.fromCpp(ret)
+    }
 }

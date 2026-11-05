@@ -177,11 +177,12 @@ class SwiftxxGenerator(spec: Spec) extends Generator(spec) {
           val params = m.params.map(p => cppMarshal.fqParamType(p.ty) + " " + idCpp.local(p.ident))
           val constFlag = if (m.const) " const" else ""
           w.w(s"$ret $proxy::${idCpp.method(m.ident)}${params.mkString("(", ", ", ")")}$constFlag").braced {
-            w.wl("djinni::swift::ParameterList params;")
+            // Not `params`: a method parameter can have that name.
+            w.wl("djinni::swift::ParameterList djinniParams;")
             for (p <- m.params) {
-              w.wl(s"params.addValue(${marshal.fromCpp(p.ty, cppMarshal.maybeMove(idCpp.local(p.ident), p.ty))});")
+              w.wl(s"djinniParams.addValue(${marshal.fromCpp(p.ty, cppMarshal.maybeMove(idCpp.local(p.ident), p.ty))});")
             }
-            val call = s"callProtocol($idx, &params)"
+            val call = s"callProtocol($idx, &djinniParams)"
             if (m.ret.isEmpty) {
               w.wl(call + ";")
             } else {

@@ -3,6 +3,8 @@
 
 #include "NativeTestOutcome.hpp"  // my header
 #include "NativeNestedOutcome.hpp"
+#include "NativeOutcomeError.hpp"
+#include "NativeOutcomeErrorInfo.hpp"
 #include "Outcome_swift.hpp"
 
 namespace djinni_generated {
@@ -63,6 +65,20 @@ djinni::swift::AnyValue TestOutcome_putNestedErrorOutcome(const djinni::swift::P
     auto _x = ::djinni_generated::NativeNestedOutcome::toCpp(params->getValue(0));
     auto ret = ::testsuite::TestOutcome::putNestedErrorOutcome(std::move(_x));
     return ::djinni::swift::String::fromCpp(ret);
+}
+catch (const std::exception& e) {
+    return {djinni::swift::ErrorValue{ e.what(), std::current_exception()}};
+}
+djinni::swift::AnyValue TestOutcome_getEnumErrorOutcome(const djinni::swift::ParameterList* params) try {
+    auto ret = ::testsuite::TestOutcome::getEnumErrorOutcome();
+    return ::djinni::swift::OutcomeAdaptor<::djinni::swift::String, ::djinni_generated::NativeOutcomeError>::fromCpp(ret);
+}
+catch (const std::exception& e) {
+    return {djinni::swift::ErrorValue{ e.what(), std::current_exception()}};
+}
+djinni::swift::AnyValue TestOutcome_getRecordErrorOutcome(const djinni::swift::ParameterList* params) try {
+    auto ret = ::testsuite::TestOutcome::getRecordErrorOutcome();
+    return ::djinni::swift::OutcomeAdaptor<::djinni::swift::String, ::djinni_generated::NativeOutcomeErrorInfo>::fromCpp(ret);
 }
 catch (const std::exception& e) {
     return {djinni::swift::ErrorValue{ e.what(), std::current_exception()}};

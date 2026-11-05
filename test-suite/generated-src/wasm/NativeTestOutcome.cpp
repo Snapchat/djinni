@@ -3,6 +3,8 @@
 
 #include "NativeTestOutcome.hpp"  // my header
 #include "NativeNestedOutcome.hpp"
+#include "NativeOutcomeError.hpp"
+#include "NativeOutcomeErrorInfo.hpp"
 #include "Outcome_wasm.hpp"
 
 namespace djinni_generated {
@@ -85,6 +87,24 @@ std::string NativeTestOutcome::putNestedErrorOutcome(const em::val& w_x) {
         return ::djinni::ExceptionHandlingTraits<::djinni::String>::handleNativeException(e);
     }
 }
+em::val NativeTestOutcome::getEnumErrorOutcome() {
+    try {
+        auto r = ::testsuite::TestOutcome::getEnumErrorOutcome();
+        return ::djinni::Outcome<::djinni::String, ::djinni_generated::NativeOutcomeError>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        return ::djinni::ExceptionHandlingTraits<::djinni::Outcome<::djinni::String, ::djinni_generated::NativeOutcomeError>>::handleNativeException(e);
+    }
+}
+em::val NativeTestOutcome::getRecordErrorOutcome() {
+    try {
+        auto r = ::testsuite::TestOutcome::getRecordErrorOutcome();
+        return ::djinni::Outcome<::djinni::String, ::djinni_generated::NativeOutcomeErrorInfo>::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        return ::djinni::ExceptionHandlingTraits<::djinni::Outcome<::djinni::String, ::djinni_generated::NativeOutcomeErrorInfo>>::handleNativeException(e);
+    }
+}
 
 EMSCRIPTEN_BINDINGS(testsuite_test_outcome) {
     ::djinni::DjinniClass_<::testsuite::TestOutcome>("testsuite_TestOutcome", "testsuite.TestOutcome")
@@ -98,6 +118,8 @@ EMSCRIPTEN_BINDINGS(testsuite_test_outcome) {
         .class_function("getNestedErrorOutcome", NativeTestOutcome::getNestedErrorOutcome)
         .class_function("putNestedSuccessOutcome", NativeTestOutcome::putNestedSuccessOutcome)
         .class_function("putNestedErrorOutcome", NativeTestOutcome::putNestedErrorOutcome)
+        .class_function("getEnumErrorOutcome", NativeTestOutcome::getEnumErrorOutcome)
+        .class_function("getRecordErrorOutcome", NativeTestOutcome::getRecordErrorOutcome)
         ;
 }
 
