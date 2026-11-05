@@ -47,6 +47,11 @@ export interface /*record*/ OutcomeErrorInfo {
     message: string;
 }
 
+/** Only Swift derivings: its YAML typedef must still parse back as an extern (yaml-test.djinni). */
+export interface /*record*/ OutcomeErrorCode {
+    code: number;
+}
+
 export interface TestOutcome {
 }
 export interface TestOutcome_statics {

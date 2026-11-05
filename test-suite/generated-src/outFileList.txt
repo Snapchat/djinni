@@ -6,6 +6,7 @@ djinni-output-temp/cpp/nested_outcome.cpp
 djinni-output-temp/cpp/outcome_error.hpp
 djinni-output-temp/cpp/outcome_error_info.hpp
 djinni-output-temp/cpp/outcome_error_info.cpp
+djinni-output-temp/cpp/outcome_error_code.hpp
 djinni-output-temp/cpp/test_outcome.hpp
 djinni-output-temp/cpp/simple_object.hpp
 djinni-output-temp/cpp/nested_provider.hpp
@@ -86,6 +87,7 @@ djinni-output-temp/java/ProtoTests.java
 djinni-output-temp/java/NestedOutcome.java
 djinni-output-temp/java/OutcomeError.java
 djinni-output-temp/java/OutcomeErrorInfo.java
+djinni-output-temp/java/OutcomeErrorCode.java
 djinni-output-temp/java/TestOutcome.java
 djinni-output-temp/java/SimpleObject.java
 djinni-output-temp/java/NestedProvider.java
@@ -157,6 +159,8 @@ djinni-output-temp/jni/NativeNestedOutcome.cpp
 djinni-output-temp/jni/NativeOutcomeError.hpp
 djinni-output-temp/jni/NativeOutcomeErrorInfo.hpp
 djinni-output-temp/jni/NativeOutcomeErrorInfo.cpp
+djinni-output-temp/jni/NativeOutcomeErrorCode.hpp
+djinni-output-temp/jni/NativeOutcomeErrorCode.cpp
 djinni-output-temp/jni/NativeTestOutcome.hpp
 djinni-output-temp/jni/NativeTestOutcome.cpp
 djinni-output-temp/jni/NativeSimpleObject.hpp
@@ -283,6 +287,8 @@ djinni-output-temp/objc/DBNestedOutcome.mm
 djinni-output-temp/objc/DBOutcomeError.h
 djinni-output-temp/objc/DBOutcomeErrorInfo.h
 djinni-output-temp/objc/DBOutcomeErrorInfo.mm
+djinni-output-temp/objc/DBOutcomeErrorCode.h
+djinni-output-temp/objc/DBOutcomeErrorCode.mm
 djinni-output-temp/objc/DBTestOutcome.h
 djinni-output-temp/objc/DBSimpleObject.h
 djinni-output-temp/objc/DBNestedProvider.h
@@ -382,6 +388,8 @@ djinni-output-temp/objc/DBNestedOutcome+Private.mm
 djinni-output-temp/objc/DBOutcomeError+Private.h
 djinni-output-temp/objc/DBOutcomeErrorInfo+Private.h
 djinni-output-temp/objc/DBOutcomeErrorInfo+Private.mm
+djinni-output-temp/objc/DBOutcomeErrorCode+Private.h
+djinni-output-temp/objc/DBOutcomeErrorCode+Private.mm
 djinni-output-temp/objc/DBTestOutcome+Private.h
 djinni-output-temp/objc/DBTestOutcome+Private.mm
 djinni-output-temp/objc/DBSimpleObject+Private.h
@@ -510,6 +518,8 @@ djinni-output-temp/wasm/NativeOutcomeError.hpp
 djinni-output-temp/wasm/NativeOutcomeError.cpp
 djinni-output-temp/wasm/NativeOutcomeErrorInfo.hpp
 djinni-output-temp/wasm/NativeOutcomeErrorInfo.cpp
+djinni-output-temp/wasm/NativeOutcomeErrorCode.hpp
+djinni-output-temp/wasm/NativeOutcomeErrorCode.cpp
 djinni-output-temp/wasm/NativeTestOutcome.hpp
 djinni-output-temp/wasm/NativeTestOutcome.cpp
 djinni-output-temp/wasm/NativeSimpleObject.hpp
@@ -642,6 +652,8 @@ djinni-output-temp/c/outcome_error.h
 djinni-output-temp/c/outcome_error.cpp
 djinni-output-temp/c/outcome_error_info.h
 djinni-output-temp/c/outcome_error_info.cpp
+djinni-output-temp/c/outcome_error_code.h
+djinni-output-temp/c/outcome_error_code.cpp
 djinni-output-temp/c/test_outcome.h
 djinni-output-temp/c/test_outcome.cpp
 djinni-output-temp/c/simple_object.h
@@ -775,6 +787,8 @@ djinni-output-temp/swift/OutcomeError.swift
 djinni-output-temp/swift/OutcomeError+Private.swift
 djinni-output-temp/swift/OutcomeErrorInfo.swift
 djinni-output-temp/swift/OutcomeErrorInfo+Private.swift
+djinni-output-temp/swift/OutcomeErrorCode.swift
+djinni-output-temp/swift/OutcomeErrorCode+Private.swift
 djinni-output-temp/swift/TestOutcome.swift
 djinni-output-temp/swift/TestOutcome+Private.swift
 djinni-output-temp/swift/SimpleObject.swift
@@ -907,6 +921,8 @@ djinni-output-temp/swiftxx/NativeOutcomeError.hpp
 djinni-output-temp/swiftxx/NativeOutcomeError.cpp
 djinni-output-temp/swiftxx/NativeOutcomeErrorInfo.hpp
 djinni-output-temp/swiftxx/NativeOutcomeErrorInfo.cpp
+djinni-output-temp/swiftxx/NativeOutcomeErrorCode.hpp
+djinni-output-temp/swiftxx/NativeOutcomeErrorCode.cpp
 djinni-output-temp/swiftxx/NativeTestOutcome.hpp
 djinni-output-temp/swiftxx/NativeTestOutcome.cpp
 djinni-output-temp/swiftxx/NativeSimpleObject.hpp

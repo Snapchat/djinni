@@ -15,6 +15,11 @@ outcome_error_info = record {
   message: string;
 } deriving(eq, error)
 
+# Only Swift derivings: its YAML typedef must still parse back as an extern (yaml-test.djinni).
+outcome_error_code = record {
+  code: i32;
+} deriving(error)
+
 test_outcome = interface +c {
 	static getSuccessOutcome(): outcome<string, i32>;
 	static getErrorOutcome(): outcome<string, i32>;
