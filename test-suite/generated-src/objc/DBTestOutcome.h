@@ -30,6 +30,4 @@
 
 + (nonnull DJOutcome<NSString *, DBOutcomeErrorInfo *> *)getRecordErrorOutcome;
 
-+ (nonnull DJOutcome<NSString *, DBOutcomeErrorInfo *> *)getOptionalErrorOutcome;
-
 @end

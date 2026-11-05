@@ -60,7 +60,6 @@ export interface TestOutcome_statics {
     putNestedErrorOutcome(x: NestedOutcome): string;
     getEnumErrorOutcome(): Outcome<string, OutcomeError>;
     getRecordErrorOutcome(): Outcome<string, OutcomeErrorInfo>;
-    getOptionalErrorOutcome(): Outcome<string, OutcomeErrorInfo | undefined>;
 }
 
 /** Simple object interface for provider testing */

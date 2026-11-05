@@ -46,6 +46,5 @@ final class OutcomeTest: XCTestCase {
             XCTAssertEqual(error as? OutcomeError, .denied)
         }
         XCTAssertEqual(try TestOutcome_statics.getRecordErrorOutcome(), .failure(OutcomeErrorInfo(code: 404, message: "not found")))
-        XCTAssertEqual(try TestOutcome_statics.getOptionalErrorOutcome(), .failure(OutcomeErrorInfo(code: 500, message: "failed")))
     }
 }

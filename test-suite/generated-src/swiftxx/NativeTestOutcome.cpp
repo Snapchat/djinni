@@ -83,12 +83,5 @@ djinni::swift::AnyValue TestOutcome_getRecordErrorOutcome(const djinni::swift::P
 catch (const std::exception& e) {
     return {djinni::swift::ErrorValue{ e.what(), std::current_exception()}};
 }
-djinni::swift::AnyValue TestOutcome_getOptionalErrorOutcome(const djinni::swift::ParameterList* params) try {
-    auto ret = ::testsuite::TestOutcome::getOptionalErrorOutcome();
-    return ::djinni::swift::OutcomeAdaptor<::djinni::swift::String, ::djinni::swift::Optional<std::experimental::optional, ::djinni_generated::NativeOutcomeErrorInfo>>::fromCpp(ret);
-}
-catch (const std::exception& e) {
-    return {djinni::swift::ErrorValue{ e.what(), std::current_exception()}};
-}
 
 } // namespace djinni_generated

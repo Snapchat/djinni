@@ -35,8 +35,6 @@ djinni_outcome_ref testsuite_test_outcome_getEnumErrorOutcome();
 
 djinni_outcome_ref testsuite_test_outcome_getRecordErrorOutcome();
 
-djinni_outcome_ref testsuite_test_outcome_getOptionalErrorOutcome();
-
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus

@@ -90,12 +90,4 @@ djinni_outcome_ref testsuite_test_outcome_getRecordErrorOutcome()
     DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_outcome_ref)
 }
 
-djinni_outcome_ref testsuite_test_outcome_getOptionalErrorOutcome()
-{
-    DJINNI_HANDLE_EXCEPTION_PROLOGUE
-    auto retValue = ::testsuite::TestOutcome::getOptionalErrorOutcome();
-    return ::djinni::c_api::OutcomeTranslator<::djinni::c_api::StringTranslator, ::djinni::c_api::OptionalTranslator<std::experimental::optional<::testsuite::OutcomeErrorInfo>, ::djinni::c_api::RecordTranslator<::testsuite::OutcomeErrorInfo>>>::fromCpp(std::move(retValue));
-    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_outcome_ref)
-}
-
 

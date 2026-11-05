@@ -105,13 +105,6 @@ static_assert(__has_feature(objc_arc), "Djinni requires ARC to be enabled for th
     } DJINNI_TRANSLATE_EXCEPTIONS()
 }
 
-+ (nonnull DJOutcome<NSString *, DBOutcomeErrorInfo *> *)getOptionalErrorOutcome {
-    try {
-        auto objcpp_result_ = ::testsuite::TestOutcome::getOptionalErrorOutcome();
-        return ::djinni::Outcome<::djinni::String, ::djinni::Optional<std::experimental::optional, ::djinni_generated::OutcomeErrorInfo>>::fromCpp(objcpp_result_);
-    } DJINNI_TRANSLATE_EXCEPTIONS()
-}
-
 namespace djinni_generated {
 
 auto TestOutcome::toCpp(ObjcType objc) -> CppType

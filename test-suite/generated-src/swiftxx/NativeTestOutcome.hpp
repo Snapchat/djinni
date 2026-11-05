@@ -20,6 +20,5 @@ djinni::swift::AnyValue TestOutcome_putNestedSuccessOutcome(const djinni::swift:
 djinni::swift::AnyValue TestOutcome_putNestedErrorOutcome(const djinni::swift::ParameterList* params);
 djinni::swift::AnyValue TestOutcome_getEnumErrorOutcome(const djinni::swift::ParameterList* params);
 djinni::swift::AnyValue TestOutcome_getRecordErrorOutcome(const djinni::swift::ParameterList* params);
-djinni::swift::AnyValue TestOutcome_getOptionalErrorOutcome(const djinni::swift::ParameterList* params);
 
 } // namespace djinni_generated

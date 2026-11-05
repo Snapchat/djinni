@@ -102,12 +102,4 @@ CJNIEXPORT ::djinni::Outcome<::djinni::String, ::djinni_generated::NativeOutcome
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
-CJNIEXPORT ::djinni::Outcome<::djinni::String, ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeOutcomeErrorInfo>>::JniType JNICALL Java_com_dropbox_djinni_test_TestOutcome_getOptionalErrorOutcome(JNIEnv* jniEnv, jobject /*this*/)
-{
-    try {
-        auto r = ::testsuite::TestOutcome::getOptionalErrorOutcome();
-        return ::djinni::release(::djinni::Outcome<::djinni::String, ::djinni::Optional<std::experimental::optional, ::djinni_generated::NativeOutcomeErrorInfo>>::fromCpp(jniEnv, r));
-    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
-}
-
 } // namespace djinni_generated

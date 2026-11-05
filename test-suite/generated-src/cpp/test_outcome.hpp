@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "../../handwritten-src/cpp/optional.hpp"
 #include "expected.hpp"
 #include <cstdint>
 #include <string>
@@ -37,8 +36,6 @@ public:
     static djinni::expected<std::string, outcome_error> getEnumErrorOutcome();
 
     static djinni::expected<std::string, OutcomeErrorInfo> getRecordErrorOutcome();
-
-    static djinni::expected<std::string, std::experimental::optional<OutcomeErrorInfo>> getOptionalErrorOutcome();
 };
 
 } // namespace testsuite

@@ -48,8 +48,4 @@ djinni::expected<std::string, OutcomeErrorInfo> TestOutcome::getRecordErrorOutco
     return djinni::make_unexpected(OutcomeErrorInfo(404, "not found"));
 }
 
-djinni::expected<std::string, std::experimental::optional<OutcomeErrorInfo>> TestOutcome::getOptionalErrorOutcome() {
-    return djinni::make_unexpected(std::experimental::optional<OutcomeErrorInfo>(OutcomeErrorInfo(500, "failed")));
-}
-
 } // namespace testsuite

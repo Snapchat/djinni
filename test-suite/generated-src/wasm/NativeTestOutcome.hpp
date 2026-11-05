@@ -33,7 +33,6 @@ struct NativeTestOutcome : ::djinni::JsInterface<::testsuite::TestOutcome, Nativ
     static std::string putNestedErrorOutcome(const em::val& w_x);
     static em::val getEnumErrorOutcome();
     static em::val getRecordErrorOutcome();
-    static em::val getOptionalErrorOutcome();
 
 };
 

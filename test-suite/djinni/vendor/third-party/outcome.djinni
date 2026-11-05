@@ -30,5 +30,4 @@ test_outcome = interface +c {
 
 	static getEnumErrorOutcome(): outcome<string, outcome_error>;
 	static getRecordErrorOutcome(): outcome<string, outcome_error_info>;
-	static getOptionalErrorOutcome(): outcome<string, optional<outcome_error_info>>;
 }

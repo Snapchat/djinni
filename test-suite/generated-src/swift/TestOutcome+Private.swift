@@ -83,10 +83,4 @@ public class TestOutcome_statics {
         try handleCppErrors(&ret)
         return DjinniSupport.OutcomeMarshaller<StringMarshaller, OutcomeErrorInfoMarshaller>.fromCpp(ret)
     }
-    public static func getOptionalErrorOutcome() throws -> Result<String, Optional<TestSuite.OutcomeErrorInfo>> {
-        var _params = djinni.swift.ParameterList()
-        var ret = djinni_generated.TestOutcome_getOptionalErrorOutcome(&_params)
-        try handleCppErrors(&ret)
-        return DjinniSupport.OutcomeMarshaller<StringMarshaller, OptionalMarshaller<OutcomeErrorInfoMarshaller>>.fromCpp(ret)
-    }
 }
