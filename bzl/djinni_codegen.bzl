@@ -1007,6 +1007,9 @@ def objc_djinni_library(
         )
         generated_hdrs = [":" + generated_headers]
         generated_includes = [generated_headers + ".headers"]
+        objc_prefix = kwargs.get("objc_include_prefix", "").rstrip("/")
+        if objc_prefix:
+            generated_includes.append(generated_headers + ".headers/" + objc_prefix)
     objc_library(
         name = name,
         srcs = ([unity] if tree_mode else _outs(outs, "objc_srcs") + _outs(outs, "objcpp_srcs")) + srcs,
