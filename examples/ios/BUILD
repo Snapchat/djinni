@@ -1,49 +1,15 @@
-load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
-load("@build_bazel_rules_swift//swift:swift_interop_hint.bzl", "swift_interop_hint")
-load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@djinni_apple//:swift_djinni_codegen.bzl", "swift_djinni_library")
+load("@djinni_rules//examples:djinni_outputs.bzl", "EXAMPLE_DJINNI_OUTS")
 
-swift_library(
-    name = "textsort-swift",
-    srcs = ["@djinni_rules//examples:swift-sources"],
-    copts = [
-        "-cxx-interoperability-mode=default",
-        "-Xcc",
-        "-std=c++20",
-    ],
-    module_name = "TextSort",
-    visibility = ["//visibility:public"],
-    deps = ["@djinni_apple//:djinni-support-swift"],
-)
-
-swift_interop_hint(
-    name = "textsort-swiftxx-hint",
-    module_name = "TextSortCxx",
-)
-
-cc_library(
-    name = "textsort-swiftxx",
-    hdrs = ["@djinni_rules//examples:swiftxx-headers"],
-    aspect_hints = [":textsort-swiftxx-hint"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "@djinni_apple//:djinni-support-swiftxx",
-        "@djinni_rules//examples:textsort-swiftxx-core",
-    ],
-)
-
-swift_library(
+swift_djinni_library(
     name = "textsort-swift-bridge",
-    srcs = ["@djinni_rules//examples:swift-bridge-sources"],
-    copts = [
-        "-cxx-interoperability-mode=default",
-        "-Xcc",
-        "-std=c++20",
-    ],
-    module_name = "TextSortBridge",
+    cc_deps = ["@djinni_rules//examples:textsort-common"],
+    cpp_namespace = "textsort",
+    deps = ["@djinni_rules//examples:example-djinni"],
+    ident_cpp_enum_type = "foo_bar",
+    ident_swiftxx_class = "SwiftFooBar",
+    ident_swiftxx_file = "SwiftFooBar",
+    module_name = "TextSort",
+    outs = EXAMPLE_DJINNI_OUTS,
     visibility = ["//visibility:public"],
-    deps = [
-        ":textsort-swift",
-        ":textsort-swiftxx",
-        "@djinni_apple//:djinni-support-swift",
-    ],
 )

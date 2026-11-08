@@ -24,6 +24,8 @@ def _provider_test_impl(ctx):
     asserts.true(env, "--list-out-files" in actions_by_mnemonic["DjinniOutputInventory"].argv)
     asserts.true(env, "--cpp-out" in actions_by_mnemonic["DjinniOutputInventory"].argv)
     asserts.true(env, "--ts-out" in actions_by_mnemonic["DjinniOutputInventory"].argv)
+    asserts.true(env, "--swift-out" in actions_by_mnemonic["DjinniOutputInventory"].argv)
+    asserts.true(env, "--swiftxx-out" in actions_by_mnemonic["DjinniOutputInventory"].argv)
     asserts.true(env, any([f.basename == "shared-schema.djinni.inputs" for f in target[DefaultInfo].files.to_list()]))
     return analysistest.end(env)
 
@@ -37,6 +39,8 @@ def _codegen_test_impl(ctx):
     asserts.equals(env, "DjinniCodegen", action.mnemonic)
     asserts.true(env, ctx.attr.output_flag in action.argv)
     asserts.false(env, ctx.attr.other_output_flag in action.argv)
+    if ctx.attr.output_flag == "--swift-out":
+        asserts.true(env, "--swiftxx-out" in action.argv)
     inputs = [f.basename for f in action.inputs.to_list()]
     for basename in ["shared.djinni", "nested.djinni", "shared-schema.djinni.inputs", "shared-schema.declarations.tsv", "shared-schema.outputs", "shared-schema.yaml"]:
         asserts.true(env, basename in inputs, "Missing transitive action input: " + basename)
@@ -240,6 +244,17 @@ def rule_tests(name):
         output_flag = "--java-out",
         other_output_flag = "--cpp-out",
     )
+    _codegen_test(
+        name = "swift_action_test",
+        target_under_test = ":swift_codegen_probe",
+        output_flag = "--swift-out",
+        other_output_flag = "--objc-out",
+        expected_options = {
+            "--swift-module": "Shared",
+            "--swiftxx-include-prefix": "shared/",
+            "--ident-swiftxx-class": "SwiftShared",
+        },
+    )
     for language, target, flag in [
         ("c", ":analysis_c_lib__djinni_c_codegen", "--c-out"),
         ("objc", ":analysis_objc_lib__djinni_objc_codegen", "--objc-out"),
@@ -290,5 +305,5 @@ def rule_tests(name):
     )
     native.test_suite(
         name = name,
-        tests = [":provider_test", ":cpp_inventory_consumer_test", ":c_inventory_consumer_test", ":java_inventory_consumer_test", ":jni_inventory_consumer_test", ":objc_inventory_consumer_test", ":wasm_inventory_consumer_test", ":ts_inventory_consumer_test", ":explicit_outputs_test", "//bzl/tests:tree_probe_consumer", "//bzl/tests:java_tree_probe_test", "//bzl/tests:java_explicit_probe_test", "//bzl/tests:ts_outputs_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":project_name_mismatch_test"],
+        tests = [":provider_test", ":cpp_inventory_consumer_test", ":c_inventory_consumer_test", ":java_inventory_consumer_test", ":jni_inventory_consumer_test", ":objc_inventory_consumer_test", ":wasm_inventory_consumer_test", ":ts_inventory_consumer_test", ":explicit_outputs_test", "//bzl/tests:tree_probe_consumer", "//bzl/tests:java_tree_probe_test", "//bzl/tests:java_explicit_probe_test", "//bzl/tests:ts_outputs_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":swift_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":project_name_mismatch_test"],
     )
