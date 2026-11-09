@@ -51,8 +51,10 @@ cd examples/android
 bazel build //:android-app
 ```
 
-The Swift example builds bridge libraries; the existing Xcode application
-project remains available. WASM has `//:codegen-consumer-verification` for both
+The Swift example uses the optional Apple module's `swift_djinni_library`
+macro to generate and compile Swift and Swift/C++ bridge libraries; the
+existing Xcode application project remains available. WASM has
+`//:codegen-consumer-verification` for both
 generated consumers and `//:server` / `//:perftest-server` for the web demos.
 These platform targets replace the previous root `//examples` application,
 Swift, and WASM-wrapper targets and root `//perftest` application/WASM wrappers.
@@ -73,6 +75,14 @@ toolchains. The core repository's old Swift support labels remain aliases for
 root-workspace tests only; external Swift consumers use the companion directly.
 Neither module is assumed to be published in BCR; use checkout overrides or
 pinned archives with the appropriate `strip_prefix` for each module root.
+
+Load `swift_djinni_library` from
+`@djinni_apple//:swift_djinni_codegen.bzl`. Declare generated files in `outs`
+under `swift_srcs`, `swiftxx_srcs`, and `swiftxx_hdrs`; Swift source outputs are
+split into the public Swift module and its `+Private.swift` bridge module. Set
+`module_name` to the Swift module configured for the IDL, and provide the
+generated native C++ library through `cc_deps` when the bridge uses native
+types. See `examples/ios/BUILD` for a complete consumer.
 
 Apple and Emscripten dependencies used by the legacy root test suite are
 development-only. Run Apple tests with `--config=apple` and WASM test targets
@@ -196,6 +206,7 @@ inputs, such as through `srcs` or `idl_include_files`.
 | `wasm_djinni_cc_library` | `wasm_srcs`, `wasm_hdrs` | `cc_library` |
 | `wasm_djinni_cc_binary` | `wasm_srcs`, `wasm_hdrs` | `cc_binary` |
 | `ts_djinni_filegroup` | `ts_srcs` | `filegroup` |
+| `swift_djinni_library` (optional Apple module) | `swift_srcs`, `swiftxx_srcs`, `swiftxx_hdrs` | Swift and Swift/C++ libraries |
 
 Each wrapper accepts exactly one base target in `deps`, an `outs` dictionary, and Djinni
 options as keyword arguments. Other known language categories in a shared manifest are
@@ -292,7 +303,8 @@ djinni_codegen(
 Use either `djinni` (a `DjinniInfo` target) or the legacy `idl` with explicit
 `srcs` and `idl_include_paths`. Supported categories are `cpp_srcs`, `cpp_hdrs`,
 `c_srcs`, `c_hdrs`, `java_srcs`, `jni_srcs`, `jni_hdrs`, `objc_srcs`, `objc_hdrs`, `objcpp_srcs`,
-`objcpp_hdrs`, `wasm_srcs`, `wasm_hdrs`, and `ts_srcs`. They are also
+`objcpp_hdrs`, `wasm_srcs`, `wasm_hdrs`, `ts_srcs`, `swift_srcs`,
+`swiftxx_srcs`, and `swiftxx_hdrs`. They are also
 output groups, along with `all`. There is no `generators` attribute: nonempty
 output categories select generators. Each category must use one directory;
 Objective-C, Objective-C++, and WASM source/header pairs each share a directory.

@@ -58,4 +58,26 @@ EXAMPLE_DJINNI_OUTS = {
     "ts_srcs": [
         "bazel-generated/example/ts/example.ts",
     ],
+    "swift_srcs": [
+        "bazel-generated/example/swift/ItemList.swift",
+        "bazel-generated/example/swift/ItemList+Private.swift",
+        "bazel-generated/example/swift/SortItems.swift",
+        "bazel-generated/example/swift/SortItems+Private.swift",
+        "bazel-generated/example/swift/SortOrder.swift",
+        "bazel-generated/example/swift/SortOrder+Private.swift",
+        "bazel-generated/example/swift/TextboxListener.swift",
+        "bazel-generated/example/swift/TextboxListener+Private.swift",
+    ],
+    "swiftxx_srcs": [
+        "bazel-generated/example/swiftxx/SwiftItemList.cpp",
+        "bazel-generated/example/swiftxx/SwiftSortItems.cpp",
+        "bazel-generated/example/swiftxx/SwiftSortOrder.cpp",
+        "bazel-generated/example/swiftxx/SwiftTextboxListener.cpp",
+    ],
+    "swiftxx_hdrs": [
+        "bazel-generated/example/swiftxx/SwiftItemList.hpp",
+        "bazel-generated/example/swiftxx/SwiftSortItems.hpp",
+        "bazel-generated/example/swiftxx/SwiftSortOrder.hpp",
+        "bazel-generated/example/swiftxx/SwiftTextboxListener.hpp",
+    ],
 }

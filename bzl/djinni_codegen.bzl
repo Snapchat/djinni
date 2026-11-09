@@ -83,6 +83,7 @@ def _djinni_codegen_impl(ctx):
     objc_files = ctx.outputs.objc_srcs + ctx.outputs.objc_hdrs
     objcpp_files = ctx.outputs.objcpp_srcs + ctx.outputs.objcpp_hdrs
     wasm_files = ctx.outputs.wasm_srcs + ctx.outputs.wasm_hdrs
+    swiftxx_files = ctx.outputs.swiftxx_srcs + ctx.outputs.swiftxx_hdrs
     all_outputs = _collect([
         cpp_files,
         c_files,
@@ -92,16 +93,18 @@ def _djinni_codegen_impl(ctx):
         objcpp_files,
         wasm_files,
         ctx.outputs.ts_srcs,
+        ctx.outputs.swift_srcs,
+        swiftxx_files,
     ])
 
     tree_outputs = {}
     for language in ctx.attr.tree_languages:
-        if language not in ["cpp", "c", "java", "jni", "objc", "wasm", "ts"]:
+        if language not in ["cpp", "c", "java", "jni", "objc", "wasm", "ts", "swift", "swiftxx"]:
             fail("Unsupported tree output language: %s" % language)
         tree_outputs[language] = ctx.actions.declare_directory(ctx.label.name + "." + language)
         all_outputs.append(tree_outputs[language])
     for language in tree_outputs:
-        if language == "cpp" and cpp_files or language == "c" and c_files or language == "java" and ctx.outputs.java_srcs or language == "jni" and jni_files or language == "objc" and (objc_files or objcpp_files) or language == "wasm" and wasm_files or language == "ts" and ctx.outputs.ts_srcs:
+        if language == "cpp" and cpp_files or language == "c" and c_files or language == "java" and ctx.outputs.java_srcs or language == "jni" and jni_files or language == "objc" and (objc_files or objcpp_files) or language == "wasm" and wasm_files or language == "ts" and ctx.outputs.ts_srcs or language == "swift" and ctx.outputs.swift_srcs or language == "swiftxx" and swiftxx_files:
             fail("Do not combine tree output and explicit outputs for %s" % language)
 
     if tree_outputs:
@@ -138,6 +141,8 @@ def _djinni_codegen_impl(ctx):
     wasm_tree_dir = tree_outputs["wasm"].path + "/" + wasm_prefix if "wasm" in tree_outputs and wasm_prefix else (tree_outputs["wasm"].path if "wasm" in tree_outputs else None)
     wasm_dir = wasm_tree_dir if wasm_tree_dir else _single_output_dir(wasm_files, "wasm")
     ts_dir = tree_outputs["ts"].path if "ts" in tree_outputs else _single_output_dir(ctx.outputs.ts_srcs, "ts")
+    swift_dir = tree_outputs["swift"].path if "swift" in tree_outputs else _single_output_dir(ctx.outputs.swift_srcs, "swift")
+    swiftxx_dir = tree_outputs["swiftxx"].path if "swiftxx" in tree_outputs else _single_output_dir(swiftxx_files, "swiftxx")
 
     if java_dir:
         args.add("--java-out")
@@ -237,8 +242,20 @@ def _djinni_codegen_impl(ctx):
     if ts_dir:
         args.add("--ts-out")
         args.add(ts_dir)
+    if swift_dir:
+        args.add("--swift-out")
+        args.add(swift_dir)
+    if swiftxx_dir:
+        args.add("--swiftxx-out")
+        args.add(swiftxx_dir)
     if not config_file:
         _add_string_arg(args, "--ts-module", ctx.attr.ts_module)
+        _add_string_arg(args, "--swift-module", ctx.attr.swift_module)
+        if ctx.attr.swift_private_in_same_module:
+            args.add("--swift-private-in-same-module")
+        _add_string_arg(args, "--swiftxx-include-prefix", ctx.attr.swiftxx_include_prefix)
+        _add_string_arg(args, "--swiftxx-include-cpp-prefix", ctx.attr.swiftxx_include_cpp_prefix)
+        _add_string_arg(args, "--swiftxx-base-lib-include-prefix", ctx.attr.swiftxx_base_lib_include_prefix)
 
     if not config_file:
         _add_ident_arg(args, "--ident-java-enum", ctx.attr.ident_java_enum)
@@ -264,6 +281,8 @@ def _djinni_codegen_impl(ctx):
         _add_ident_arg(args, "--ident-objc-local", ctx.attr.ident_objc_local)
         _add_ident_arg(args, "--ident-objc-const", ctx.attr.ident_objc_const)
         _add_ident_arg(args, "--ident-objc-file", ctx.attr.ident_objc_file)
+        _add_ident_arg(args, "--ident-swiftxx-class", ctx.attr.ident_swiftxx_class)
+        _add_ident_arg(args, "--ident-swiftxx-file", ctx.attr.ident_swiftxx_file)
 
     if defaults_file:
         args.add("--defaults")
@@ -300,8 +319,6 @@ def _djinni_codegen_impl(ctx):
     )
 
     if tree_outputs and ctx.attr.djinni:
-        if len(tree_outputs) != 1:
-            fail("A Djinni language codegen target may declare only one tree output language")
         language_output_roots = {
             "cpp": [("__djinni_outputs/cpp_src/", cpp_src_dir), ("__djinni_outputs/cpp_hdr/", cpp_hdr_dir)],
             "java": [("__djinni_outputs/java/", java_dir)],
@@ -310,6 +327,8 @@ def _djinni_codegen_impl(ctx):
             "objc": [("__djinni_outputs/objc/", objc_dir), ("__djinni_outputs/objcpp/", objcpp_dir)],
             "wasm": [("__djinni_outputs/wasm/", wasm_dir)],
             "ts": [("__djinni_outputs/ts/", tree_outputs["ts"].path if "ts" in tree_outputs else None)],
+            "swift": [("__djinni_outputs/swift/", swift_dir)],
+            "swiftxx": [("__djinni_outputs/swiftxx/", swiftxx_dir)],
         }
         mapping_args = []
         for language in tree_outputs:
@@ -337,6 +356,8 @@ def _djinni_codegen_impl(ctx):
             objc_tree = depset([tree_outputs["objc"]] if "objc" in tree_outputs else []),
             wasm_tree = depset([tree_outputs["wasm"]] if "wasm" in tree_outputs else []),
             ts_tree = depset([tree_outputs["ts"]] if "ts" in tree_outputs else []),
+            swift_tree = depset([tree_outputs["swift"]] if "swift" in tree_outputs else []),
+            swiftxx_tree = depset([tree_outputs["swiftxx"]] if "swiftxx" in tree_outputs else []),
             cpp_srcs = depset(ctx.outputs.cpp_srcs),
             cpp_hdrs = depset(ctx.outputs.cpp_hdrs),
             c_srcs = depset(ctx.outputs.c_srcs),
@@ -351,6 +372,9 @@ def _djinni_codegen_impl(ctx):
             wasm_srcs = depset(ctx.outputs.wasm_srcs),
             wasm_hdrs = depset(ctx.outputs.wasm_hdrs),
             ts_srcs = depset(ctx.outputs.ts_srcs),
+            swift_srcs = depset(ctx.outputs.swift_srcs),
+            swiftxx_srcs = depset(ctx.outputs.swiftxx_srcs),
+            swiftxx_hdrs = depset(ctx.outputs.swiftxx_hdrs),
         ),
     ]
 
@@ -380,6 +404,9 @@ _djinni_codegen = rule(
         "wasm_srcs": attr.output_list(),
         "wasm_hdrs": attr.output_list(),
         "ts_srcs": attr.output_list(),
+        "swift_srcs": attr.output_list(),
+        "swiftxx_srcs": attr.output_list(),
+        "swiftxx_hdrs": attr.output_list(),
         "java_package": attr.string(),
         "java_class_access_modifier": attr.string(),
         "java_nullable_annotation": attr.string(),
@@ -431,6 +458,11 @@ _djinni_codegen = rule(
         "wasm_omit_constants": attr.string(),
         "wasm_omit_namespace_alias": attr.string(),
         "ts_module": attr.string(),
+        "swift_module": attr.string(),
+        "swift_private_in_same_module": attr.bool(),
+        "swiftxx_include_prefix": attr.string(),
+        "swiftxx_include_cpp_prefix": attr.string(),
+        "swiftxx_base_lib_include_prefix": attr.string(),
         "ident_java_enum": attr.string(),
         "ident_java_field": attr.string(),
         "ident_java_type": attr.string(),
@@ -454,6 +486,8 @@ _djinni_codegen = rule(
         "ident_objc_local": attr.string(),
         "ident_objc_const": attr.string(),
         "ident_objc_file": attr.string(),
+        "ident_swiftxx_class": attr.string(),
+        "ident_swiftxx_file": attr.string(),
         "compiler": attr.label(
             default = Label("//src:djinni"),
             executable = True,
@@ -640,7 +674,7 @@ def djinni_codegen(name, outs, **kwargs):
         outs: Dictionary keyed by output category. Supported keys are
             cpp_srcs, cpp_hdrs, c_srcs, c_hdrs, java_srcs, jni_srcs, jni_hdrs, objc_srcs,
             objc_hdrs, objcpp_srcs, objcpp_hdrs, wasm_srcs, wasm_hdrs,
-            and ts_srcs.
+            ts_srcs, swift_srcs, swiftxx_srcs, and swiftxx_hdrs.
         **kwargs: Djinni options and input labels.
     """
     unknown = [key for key in outs if key not in _OUTPUT_KEYS]
@@ -663,6 +697,9 @@ def djinni_codegen(name, outs, **kwargs):
         wasm_srcs = _outs(outs, "wasm_srcs"),
         wasm_hdrs = _outs(outs, "wasm_hdrs"),
         ts_srcs = _outs(outs, "ts_srcs"),
+        swift_srcs = _outs(outs, "swift_srcs"),
+        swiftxx_srcs = _outs(outs, "swiftxx_srcs"),
+        swiftxx_hdrs = _outs(outs, "swiftxx_hdrs"),
         **normalized
     )
 
@@ -685,6 +722,9 @@ _OUTPUT_KEYS = [
     "wasm_srcs",
     "wasm_hdrs",
     "ts_srcs",
+    "swift_srcs",
+    "swiftxx_srcs",
+    "swiftxx_hdrs",
 ]
 
 _COMMON_ATTRS = ["testonly", "tags", "compatible_with", "restricted_to", "target_compatible_with", "features", "deprecation"]

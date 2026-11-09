@@ -219,4 +219,4 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-exports_files(["ts/run.sh"])
+exports_files(["djinni_outputs.bzl", "ts/run.sh"])

@@ -2,7 +2,7 @@ load("@build_bazel_rules_swift//swift:swift.bzl", "swift_library")
 load("@build_bazel_rules_swift//swift:swift_interop_hint.bzl", "swift_interop_hint")
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-exports_files(["swift_protobuf.BUILD"])
+exports_files(["swift_djinni_codegen.bzl", "swift_protobuf.BUILD"])
 
 swift_interop_hint(
     name = "swiftxx_hint",

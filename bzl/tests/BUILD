@@ -1,4 +1,4 @@
-load("//bzl:djinni_codegen.bzl", "c_djinni_library", "cc_djinni_library", "djinni_library", "java_djinni_library", "jni_djinni_library", "objc_djinni_library", "ts_djinni_filegroup", "wasm_djinni_cc_library")
+load("//bzl:djinni_codegen.bzl", "c_djinni_library", "cc_djinni_library", "djinni_codegen", "djinni_library", "java_djinni_library", "jni_djinni_library", "objc_djinni_library", "ts_djinni_filegroup", "wasm_djinni_cc_library")
 load(":rules_test.bzl", "rule_tests")
 
 rule_tests(name = "rule_tests")
@@ -90,6 +90,20 @@ java_djinni_library(
     ]},
     java_package = "example.shared",
     deps = [":shared-schema"],
+)
+
+djinni_codegen(
+    name = "swift_codegen_probe",
+    djinni = ":shared-schema",
+    outs = {
+        "swift_srcs": ["analysis/swift/Shared.swift"],
+        "swiftxx_srcs": ["analysis/swiftxx/SwiftShared.cpp"],
+        "swiftxx_hdrs": ["analysis/swiftxx/SwiftShared.hpp"],
+    },
+    swift_module = "Shared",
+    swiftxx_include_prefix = "shared/",
+    ident_swiftxx_class = "SwiftShared",
+    tags = ["manual"],
 )
 
 java_test(
