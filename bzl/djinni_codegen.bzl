@@ -732,6 +732,41 @@ def _generated_tree(name, codegen_name, language, testonly):
     )
     return ":" + tree_name
 
+def _objc_headers_tree_impl(ctx):
+    source = ctx.file.src
+    output = ctx.actions.declare_directory(ctx.label.name + ".headers")
+    ctx.actions.run_shell(
+        inputs = [source],
+        outputs = [output],
+        arguments = [source.path, output.path, ctx.attr.header_mode],
+        command = """
+set -euo pipefail
+source="$1"
+output="$2"
+header_mode="$3"
+mkdir -p "$output"
+if [ "$header_mode" = "private" ]; then
+    pattern='*+Private.h'
+else
+    pattern='*.h'
+fi
+find -L "$source" -type f -name "$pattern" | while IFS= read -r file; do
+    relative="${file#"$source"/}"
+    mkdir -p "$output/$(dirname "$relative")"
+    cp "$file" "$output/$relative"
+done
+""",
+    )
+    return [DefaultInfo(files = depset([output]))]
+
+_objc_headers_tree = rule(
+    implementation = _objc_headers_tree_impl,
+    attrs = {
+        "header_mode": attr.string(default = "all", values = ["all", "private"]),
+        "src": attr.label(allow_single_file = True, mandatory = True),
+    },
+)
+
 def _public_objc_headers_impl(ctx):
     source = ctx.file.src
     output = ctx.actions.declare_directory(ctx.label.name + ".headers")
@@ -756,13 +791,25 @@ def _generated_manifest(codegen_name, testonly):
         testonly = testonly,
     )
 
-def _generated_unity(name, codegen_name, tree, extensions, testonly, output_extension = "cpp"):
+def _generated_unity(name, codegen_name, tree, extensions, testonly, output_extension = "cpp", inline_sources = False):
     unity_name = name + "__unity"
+    if inline_sources:
+        cmd = """tree=$(location %s); find -L "$$tree" -type f | LC_ALL=C sort | while IFS= read -r file; do
+case "$$file" in %s)
+    relative=$$(printf '%%s\\n' "$$file" | sed "s#^$$tree/##")
+    printf '#line 1 \"%%s\"\\n' "$$relative"
+    cat "$$file"
+    printf '\\n'
+    ;;
+esac
+done > $@""" % (tree, "|".join(["*.%s" % ext for ext in extensions]))
+    else:
+        cmd = "tree=$(location %s); find -L \"$$tree\" -type f | sed 's#^'\"$$tree\"'/##' | LC_ALL=C sort | while read f; do case \"$$f\" in %s) printf '#include \"%%s\"\\n' \"$$f\";; esac; done > $@" % (tree, "|".join(["*.%s" % ext for ext in extensions]))
     native.genrule(
         name = unity_name,
         srcs = [tree],
         outs = [name + "__djinni_unity." + output_extension],
-        cmd = "tree=$(location %s); find \"$$tree\" -type f | sed 's#^'\"$$tree\"'/##' | LC_ALL=C sort | while read f; do case \"$$f\" in %s) printf '#include \"%%s\"\\n' \"$$f\";; esac; done > $@" % (tree, "|".join(["*.%s" % ext for ext in extensions])),
+        cmd = cmd,
         testonly = testonly,
     )
     return ":" + unity_name
@@ -936,6 +983,7 @@ def objc_djinni_library(
         alwayslink = 0,
         visibility = None,
         library_kwargs = {},
+        generated_header_mode = "all",
         **kwargs):
     """Generates Objective-C and Objective-C++ sources in an objc_library."""
     codegen_name = name + "__djinni_objc_codegen"
@@ -944,15 +992,29 @@ def objc_djinni_library(
         kwargs["tree_languages"] = ["objc"]
         outs = {}
     common = _language_codegen(codegen_name, deps, outs, "objc", kwargs)
+    generated_hdrs = []
+    generated_includes = []
     if tree_mode:
         tree = _generated_tree(name, codegen_name, "objc", kwargs.get("testonly", False))
         _generated_manifest(codegen_name, kwargs.get("testonly", False))
-        unity = _generated_unity(name, codegen_name, tree, ["m", "mm"], kwargs.get("testonly", False), "mm")
+        unity = _generated_unity(name, codegen_name, tree, ["m", "mm"], kwargs.get("testonly", False), "mm", inline_sources = True)
+        generated_headers = name + "__objc_headers"
+        _objc_headers_tree(
+            name = generated_headers,
+            src = tree,
+            header_mode = generated_header_mode,
+            testonly = kwargs.get("testonly", False),
+        )
+        generated_hdrs = [":" + generated_headers]
+        generated_includes = [generated_headers + ".headers"]
+        objc_prefix = kwargs.get("objc_include_prefix", "").rstrip("/")
+        if objc_prefix:
+            generated_includes.append(generated_headers + ".headers/" + objc_prefix)
     objc_library(
         name = name,
         srcs = ([unity] if tree_mode else _outs(outs, "objc_srcs") + _outs(outs, "objcpp_srcs")) + srcs,
-        hdrs = ([tree] if tree_mode else _outs(outs, "objc_hdrs") + _outs(outs, "objcpp_hdrs")) + hdrs,
-        includes = ([codegen_name + ".objc"] if tree_mode else []) + includes,
+        hdrs = (generated_hdrs if tree_mode else _outs(outs, "objc_hdrs") + _outs(outs, "objcpp_hdrs")) + hdrs,
+        includes = (generated_includes if tree_mode else []) + includes,
         copts = copts,
         linkopts = linkopts,
         deps = objc_deps,
