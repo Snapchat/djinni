@@ -139,7 +139,7 @@ void jniInit(JavaVM * jvm) {
         try {
             auto clazz = jniFindClass(classString);
             if (env->RegisterNatives(clazz.get(), nativeMethods, nativeMethodsSize)) {
-                return;
+                env->ExceptionClear();
             }
         } catch (jni_exception& e) {
             // Experimental java classes are not included in the build
