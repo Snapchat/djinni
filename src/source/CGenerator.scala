@@ -377,9 +377,9 @@ class CGenerator(spec: Spec) extends Generator(spec) {
   }
 
   private def writeProxyClass(w: IndentWriter, ident: Ident, methodDefsStructName: String, resolvedMethods: Seq[ResolvedMethod]): String = {
-    val baseProxyClassName = "Proxy_Parent"
-    w.wl(s"using ${baseProxyClassName} = ::djinni::Proxy<${methodDefsStructName}>;")
     val cppClassName = spec.cppIdentStyle.ty(ident.name)
+    val baseProxyClassName = s"Proxy_Parent_${cppClassName}"
+    w.wl(s"using ${baseProxyClassName} = ::djinni::Proxy<${methodDefsStructName}>;")
     val proxyClassName = s"${cppClassName}_Proxy"
     val baseClassName = withCppNs(cppClassName)
     w.w(s"struct ${proxyClassName}: public ${baseProxyClassName}, public ${baseClassName} ")
