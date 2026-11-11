@@ -1078,6 +1078,7 @@ def wasm_djinni_cc_library(
         alwayslink = 0,
         visibility = None,
         library_kwargs = {},
+        additional_compiler_inputs = [],
         **kwargs):
     """Generates WASM bridge sources in a cc_library for caller-owned linking."""
     codegen_name = name + "__djinni_wasm_codegen"
@@ -1094,7 +1095,7 @@ def wasm_djinni_cc_library(
         name = name,
         srcs = ([unity] if tree_mode else _outs(outs, "wasm_srcs")) + srcs,
         hdrs = ([tree] if tree_mode else _outs(outs, "wasm_hdrs")) + hdrs,
-        additional_compiler_inputs = [tree] if tree_mode else [],
+        additional_compiler_inputs = ([tree] if tree_mode else []) + additional_compiler_inputs,
         includes = ([codegen_name + ".wasm"] if tree_mode else []) + includes,
         copts = copts,
         linkopts = linkopts,

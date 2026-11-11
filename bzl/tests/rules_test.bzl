@@ -79,6 +79,22 @@ _inventory_consumer_test = analysistest.make(_inventory_consumer_test_impl, attr
     "target_name": attr.string(),
 })
 
+def _additional_compiler_inputs_test_impl(ctx):
+    env = analysistest.begin(ctx)
+    compile_actions = [action for action in analysistest.target_actions(env) if action.mnemonic == "CppCompile"]
+    asserts.true(env, compile_actions, "Expected a CppCompile action")
+    input_basenames = [
+        input_file.basename
+        for action in compile_actions
+        for input_file in action.inputs.to_list()
+    ]
+    asserts.true(env, ctx.attr.input_basename in input_basenames, "Missing additional compiler input: " + ctx.attr.input_basename)
+    return analysistest.end(env)
+
+_additional_compiler_inputs_test = analysistest.make(_additional_compiler_inputs_test_impl, attrs = {
+    "input_basename": attr.string(),
+})
+
 def _explicit_outputs_test_impl(ctx):
     env = analysistest.begin(ctx)
     actions = analysistest.target_actions(env)
@@ -184,6 +200,11 @@ def rule_tests(name):
         ident_wasm_file = "NativeFooBar",
         wasm_cpp_namespace = "wasm::bridge",
         tags = ["manual"],
+    )
+    _additional_compiler_inputs_test(
+        name = "wasm_additional_compiler_inputs_test",
+        target_under_test = "//bzl/tests:wasm_tree_probe",
+        input_basename = "nested.djinni",
     )
     ts_djinni_filegroup(
         name = "analysis_ts_files",
@@ -305,5 +326,5 @@ def rule_tests(name):
     )
     native.test_suite(
         name = name,
-        tests = [":provider_test", ":cpp_inventory_consumer_test", ":c_inventory_consumer_test", ":java_inventory_consumer_test", ":jni_inventory_consumer_test", ":objc_inventory_consumer_test", ":wasm_inventory_consumer_test", ":ts_inventory_consumer_test", ":explicit_outputs_test", "//bzl/tests:tree_probe_consumer", "//bzl/tests:java_tree_probe_test", "//bzl/tests:java_explicit_probe_test", "//bzl/tests:ts_outputs_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":swift_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":project_name_mismatch_test"],
+        tests = [":provider_test", ":cpp_inventory_consumer_test", ":c_inventory_consumer_test", ":java_inventory_consumer_test", ":jni_inventory_consumer_test", ":objc_inventory_consumer_test", ":wasm_inventory_consumer_test", ":ts_inventory_consumer_test", ":explicit_outputs_test", "//bzl/tests:tree_probe_consumer", "//bzl/tests:java_tree_probe_test", "//bzl/tests:java_explicit_probe_test", "//bzl/tests:ts_outputs_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":swift_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":wasm_additional_compiler_inputs_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":project_name_mismatch_test"],
     )
