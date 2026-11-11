@@ -175,6 +175,7 @@ wasm_djinni_cc_library(
 wasm_djinni_cc_library(
     name = "wasm_tree_probe",
     testonly = True,
+    additional_compiler_inputs = ["idl/nested.djinni"],
     cc_deps = [
         ":tree_probe",
         "//support-lib:djinni-support-wasm",
