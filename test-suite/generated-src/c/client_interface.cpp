@@ -7,9 +7,9 @@
 #include "client_returned_record.hpp"
 #include <memory>
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_client_interface_method_defs>;
-struct ClientInterface_Proxy: public Proxy_Parent, public ::testsuite::ClientInterface  {
-    ClientInterface_Proxy(::djinni::ProxyClass<testsuite_client_interface_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
+using Proxy_Parent_ClientInterface = ::djinni::Proxy<testsuite_client_interface_method_defs>;
+struct ClientInterface_Proxy: public Proxy_Parent_ClientInterface, public ::testsuite::ClientInterface  {
+    ClientInterface_Proxy(::djinni::ProxyClass<testsuite_client_interface_method_defs> *proxyClass, void *opaque): Proxy_Parent_ClientInterface(proxyClass, opaque) {}
 
     ~ClientInterface_Proxy() override = default;
 
@@ -17,7 +17,7 @@ struct ClientInterface_Proxy: public Proxy_Parent, public ::testsuite::ClientInt
         auto record_id_c = record_id;
         auto utf8string_c = ::djinni::c_api::Ref(::djinni::c_api::StringTranslator::fromCpp(utf8string));
         auto misc_c = ::djinni::c_api::Ref(::djinni::c_api::OptionalTranslator<std::experimental::optional<std::string>, ::djinni::c_api::StringTranslator>::fromCpp(misc));
-        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent::getProxyClass().methodDefs().get_record(Proxy_Parent::getOpaque(), record_id_c, utf8string_c.get(), misc_c.get()));
+        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent_ClientInterface::getProxyClass().methodDefs().get_record(Proxy_Parent_ClientInterface::getOpaque(), record_id_c, utf8string_c.get(), misc_c.get()));
         return ::djinni::c_api::RecordTranslator<::testsuite::ClientReturnedRecord>::toCpp(returnValue.get());
     }
 
@@ -25,25 +25,25 @@ struct ClientInterface_Proxy: public Proxy_Parent, public ::testsuite::ClientInt
         auto data_c = ::djinni::c_api::Ref(::djinni::c_api::BinaryTranslator::fromCpp(data));
         auto r_c = r;
         auto jret_c = jret;
-        auto returnValue = Proxy_Parent::getProxyClass().methodDefs().identifier_check(Proxy_Parent::getOpaque(), data_c.get(), r_c, jret_c);
+        auto returnValue = Proxy_Parent_ClientInterface::getProxyClass().methodDefs().identifier_check(Proxy_Parent_ClientInterface::getOpaque(), data_c.get(), r_c, jret_c);
 
         return returnValue;
     }
 
     std::string return_str() override {
-        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent::getProxyClass().methodDefs().return_str(Proxy_Parent::getOpaque()));
+        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent_ClientInterface::getProxyClass().methodDefs().return_str(Proxy_Parent_ClientInterface::getOpaque()));
         return ::djinni::c_api::StringTranslator::toCpp(returnValue.get());
     }
 
     std::string meth_taking_interface(const /*not-null*/ std::shared_ptr<::testsuite::ClientInterface> & i) override {
         auto i_c = ::djinni::c_api::Ref(::djinni::c_api::InterfaceTranslator<::testsuite::ClientInterface>::fromCpp(i));
-        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent::getProxyClass().methodDefs().meth_taking_interface(Proxy_Parent::getOpaque(), i_c.get()));
+        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent_ClientInterface::getProxyClass().methodDefs().meth_taking_interface(Proxy_Parent_ClientInterface::getOpaque(), i_c.get()));
         return ::djinni::c_api::StringTranslator::toCpp(returnValue.get());
     }
 
     std::string meth_taking_optional_interface(const /*nullable*/ std::shared_ptr<::testsuite::ClientInterface> & i) override {
         auto i_c = ::djinni::c_api::Ref(::djinni::c_api::OptionalPtrTranslator<::djinni::c_api::InterfaceTranslator<::testsuite::ClientInterface>>::fromCpp(i));
-        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent::getProxyClass().methodDefs().meth_taking_optional_interface(Proxy_Parent::getOpaque(), i_c.get()));
+        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent_ClientInterface::getProxyClass().methodDefs().meth_taking_optional_interface(Proxy_Parent_ClientInterface::getOpaque(), i_c.get()));
         return ::djinni::c_api::StringTranslator::toCpp(returnValue.get());
     }
 

@@ -5,14 +5,14 @@
 #include "djinni_c_translators.hpp"
 #include "user_token.hpp"
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_user_token_method_defs>;
-struct UserToken_Proxy: public Proxy_Parent, public ::testsuite::UserToken  {
-    UserToken_Proxy(::djinni::ProxyClass<testsuite_user_token_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
+using Proxy_Parent_UserToken = ::djinni::Proxy<testsuite_user_token_method_defs>;
+struct UserToken_Proxy: public Proxy_Parent_UserToken, public ::testsuite::UserToken  {
+    UserToken_Proxy(::djinni::ProxyClass<testsuite_user_token_method_defs> *proxyClass, void *opaque): Proxy_Parent_UserToken(proxyClass, opaque) {}
 
     ~UserToken_Proxy() override = default;
 
     std::string whoami() override {
-        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent::getProxyClass().methodDefs().whoami(Proxy_Parent::getOpaque()));
+        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent_UserToken::getProxyClass().methodDefs().whoami(Proxy_Parent_UserToken::getOpaque()));
         return ::djinni::c_api::StringTranslator::toCpp(returnValue.get());
     }
 
