@@ -56,6 +56,14 @@ djinni_binary_ref testsuite_DataRefTest_dataFromStr(testsuite_DataRefTest_ref in
     DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_binary_ref)
 }
 
+djinni_binary_ref testsuite_DataRefTest_generateDataPreferNative(testsuite_DataRefTest_ref instance, int32_t len)
+{
+    DJINNI_HANDLE_EXCEPTION_PROLOGUE
+    auto retValue = ::djinni::c_api::InterfaceTranslator<::testsuite::DataRefTest>::toCpp(instance)->generateDataPreferNative(len);
+    return ::djinni::c_api::DataRefTranslator::fromCpp(std::move(retValue));
+    DJINNI_HANDLE_EXCEPTION_EPILOGUE(djinni_binary_ref)
+}
+
 djinni_binary_ref testsuite_DataRefTest_sendDataView(testsuite_DataRefTest_ref instance, djinni_binary_ref data)
 {
     DJINNI_HANDLE_EXCEPTION_PROLOGUE

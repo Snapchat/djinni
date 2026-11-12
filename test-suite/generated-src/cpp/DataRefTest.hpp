@@ -27,6 +27,8 @@ public:
 
     virtual ::djinni::DataRef dataFromStr() = 0;
 
+    virtual ::djinni::DataRef generateDataPreferNative(int32_t len) = 0;
+
     virtual std::vector<uint8_t> sendDataView(const ::djinni::DataView & data) = 0;
 
     virtual ::djinni::DataView recvDataView() = 0;
