@@ -7,15 +7,15 @@
 #include "Future_c_translator.hpp"
 #include "async_interface.hpp"
 
-using Proxy_Parent = ::djinni::Proxy<testsuite_async_interface_method_defs>;
-struct AsyncInterface_Proxy: public Proxy_Parent, public ::testsuite::AsyncInterface  {
-    AsyncInterface_Proxy(::djinni::ProxyClass<testsuite_async_interface_method_defs> *proxyClass, void *opaque): Proxy_Parent(proxyClass, opaque) {}
+using Proxy_Parent_AsyncInterface = ::djinni::Proxy<testsuite_async_interface_method_defs>;
+struct AsyncInterface_Proxy: public Proxy_Parent_AsyncInterface, public ::testsuite::AsyncInterface  {
+    AsyncInterface_Proxy(::djinni::ProxyClass<testsuite_async_interface_method_defs> *proxyClass, void *opaque): Proxy_Parent_AsyncInterface(proxyClass, opaque) {}
 
     ~AsyncInterface_Proxy() override = default;
 
     ::djinni::Future<std::string> future_roundtrip(::djinni::Future<int32_t> f) override {
         auto f_c = ::djinni::c_api::Ref(::djinni::c_api::FutureTranslator<::djinni::c_api::Int32Translator>::fromCpp(std::move(f)));
-        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent::getProxyClass().methodDefs().future_roundtrip(Proxy_Parent::getOpaque(), f_c.get()));
+        auto returnValue = ::djinni::c_api::Ref(Proxy_Parent_AsyncInterface::getProxyClass().methodDefs().future_roundtrip(Proxy_Parent_AsyncInterface::getOpaque(), f_c.get()));
         return ::djinni::c_api::FutureTranslator<::djinni::c_api::StringTranslator>::toCpp(returnValue.get());
     }
 
