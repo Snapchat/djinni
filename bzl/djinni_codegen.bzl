@@ -10,6 +10,7 @@ DjinniInfo = provider(
         "transitive_srcs": "Root IDL and imported IDL/config sources from the transitive dependency closure.",
         "idl_include_paths": "Depset of execution-root include paths.",
         "types": "Map from declaration category (enums, records, interfaces) to names in this schema's resolved import closure.",
+        "types_provided": "Whether the caller supplied a complete declaration list, including an empty list.",
         "declarations_manifest": "Resolved internal declarations produced by Djinni.",
         "output_manifest": "Per-language generated file inventory produced from the IDL and its configuration.",
         "project_name": "Consumer project name for language-specific defaults.",
@@ -433,6 +434,7 @@ def _validate_type_lists(ctx):
 def _djinni_library_impl(ctx):
     _validate_type_lists(ctx)
     types = _normalized_types(ctx.attr.types)
+    types_provided = ctx.attr.types_provided
     transitive = [
         dep[DjinniInfo].transitive_srcs
         for dep in ctx.attr.deps
@@ -469,7 +471,7 @@ def _djinni_library_impl(ctx):
     args.add("--yaml-out", yaml_tree.path + "/" + ctx.attr.project_name)
     args.add("--idl", ctx.file.idl)
     args.add("--list-declarations", declarations_manifest)
-    if ctx.attr.types:
+    if types_provided:
         args.add("--verify-type-lists", "true")
         for category in _TYPE_CATEGORIES:
             args.add_all(types[category], before_each = _TYPE_FLAGS[category])
@@ -527,6 +529,7 @@ def _djinni_library_impl(ctx):
             transitive_srcs = transitive_srcs,
             idl_include_paths = include_paths,
             types = types,
+            types_provided = types_provided,
             declarations_manifest = declarations_manifest,
             output_manifest = output_manifest,
             project_name = ctx.attr.project_name,
@@ -543,7 +546,7 @@ def _djinni_library_impl(ctx):
         ),
     ]
 
-djinni_library = rule(
+_djinni_library_rule = rule(
     doc = "Declares one root IDL and its import closure; verifies syntax and types by default.",
     implementation = _djinni_library_impl,
     attrs = {
@@ -553,6 +556,7 @@ djinni_library = rule(
         "config_file": attr.label(allow_single_file = [".yaml", ".yml"]),
         "deps": attr.label_list(providers = [DjinniInfo]),
         "types": attr.string_list_dict(),
+        "types_provided": attr.bool(default = False),
         "idl_include_paths": attr.string_list(),
         "idl_include_files": attr.label_list(allow_files = True),
         "verify": attr.bool(default = True),
@@ -565,6 +569,15 @@ djinni_library = rule(
         "cpp_optional_header": attr.string(default = ""),
     },
 )
+
+def djinni_library(name, types = None, **kwargs):
+    """Declares one root IDL and whether its complete declaration list is supplied."""
+    _djinni_library_rule(
+        name = name,
+        types = {} if types == None else types,
+        types_provided = types != None,
+        **kwargs
+    )
 
 _BOOL_ATTRS = [
     "java_implement_android_os_parcelable",
@@ -718,7 +731,7 @@ def _source_slots(language, djinni):
 
 def _typed_source_files_impl(ctx):
     djinni = ctx.attr.djinni[DjinniInfo]
-    if not any([djinni.types[category] for category in _TYPE_CATEGORIES]):
+    if not djinni.types_provided:
         output_extension = "mm" if ctx.attr.language == "objc" else "cpp"
         output = ctx.actions.declare_file(ctx.label.name + "__unity." + output_extension)
         command = """set -euo pipefail

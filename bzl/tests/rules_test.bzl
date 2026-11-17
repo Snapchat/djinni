@@ -14,6 +14,7 @@ def _provider_test_impl(ctx):
         "records": ["shared"],
         "interfaces": ["first", "second"],
     }, info.types)
+    asserts.true(env, info.types_provided)
     asserts.equals(env, ["typed-schema.yaml"], sorted([f.basename for f in info.yaml_files.to_list()]))
     asserts.equals(env, "typed-schema.yaml", info.yaml_tree.basename)
     asserts.equals(env, ["bzl/tests/idl"], info.idl_include_paths.to_list())
@@ -40,6 +41,22 @@ def _provider_test_impl(ctx):
     return analysistest.end(env)
 
 _provider_test = analysistest.make(_provider_test_impl)
+
+def _types_presence_test_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    info = target[DjinniInfo]
+    asserts.equals(env, ctx.attr.expected, info.types_provided)
+    asserts.equals(env, ctx.attr.expected_types, info.types)
+    declaration_actions = [action for action in analysistest.target_actions(env) if action.mnemonic == "DjinniDeclarations"]
+    asserts.equals(env, 1, len(declaration_actions))
+    asserts.equals(env, ctx.attr.expected, "--verify-type-lists" in declaration_actions[0].argv)
+    return analysistest.end(env)
+
+_types_presence_test = analysistest.make(_types_presence_test_impl, attrs = {
+    "expected": attr.bool(),
+    "expected_types": attr.string_list_dict(default = {}),
+})
 
 def _codegen_test_impl(ctx):
     env = analysistest.begin(ctx)
@@ -159,6 +176,18 @@ def rule_tests(name):
         cpp_namespace = "override::namespace",
         tags = ["manual"],
     )
+    djinni_library(
+        name = "explicit_empty_schema",
+        idl = "idl/shared.djinni",
+        types = {},
+        tags = ["manual"],
+    )
+    cc_djinni_library(
+        name = "explicit_empty_cpp_probe",
+        deps = [":explicit_empty_schema"],
+        testonly = True,
+        tags = ["manual"],
+    )
     djinni_codegen(
         name = "invalid_project_name",
         djinni = ":shared-schema",
@@ -259,7 +288,44 @@ def rule_tests(name):
         expected_mnemonic = "DjinniUnityFallback",
         expected_action_count = 1,
     )
+    _source_outputs_test(
+        name = "explicit_empty_types_sources_test",
+        target_under_test = ":explicit_empty_cpp_probe__generated_sources",
+        expected_files = [],
+        expected_mnemonic = "DjinniTypedSource",
+        expected_action_count = 0,
+    )
     _provider_test(name = "provider_test", target_under_test = ":typed-schema")
+    _types_presence_test(
+        name = "omitted_types_test",
+        target_under_test = ":c-schema",
+        expected = False,
+        expected_types = {
+            "enums": [],
+            "records": [],
+            "interfaces": [],
+        },
+    )
+    _types_presence_test(
+        name = "partial_types_test",
+        target_under_test = ":shared-schema",
+        expected = True,
+        expected_types = {
+            "enums": ["status"],
+            "records": ["shared"],
+            "interfaces": [],
+        },
+    )
+    _types_presence_test(
+        name = "explicit_empty_types_test",
+        target_under_test = ":explicit_empty_schema",
+        expected = True,
+        expected_types = {
+            "enums": [],
+            "records": [],
+            "interfaces": [],
+        },
+    )
     for language, target_name, schema_manifest in [
         ("cpp", "typed_cpp_probe__djinni_cpp_codegen", "typed-schema"),
         ("c", "c_tree_probe__djinni_c_codegen", "c-schema"),
@@ -367,5 +433,5 @@ def rule_tests(name):
     )
     native.test_suite(
         name = name,
-        tests = [":provider_test", ":duplicate_type_list_test", ":invalid_type_category_test", ":typed_cpp_sources_test", ":tree_fallback_sources_test", ":cpp_inventory_consumer_test", ":c_inventory_consumer_test", ":java_inventory_consumer_test", ":jni_inventory_consumer_test", ":objc_inventory_consumer_test", ":wasm_inventory_consumer_test", ":ts_inventory_consumer_test", "//bzl/tests:typed_cpp_probe_consumer", "//bzl/tests:tree_fallback_consumer", "//bzl/tests:java_tree_probe_test", "//bzl/tests:ts_outputs_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":swift_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":wasm_additional_compiler_inputs_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":project_name_mismatch_test"],
+        tests = [":provider_test", ":omitted_types_test", ":partial_types_test", ":explicit_empty_types_test", ":duplicate_type_list_test", ":invalid_type_category_test", ":typed_cpp_sources_test", ":tree_fallback_sources_test", ":explicit_empty_types_sources_test", ":cpp_inventory_consumer_test", ":c_inventory_consumer_test", ":java_inventory_consumer_test", ":jni_inventory_consumer_test", ":objc_inventory_consumer_test", ":wasm_inventory_consumer_test", ":ts_inventory_consumer_test", "//bzl/tests:typed_cpp_probe_consumer", "//bzl/tests:tree_fallback_consumer", "//bzl/tests:java_tree_probe_test", "//bzl/tests:ts_outputs_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":swift_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":wasm_additional_compiler_inputs_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":project_name_mismatch_test"],
     )

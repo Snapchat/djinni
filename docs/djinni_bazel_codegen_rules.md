@@ -106,7 +106,8 @@ working external-module setup and explicit C++/Java rule dependencies.
 ## Base Declaration and Language Libraries
 
 The API follows the `rules_proto` separation of source declarations, providers,
-and language consumers. `djinni_library` is a Starlark rule. Language library
+and language consumers. `djinni_library` is a Starlark macro over an internal
+rule. Language library
 macros create a private codegen rule and an ordinary `cc_library`, `java_library`,
 or `cc_binary`, returning the normal language provider to downstream consumers.
 The shared action implementation is internal; each language macro selects only
@@ -114,11 +115,13 @@ its own output categories and runs a separate action.
 
 `djinni_library` can carry the resolved enum, record, and interface names. Native language rules use those
 types to expose one source artifact per possible generated type; a generator
-ownership manifest maps each artifact to Djinni's configured filename. When the
-type lists are omitted, native rules use the generated tree and compile a unity
-source. Java packages the tree's listed files into a source JAR, and TypeScript
-copies its module file from the tree. The optional compiled Swift macro requires
-type lists to preserve Swift's per-file access rules.
+ownership manifest maps each artifact to Djinni's configured filename. When
+`types` is `None`, native C-family rules use the generated tree and compile a
+unity source. Any non-`None` map is treated as the complete declaration list,
+including an empty map; omitted categories are treated as empty. Java packages
+the tree's listed files into a source JAR, and TypeScript copies its module file
+from the tree. The optional compiled Swift macro requires type lists to preserve
+Swift's per-file access rules.
 
 `types` is optional and checked when supplied. It maps declaration categories
 to lists of names and describes every internal declaration in the root IDL's
@@ -175,8 +178,9 @@ cc_binary(
 - `types`: optional map from `enums`, `records`, and `interfaces` to lists of
   internal declaration names in the resolved IDL import closure. These names
   also determine the declaration source artifacts exposed by native and Swift
-  language macros. When the map is supplied, Djinni verifies every category
-  against the resolved declarations; omitted categories are treated as empty.
+  language macros. When non-`None`, Djinni verifies the complete list against
+  the resolved declarations; omitted categories are treated as empty. Use
+  `None` to select tree/unity source handling in native C-family rules.
 - `idl_include_paths`: repository-relative search directories. For example,
   `schemas/vendor` refers to that directory in the repository defining this rule,
   including when loaded as `@djinni`. Absolute paths and `..` are rejected.
@@ -188,7 +192,8 @@ cc_binary(
 - `compiler`: executable label, defaulting to Djinni's `//src:djinni`, resolved
   relative to the rules repository and built in the execution configuration.
 
-`DjinniInfo` carries the root IDL, the category-to-name `types` map, project
+`DjinniInfo` carries the root IDL, the category-to-name `types` map and whether
+the caller supplied it, project
 name, a depset of transitive source files, execution-root include paths, the
 declaration and output manifests, and generated YAML trees from this target and
 its dependency closure. The output ownership manifest is created for each
