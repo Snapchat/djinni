@@ -9,9 +9,11 @@ def _provider_test_impl(ctx):
     info = target[DjinniInfo]
     asserts.equals(env, "typed.djinni", info.idl.basename)
     asserts.equals(env, ["nested.djinni", "typed.djinni"], sorted([f.basename for f in info.transitive_srcs.to_list()]))
-    asserts.equals(env, ["status"], info.enums)
-    asserts.equals(env, ["shared"], info.records)
-    asserts.equals(env, ["first", "second"], info.interfaces)
+    asserts.equals(env, {
+        "enums": ["status"],
+        "records": ["shared"],
+        "interfaces": ["first", "second"],
+    }, info.types)
     asserts.equals(env, ["typed-schema.yaml"], sorted([f.basename for f in info.yaml_files.to_list()]))
     asserts.equals(env, "typed-schema.yaml", info.yaml_tree.basename)
     asserts.equals(env, ["bzl/tests/idl"], info.idl_include_paths.to_list())
@@ -172,13 +174,24 @@ def rule_tests(name):
     djinni_library(
         name = "duplicate_type_list",
         idl = "idl/shared.djinni",
-        records = ["shared", "shared"],
+        types = {"records": ["shared", "shared"]},
         tags = ["manual"],
     )
     _failure_test(
         name = "duplicate_type_list_test",
         target_under_test = ":duplicate_type_list",
         message = "appears more than once",
+    )
+    djinni_library(
+        name = "invalid_type_category",
+        idl = "idl/shared.djinni",
+        types = {"classes": ["shared"]},
+        tags = ["manual"],
+    )
+    _failure_test(
+        name = "invalid_type_category_test",
+        target_under_test = ":invalid_type_category",
+        message = "Unknown type category",
     )
     java_djinni_library(
         name = "analysis_java",
@@ -354,5 +367,5 @@ def rule_tests(name):
     )
     native.test_suite(
         name = name,
-        tests = [":provider_test", ":duplicate_type_list_test", ":typed_cpp_sources_test", ":tree_fallback_sources_test", ":cpp_inventory_consumer_test", ":c_inventory_consumer_test", ":java_inventory_consumer_test", ":jni_inventory_consumer_test", ":objc_inventory_consumer_test", ":wasm_inventory_consumer_test", ":ts_inventory_consumer_test", "//bzl/tests:typed_cpp_probe_consumer", "//bzl/tests:tree_fallback_consumer", "//bzl/tests:java_tree_probe_test", "//bzl/tests:ts_outputs_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":swift_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":wasm_additional_compiler_inputs_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":project_name_mismatch_test"],
+        tests = [":provider_test", ":duplicate_type_list_test", ":invalid_type_category_test", ":typed_cpp_sources_test", ":tree_fallback_sources_test", ":cpp_inventory_consumer_test", ":c_inventory_consumer_test", ":java_inventory_consumer_test", ":jni_inventory_consumer_test", ":objc_inventory_consumer_test", ":wasm_inventory_consumer_test", ":ts_inventory_consumer_test", "//bzl/tests:typed_cpp_probe_consumer", "//bzl/tests:tree_fallback_consumer", "//bzl/tests:java_tree_probe_test", "//bzl/tests:ts_outputs_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":swift_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":wasm_additional_compiler_inputs_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":project_name_mismatch_test"],
     )

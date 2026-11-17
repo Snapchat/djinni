@@ -11,7 +11,7 @@ _DJINNI_SWIFTXX_SUPPORT_CORE = Label("@djinni_rules//support-lib:djinni-support-
 _COMMON_ATTRS = ["testonly", "tags", "compatible_with", "restricted_to", "target_compatible_with", "features", "deprecation"]
 
 def _declaration_names(djinni):
-    return djinni.enums + djinni.records + djinni.interfaces
+    return djinni.types["enums"] + djinni.types["records"] + djinni.types["interfaces"]
 
 def _typed_swift_outputs_impl(ctx):
     djinni = ctx.attr.djinni[DjinniInfo]

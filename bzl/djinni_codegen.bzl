@@ -9,9 +9,7 @@ DjinniInfo = provider(
         "idl": "Root .djinni file.",
         "transitive_srcs": "Root IDL and imported IDL/config sources from the transitive dependency closure.",
         "idl_include_paths": "Depset of execution-root include paths.",
-        "enums": "Enum and flags names in this schema's resolved import closure.",
-        "records": "Record names in this schema's resolved import closure.",
-        "interfaces": "Interface names in this schema's resolved import closure.",
+        "types": "Map from declaration category (enums, records, interfaces) to names in this schema's resolved import closure.",
         "declarations_manifest": "Resolved internal declarations produced by Djinni.",
         "output_manifest": "Per-language generated file inventory produced from the IDL and its configuration.",
         "project_name": "Consumer project name for language-specific defaults.",
@@ -410,20 +408,31 @@ def _include_paths(ctx):
         result.append(root + "/" + path if root and path else root or path or ".")
     return result + [file.dirname for file in ctx.files.idl_include_files]
 
+_TYPE_CATEGORIES = ["enums", "records", "interfaces"]
+_TYPE_FLAGS = {
+    "enums": "--expected-enum",
+    "records": "--expected-record",
+    "interfaces": "--expected-interface",
+}
+
+def _normalized_types(types):
+    return {category: types.get(category, []) for category in _TYPE_CATEGORIES}
+
 def _validate_type_lists(ctx):
+    for category in ctx.attr.types:
+        if category not in _TYPE_CATEGORIES:
+            fail("Unknown type category %r; expected one of: %s" % (category, ", ".join(_TYPE_CATEGORIES)))
+
     owner_by_name = {}
-    for kind, names in [
-        ("enum", ctx.attr.enums),
-        ("record", ctx.attr.records),
-        ("interface", ctx.attr.interfaces),
-    ]:
-        for name in names:
+    for category in _TYPE_CATEGORIES:
+        for name in ctx.attr.types.get(category, []):
             if name in owner_by_name:
-                fail("Declaration %s appears more than once (as %s and %s)" % (name, owner_by_name[name], kind))
-            owner_by_name[name] = kind
+                fail("Declaration %s appears more than once (as %s and %s)" % (name, owner_by_name[name], category))
+            owner_by_name[name] = category
 
 def _djinni_library_impl(ctx):
     _validate_type_lists(ctx)
+    types = _normalized_types(ctx.attr.types)
     transitive = [
         dep[DjinniInfo].transitive_srcs
         for dep in ctx.attr.deps
@@ -460,11 +469,10 @@ def _djinni_library_impl(ctx):
     args.add("--yaml-out", yaml_tree.path + "/" + ctx.attr.project_name)
     args.add("--idl", ctx.file.idl)
     args.add("--list-declarations", declarations_manifest)
-    if ctx.attr.enums or ctx.attr.records or ctx.attr.interfaces:
+    if ctx.attr.types:
         args.add("--verify-type-lists", "true")
-        args.add_all(ctx.attr.enums, before_each = "--expected-enum")
-        args.add_all(ctx.attr.records, before_each = "--expected-record")
-        args.add_all(ctx.attr.interfaces, before_each = "--expected-interface")
+        for category in _TYPE_CATEGORIES:
+            args.add_all(types[category], before_each = _TYPE_FLAGS[category])
     if validated_inputs:
         args.add("--list-in-files", validated_inputs)
     args.add_all(include_paths.to_list(), before_each = "--idl-include-path")
@@ -518,9 +526,7 @@ def _djinni_library_impl(ctx):
             idl = ctx.file.idl,
             transitive_srcs = transitive_srcs,
             idl_include_paths = include_paths,
-            enums = ctx.attr.enums,
-            records = ctx.attr.records,
-            interfaces = ctx.attr.interfaces,
+            types = types,
             declarations_manifest = declarations_manifest,
             output_manifest = output_manifest,
             project_name = ctx.attr.project_name,
@@ -546,9 +552,7 @@ djinni_library = rule(
         "defaults_file": attr.label(allow_single_file = [".yaml", ".yml"]),
         "config_file": attr.label(allow_single_file = [".yaml", ".yml"]),
         "deps": attr.label_list(providers = [DjinniInfo]),
-        "enums": attr.string_list(),
-        "records": attr.string_list(),
-        "interfaces": attr.string_list(),
+        "types": attr.string_list_dict(),
         "idl_include_paths": attr.string_list(),
         "idl_include_files": attr.label_list(allow_files = True),
         "verify": attr.bool(default = True),
@@ -691,18 +695,21 @@ def _generated_manifest(codegen_name, testonly):
 
 def _source_slots(language, djinni):
     slots = []
+    enums = djinni.types["enums"]
+    records = djinni.types["records"]
+    interfaces = djinni.types["interfaces"]
     if language == "cpp":
-        names = djinni.records + djinni.interfaces
+        names = records + interfaces
         slots += [struct(backend = "cpp", name = name, extension = ".cpp") for name in names]
     elif language == "c" or language == "wasm":
-        names = djinni.enums + djinni.records + djinni.interfaces
+        names = enums + records + interfaces
         slots += [struct(backend = language, name = name, extension = ".cpp") for name in names]
     elif language == "jni":
-        names = djinni.records + djinni.interfaces
+        names = records + interfaces
         slots += [struct(backend = "jni", name = name, extension = ".cpp") for name in names]
         slots.append(struct(backend = "jni", name = "__module__", extension = ".cpp"))
     elif language == "objc":
-        names = djinni.records + djinni.interfaces
+        names = records + interfaces
         for backend in ["objc", "objcpp"]:
             slots += [struct(backend = backend, name = name, extension = ".mm") for name in names]
     else:
@@ -711,7 +718,7 @@ def _source_slots(language, djinni):
 
 def _typed_source_files_impl(ctx):
     djinni = ctx.attr.djinni[DjinniInfo]
-    if not (djinni.enums or djinni.records or djinni.interfaces):
+    if not any([djinni.types[category] for category in _TYPE_CATEGORIES]):
         output_extension = "mm" if ctx.attr.language == "objc" else "cpp"
         output = ctx.actions.declare_file(ctx.label.name + "__unity." + output_extension)
         command = """set -euo pipefail

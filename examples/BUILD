@@ -2,9 +2,11 @@ load("//bzl:djinni_codegen.bzl", "cc_djinni_library", "djinni_library", "java_dj
 
 djinni_library(
     name = "example-djinni",
-    enums = ["sort_order"],
-    records = ["item_list"],
-    interfaces = ["sort_items", "textbox_listener"],
+    types = {
+        "enums": ["sort_order"],
+        "records": ["item_list"],
+        "interfaces": ["sort_items", "textbox_listener"],
+    },
     idl = "example.djinni",
     visibility = ["//visibility:public"],
 )

@@ -120,11 +120,11 @@ source. Java packages the tree's listed files into a source JAR, and TypeScript
 copies its module file from the tree. The optional compiled Swift macro requires
 type lists to preserve Swift's per-file access rules.
 
-Type lists are optional and checked when supplied. They describe every internal
-declaration in the root IDL's resolved import closure, including imported
-declarations. A typo or stale list fails in Djinni's declaration action before
-the language codegen runs. The lists remain separate fields on `DjinniInfo`;
-declaration kind is represented by the field it appears in.
+`types` is optional and checked when supplied. It maps declaration categories
+to lists of names and describes every internal declaration in the root IDL's
+resolved import closure, including imported declarations. A typo or stale list
+fails in Djinni's declaration action before the language codegen runs. The same
+category-to-name map is carried on `DjinniInfo`.
 
 ```python
 load("@djinni//bzl:djinni_codegen.bzl", "cc_djinni_library", "djinni_library", "java_djinni_library")
@@ -133,9 +133,11 @@ djinni_library(
     name = "messages",
     idl = "messages.djinni",
     srcs = ["common.djinni"],
-    enums = ["message_kind"],
-    records = ["message", "common_message"],
-    interfaces = ["message_listener"],
+    types = {
+        "enums": ["message_kind"],
+        "records": ["message", "common_message"],
+        "interfaces": ["message_listener"],
+    },
 )
 
 cc_djinni_library(
@@ -170,10 +172,11 @@ cc_binary(
   repository or generated imports without hardcoding execution-root paths.
 - `deps`: other `djinni_library` targets contributing transitive import inputs
   and generated YAML extern files.
-- `enums`, `records`, `interfaces`: optional lists of internal declaration names
-  in the resolved IDL import closure. These names also determine the declaration
-  source artifacts exposed by native and Swift language macros. When any list is
-  supplied, Djinni verifies all three lists against the resolved declarations.
+- `types`: optional map from `enums`, `records`, and `interfaces` to lists of
+  internal declaration names in the resolved IDL import closure. These names
+  also determine the declaration source artifacts exposed by native and Swift
+  language macros. When the map is supplied, Djinni verifies every category
+  against the resolved declarations; omitted categories are treated as empty.
 - `idl_include_paths`: repository-relative search directories. For example,
   `schemas/vendor` refers to that directory in the repository defining this rule,
   including when loaded as `@djinni`. Absolute paths and `..` are rejected.
@@ -185,10 +188,10 @@ cc_binary(
 - `compiler`: executable label, defaulting to Djinni's `//src:djinni`, resolved
   relative to the rules repository and built in the execution configuration.
 
-`DjinniInfo` carries the root IDL, the separate enum/record/interface lists,
-project name, a depset of transitive source files, execution-root include paths,
-the declaration and output manifests, and generated YAML trees from this target
-and its dependency closure. The output ownership manifest is created for each
+`DjinniInfo` carries the root IDL, the category-to-name `types` map, project
+name, a depset of transitive source files, execution-root include paths, the
+declaration and output manifests, and generated YAML trees from this target and
+its dependency closure. The output ownership manifest is created for each
 language action and records backend, source/header role, declaration kind/name,
 and generated path. The provider does not need to duplicate language-specific
 filename rules.

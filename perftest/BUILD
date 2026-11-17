@@ -2,9 +2,11 @@ load("//bzl:djinni_codegen.bzl", "cc_djinni_library", "djinni_library", "java_dj
 
 djinni_library(
     name = "benchmark-djinni",
-    enums = ["EnumSixValue"],
-    records = ["RecordSixInt"],
-    interfaces = ["ObjectNative", "ObjectPlatform", "djinni_perf_benchmark"],
+    types = {
+        "enums": ["EnumSixValue"],
+        "records": ["RecordSixInt"],
+        "interfaces": ["ObjectNative", "ObjectPlatform", "djinni_perf_benchmark"],
+    },
     srcs = [
         "//support-lib:dataref.yaml",
         "//support-lib:dataview.yaml",

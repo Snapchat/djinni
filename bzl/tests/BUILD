@@ -12,8 +12,10 @@ exports_files([
 # An external consumer imports these through a repository-relative search path.
 djinni_library(
     name = "shared-schema",
-    enums = ["status"],
-    records = ["shared"],
+    types = {
+        "enums": ["status"],
+        "records": ["shared"],
+    },
     srcs = ["idl/nested.djinni"],
     cpp_base_lib_include_prefix = "djinni/cpp/",
     cpp_include_prefix = "shared/",
@@ -29,9 +31,11 @@ djinni_library(
 
 djinni_library(
     name = "typed-schema",
-    enums = ["status"],
-    records = ["shared"],
-    interfaces = ["first", "second"],
+    types = {
+        "enums": ["status"],
+        "records": ["shared"],
+        "interfaces": ["first", "second"],
+    },
     srcs = ["idl/nested.djinni"],
     cpp_base_lib_include_prefix = "djinni/cpp/",
     cpp_include_prefix = "shared/",

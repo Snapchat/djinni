@@ -5,8 +5,10 @@ load("@rules_java//java:defs.bzl", "java_test")
 djinni_library(
     name = "schema",
     testonly = True,
-    enums = ["status"],
-    records = ["message", "shared"],
+    types = {
+        "enums": ["status"],
+        "records": ["message", "shared"],
+    },
     idl = "schema.djinni",
     deps = ["@djinni//bzl/tests:shared-schema"],
 )
