@@ -62,6 +62,40 @@
     XCTAssertEqual(intFuture2.get(), 43);
 }
 
+- (void)testThenUnwrapsFuture
+{
+    djinni::Promise<int> intPromise;
+    djinni::SharedFuture<int> futureInt(intPromise.getFuture());
+
+    djinni::Promise<std::string> innerPromise;
+    auto innerFuture = std::make_optional(innerPromise.getFuture());
+    auto unwrapped = futureInt.then([&](const auto& resolved) {
+        XCTAssertEqual(resolved.get(), 42);
+        return std::move(*innerFuture);
+    });
+    static_assert(std::is_same_v<decltype(unwrapped), djinni::Future<std::string>>);
+
+    auto unwrappedShared = futureInt.thenShared([](const auto& resolved) {
+        return djinni::Promise<int>::resolve(resolved.get() + 1);
+    });
+    static_assert(std::is_same_v<decltype(unwrappedShared), djinni::SharedFuture<int>>);
+
+    auto unwrappedVoid = futureInt.then([](const auto&) { return djinni::Promise<void>::resolve(true); });
+    static_assert(std::is_same_v<decltype(unwrappedVoid), djinni::Future<void>>);
+
+    auto unwrappedError = futureInt.then([](const auto&) {
+        return djinni::Promise<int>::reject(std::runtime_error("inner failed"));
+    });
+
+    intPromise.setValue(42);
+    XCTAssertEqual(unwrappedShared.get(), 43);
+    XCTAssertNoThrow(unwrappedVoid.get());
+    XCTAssertThrows(unwrappedError.get());
+    XCTAssertFalse(unwrapped.isReady());
+    innerPromise.setValue("done");
+    XCTAssertEqual(unwrapped.get(), std::string("done"));
+}
+
 - (void)testException
 {
     // Also verify exception handling.

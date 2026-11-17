@@ -366,6 +366,26 @@ The C++ `Future` type has optional support for coroutines. If coroutines are
 available (eg. compiling with C++20 with coroutine support), then you can
 use `co_await` on future objects.
 
+In C++, `Future::then()` chains a handler that runs when the future completes.
+Like `Promise.then()` in Javascript, the handler can return either a value or
+another `Future`. When it returns a `Future<U>`, the result is unwrapped:
+`then()` returns a `Future<U>` (not a `Future<Future<U>>`) that completes when
+the inner future does, so synchronous and asynchronous steps can be mixed in
+one chain:
+
+```cpp
+djinni::Future<int> doubleAsync(djinni::Future<int> f);   // async step
+int doubleSync(djinni::Future<int> f) { return f.get() * 2; }
+
+djinni::Future<int> result = getValue().then(doubleAsync)
+                                       .then(doubleSync)
+                                       .then(doubleAsync);
+```
+
+Exceptions thrown by the handler, or stored in the future it returns, are
+propagated to the future returned by `then()`. `SharedFuture::then()` and
+`SharedFuture::thenShared()` unwrap in the same way.
+
 ## Requiring Optional Parameters in Individual Records
 - By default, optionals will be omitted from the constructor in Djinni
 - The Djinni code generator will generate two constructors for a record with optionals: one with all values and one with optionals omitted. This will minimize code disruption

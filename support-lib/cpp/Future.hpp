@@ -26,6 +26,7 @@
 #include <mutex>
 #include <cassert>
 #include <exception>
+#include <type_traits>
 
 #ifdef __has_include
 #if __has_include(<version>)
@@ -112,6 +113,19 @@ struct SharedState: ValueHolder<T> {
 
 template<typename T>
 using SharedStatePtr = std::shared_ptr<SharedState<T>>;
+
+// Used by `Future::then()` to unwrap a handler that returns a `Future<U>` into
+// a `Future<U>` (instead of a `Future<Future<U>>`). Only one level is unwrapped.
+template <typename R>
+struct UnwrapFuture {
+    static constexpr bool isFuture = false;
+    using type = R;
+};
+template <typename U>
+struct UnwrapFuture<Future<U>> {
+    static constexpr bool isFuture = true;
+    using type = U;
+};
 
 // Common promise base class, shared by both `void` and `T` results.
 template <typename T>
@@ -316,24 +330,52 @@ public:
     // already available, then the handler routine will immediately be called in
     // the current thread. Returns a new future that wraps the return value of
     // the handler routine. The current future becomes invalid after this call.
+    //
+    // If the handler returns a `Future<U>`, the returned future is unwrapped:
+    // `then()` returns a `Future<U>` that resolves (or fails) when the future
+    // returned by the handler does, instead of a `Future<Future<U>>`. This
+    // allows chaining asynchronous steps the same way as JavaScript promises:
+    //
+    //   fetchId().then([] (Future<int> id) { return fetchName(id.get()); })
+    //            .then([] (Future<std::string> name) { ... });
     template<typename FUNC>
     auto then(FUNC&& handler) {
         using HandlerReturnType = std::invoke_result_t<FUNC, Future<T>>;
+        using Unwrap = detail::UnwrapFuture<std::remove_cv_t<std::remove_reference_t<HandlerReturnType>>>;
+        using ResultType = std::conditional_t<Unwrap::isFuture, typename Unwrap::type, HandlerReturnType>;
         detail::SharedStatePtr<T> sharedState;
         sharedState = std::atomic_exchange(&_sharedState, sharedState);
         assert(sharedState);    // a second call will trigger assertion
-        auto nextPromise = std::make_unique<Promise<HandlerReturnType>>();
+        auto nextPromise = std::make_unique<Promise<ResultType>>();
         auto nextFuture = nextPromise->getFuture();
         auto continuation = [handler = std::forward<FUNC>(handler), nextPromise = std::move(nextPromise)] (detail::SharedStatePtr<T> x) mutable {
             try {
-                if constexpr(std::is_void_v<HandlerReturnType>) {
+                if constexpr(Unwrap::isFuture) {
+                    auto innerFuture = handler(Future<T>(x));
+                    // Forward the result of the inner future (value or
+                    // exception) to the future returned by `then()`.
+                    innerFuture.then([nextPromise = std::move(nextPromise)] (Future<ResultType> inner) mutable {
+                        try {
+                            if constexpr(std::is_void_v<ResultType>) {
+                                inner.get();
+                                nextPromise->setValue();
+                            } else {
+                                nextPromise->setValue(inner.get());
+                            }
+                        } catch (...) {
+                            nextPromise->setException(std::current_exception());
+                        }
+                    });
+                } else if constexpr(std::is_void_v<HandlerReturnType>) {
                     handler(Future<T>(x));
                     nextPromise->setValue();
                 } else {
                     nextPromise->setValue(handler(Future<T>(x)));
                 }
             } catch (const std::exception& e) {
-                nextPromise->setException(std::current_exception());
+                if (nextPromise) {
+                    nextPromise->setException(std::current_exception());
+                }
             }
         };
         detail::SharedStatePtr<T> sharedStateForReadyFuture;

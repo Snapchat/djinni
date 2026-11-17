@@ -54,7 +54,12 @@ public:
     }
 
     template <typename Func>
-    using ResultT = std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<Func, const SharedFuture<T>&>>>;
+    using HandlerResultT = std::remove_cv_t<std::remove_reference_t<std::invoke_result_t<Func, const SharedFuture<T>&>>>;
+
+    // Result type of `then(transform)`. Like `Future::then`, a transform that returns `Future<U>` is unwrapped
+    // to `U`.
+    template <typename Func>
+    using ResultT = typename detail::UnwrapFuture<HandlerResultT<Func>>::type;
 
     // Transform the result of this future into a new future. The behavior is same as Future::then except that
     // it doesn't consume the future, and can be called multiple times.
@@ -62,7 +67,16 @@ public:
     Future<ResultT<Func>> then(Func transform) const {
         auto cpy = SharedFuture(*this); // retain copy during coroutine suspension
         co_await cpy.waitIgnoringExceptions();
-        co_return transform(cpy);
+        if constexpr (detail::UnwrapFuture<HandlerResultT<Func>>::isFuture) {
+            if constexpr (std::is_void_v<ResultT<Func>>) {
+                co_await transform(cpy);
+                co_return;
+            } else {
+                co_return co_await transform(cpy);
+            }
+        } else {
+            co_return transform(cpy);
+        }
     }
 
     // Same as above but returns SharedFuture.
