@@ -5,7 +5,6 @@ load("@emsdk//emscripten_toolchain:wasm_rules.bzl", "wasm_cc_binary")
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "objc_library")
 load("@rules_java//java:defs.bzl", "java_test")
 load("//bzl:djinni_codegen.bzl", "djinni_codegen")
-load(":djinni_outputs.bzl", "TESTSUITE_MAIN_DJINNI_OUTS")
 
 exports_files(["djinni/all.djinni"], visibility = ["//visibility:public"])
 
@@ -40,7 +39,7 @@ djinni_codegen(
         "//support-lib:outcome.yaml",
         "//support-lib:provider.yaml",
     ],
-    outs = TESTSUITE_MAIN_DJINNI_OUTS,
+    tree_languages = ["cpp", "java", "jni", "objc", "wasm", "ts"],
     cpp_extended_record_include_prefix = "../../handwritten-src/cpp/",
     cpp_namespace = "testsuite",
     cpp_optional_header = "\"../../handwritten-src/cpp/optional.hpp\"",

@@ -36,7 +36,9 @@ object Main {
     "--jni-out", "--jni-header-out", "--objc-out", "--objcpp-out", "--wasm-out",
     "--ts-out", "--swift-out", "--swiftxx-out", "--valdi-out", "--valdi-ts-out",
     "--c-out", "--c-header-out", "--yaml-out", "--list-in-files", "--list-out-files",
-    "--list-declarations", "--verify-declarations", "--skip-generation"
+    "--list-out-files-with-owner", "--list-declarations", "--verify-declarations",
+    "--verify-type-lists", "--expected-enum", "--expected-record", "--expected-interface",
+    "--skip-generation"
   )
 
   private def configMap(value: Any, context: String): Seq[(String, Any)] = value match {
@@ -390,8 +392,13 @@ object Main {
     var swiftxxBaseLibIncludePrefix: String = ""
     var inFileListPath: Option[File] = None
     var outFileListPath: Option[File] = None
+    var ownedOutFileListPath: Option[File] = None
     var declarationManifestPath: Option[File] = None
     var verifyDeclarationManifestPath: Option[File] = None
+    var verifyTypeLists: Boolean = false
+    var expectedEnums: Seq[String] = Seq.empty
+    var expectedRecords: Seq[String] = Seq.empty
+    var expectedInterfaces: Seq[String] = Seq.empty
     var skipGeneration: Boolean = false
     var yamlOutFolder: Option[File] = None
     var yamlOutFile: Option[String] = None
@@ -619,10 +626,20 @@ object Main {
         .text("Optional file in which to write the list of input files parsed.")
       opt[File]("list-out-files").valueName("<list-out-files>").foreach(x => outFileListPath = Some(x))
         .text("Optional file in which to write the list of output files produced.")
+      opt[File]("list-out-files-with-owner").valueName("<list-out-files-with-owner>").foreach(x => ownedOutFileListPath = Some(x))
+        .text("Optional TSV file listing each output's backend and owning declaration.")
       opt[File]("list-declarations").valueName("<list-declarations>").foreach(x => declarationManifestPath = Some(x))
         .text("Write internal type names, kinds, and generation-relevant properties as TSV.")
       opt[File]("verify-declarations").valueName("<verify-declarations>").foreach(x => verifyDeclarationManifestPath = Some(x))
         .text("Verify the resolved declarations against a manifest.")
+      opt[Boolean]("verify-type-lists").valueName("<true/false>").foreach(x => verifyTypeLists = x)
+        .text("Verify the declared enum, record, and interface lists against the resolved IDL.")
+      opt[String]("expected-enum").valueName("<name>").optional().unbounded().foreach(x => expectedEnums = expectedEnums :+ x)
+        .text("Expected enum or flags declaration; repeat for each type.")
+      opt[String]("expected-record").valueName("<name>").optional().unbounded().foreach(x => expectedRecords = expectedRecords :+ x)
+        .text("Expected record declaration; repeat for each type.")
+      opt[String]("expected-interface").valueName("<name>").optional().unbounded().foreach(x => expectedInterfaces = expectedInterfaces :+ x)
+        .text("Expected interface declaration; repeat for each type.")
       opt[Boolean]("skip-generation").valueName("<true/false>").foreach(x => skipGeneration = x)
         .text("Way of specifying if file generation should be skipped (default: false)")
 
@@ -712,7 +729,7 @@ object Main {
       }
     }
 
-    if (declarationManifestPath.isDefined || verifyDeclarationManifestPath.isDefined) {
+    if (declarationManifestPath.isDefined || verifyDeclarationManifestPath.isDefined || verifyTypeLists) {
       val declarations = idl.collect { case td: ast.InternTypeDecl => td }.map { td =>
         val (kind, hasConstants, hasDerivings, extensions) = td.body match {
           case e: ast.Enum => (if (e.flags) "flags" else "enum", false, false, "")
@@ -722,6 +739,22 @@ object Main {
         }
         Seq(td.ident.name, kind, td.params.length.toString, hasConstants.toString, hasDerivings.toString, extensions).mkString("\t")
       }.mkString("", "\n", "\n")
+      if (verifyTypeLists) {
+        val internal = idl.collect { case td: ast.InternTypeDecl => td }
+        val actualEnums = internal.collect { case td if td.body.isInstanceOf[ast.Enum] => td.ident.name }.sorted
+        val actualRecords = internal.collect { case td if td.body.isInstanceOf[ast.Record] => td.ident.name }.sorted
+        val actualInterfaces = internal.collect { case td if td.body.isInstanceOf[ast.Interface] => td.ident.name }.sorted
+        val expectedEnumNames = expectedEnums.sorted
+        val expectedRecordNames = expectedRecords.sorted
+        val expectedInterfaceNames = expectedInterfaces.sorted
+        if (expectedEnumNames != actualEnums || expectedRecordNames != actualRecords || expectedInterfaceNames != actualInterfaces) {
+          System.err.println("Declared type lists do not match resolved IDL declarations.")
+          System.err.println("  enums: expected [" + expectedEnumNames.mkString(", ") + "], found [" + actualEnums.mkString(", ") + "]")
+          System.err.println("  records: expected [" + expectedRecordNames.mkString(", ") + "], found [" + actualRecords.mkString(", ") + "]")
+          System.err.println("  interfaces: expected [" + expectedInterfaceNames.mkString(", ") + "], found [" + actualInterfaces.mkString(", ") + "]")
+          System.exit(1)
+        }
+      }
       verifyDeclarationManifestPath.foreach { path =>
         val existing = scala.io.Source.fromFile(path, "UTF-8")
         try {
@@ -743,6 +776,13 @@ object Main {
       if (outFileListPath.get.getParentFile != null)
         createFolder("output file list", outFileListPath.get.getParentFile)
       Some(new BufferedWriter(new FileWriter(outFileListPath.get)))
+    } else {
+      None
+    }
+    val ownedOutFileListWriter = if (ownedOutFileListPath.isDefined) {
+      if (ownedOutFileListPath.get.getParentFile != null)
+        createFolder("owned output file list", ownedOutFileListPath.get.getParentFile)
+      Some(new BufferedWriter(new FileWriter(ownedOutFileListPath.get)))
     } else {
       None
     }
@@ -861,6 +901,7 @@ object Main {
       swiftxxIncludeCppPrefix,
       swiftxxBaseLibIncludePrefix,
       outFileListWriter,
+      ownedOutFileListWriter,
       skipGeneration,
       yamlOutFolder,
       yamlOutFile,
@@ -884,6 +925,9 @@ object Main {
     finally {
       if (outFileListWriter.isDefined) {
         outFileListWriter.get.close()
+      }
+      if (ownedOutFileListWriter.isDefined) {
+        ownedOutFileListWriter.get.close()
       }
       if (objcSwiftBridgingHeaderWriter.isDefined) {
         objcSwiftBridgingHeaderWriter.get.close()

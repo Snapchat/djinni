@@ -9,6 +9,9 @@ DjinniInfo = provider(
         "idl": "Root .djinni file.",
         "transitive_srcs": "Root IDL and imported IDL/config sources from the transitive dependency closure.",
         "idl_include_paths": "Depset of execution-root include paths.",
+        "enums": "Enum and flags names in this schema's resolved import closure.",
+        "records": "Record names in this schema's resolved import closure.",
+        "interfaces": "Interface names in this schema's resolved import closure.",
         "declarations_manifest": "Resolved internal declarations produced by Djinni.",
         "output_manifest": "Per-language generated file inventory produced from the IDL and its configuration.",
         "project_name": "Consumer project name for language-specific defaults.",
@@ -24,25 +27,6 @@ DjinniInfo = provider(
         "input_manifest": "Manifest of IDL files read by this declaration and its imports.",
     },
 )
-
-def _collect(values):
-    result = []
-    for value in values:
-        result += value
-    return result
-
-def _single_output_dir(files, name):
-    if not files:
-        return None
-    directory = files[0].dirname
-    for file in files:
-        if file.dirname != directory:
-            fail("%s outputs must all be in one directory; got %s and %s" % (
-                name,
-                directory,
-                file.dirname,
-            ))
-    return directory
 
 def _add_string_arg(args, flag, value):
     if value:
@@ -63,7 +47,7 @@ def _djinni_codegen_impl(ctx):
         if ctx.attr.project_name and djinni.project_name and ctx.attr.project_name != djinni.project_name:
             fail("project_name %s does not match djinni_library project_name %s" % (ctx.attr.project_name, djinni.project_name))
         idl = djinni.idl
-        manifests = [djinni.declarations_manifest, djinni.output_manifest]
+        manifests = [djinni.declarations_manifest]
         if djinni.input_manifest:
             manifests.append(djinni.input_manifest)
         input_depsets = [djinni.transitive_srcs, djinni.yaml_files, depset(manifests)]
@@ -77,42 +61,21 @@ def _djinni_codegen_impl(ctx):
     if ctx.attr.djinni and ctx.file.idl:
         fail("Specify only one of djinni or idl")
 
-    cpp_files = ctx.outputs.cpp_srcs + ctx.outputs.cpp_hdrs
-    c_files = ctx.outputs.c_srcs + ctx.outputs.c_hdrs
-    jni_files = ctx.outputs.jni_srcs + ctx.outputs.jni_hdrs
-    objc_files = ctx.outputs.objc_srcs + ctx.outputs.objc_hdrs
-    objcpp_files = ctx.outputs.objcpp_srcs + ctx.outputs.objcpp_hdrs
-    wasm_files = ctx.outputs.wasm_srcs + ctx.outputs.wasm_hdrs
-    swiftxx_files = ctx.outputs.swiftxx_srcs + ctx.outputs.swiftxx_hdrs
-    all_outputs = _collect([
-        cpp_files,
-        c_files,
-        ctx.outputs.java_srcs,
-        jni_files,
-        objc_files,
-        objcpp_files,
-        wasm_files,
-        ctx.outputs.ts_srcs,
-        ctx.outputs.swift_srcs,
-        swiftxx_files,
-    ])
-
+    all_outputs = []
     tree_outputs = {}
     for language in ctx.attr.tree_languages:
         if language not in ["cpp", "c", "java", "jni", "objc", "wasm", "ts", "swift", "swiftxx"]:
             fail("Unsupported tree output language: %s" % language)
+        if language in tree_outputs:
+            fail("Duplicate tree output language: %s" % language)
         tree_outputs[language] = ctx.actions.declare_directory(ctx.label.name + "." + language)
         all_outputs.append(tree_outputs[language])
-    for language in tree_outputs:
-        if language == "cpp" and cpp_files or language == "c" and c_files or language == "java" and ctx.outputs.java_srcs or language == "jni" and jni_files or language == "objc" and (objc_files or objcpp_files) or language == "wasm" and wasm_files or language == "ts" and ctx.outputs.ts_srcs or language == "swift" and ctx.outputs.swift_srcs or language == "swiftxx" and swiftxx_files:
-            fail("Do not combine tree output and explicit outputs for %s" % language)
-
-    if tree_outputs:
-        manifest = ctx.actions.declare_file(ctx.label.name + ".outputs")
-        all_outputs.append(manifest)
-
-    if not all_outputs:
-        fail("djinni_codegen requires at least one declared output")
+    if not tree_outputs:
+        fail("djinni_codegen requires at least one tree language")
+    owned_manifest = ctx.actions.declare_file(ctx.label.name + ".outputs_by_declaration.tsv")
+    all_outputs.append(owned_manifest)
+    manifest = ctx.actions.declare_file(ctx.label.name + ".outputs")
+    all_outputs.append(manifest)
 
     args = ctx.actions.args()
     defaults_file = djinni.defaults_file if ctx.attr.djinni else ctx.file.defaults_file
@@ -120,29 +83,29 @@ def _djinni_codegen_impl(ctx):
     config_files = ([defaults_file] if defaults_file else []) + ([config_file] if config_file else [])
 
     java_package_path = ctx.attr.java_package.replace(".", "/")
-    java_dir = (tree_outputs["java"].path + "/" + java_package_path if java_package_path else tree_outputs["java"].path) if "java" in tree_outputs else _single_output_dir(ctx.outputs.java_srcs, "java")
+    java_dir = (tree_outputs["java"].path + "/" + java_package_path if java_package_path else tree_outputs["java"].path) if "java" in tree_outputs else None
     cpp_prefix = ctx.attr.cpp_include_prefix or (ctx.attr.djinni[DjinniInfo].cpp_include_prefix if ctx.attr.djinni else "")
     cpp_tree_dir = tree_outputs["cpp"].path + "/" + cpp_prefix.rstrip("/") if "cpp" in tree_outputs and cpp_prefix else (tree_outputs["cpp"].path if "cpp" in tree_outputs else None)
-    cpp_src_dir = cpp_tree_dir if cpp_tree_dir else _single_output_dir(ctx.outputs.cpp_srcs, "cpp source")
-    cpp_hdr_dir = cpp_tree_dir if cpp_tree_dir else _single_output_dir(ctx.outputs.cpp_hdrs, "cpp header")
+    cpp_src_dir = cpp_tree_dir
+    cpp_hdr_dir = cpp_tree_dir
     c_prefix = ctx.attr.c_include_prefix.rstrip("/")
     c_tree_dir = tree_outputs["c"].path + "/" + c_prefix if "c" in tree_outputs and c_prefix else (tree_outputs["c"].path if "c" in tree_outputs else None)
-    c_src_dir = tree_outputs["c"].path if "c" in tree_outputs else _single_output_dir(ctx.outputs.c_srcs, "C wrapper source")
-    c_hdr_dir = c_tree_dir if c_tree_dir else _single_output_dir(ctx.outputs.c_hdrs, "C header")
+    c_src_dir = tree_outputs["c"].path if "c" in tree_outputs else None
+    c_hdr_dir = c_tree_dir
     jni_prefix = ctx.attr.jni_include_prefix.rstrip("/")
     jni_tree_dir = tree_outputs["jni"].path + "/" + jni_prefix if "jni" in tree_outputs and jni_prefix else (tree_outputs["jni"].path if "jni" in tree_outputs else None)
-    jni_src_dir = jni_tree_dir if jni_tree_dir else _single_output_dir(ctx.outputs.jni_srcs, "jni source")
-    jni_hdr_dir = jni_tree_dir if jni_tree_dir else _single_output_dir(ctx.outputs.jni_hdrs, "jni header")
+    jni_src_dir = jni_tree_dir
+    jni_hdr_dir = jni_tree_dir
     objc_prefix = ctx.attr.objc_include_prefix.rstrip("/")
     objc_tree_dir = tree_outputs["objc"].path + "/" + objc_prefix if "objc" in tree_outputs and objc_prefix else (tree_outputs["objc"].path if "objc" in tree_outputs else None)
-    objc_dir = objc_tree_dir if objc_tree_dir else _single_output_dir(objc_files, "objc")
-    objcpp_dir = objc_tree_dir if objc_tree_dir else _single_output_dir(objcpp_files, "objcpp")
+    objc_dir = objc_tree_dir
+    objcpp_dir = objc_tree_dir
     wasm_prefix = ctx.attr.wasm_include_prefix.rstrip("/")
     wasm_tree_dir = tree_outputs["wasm"].path + "/" + wasm_prefix if "wasm" in tree_outputs and wasm_prefix else (tree_outputs["wasm"].path if "wasm" in tree_outputs else None)
-    wasm_dir = wasm_tree_dir if wasm_tree_dir else _single_output_dir(wasm_files, "wasm")
-    ts_dir = tree_outputs["ts"].path if "ts" in tree_outputs else _single_output_dir(ctx.outputs.ts_srcs, "ts")
-    swift_dir = tree_outputs["swift"].path if "swift" in tree_outputs else _single_output_dir(ctx.outputs.swift_srcs, "swift")
-    swiftxx_dir = tree_outputs["swiftxx"].path if "swiftxx" in tree_outputs else _single_output_dir(swiftxx_files, "swiftxx")
+    wasm_dir = wasm_tree_dir
+    ts_dir = tree_outputs["ts"].path if "ts" in tree_outputs else None
+    swift_dir = tree_outputs["swift"].path if "swift" in tree_outputs else None
+    swiftxx_dir = tree_outputs["swiftxx"].path if "swiftxx" in tree_outputs else None
 
     if java_dir:
         args.add("--java-out")
@@ -293,12 +256,13 @@ def _djinni_codegen_impl(ctx):
 
     args.add("--idl")
     args.add(idl.path)
+    args.add("--list-out-files", manifest.path)
+    if owned_manifest:
+        args.add("--list-out-files-with-owner")
+        args.add(owned_manifest.path)
     if ctx.attr.djinni:
         args.add("--verify-declarations")
         args.add(djinni.declarations_manifest.path)
-    if tree_outputs and not ctx.attr.djinni:
-        args.add("--list-out-files")
-        args.add(manifest.path)
     for include_path in idl_include_paths:
         args.add("--idl-include-path")
         args.add(include_path)
@@ -308,47 +272,21 @@ def _djinni_codegen_impl(ctx):
         transitive = input_depsets,
     )
 
-    codegen_outputs = all_outputs[:-1] if tree_outputs and ctx.attr.djinni else all_outputs
     ctx.actions.run(
         executable = ctx.attr.compiler[DefaultInfo].files_to_run,
         arguments = [args],
         inputs = inputs,
-        outputs = codegen_outputs,
+        outputs = all_outputs,
         mnemonic = "DjinniCodegen",
         progress_message = "Generating Djinni sources for %s" % ctx.label,
     )
-
-    if tree_outputs and ctx.attr.djinni:
-        language_output_roots = {
-            "cpp": [("__djinni_outputs/cpp_src/", cpp_src_dir), ("__djinni_outputs/cpp_hdr/", cpp_hdr_dir)],
-            "java": [("__djinni_outputs/java/", java_dir)],
-            "c": [("__djinni_outputs/c_src/", c_src_dir), ("__djinni_outputs/c_hdr/", c_hdr_dir)],
-            "jni": [("__djinni_outputs/jni_src/", jni_src_dir), ("__djinni_outputs/jni_hdr/", jni_hdr_dir)],
-            "objc": [("__djinni_outputs/objc/", objc_dir), ("__djinni_outputs/objcpp/", objcpp_dir)],
-            "wasm": [("__djinni_outputs/wasm/", wasm_dir)],
-            "ts": [("__djinni_outputs/ts/", tree_outputs["ts"].path if "ts" in tree_outputs else None)],
-            "swift": [("__djinni_outputs/swift/", swift_dir)],
-            "swiftxx": [("__djinni_outputs/swiftxx/", swiftxx_dir)],
-        }
-        mapping_args = []
-        for language in tree_outputs:
-            for inventory_root, tree_root in language_output_roots[language]:
-                if tree_root:
-                    mapping_args += [inventory_root, tree_root]
-        ctx.actions.run_shell(
-            inputs = [djinni.output_manifest],
-            outputs = [manifest],
-            arguments = [djinni.output_manifest.path, manifest.path] + mapping_args,
-            command = "input=\"$1\"; output=\"$2\"; shift 2; : > \"$output\"; while [ \"$#\" -ge 2 ]; do root=\"$1\"; tree=\"$2\"; shift 2; while IFS= read -r file; do case \"$file\" in \"$root\"*) relative=${file#\"$root\"}; printf '%s/%s\\n' \"$tree\" \"$relative\" >> \"$output\";; esac; done < \"$input\"; done",
-            mnemonic = "DjinniOutputManifest",
-            progress_message = "Preparing Djinni output manifest for %s" % ctx.label,
-        )
 
     return [
         DefaultInfo(files = depset(all_outputs)),
         OutputGroupInfo(
             all = depset(all_outputs),
             manifest = depset([manifest] if tree_outputs else []),
+            outputs_by_declaration = depset([owned_manifest] if owned_manifest else []),
             cpp_tree = depset([tree_outputs["cpp"]] if "cpp" in tree_outputs else []),
             java_tree = depset([tree_outputs["java"]] if "java" in tree_outputs else []),
             c_tree = depset([tree_outputs["c"]] if "c" in tree_outputs else []),
@@ -358,23 +296,6 @@ def _djinni_codegen_impl(ctx):
             ts_tree = depset([tree_outputs["ts"]] if "ts" in tree_outputs else []),
             swift_tree = depset([tree_outputs["swift"]] if "swift" in tree_outputs else []),
             swiftxx_tree = depset([tree_outputs["swiftxx"]] if "swiftxx" in tree_outputs else []),
-            cpp_srcs = depset(ctx.outputs.cpp_srcs),
-            cpp_hdrs = depset(ctx.outputs.cpp_hdrs),
-            c_srcs = depset(ctx.outputs.c_srcs),
-            c_hdrs = depset(ctx.outputs.c_hdrs),
-            java_srcs = depset(ctx.outputs.java_srcs),
-            jni_srcs = depset(ctx.outputs.jni_srcs),
-            jni_hdrs = depset(ctx.outputs.jni_hdrs),
-            objc_srcs = depset(ctx.outputs.objc_srcs),
-            objc_hdrs = depset(ctx.outputs.objc_hdrs),
-            objcpp_srcs = depset(ctx.outputs.objcpp_srcs),
-            objcpp_hdrs = depset(ctx.outputs.objcpp_hdrs),
-            wasm_srcs = depset(ctx.outputs.wasm_srcs),
-            wasm_hdrs = depset(ctx.outputs.wasm_hdrs),
-            ts_srcs = depset(ctx.outputs.ts_srcs),
-            swift_srcs = depset(ctx.outputs.swift_srcs),
-            swiftxx_srcs = depset(ctx.outputs.swiftxx_srcs),
-            swiftxx_hdrs = depset(ctx.outputs.swiftxx_hdrs),
         ),
     ]
 
@@ -390,23 +311,6 @@ _djinni_codegen = rule(
         "idl_include_paths": attr.string_list(),
         "idl_include_files": attr.label_list(allow_files = True),
         "tree_languages": attr.string_list(),
-        "cpp_srcs": attr.output_list(),
-        "cpp_hdrs": attr.output_list(),
-        "c_srcs": attr.output_list(),
-        "c_hdrs": attr.output_list(),
-        "java_srcs": attr.output_list(),
-        "jni_srcs": attr.output_list(),
-        "jni_hdrs": attr.output_list(),
-        "objc_srcs": attr.output_list(),
-        "objc_hdrs": attr.output_list(),
-        "objcpp_srcs": attr.output_list(),
-        "objcpp_hdrs": attr.output_list(),
-        "wasm_srcs": attr.output_list(),
-        "wasm_hdrs": attr.output_list(),
-        "ts_srcs": attr.output_list(),
-        "swift_srcs": attr.output_list(),
-        "swiftxx_srcs": attr.output_list(),
-        "swiftxx_hdrs": attr.output_list(),
         "java_package": attr.string(),
         "java_class_access_modifier": attr.string(),
         "java_nullable_annotation": attr.string(),
@@ -506,7 +410,20 @@ def _include_paths(ctx):
         result.append(root + "/" + path if root and path else root or path or ".")
     return result + [file.dirname for file in ctx.files.idl_include_files]
 
+def _validate_type_lists(ctx):
+    owner_by_name = {}
+    for kind, names in [
+        ("enum", ctx.attr.enums),
+        ("record", ctx.attr.records),
+        ("interface", ctx.attr.interfaces),
+    ]:
+        for name in names:
+            if name in owner_by_name:
+                fail("Declaration %s appears more than once (as %s and %s)" % (name, owner_by_name[name], kind))
+            owner_by_name[name] = kind
+
 def _djinni_library_impl(ctx):
+    _validate_type_lists(ctx)
     transitive = [
         dep[DjinniInfo].transitive_srcs
         for dep in ctx.attr.deps
@@ -543,6 +460,11 @@ def _djinni_library_impl(ctx):
     args.add("--yaml-out", yaml_tree.path + "/" + ctx.attr.project_name)
     args.add("--idl", ctx.file.idl)
     args.add("--list-declarations", declarations_manifest)
+    if ctx.attr.enums or ctx.attr.records or ctx.attr.interfaces:
+        args.add("--verify-type-lists", "true")
+        args.add_all(ctx.attr.enums, before_each = "--expected-enum")
+        args.add_all(ctx.attr.records, before_each = "--expected-record")
+        args.add_all(ctx.attr.interfaces, before_each = "--expected-interface")
     if validated_inputs:
         args.add("--list-in-files", validated_inputs)
     args.add_all(include_paths.to_list(), before_each = "--idl-include-path")
@@ -596,6 +518,9 @@ def _djinni_library_impl(ctx):
             idl = ctx.file.idl,
             transitive_srcs = transitive_srcs,
             idl_include_paths = include_paths,
+            enums = ctx.attr.enums,
+            records = ctx.attr.records,
+            interfaces = ctx.attr.interfaces,
             declarations_manifest = declarations_manifest,
             output_manifest = output_manifest,
             project_name = ctx.attr.project_name,
@@ -621,6 +546,9 @@ djinni_library = rule(
         "defaults_file": attr.label(allow_single_file = [".yaml", ".yml"]),
         "config_file": attr.label(allow_single_file = [".yaml", ".yml"]),
         "deps": attr.label_list(providers = [DjinniInfo]),
+        "enums": attr.string_list(),
+        "records": attr.string_list(),
+        "interfaces": attr.string_list(),
         "idl_include_paths": attr.string_list(),
         "idl_include_files": attr.label_list(allow_files = True),
         "verify": attr.bool(default = True),
@@ -633,9 +561,6 @@ djinni_library = rule(
         "cpp_optional_header": attr.string(default = ""),
     },
 )
-
-def _outs(outs, key):
-    return outs.get(key, [])
 
 _BOOL_ATTRS = [
     "java_implement_android_os_parcelable",
@@ -666,93 +591,26 @@ def _normalize_kwargs(kwargs):
             normalized[name] = "true" if value else "false"
     return normalized
 
-def djinni_codegen(name, outs, **kwargs):
-    """Runs Djinni and exposes generated files through output groups.
+def djinni_codegen(name, **kwargs):
+    """Runs Djinni and exposes generated language trees through output groups.
 
     Args:
         name: Rule name.
-        outs: Dictionary keyed by output category. Supported keys are
-            cpp_srcs, cpp_hdrs, c_srcs, c_hdrs, java_srcs, jni_srcs, jni_hdrs, objc_srcs,
-            objc_hdrs, objcpp_srcs, objcpp_hdrs, wasm_srcs, wasm_hdrs,
-            ts_srcs, swift_srcs, swiftxx_srcs, and swiftxx_hdrs.
-        **kwargs: Djinni options and input labels.
+        **kwargs: Djinni options, input labels, and required tree_languages.
     """
-    unknown = [key for key in outs if key not in _OUTPUT_KEYS]
-    if unknown:
-        fail("Unknown Djinni output categories: %s" % unknown)
+    if not kwargs.get("tree_languages"):
+        fail("djinni_codegen requires tree_languages")
     normalized = _normalize_kwargs(kwargs)
-    _djinni_codegen(
-        name = name,
-        cpp_srcs = _outs(outs, "cpp_srcs"),
-        cpp_hdrs = _outs(outs, "cpp_hdrs"),
-        c_srcs = _outs(outs, "c_srcs"),
-        c_hdrs = _outs(outs, "c_hdrs"),
-        java_srcs = _outs(outs, "java_srcs"),
-        jni_srcs = _outs(outs, "jni_srcs"),
-        jni_hdrs = _outs(outs, "jni_hdrs"),
-        objc_srcs = _outs(outs, "objc_srcs"),
-        objc_hdrs = _outs(outs, "objc_hdrs"),
-        objcpp_srcs = _outs(outs, "objcpp_srcs"),
-        objcpp_hdrs = _outs(outs, "objcpp_hdrs"),
-        wasm_srcs = _outs(outs, "wasm_srcs"),
-        wasm_hdrs = _outs(outs, "wasm_hdrs"),
-        ts_srcs = _outs(outs, "ts_srcs"),
-        swift_srcs = _outs(outs, "swift_srcs"),
-        swiftxx_srcs = _outs(outs, "swiftxx_srcs"),
-        swiftxx_hdrs = _outs(outs, "swiftxx_hdrs"),
-        **normalized
-    )
+    _djinni_codegen(name = name, **normalized)
 
 def _exactly_one_dep(name, deps):
     if len(deps) != 1:
         fail("%s expects exactly one djinni_library dep" % name)
 
-_OUTPUT_KEYS = [
-    "cpp_srcs",
-    "cpp_hdrs",
-    "c_srcs",
-    "c_hdrs",
-    "java_srcs",
-    "jni_srcs",
-    "jni_hdrs",
-    "objc_srcs",
-    "objc_hdrs",
-    "objcpp_srcs",
-    "objcpp_hdrs",
-    "wasm_srcs",
-    "wasm_hdrs",
-    "ts_srcs",
-    "swift_srcs",
-    "swiftxx_srcs",
-    "swiftxx_hdrs",
-]
-
 _COMMON_ATTRS = ["testonly", "tags", "compatible_with", "restricted_to", "target_compatible_with", "features", "deprecation"]
 
 def _cpp_string_option(language_value, idl_value):
     return language_value if language_value else idl_value
-
-def _language_codegen(name, deps, outs, language, kwargs):
-    _exactly_one_dep(name, deps)
-    unknown = [key for key in outs if key not in _OUTPUT_KEYS]
-    if unknown:
-        fail("Unknown Djinni output categories: %s" % unknown)
-    common = {}
-    options = dict(kwargs)
-    for attr_name in _COMMON_ATTRS:
-        if attr_name in options:
-            common[attr_name] = options.pop(attr_name)
-    languages = [language, "objcpp"] if language == "objc" else [language]
-    selected = {key: value for key, value in outs.items() if key.split("_")[0] in languages}
-    visibility = options.pop("visibility", ["//visibility:private"])
-    djinni_codegen(
-        name = name,
-        djinni = deps[0],
-        outs = selected,
-        visibility = visibility,
-        **dict(options, **common)
-    )
-    return common
 
 def _consumer_attrs(library_kwargs, common):
     attrs = dict(library_kwargs)
@@ -831,33 +689,207 @@ def _generated_manifest(codegen_name, testonly):
         testonly = testonly,
     )
 
-def _generated_unity(name, codegen_name, tree, extensions, testonly, output_extension = "cpp", inline_sources = False):
-    unity_name = name + "__unity"
-    if inline_sources:
-        cmd = """tree=$(location %s); find -L "$$tree" -type f | LC_ALL=C sort | while IFS= read -r file; do
-case "$$file" in %s)
-    relative=$$(printf '%%s\\n' "$$file" | sed "s#^$$tree/##")
-    printf '#line 1 \"%%s\"\\n' "$$relative"
-    cat "$$file"
-    printf '\\n'
-    ;;
-esac
-done > $@""" % (tree, "|".join(["*.%s" % ext for ext in extensions]))
+def _source_slots(language, djinni):
+    slots = []
+    if language == "cpp":
+        names = djinni.records + djinni.interfaces
+        slots += [struct(backend = "cpp", name = name, extension = ".cpp") for name in names]
+    elif language == "c" or language == "wasm":
+        names = djinni.enums + djinni.records + djinni.interfaces
+        slots += [struct(backend = language, name = name, extension = ".cpp") for name in names]
+    elif language == "jni":
+        names = djinni.records + djinni.interfaces
+        slots += [struct(backend = "jni", name = name, extension = ".cpp") for name in names]
+        slots.append(struct(backend = "jni", name = "__module__", extension = ".cpp"))
+    elif language == "objc":
+        names = djinni.records + djinni.interfaces
+        for backend in ["objc", "objcpp"]:
+            slots += [struct(backend = backend, name = name, extension = ".mm") for name in names]
     else:
-        cmd = "tree=$(location %s); find -L \"$$tree\" -type f | sed 's#^'\"$$tree\"'/##' | LC_ALL=C sort | while read f; do case \"$$f\" in %s) printf '#include \"%%s\"\\n' \"$$f\";; esac; done > $@" % (tree, "|".join(["*.%s" % ext for ext in extensions]))
-    native.genrule(
-        name = unity_name,
-        srcs = [tree],
-        outs = [name + "__djinni_unity." + output_extension],
-        cmd = cmd,
+        fail("Declaration source extraction is unsupported for %s" % language)
+    return slots
+
+def _typed_source_files_impl(ctx):
+    djinni = ctx.attr.djinni[DjinniInfo]
+    if not (djinni.enums or djinni.records or djinni.interfaces):
+        output_extension = "mm" if ctx.attr.language == "objc" else "cpp"
+        output = ctx.actions.declare_file(ctx.label.name + "__unity." + output_extension)
+        command = """set -euo pipefail
+tree="$1"
+manifest="$2"
+output="$3"
+language="$4"
+while IFS="$(printf '\\t')" read -r row_backend row_role row_kind row_name file; do
+    backend_matches=false
+    if [ "$language" = "objc" ]; then
+        if [ "$row_backend" = "objc" ] || [ "$row_backend" = "objcpp" ]; then
+            backend_matches=true
+        fi
+    elif [ "$row_backend" = "$language" ]; then
+        backend_matches=true
+    fi
+    if [ "$row_role" = "source" ] && [ "$backend_matches" = "true" ]; then
+        case "$file" in
+            "$tree"/*) printf '%s\\n' "$file" ;;
+        esac
+    fi
+done < "$manifest" | LC_ALL=C sort | while IFS= read -r file; do
+    relative="${file#"$tree"/}"
+    printf '#line 1 \"%s\"\\n' "$relative"
+    cat "$file"
+    printf '\\n'
+done > "$output"
+"""
+        ctx.actions.run_shell(
+            inputs = [ctx.file.source_tree, ctx.file.owned_manifest],
+            outputs = [output],
+            arguments = [ctx.file.source_tree.path, ctx.file.owned_manifest.path, output.path, ctx.attr.language],
+            command = command,
+            mnemonic = "DjinniUnityFallback",
+        )
+        return [DefaultInfo(files = depset([output]))]
+
+    outputs = []
+    for slot in _source_slots(ctx.attr.language, djinni):
+        output = ctx.actions.declare_file(
+            ctx.label.name + "__typed_sources/" + slot.name + "__" + slot.backend + slot.extension,
+        )
+        ctx.actions.run_shell(
+            inputs = [ctx.file.source_tree, ctx.file.owned_manifest],
+            outputs = [output],
+            arguments = [
+                ctx.file.source_tree.path,
+                ctx.file.owned_manifest.path,
+                output.path,
+                slot.backend,
+                slot.name,
+            ],
+            command = """set -euo pipefail
+tree="$1"
+manifest="$2"
+output="$3"
+backend="$4"
+declaration="$5"
+found=""
+while IFS="$(printf '\\t')" read -r row_backend row_role row_kind row_name file; do
+    if [ "$row_backend" = "$backend" ] && [ "$row_role" = "source" ] && [ "$row_name" = "$declaration" ]; then
+        if [ -n "$found" ]; then
+            echo "More than one $backend source file found for $declaration" >&2
+            exit 1
+        fi
+        found="$file"
+    fi
+done < "$manifest"
+if [ -n "$found" ]; then
+    case "$found" in
+        "$tree"/*) cp "$found" "$output" ;;
+        *) echo "Owned source path is outside its generated tree: $found" >&2; exit 1 ;;
+    esac
+else
+    : > "$output"
+fi
+""",
+            mnemonic = "DjinniTypedSource",
+            progress_message = "Selecting %s source for %s" % (slot.backend, slot.name),
+        )
+        outputs.append(output)
+    return [DefaultInfo(files = depset(outputs))]
+
+_typed_source_files = rule(
+    implementation = _typed_source_files_impl,
+    attrs = {
+        "djinni": attr.label(mandatory = True, providers = [DjinniInfo]),
+        "language": attr.string(mandatory = True, values = ["cpp", "c", "jni", "objc", "wasm"]),
+        "owned_manifest": attr.label(allow_single_file = True, mandatory = True),
+        "source_tree": attr.label(allow_single_file = True, mandatory = True),
+    },
+)
+
+def _owned_headers_tree_impl(ctx):
+    output = ctx.actions.declare_directory(ctx.label.name + ".headers")
+    ctx.actions.run_shell(
+        inputs = [ctx.file.source_tree, ctx.file.owned_manifest],
+        outputs = [output],
+        arguments = [ctx.file.source_tree.path, ctx.file.owned_manifest.path, output.path],
+        command = """set -euo pipefail
+tree="$1"
+manifest="$2"
+output="$3"
+mkdir -p "$output"
+while IFS="$(printf '\\t')" read -r backend row_role row_kind row_name file; do
+    if [ "$row_role" = "header" ]; then
+        case "$file" in
+            "$tree"/*)
+                relative="${file#"$tree"/}"
+                mkdir -p "$output/$(dirname "$relative")"
+                cp "$file" "$output/$relative"
+                ;;
+        esac
+    fi
+done < "$manifest"
+""",
+        mnemonic = "DjinniGeneratedHeaders",
+    )
+    return [DefaultInfo(files = depset([output]))]
+
+_owned_headers_tree = rule(
+    implementation = _owned_headers_tree_impl,
+    attrs = {
+        "owned_manifest": attr.label(allow_single_file = True, mandatory = True),
+        "source_tree": attr.label(allow_single_file = True, mandatory = True),
+    },
+)
+
+def _generated_owned_manifest(name, codegen_name, testonly):
+    native.filegroup(
+        name = name,
+        srcs = [":" + codegen_name],
+        output_group = "outputs_by_declaration",
         testonly = testonly,
     )
-    return ":" + unity_name
+
+def _generated_sources(name, tree, owned_manifest, language, djinni, testonly):
+    sources_name = name + "__generated_sources"
+    _typed_source_files(
+        name = sources_name,
+        djinni = djinni,
+        language = language,
+        owned_manifest = owned_manifest,
+        source_tree = tree,
+        testonly = testonly,
+    )
+    return ":" + sources_name
+
+def _generated_owned_headers(name, tree, owned_manifest, testonly):
+    headers_name = name + "__generated_headers"
+    _owned_headers_tree(
+        name = headers_name,
+        owned_manifest = owned_manifest,
+        source_tree = tree,
+        testonly = testonly,
+    )
+    return ":" + headers_name, headers_name + ".headers"
+
+def _language_tree_codegen(name, deps, language, kwargs):
+    _exactly_one_dep(name, deps)
+    options = dict(kwargs)
+    common = {}
+    for attr_name in _COMMON_ATTRS:
+        if attr_name in options:
+            common[attr_name] = options.pop(attr_name)
+    visibility = options.pop("visibility", ["//visibility:private"])
+    options["tree_languages"] = [language]
+    djinni_codegen(
+        name = name,
+        djinni = deps[0],
+        visibility = visibility,
+        **dict(options, **common)
+    )
+    return common
 
 def cc_djinni_library(
         name,
         deps,
-        outs = None,
         srcs = [],
         hdrs = [],
         includes = [],
@@ -868,23 +900,20 @@ def cc_djinni_library(
         visibility = None,
         library_kwargs = {},
         **kwargs):
-    """Generates C++ from a djinni_library and wraps it in cc_library."""
+    """Generates C++ from declared types, or a unity fallback when types are absent."""
     codegen_name = name + "__djinni_cpp_codegen"
-    tree_mode = outs == None
-    if tree_mode:
-        kwargs["tree_languages"] = ["cpp"]
-        outs = {}
-    common = _language_codegen(codegen_name, deps, outs, "cpp", kwargs)
-    if tree_mode:
-        tree = _generated_tree(name, codegen_name, "cpp", kwargs.get("testonly", False))
-        _generated_manifest(codegen_name, kwargs.get("testonly", False))
-        unity = _generated_unity(name, codegen_name, tree, ["cpp"], kwargs.get("testonly", False))
+    testonly = kwargs.get("testonly", False)
+    common = _language_tree_codegen(codegen_name, deps, "cpp", kwargs)
+    tree = _generated_tree(name, codegen_name, "cpp", testonly)
+    owned_manifest = name + "__owned_manifest"
+    _generated_owned_manifest(owned_manifest, codegen_name, testonly)
+    generated_sources = _generated_sources(name, tree, ":" + owned_manifest, "cpp", deps[0], testonly)
+    generated_headers, generated_include_root = _generated_owned_headers(name, tree, ":" + owned_manifest, testonly)
     cc_library(
         name = name,
-        srcs = ([unity] if tree_mode else _outs(outs, "cpp_srcs")) + srcs,
-        hdrs = ([tree] if tree_mode else _outs(outs, "cpp_hdrs")) + hdrs,
-        additional_compiler_inputs = [tree] if tree_mode else [],
-        includes = ([codegen_name + ".cpp"] if tree_mode else []) + includes,
+        srcs = [generated_sources] + srcs,
+        hdrs = [generated_headers] + hdrs,
+        includes = [generated_include_root] + includes,
         copts = copts,
         linkopts = linkopts,
         deps = cc_deps,
@@ -896,7 +925,6 @@ def cc_djinni_library(
 def c_djinni_library(
         name,
         deps,
-        outs = None,
         srcs = [],
         hdrs = [],
         includes = [],
@@ -908,23 +936,20 @@ def c_djinni_library(
         visibility = None,
         library_kwargs = {},
         **kwargs):
-    """Generates Djinni's C-facing wrapper sources in a cc_library."""
+    """Generates C-facing wrapper sources from declared types, or a unity fallback."""
     codegen_name = name + "__djinni_c_codegen"
-    tree_mode = outs == None
-    if tree_mode:
-        kwargs["tree_languages"] = ["c"]
-        outs = {}
-    common = _language_codegen(codegen_name, deps, outs, "c", kwargs)
-    if tree_mode:
-        tree = _generated_tree(name, codegen_name, "c", kwargs.get("testonly", False))
-        _generated_manifest(codegen_name, kwargs.get("testonly", False))
-        unity = _generated_unity(name, codegen_name, tree, ["cpp"], kwargs.get("testonly", False))
+    testonly = kwargs.get("testonly", False)
+    common = _language_tree_codegen(codegen_name, deps, "c", kwargs)
+    tree = _generated_tree(name, codegen_name, "c", testonly)
+    owned_manifest = name + "__owned_manifest"
+    _generated_owned_manifest(owned_manifest, codegen_name, testonly)
+    generated_sources = _generated_sources(name, tree, ":" + owned_manifest, "c", deps[0], testonly)
+    generated_headers, generated_include_root = _generated_owned_headers(name, tree, ":" + owned_manifest, testonly)
     cc_library(
         name = name,
-        srcs = ([unity] if tree_mode else _outs(outs, "c_srcs")) + srcs,
-        hdrs = ([tree] if tree_mode else _outs(outs, "c_hdrs")) + hdrs,
-        additional_compiler_inputs = [tree] if tree_mode else [],
-        includes = ([codegen_name + ".c"] if tree_mode else []) + includes,
+        srcs = [generated_sources] + srcs,
+        hdrs = [generated_headers] + hdrs,
+        includes = [generated_include_root] + includes,
         copts = copts,
         linkopts = linkopts,
         deps = cc_deps,
@@ -937,7 +962,6 @@ def c_djinni_library(
 def java_djinni_library(
         name,
         deps,
-        outs = None,
         java_deps = [],
         visibility = None,
         srcs = [],
@@ -945,25 +969,21 @@ def java_djinni_library(
         **kwargs):
     """Generates Java from a djinni_library and wraps it in java_library."""
     codegen_name = name + "__djinni_java_codegen"
-    tree_mode = outs == None
-    if tree_mode:
-        kwargs["tree_languages"] = ["java"]
-        outs = {}
-    common = _language_codegen(codegen_name, deps, outs, "java", kwargs)
-    if tree_mode:
-        tree = _generated_tree(name, codegen_name, "java", kwargs.get("testonly", False))
-        _generated_manifest(codegen_name, kwargs.get("testonly", False))
-        native.genrule(
-            name = name + "__srcjar",
-            srcs = [tree, ":" + codegen_name + "__manifest"],
-            outs = [name + "__djinni.srcjar"],
-            tools = ["@bazel_tools//tools/zip:zipper"],
-            cmd = "tree=$(location %s); zipper=$$(pwd)/$(execpath @bazel_tools//tools/zip:zipper); out=$$(pwd)/$(location %s); files=$$(sed 's#^'\"$$tree\"'/##' $(location :%s__manifest) | LC_ALL=C sort); cd $$tree && $$zipper c $$out $$files" % (codegen_name + "__tree", name + "__djinni.srcjar", codegen_name),
-            testonly = kwargs.get("testonly", False),
-        )
+    testonly = kwargs.get("testonly", False)
+    common = _language_tree_codegen(codegen_name, deps, "java", kwargs)
+    tree = _generated_tree(name, codegen_name, "java", testonly)
+    _generated_manifest(codegen_name, testonly)
+    native.genrule(
+        name = name + "__srcjar",
+        srcs = [tree, ":" + codegen_name + "__manifest"],
+        outs = [name + "__djinni.srcjar"],
+        tools = ["@bazel_tools//tools/zip:zipper"],
+        cmd = "tree=$(location %s); zipper=$$(pwd)/$(execpath @bazel_tools//tools/zip:zipper); out=$$(pwd)/$(location %s); files=$$(sed 's#^'\"$$tree\"'/##' $(location :%s__manifest) | LC_ALL=C sort); cd $$tree && $$zipper c $$out $$files" % (codegen_name + "__tree", name + "__djinni.srcjar", codegen_name),
+        testonly = testonly,
+    )
     java_library(
         name = name,
-        srcs = ([":" + name + "__srcjar"] if tree_mode else _outs(outs, "java_srcs")) + srcs,
+        srcs = [":" + name + "__srcjar"] + srcs,
         deps = java_deps,
         visibility = visibility,
         **_consumer_attrs(library_kwargs, common)
@@ -972,7 +992,6 @@ def java_djinni_library(
 def jni_djinni_library(
         name,
         deps,
-        outs = None,
         includes = [],
         cc_deps = [],
         copts = [],
@@ -983,23 +1002,20 @@ def jni_djinni_library(
         hdrs = [],
         library_kwargs = {},
         **kwargs):
-    """Generates JNI C++ from a djinni_library and wraps it in cc_library."""
+    """Generates JNI C++ from declared types, or a unity fallback when types are absent."""
     codegen_name = name + "__djinni_jni_codegen"
-    tree_mode = outs == None
-    if tree_mode:
-        kwargs["tree_languages"] = ["jni"]
-        outs = {}
-    common = _language_codegen(codegen_name, deps, outs, "jni", kwargs)
-    if tree_mode:
-        tree = _generated_tree(name, codegen_name, "jni", kwargs.get("testonly", False))
-        _generated_manifest(codegen_name, kwargs.get("testonly", False))
-        unity = _generated_unity(name, codegen_name, tree, ["cpp"], kwargs.get("testonly", False))
+    testonly = kwargs.get("testonly", False)
+    common = _language_tree_codegen(codegen_name, deps, "jni", kwargs)
+    tree = _generated_tree(name, codegen_name, "jni", testonly)
+    owned_manifest = name + "__owned_manifest"
+    _generated_owned_manifest(owned_manifest, codegen_name, testonly)
+    generated_sources = _generated_sources(name, tree, ":" + owned_manifest, "jni", deps[0], testonly)
+    generated_headers, generated_include_root = _generated_owned_headers(name, tree, ":" + owned_manifest, testonly)
     cc_library(
         name = name,
-        srcs = ([unity] if tree_mode else _outs(outs, "jni_srcs")) + srcs,
-        hdrs = ([tree] if tree_mode else _outs(outs, "jni_hdrs")) + hdrs,
-        additional_compiler_inputs = [tree] if tree_mode else [],
-        includes = ([codegen_name + ".jni"] if tree_mode else []) + includes,
+        srcs = [generated_sources] + srcs,
+        hdrs = [generated_headers] + hdrs,
+        includes = [generated_include_root] + includes,
         copts = copts,
         linkopts = linkopts,
         deps = cc_deps,
@@ -1011,7 +1027,6 @@ def jni_djinni_library(
 def objc_djinni_library(
         name,
         deps,
-        outs = None,
         srcs = [],
         hdrs = [],
         includes = [],
@@ -1025,36 +1040,30 @@ def objc_djinni_library(
         library_kwargs = {},
         generated_header_mode = "all",
         **kwargs):
-    """Generates Objective-C and Objective-C++ sources in an objc_library."""
+    """Generates Objective-C sources per declared type, or unity fallback without type metadata."""
     codegen_name = name + "__djinni_objc_codegen"
-    tree_mode = outs == None
-    if tree_mode:
-        kwargs["tree_languages"] = ["objc"]
-        outs = {}
-    common = _language_codegen(codegen_name, deps, outs, "objc", kwargs)
-    generated_hdrs = []
-    generated_includes = []
-    if tree_mode:
-        tree = _generated_tree(name, codegen_name, "objc", kwargs.get("testonly", False))
-        _generated_manifest(codegen_name, kwargs.get("testonly", False))
-        unity = _generated_unity(name, codegen_name, tree, ["m", "mm"], kwargs.get("testonly", False), "mm", inline_sources = True)
-        generated_headers = name + "__objc_headers"
-        _objc_headers_tree(
-            name = generated_headers,
-            src = tree,
-            header_mode = generated_header_mode,
-            testonly = kwargs.get("testonly", False),
-        )
-        generated_hdrs = [":" + generated_headers]
-        generated_includes = [generated_headers + ".headers"]
-        objc_prefix = kwargs.get("objc_include_prefix", "").rstrip("/")
-        if objc_prefix:
-            generated_includes.append(generated_headers + ".headers/" + objc_prefix)
+    testonly = kwargs.get("testonly", False)
+    common = _language_tree_codegen(codegen_name, deps, "objc", kwargs)
+    tree = _generated_tree(name, codegen_name, "objc", testonly)
+    owned_manifest = name + "__owned_manifest"
+    _generated_owned_manifest(owned_manifest, codegen_name, testonly)
+    generated_sources = _generated_sources(name, tree, ":" + owned_manifest, "objc", deps[0], testonly)
+    generated_headers = name + "__objc_headers"
+    _objc_headers_tree(
+        name = generated_headers,
+        src = tree,
+        header_mode = generated_header_mode,
+        testonly = testonly,
+    )
+    generated_includes = [generated_headers + ".headers"]
+    objc_prefix = kwargs.get("objc_include_prefix", "").rstrip("/")
+    if objc_prefix:
+        generated_includes.append(generated_headers + ".headers/" + objc_prefix)
     objc_library(
         name = name,
-        srcs = ([unity] if tree_mode else _outs(outs, "objc_srcs") + _outs(outs, "objcpp_srcs")) + srcs,
-        hdrs = (generated_hdrs if tree_mode else _outs(outs, "objc_hdrs") + _outs(outs, "objcpp_hdrs")) + hdrs,
-        includes = (generated_includes if tree_mode else []) + includes,
+        srcs = [generated_sources] + srcs,
+        hdrs = [":" + generated_headers] + hdrs,
+        includes = generated_includes + includes,
         copts = copts,
         linkopts = linkopts,
         deps = objc_deps,
@@ -1068,7 +1077,6 @@ def objc_djinni_library(
 def wasm_djinni_cc_library(
         name,
         deps,
-        outs = None,
         srcs = [],
         hdrs = [],
         includes = [],
@@ -1080,23 +1088,21 @@ def wasm_djinni_cc_library(
         library_kwargs = {},
         additional_compiler_inputs = [],
         **kwargs):
-    """Generates WASM bridge sources in a cc_library for caller-owned linking."""
+    """Generates WASM bridge sources per declared type, or unity fallback without type metadata."""
     codegen_name = name + "__djinni_wasm_codegen"
-    tree_mode = outs == None
-    if tree_mode:
-        kwargs["tree_languages"] = ["wasm"]
-        outs = {}
-    common = _language_codegen(codegen_name, deps, outs, "wasm", kwargs)
-    if tree_mode:
-        tree = _generated_tree(name, codegen_name, "wasm", kwargs.get("testonly", False))
-        _generated_manifest(codegen_name, kwargs.get("testonly", False))
-        unity = _generated_unity(name, codegen_name, tree, ["cpp"], kwargs.get("testonly", False))
+    testonly = kwargs.get("testonly", False)
+    common = _language_tree_codegen(codegen_name, deps, "wasm", kwargs)
+    tree = _generated_tree(name, codegen_name, "wasm", testonly)
+    owned_manifest = name + "__owned_manifest"
+    _generated_owned_manifest(owned_manifest, codegen_name, testonly)
+    generated_sources = _generated_sources(name, tree, ":" + owned_manifest, "wasm", deps[0], testonly)
+    generated_headers, generated_include_root = _generated_owned_headers(name, tree, ":" + owned_manifest, testonly)
     cc_library(
         name = name,
-        srcs = ([unity] if tree_mode else _outs(outs, "wasm_srcs")) + srcs,
-        hdrs = ([tree] if tree_mode else _outs(outs, "wasm_hdrs")) + hdrs,
-        additional_compiler_inputs = ([tree] if tree_mode else []) + additional_compiler_inputs,
-        includes = ([codegen_name + ".wasm"] if tree_mode else []) + includes,
+        srcs = [generated_sources] + srcs,
+        hdrs = [generated_headers] + hdrs,
+        additional_compiler_inputs = additional_compiler_inputs,
+        includes = [generated_include_root] + includes,
         copts = copts,
         linkopts = linkopts,
         deps = cc_deps,
@@ -1105,28 +1111,23 @@ def wasm_djinni_cc_library(
         **_consumer_attrs(library_kwargs, common)
     )
 
-def ts_djinni_filegroup(name, deps, outs = None, srcs = [], visibility = None, **kwargs):
+def ts_djinni_filegroup(name, deps, srcs = [], visibility = None, **kwargs):
     """Generates TypeScript and exposes it as a filegroup."""
     codegen_name = name + "__djinni_ts_codegen"
-    tree_mode = outs == None
-    if tree_mode:
-        kwargs["tree_languages"] = ["ts"]
-        outs = {}
-    common = _language_codegen(codegen_name, deps, outs, "ts", kwargs)
-    if tree_mode:
-        tree = _generated_tree(name, codegen_name, "ts", kwargs.get("testonly", False))
-        _generated_manifest(codegen_name, kwargs.get("testonly", False))
-        native.genrule(
-            name = name + "__source",
-            srcs = [tree, ":" + codegen_name + "__manifest"],
-            outs = [name + ".ts"],
-            cmd = "tree=$(location %s); file=$$(sed 's#^'\"$$tree\"'/##' $(location :%s__manifest)); cp \"$$tree/$$file\" $@" % (codegen_name + "__tree", codegen_name),
-            testonly = kwargs.get("testonly", False),
-        )
+    testonly = kwargs.get("testonly", False)
+    common = _language_tree_codegen(codegen_name, deps, "ts", kwargs)
+    tree = _generated_tree(name, codegen_name, "ts", testonly)
+    _generated_manifest(codegen_name, testonly)
+    native.genrule(
+        name = name + "__source",
+        srcs = [tree, ":" + codegen_name + "__manifest"],
+        outs = [name + ".ts"],
+        cmd = "tree=$(location %s); file=$$(sed 's#^'\"$$tree\"'/##' $(location :%s__manifest)); cp \"$$tree/$$file\" $@" % (codegen_name + "__tree", codegen_name),
+        testonly = testonly,
+    )
     native.filegroup(
         name = name,
-        srcs = ([":" + name + "__source"] if tree_mode else [":" + codegen_name]) + srcs,
-        output_group = None if tree_mode else "ts_srcs",
+        srcs = [":" + name + "__source"] + srcs,
         visibility = visibility or ["//visibility:private"],
         **common
     )
@@ -1134,7 +1135,6 @@ def ts_djinni_filegroup(name, deps, outs = None, srcs = [], visibility = None, *
 def wasm_djinni_cc_binary(
         name,
         deps,
-        outs = None,
         cc_deps = [],
         copts = [],
         linkopts = [],
@@ -1144,31 +1144,29 @@ def wasm_djinni_cc_binary(
         **kwargs):
     """Generates WASM C++ bridge sources from a djinni_library and wraps them in cc_binary."""
     codegen_name = name + "__djinni_wasm_codegen"
-    tree_mode = outs == None
-    if tree_mode:
-        kwargs["tree_languages"] = ["wasm"]
-        outs = {}
-    common = _language_codegen(codegen_name, deps, outs, "wasm", kwargs)
-    if tree_mode:
-        tree = _generated_tree(name, codegen_name, "wasm", kwargs.get("testonly", False))
-        _generated_manifest(codegen_name, kwargs.get("testonly", False))
-        unity = _generated_unity(name, codegen_name, tree, ["cpp"], kwargs.get("testonly", False))
-        cc_library(
-            name = name + "__generated",
-            srcs = [unity],
-            hdrs = [tree],
-            additional_compiler_inputs = [tree],
-            deps = cc_deps,
-            copts = copts,
-            linkopts = linkopts,
-            testonly = kwargs.get("testonly", False),
-        )
-    cc_binary(
-        name = name,
-        srcs = ([] if tree_mode else _outs(outs, "wasm_srcs") + _outs(outs, "wasm_hdrs")) + srcs,
+    testonly = kwargs.get("testonly", False)
+    common = _language_tree_codegen(codegen_name, deps, "wasm", kwargs)
+    tree = _generated_tree(name, codegen_name, "wasm", testonly)
+    owned_manifest = name + "__owned_manifest"
+    _generated_owned_manifest(owned_manifest, codegen_name, testonly)
+    generated_sources = _generated_sources(name, tree, ":" + owned_manifest, "wasm", deps[0], testonly)
+    generated_headers, generated_include_root = _generated_owned_headers(name, tree, ":" + owned_manifest, testonly)
+    cc_library(
+        name = name + "__generated",
+        srcs = [generated_sources],
+        hdrs = [generated_headers],
+        includes = [generated_include_root],
+        deps = cc_deps,
         copts = copts,
         linkopts = linkopts,
-        deps = ([":" + name + "__generated"] if tree_mode else cc_deps),
+        testonly = testonly,
+    )
+    cc_binary(
+        name = name,
+        srcs = srcs,
+        copts = copts,
+        linkopts = linkopts,
+        deps = [":" + name + "__generated"],
         visibility = visibility,
         **_consumer_attrs(library_kwargs, common)
     )

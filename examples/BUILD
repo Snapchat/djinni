@@ -1,8 +1,10 @@
 load("//bzl:djinni_codegen.bzl", "cc_djinni_library", "djinni_library", "java_djinni_library", "jni_djinni_library", "wasm_djinni_cc_binary")
-load(":djinni_outputs.bzl", "EXAMPLE_DJINNI_OUTS")
 
 djinni_library(
     name = "example-djinni",
+    enums = ["sort_order"],
+    records = ["item_list"],
+    interfaces = ["sort_items", "textbox_listener"],
     idl = "example.djinni",
     visibility = ["//visibility:public"],
 )
@@ -36,7 +38,6 @@ cc_djinni_library(
     srcs = glob([
         "handwritten-src/cpp/*.cpp",
     ]),
-    outs = EXAMPLE_DJINNI_OUTS,
     hdrs = glob([
         "handwritten-src/cpp/*.hpp",
     ]),
@@ -46,7 +47,6 @@ cc_djinni_library(
     cpp_namespace = "textsort",
     ident_cpp_enum_type = "foo_bar",
     includes = [
-        "bazel-generated/example/cpp",
         "handwritten-src/cpp",
     ],
     visibility = ["//visibility:public"],
@@ -68,7 +68,6 @@ java_library(
 
 java_djinni_library(
     name = "textsort-java-generated",
-    outs = EXAMPLE_DJINNI_OUTS,
     ident_java_field = "mFooBar",
     java_class_access_modifier = "package",
     java_deps = [
@@ -101,7 +100,6 @@ cc_library(
 
 jni_djinni_library(
     name = "textsort-jni-generated",
-    outs = EXAMPLE_DJINNI_OUTS,
     cc_deps = [
         ":textsort-common-generated",
         "//support-lib:djinni-support-jni",
@@ -111,7 +109,6 @@ jni_djinni_library(
     ident_java_field = "mFooBar",
     ident_jni_class = "NativeFooBar",
     ident_jni_file = "NativeFooBar",
-    includes = ["bazel-generated/example/jni"],
     java_package = "com.dropbox.textsort",
     linkopts = [
         "-lm",
@@ -151,7 +148,6 @@ cc_binary(
 
 wasm_djinni_cc_binary(
     name = "textsort-wasm-generated",
-    outs = EXAMPLE_DJINNI_OUTS,
     cc_deps = [
         ":textsort-common-generated",
         "//support-lib:djinni-support-wasm",
@@ -219,4 +215,4 @@ filegroup(
     visibility = ["//visibility:public"],
 )
 
-exports_files(["djinni_outputs.bzl", "ts/run.sh"])
+exports_files(["ts/run.sh"])

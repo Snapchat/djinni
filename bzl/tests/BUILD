@@ -6,11 +6,14 @@ rule_tests(name = "rule_tests")
 exports_files([
     "idl/shared.djinni",
     "idl/nested.djinni",
+    "idl/typed.djinni",
 ])
 
 # An external consumer imports these through a repository-relative search path.
 djinni_library(
     name = "shared-schema",
+    enums = ["status"],
+    records = ["shared"],
     srcs = ["idl/nested.djinni"],
     cpp_base_lib_include_prefix = "djinni/cpp/",
     cpp_include_prefix = "shared/",
@@ -24,17 +27,35 @@ djinni_library(
     visibility = ["//visibility:public"],
 )
 
+djinni_library(
+    name = "typed-schema",
+    enums = ["status"],
+    records = ["shared"],
+    interfaces = ["first", "second"],
+    srcs = ["idl/nested.djinni"],
+    cpp_base_lib_include_prefix = "djinni/cpp/",
+    cpp_include_prefix = "shared/",
+    cpp_namespace = "shared::defaults",
+    cpp_optional_header = "<optional>",
+    cpp_optional_template = "std::optional",
+    idl = "idl/typed.djinni",
+    idl_include_files = ["idl/nested.djinni"],
+    idl_include_paths = ["bzl/tests/idl"],
+    project_name = "shared",
+)
+
 cc_djinni_library(
-    name = "tree_probe",
+    name = "typed_cpp_probe",
     testonly = True,
-    deps = [":shared-schema"],
+    deps = [":typed-schema"],
 )
 
 c_djinni_library(
     name = "c_tree_probe",
     testonly = True,
+    c_namespace = "c_",
     cc_deps = [
-        ":tree_probe",
+        ":typed_cpp_probe",
         "//support-lib:djinni-support-common",
     ],
     tags = ["manual"],
@@ -44,6 +65,11 @@ c_djinni_library(
 djinni_library(
     name = "c-schema",
     testonly = True,
+    cpp_base_lib_include_prefix = "",
+    cpp_include_prefix = "shared/",
+    cpp_namespace = "shared::defaults",
+    cpp_optional_header = "<optional>",
+    cpp_optional_template = "std::optional",
     srcs = ["idl/nested.djinni"],
     idl = "idl/shared.djinni",
     idl_include_files = ["idl/nested.djinni"],
@@ -51,23 +77,31 @@ djinni_library(
 )
 
 cc_test(
-    name = "tree_probe_consumer",
+    name = "typed_cpp_probe_consumer",
     testonly = True,
     srcs = ["tree_probe_consumer.cc"],
-    deps = [":tree_probe"],
+    deps = [":typed_cpp_probe"],
+)
+
+cc_test(
+    name = "tree_fallback_consumer",
+    testonly = True,
+    srcs = ["tree_probe_consumer.cc"],
+    deps = [":c_tree_probe"],
 )
 
 java_djinni_library(
-    name = "java_tree_probe",
+    name = "java_probe",
     testonly = True,
     java_package = "example.shared",
     deps = [":shared-schema"],
 )
 
 jni_djinni_library(
-    name = "jni_tree_probe",
+    name = "jni_typed_probe",
     testonly = True,
-    cc_deps = ["//support-lib:djinni-support-jni"],
+    cc_deps = [":typed_cpp_probe", "//support-lib:djinni-support-jni"],
+    jni_include_cpp_prefix = "shared/",
     tags = ["manual"],
     deps = [":shared-schema"],
 )
@@ -78,41 +112,17 @@ java_test(
     srcs = ["TreeProbe.java"],
     main_class = "example.shared.TreeProbe",
     use_testrunner = False,
-    deps = [":java_tree_probe"],
-)
-
-java_djinni_library(
-    name = "java_explicit_probe",
-    testonly = True,
-    outs = {"java_srcs": [
-        "analysis/java_explicit/Shared.java",
-        "analysis/java_explicit/Status.java",
-    ]},
-    java_package = "example.shared",
-    deps = [":shared-schema"],
+    deps = [":java_probe"],
 )
 
 djinni_codegen(
     name = "swift_codegen_probe",
     djinni = ":shared-schema",
-    outs = {
-        "swift_srcs": ["analysis/swift/Shared.swift"],
-        "swiftxx_srcs": ["analysis/swiftxx/SwiftShared.cpp"],
-        "swiftxx_hdrs": ["analysis/swiftxx/SwiftShared.hpp"],
-    },
+    tree_languages = ["swift", "swiftxx"],
     swift_module = "Shared",
     swiftxx_include_prefix = "shared/",
     ident_swiftxx_class = "SwiftShared",
     tags = ["manual"],
-)
-
-java_test(
-    name = "java_explicit_probe_test",
-    testonly = True,
-    srcs = ["ExplicitTreeProbe.java"],
-    main_class = "example.shared.ExplicitTreeProbe",
-    use_testrunner = False,
-    deps = [":java_explicit_probe"],
 )
 
 djinni_library(
@@ -152,10 +162,10 @@ objc_djinni_library(
 )
 
 objc_djinni_library(
-    name = "objc_tree_probe",
+    name = "objc_typed_probe",
     testonly = True,
     objc_deps = [
-        ":tree_probe",
+        ":typed_cpp_probe",
         "//support-lib:djinni-support-objc",
     ],
     objc_include_prefix = "shared/",
@@ -173,11 +183,11 @@ wasm_djinni_cc_library(
 )
 
 wasm_djinni_cc_library(
-    name = "wasm_tree_probe",
+    name = "wasm_typed_probe",
     testonly = True,
     additional_compiler_inputs = ["idl/nested.djinni"],
     cc_deps = [
-        ":tree_probe",
+        ":typed_cpp_probe",
         "//support-lib:djinni-support-wasm",
     ],
     tags = ["manual"],
@@ -190,22 +200,11 @@ ts_djinni_filegroup(
     deps = [":shared-schema"],
 )
 
-ts_djinni_filegroup(
-    name = "ts_explicit_probe",
-    outs = {"ts_srcs": ["analysis/ts_explicit/shared.ts"]},
-    ts_module = "shared",
-    deps = [":shared-schema"],
-)
-
 sh_test(
     name = "ts_outputs_test",
     srcs = ["ts_outputs_test.sh"],
-    args = [
-        "$(rootpath :ts_tree_probe)",
-        "$(rootpath :ts_explicit_probe)",
-    ],
+    args = ["$(rootpath :ts_tree_probe)"],
     data = [
-        ":ts_explicit_probe",
         ":ts_tree_probe",
     ],
 )

@@ -77,10 +77,11 @@ Neither module is assumed to be published in BCR; use checkout overrides or
 pinned archives with the appropriate `strip_prefix` for each module root.
 
 Load `swift_djinni_library` from
-`@djinni_apple//:swift_djinni_codegen.bzl`. Declare generated files in `outs`
-under `swift_srcs`, `swiftxx_srcs`, and `swiftxx_hdrs`; Swift source outputs are
-split into the public Swift module and its `+Private.swift` bridge module. Set
-`module_name` to the Swift module configured for the IDL, and provide the
+`@djinni_apple//:swift_djinni_codegen.bzl`. The macro uses the declaration lists
+to select Swift and Swift/C++ bridge sources by owner; it splits public and
+private Swift files into separate modules. Swift source access is file scoped,
+so this compiled macro requires type metadata instead of using unity fallback.
+Set `module_name` to the Swift module configured for the IDL, and provide the
 generated native C++ library through `cc_deps` when the bridge uses native
 types. See `examples/ios/BUILD` for a complete consumer.
 
@@ -111,19 +112,19 @@ or `cc_binary`, returning the normal language provider to downstream consumers.
 The shared action implementation is internal; each language macro selects only
 its own output categories and runs a separate action.
 
-The WIP directory-backed mode omits `outs`. `djinni_library` writes a resolved
-declaration manifest, and each language action checks it before generating into a
-declared directory. Djinni also writes its exact output list for the action.
-C++/JNI/WASM headers and sources use the configured include prefix inside the
-directory. C sources stay at its root while C headers use the C include prefix;
-Java files use the package path beneath the directory.
-C++, C, JNI, and WASM compile discovered sources through a generated unity file;
-Java packages discovered sources into a source JAR. Objective-C uses a generated
-`.mm` unity file. TypeScript copies its module file from the directory so callers
-still receive one `.ts` artifact. Existing `outs` calls continue to use explicit
-outputs. Unity compilation can change diagnostics or expose definitions that
-were isolated in separate source files, so it needs broader validation before
-replacing the explicit-output path.
+`djinni_library` can carry the resolved enum, record, and interface names. Native language rules use those
+types to expose one source artifact per possible generated type; a generator
+ownership manifest maps each artifact to Djinni's configured filename. When the
+type lists are omitted, native rules use the generated tree and compile a unity
+source. Java packages the tree's listed files into a source JAR, and TypeScript
+copies its module file from the tree. The optional compiled Swift macro requires
+type lists to preserve Swift's per-file access rules.
+
+Type lists are optional and checked when supplied. They describe every internal
+declaration in the root IDL's resolved import closure, including imported
+declarations. A typo or stale list fails in Djinni's declaration action before
+the language codegen runs. The lists remain separate fields on `DjinniInfo`;
+declaration kind is represented by the field it appears in.
 
 ```python
 load("@djinni//bzl:djinni_codegen.bzl", "cc_djinni_library", "djinni_library", "java_djinni_library")
@@ -132,6 +133,9 @@ djinni_library(
     name = "messages",
     idl = "messages.djinni",
     srcs = ["common.djinni"],
+    enums = ["message_kind"],
+    records = ["message", "common_message"],
+    interfaces = ["message_listener"],
 )
 
 cc_djinni_library(
@@ -155,11 +159,6 @@ cc_binary(
 )
 ```
 
-When `outs` is supplied, output names must match the IDL and options. A large manifest can be loaded from
-a checked-in `.bzl` file, as in `examples/djinni_outputs.bzl`. Output declarations
-are package-relative paths, and must not overlap checked-in files or outputs from
-another target. Use distinct output directories for separate option sets.
-
 ### `djinni_library`
 
 - `idl`: required single root `.djinni` label.
@@ -171,6 +170,10 @@ another target. Use distinct output directories for separate option sets.
   repository or generated imports without hardcoding execution-root paths.
 - `deps`: other `djinni_library` targets contributing transitive import inputs
   and generated YAML extern files.
+- `enums`, `records`, `interfaces`: optional lists of internal declaration names
+  in the resolved IDL import closure. These names also determine the declaration
+  source artifacts exposed by native and Swift language macros. When any list is
+  supplied, Djinni verifies all three lists against the resolved declarations.
 - `idl_include_paths`: repository-relative search directories. For example,
   `schemas/vendor` refers to that directory in the repository defining this rule,
   including when loaded as `@djinni`. Absolute paths and `..` are rejected.
@@ -182,9 +185,13 @@ another target. Use distinct output directories for separate option sets.
 - `compiler`: executable label, defaulting to Djinni's `//src:djinni`, resolved
   relative to the rules repository and built in the execution configuration.
 
-`DjinniInfo` carries the root IDL, project name, a depset of transitive source
-files, execution-root include paths, the declaration and input manifests, and
-generated YAML trees from this target and its dependency closure.
+`DjinniInfo` carries the root IDL, the separate enum/record/interface lists,
+project name, a depset of transitive source files, execution-root include paths,
+the declaration and output manifests, and generated YAML trees from this target
+and its dependency closure. The output ownership manifest is created for each
+language action and records backend, source/header role, declaration kind/name,
+and generated path. The provider does not need to duplicate language-specific
+filename rules.
 The YAML tree is also available through the `yaml_tree` output group.
 
 Imports must be declared through `srcs`, `idl_include_files`, or `deps`; string
@@ -196,22 +203,21 @@ inputs, such as through `srcs` or `idl_include_files`.
 
 ### Language Macros
 
-| Macro | Selected output categories | Consumer |
+| Macro | Generated consumer | Source handling |
 | --- | --- | --- |
-| `cc_djinni_library` | `cpp_srcs`, `cpp_hdrs` | `cc_library` |
-| `c_djinni_library` | `c_srcs`, `c_hdrs` | `cc_library` |
-| `java_djinni_library` | `java_srcs` | `java_library` |
-| `jni_djinni_library` | `jni_srcs`, `jni_hdrs` | `cc_library` |
-| `objc_djinni_library` | `objc_*`, `objcpp_*` | `objc_library` |
-| `wasm_djinni_cc_library` | `wasm_srcs`, `wasm_hdrs` | `cc_library` |
-| `wasm_djinni_cc_binary` | `wasm_srcs`, `wasm_hdrs` | `cc_binary` |
-| `ts_djinni_filegroup` | `ts_srcs` | `filegroup` |
-| `swift_djinni_library` (optional Apple module) | `swift_srcs`, `swiftxx_srcs`, `swiftxx_hdrs` | Swift and Swift/C++ libraries |
+| `cc_djinni_library` | `cc_library` | Per-type sources with type lists; unity source otherwise |
+| `c_djinni_library` | `cc_library` | Per-type sources with type lists; unity source otherwise |
+| `java_djinni_library` | `java_library` | Source JAR from the generated tree |
+| `jni_djinni_library` | `cc_library` | Per-type sources with type lists; unity source otherwise |
+| `objc_djinni_library` | `objc_library` | Per-type sources with type lists; unity source otherwise |
+| `wasm_djinni_cc_library` | `cc_library` | Per-type sources with type lists; unity source otherwise |
+| `wasm_djinni_cc_binary` | `cc_binary` | Per-type sources with type lists; unity source otherwise |
+| `ts_djinni_filegroup` | `filegroup` | Module file from the generated tree |
+| `swift_djinni_library` (optional Apple module) | Swift and Swift/C++ libraries | Per-type source files; requires type lists |
 
-Each wrapper accepts exactly one base target in `deps`, an `outs` dictionary, and Djinni
-options as keyword arguments. Other known language categories in a shared manifest are
-ignored. Unknown categories fail analysis. Boolean CLI options accept Starlark booleans;
-omission preserves the compiler's default.
+Each wrapper accepts exactly one base target in `deps` and Djinni options as
+keyword arguments. Boolean CLI options accept Starlark booleans; omission
+preserves the compiler's default.
 
 The C, ObjC, and WASM library wrappers compile their generated sources. The TS
 wrapper exposes generated artifacts as a filegroup; it does not add a compiler or
@@ -221,32 +227,24 @@ consumer dependency:
 c_djinni_library(
     name = "messages_c",
     deps = [":messages"],
-    outs = {"c_srcs": ["generated/c/messages.cpp"], "c_hdrs": ["generated/c/messages.h"]},
     cc_deps = ["//support-lib:djinni-support-common"],
 )
 
 objc_djinni_library(
     name = "messages_objc",
     deps = [":messages"],
-    outs = {
-        "objc_hdrs": ["generated/objc/Messages.h"],
-        "objcpp_hdrs": ["generated/objc/Messages+Private.h"],
-        "objcpp_srcs": ["generated/objc/Messages+Private.mm"],
-    },
     objc_deps = ["//support-lib:djinni-support-objc"],
 )
 
 wasm_djinni_cc_library(
     name = "messages_wasm",
     deps = [":messages"],
-    outs = {"wasm_srcs": ["generated/wasm/Messages.cpp"], "wasm_hdrs": ["generated/wasm/Messages.hpp"]},
     cc_deps = ["//support-lib:djinni-support-wasm"],
 )
 
 ts_djinni_filegroup(
     name = "messages_ts",
     deps = [":messages"],
-    outs = {"ts_srcs": ["generated/ts/messages.ts"]},
     ts_module = "messages",
 )
 ```
@@ -285,9 +283,9 @@ your workspace's WASM build setup.
 
 ## Low-Level Codegen
 
-`djinni_codegen` remains available for explicit generated-file integration,
-including Objective-C, Objective-C++, and TypeScript. Dedicated compiled
-library macros for those languages are not implemented yet.
+`djinni_codegen` is a tree-only interface for custom integrations. Use the typed
+language wrappers above for compiled libraries. Set `tree_languages` to the
+backends whose generated trees the target needs.
 
 ```python
 load("@djinni//bzl:djinni_codegen.bzl", "djinni_codegen")
@@ -295,19 +293,16 @@ load("@djinni//bzl:djinni_codegen.bzl", "djinni_codegen")
 djinni_codegen(
     name = "messages_ts",
     djinni = ":messages",
-    outs = {"ts_srcs": ["generated/ts/messages.ts"]},
+    tree_languages = ["ts"],
     ts_module = "messages",
 )
 ```
 
-Use either `djinni` (a `DjinniInfo` target) or the legacy `idl` with explicit
-`srcs` and `idl_include_paths`. Supported categories are `cpp_srcs`, `cpp_hdrs`,
-`c_srcs`, `c_hdrs`, `java_srcs`, `jni_srcs`, `jni_hdrs`, `objc_srcs`, `objc_hdrs`, `objcpp_srcs`,
-`objcpp_hdrs`, `wasm_srcs`, `wasm_hdrs`, `ts_srcs`, `swift_srcs`,
-`swiftxx_srcs`, and `swiftxx_hdrs`. They are also
-output groups, along with `all`. There is no `generators` attribute: nonempty
-output categories select generators. Each category must use one directory;
-Objective-C, Objective-C++, and WASM source/header pairs each share a directory.
+Use either `djinni` (a `DjinniInfo` target) or an `idl` with explicit `srcs` and
+`idl_include_paths`. `tree_languages` is required. Consumers can request each
+language tree, the generated output inventory (`manifest`), or the per
+declaration ownership inventory (`outputs_by_declaration`) through output
+groups. `all` contains all declared trees and manifests.
 
 Actions use declared files, `ctx.actions.args`, and the compiler's
 `FilesToRunProvider` so its runfiles are included. Shell generation scripts are

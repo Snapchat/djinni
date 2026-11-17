@@ -1,5 +1,4 @@
 load("@djinni_apple//:swift_djinni_codegen.bzl", "swift_djinni_library")
-load("@djinni_rules//examples:djinni_outputs.bzl", "EXAMPLE_DJINNI_OUTS")
 
 swift_djinni_library(
     name = "textsort-swift-bridge",
@@ -10,6 +9,5 @@ swift_djinni_library(
     ident_swiftxx_class = "SwiftFooBar",
     ident_swiftxx_file = "SwiftFooBar",
     module_name = "TextSort",
-    outs = EXAMPLE_DJINNI_OUTS,
     visibility = ["//visibility:public"],
 )
