@@ -1,8 +1,12 @@
 load("//bzl:djinni_codegen.bzl", "cc_djinni_library", "djinni_library", "java_djinni_library", "jni_djinni_library", "wasm_djinni_cc_binary")
-load(":djinni_outputs.bzl", "BENCHMARK_DJINNI_OUTS")
 
 djinni_library(
     name = "benchmark-djinni",
+    types = {
+        "enums": ["EnumSixValue"],
+        "records": ["RecordSixInt"],
+        "interfaces": ["ObjectNative", "ObjectPlatform", "djinni_perf_benchmark"],
+    },
     srcs = [
         "//support-lib:dataref.yaml",
         "//support-lib:dataview.yaml",
@@ -40,7 +44,6 @@ cc_djinni_library(
     srcs = glob([
         "handwritten-src/cpp/*.cpp",
     ]),
-    outs = BENCHMARK_DJINNI_OUTS,
     hdrs = glob([
         "handwritten-src/cpp/*.hpp",
     ]),
@@ -50,7 +53,6 @@ cc_djinni_library(
     cpp_namespace = "snapchat::djinni::benchmark",
     ident_cpp_enum_type = "foo_bar",
     includes = [
-        "bazel-generated/benchmark/cpp",
         "handwritten-src/cpp",
     ],
     visibility = ["//visibility:public"],
@@ -72,7 +74,6 @@ java_library(
 
 java_djinni_library(
     name = "benchmark-java-generated",
-    outs = BENCHMARK_DJINNI_OUTS,
     ident_java_field = "mFooBar",
     java_class_access_modifier = "package",
     java_deps = [
@@ -105,7 +106,6 @@ cc_library(
 
 jni_djinni_library(
     name = "benchmark-jni-generated",
-    outs = BENCHMARK_DJINNI_OUTS,
     cc_deps = [
         ":benchmark-common-generated",
         "//support-lib:djinni-support-jni",
@@ -115,7 +115,6 @@ jni_djinni_library(
     ident_java_field = "mFooBar",
     ident_jni_class = "NativeFooBar",
     ident_jni_file = "NativeFooBar",
-    includes = ["bazel-generated/benchmark/jni"],
     java_package = "com.snapchat.djinni.benchmark",
     linkopts = [
         "-lm",
@@ -155,7 +154,6 @@ cc_binary(
 
 wasm_djinni_cc_binary(
     name = "perftest-wasm-generated",
-    outs = BENCHMARK_DJINNI_OUTS,
     cc_deps = [
         ":benchmark-common-generated",
         "//support-lib:djinni-support-wasm",

@@ -1,0 +1,14 @@
+@import "nested.djinni"
+
+shared = record {
+    status: status;
+    value: i32;
+} deriving (eq)
+
+first = interface {
+    get(): i32;
+}
+
+second = interface {
+    get(): i32;
+}

@@ -5,29 +5,18 @@ load("@rules_java//java:defs.bzl", "java_test")
 djinni_library(
     name = "schema",
     testonly = True,
+    types = {
+        "enums": ["status"],
+        "records": ["message", "shared"],
+    },
     idl = "schema.djinni",
     deps = ["@djinni//bzl/tests:shared-schema"],
 )
 
-OUTS = {
-    "cpp_hdrs": [
-        "generated/cpp/message.hpp",
-        "generated/cpp/shared.hpp",
-        "generated/cpp/status.hpp",
-    ],
-    "java_srcs": [
-        "generated/java/Message.java",
-        "generated/java/Shared.java",
-        "generated/java/Status.java",
-    ],
-}
-
 cc_djinni_library(
     name = "schema_cc",
     testonly = True,
-    outs = OUTS,
     cpp_namespace = "consumer",
-    includes = ["generated/cpp"],
     library_kwargs = {"defines": ["DJINNI_CONSUMER_TEST=1"]},
     deps = [":schema"],
 )
@@ -35,7 +24,6 @@ cc_djinni_library(
 java_djinni_library(
     name = "schema_java",
     testonly = True,
-    outs = OUTS,
     java_package = "consumer",
     java_use_final_for_record = False,
     deps = [":schema"],
@@ -67,6 +55,8 @@ sh_test(
     args = [
         "$(rootpath @djinni//src:djinni)",
         "$(rootpath @djinni//bzl/tests:idl/shared.djinni)",
+        "$(rootpath :schema_cc__djinni_cpp_codegen__tree)",
+        "$(rootpath :schema_java__djinni_java_codegen__tree)",
     ],
     data = [
         "common_defaults.yaml",
@@ -75,7 +65,9 @@ sh_test(
         "@djinni//bzl/tests:idl/nested.djinni",
         "@djinni//bzl/tests:idl/shared.djinni",
         "@djinni//src:djinni",
-    ] + OUTS["cpp_hdrs"] + OUTS["java_srcs"],
+        ":schema_cc__djinni_cpp_codegen__tree",
+        ":schema_java__djinni_java_codegen__tree",
+    ],
 )
 
 sh_test(

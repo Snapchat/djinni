@@ -136,6 +136,7 @@ package object generatorTools {
                    swiftxxIncludeCppPrefix: String,
                    swiftxxBaseLibIncludePrefix: String,
                    outFileListWriter: Option[Writer],
+                   ownedOutFileListWriter: Option[Writer],
                    skipGeneration: Boolean,
                    yamlOutFolder: Option[File],
                    yamlOutFile: Option[String],
@@ -397,16 +398,43 @@ package object generatorTools {
 abstract class Generator(spec: Spec)
 {
   protected val writtenFiles = mutable.HashMap[String,String]()
+  private var currentOwner: (String, String) = ("module", "__module__")
+  private val outputBackend = getClass.getSimpleName.stripSuffix("Generator").toLowerCase
+
+  private def outputRole(fileName: String): String = {
+    def hasExtension(extension: String): Boolean = fileName.endsWith("." + extension)
+    val isSource = outputBackend match {
+      case "cpp" | "jni" | "wasm" | "swiftxx" => hasExtension(spec.cppExt)
+      case "c" => hasExtension("cpp")
+      case "objc" => hasExtension("m") || hasExtension(spec.objcppExt)
+      case "objcpp" => hasExtension(spec.objcppExt)
+      case "java" => hasExtension("java")
+      case "ts" => hasExtension("ts")
+      case "swift" => hasExtension("swift")
+      case _ => false
+    }
+    if (isSource) "source" else "header"
+  }
+
+  private def ownerKind(td: InternTypeDecl): String = td.body match {
+    case e: Enum => if (e.flags) "flags" else "enum"
+    case _: Record => "record"
+    case _: Interface => "interface"
+    case _: ProtobufMessage => "protobuf"
+  }
 
   protected def createFile(folder: File, fileName: String, makeWriter: OutputStreamWriter => IndentWriter, f: IndentWriter => Unit): Unit = {
+    val file = new File(folder, fileName)
     if (spec.outFileListWriter.isDefined) {
-      spec.outFileListWriter.get.write(new File(folder, fileName).getPath + "\n")
+      spec.outFileListWriter.get.write(file.getPath + "\n")
+    }
+    if (spec.ownedOutFileListWriter.isDefined) {
+      spec.ownedOutFileListWriter.get.write(Seq(outputBackend, outputRole(fileName), currentOwner._1, currentOwner._2, file.getPath).mkString("\t") + "\n")
     }
     if (spec.skipGeneration) {
       return
     }
 
-    val file = new File(folder, fileName)
     val cp = file.getCanonicalPath
     writtenFiles.put(cp.toLowerCase, cp) match {
       case Some(existing) =>
@@ -499,6 +527,7 @@ abstract class Generator(spec: Spec)
   def generate(idl: Seq[TypeDecl]) {
     val decls = idl.collect { case itd: InternTypeDecl => itd }
     for (td <- decls) {
+      currentOwner = (ownerKind(td), td.ident.name)
       try {
         td.body match {
           case e: Enum =>
@@ -511,8 +540,8 @@ abstract class Generator(spec: Spec)
       } catch {
         case t: Throwable => throw new RuntimeException("Failed to process " + td.ident.name, t)
       }
-
     }
+    currentOwner = ("module", "__module__")
     generateModule(decls.filter(td => td.body.isInstanceOf[Interface]))
   }
 

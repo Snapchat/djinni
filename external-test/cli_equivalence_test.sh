@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+cpp_tree="$TEST_SRCDIR/$TEST_WORKSPACE/$3"
+java_tree="$TEST_SRCDIR/$TEST_WORKSPACE/$4"
+
 # Exercise the normal CLI, independent of the Starlark generation actions.
 "$1" \
     --defaults common_defaults.yaml \
@@ -25,10 +28,10 @@ set -euo pipefail
     --java-out "$TEST_TMPDIR/config-java"
 
 for file in message.hpp shared.hpp status.hpp; do
-    diff -u "generated/cpp/$file" "$TEST_TMPDIR/cpp/$file"
+    diff -u "$cpp_tree/$file" "$TEST_TMPDIR/cpp/$file"
 done
 for file in Message.java Shared.java Status.java; do
-    diff -u "generated/java/$file" "$TEST_TMPDIR/java/$file"
+    diff -u "$java_tree/consumer/$file" "$TEST_TMPDIR/java/$file"
     diff -u "$TEST_TMPDIR/java/$file" "$TEST_TMPDIR/config-java/$file"
 done
 for file in message.hpp shared.hpp status.hpp; do
