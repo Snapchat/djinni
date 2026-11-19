@@ -407,7 +407,34 @@ def _include_paths(ctx):
         if path.startswith("/") or ".." in path.split("/"):
             fail("idl_include_paths must be repository-relative: %s" % path)
         result.append(root + "/" + path if root and path else root or path or ".")
-    return result + [file.dirname for file in ctx.files.idl_include_files]
+    for file in ctx.files.idl_include_files:
+        owner = file.owner
+        if owner and owner.workspace_root:
+            result.append(owner.workspace_root)
+        result.append(file.dirname)
+    return result
+
+_TYPE_CATEGORIES = ["enums", "records", "interfaces"]
+_TYPE_FLAGS = {
+    "enums": "--expected-enum",
+    "records": "--expected-record",
+    "interfaces": "--expected-interface",
+}
+
+def _normalized_types(types):
+    return {category: types.get(category, []) for category in _TYPE_CATEGORIES}
+
+def _validate_type_lists(ctx):
+    for category in ctx.attr.types:
+        if category not in _TYPE_CATEGORIES:
+            fail("Unknown type category %r; expected one of: %s" % (category, ", ".join(_TYPE_CATEGORIES)))
+
+    owner_by_name = {}
+    for category in _TYPE_CATEGORIES:
+        for name in ctx.attr.types.get(category, []):
+            if name in owner_by_name:
+                fail("Declaration %s appears more than once (as %s and %s)" % (name, owner_by_name[name], category))
+            owner_by_name[name] = category
 
 _TYPE_CATEGORIES = ["enums", "records", "interfaces"]
 _TYPE_FLAGS = {
