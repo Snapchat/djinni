@@ -17,5 +17,22 @@
 package com.snapchat.djinni;
 
 public final class DataRefHelper {
+    /** Lets PreferNativeMemory DataRefs use up to limitBytes of malloc memory; 0 (default) is off. */
+    public static void setNativeAllocationLimit(long limitBytes) {
+        if (limitBytes < 0) {
+            throw new IllegalArgumentException("limitBytes must not be negative: " + limitBytes);
+        }
+        nativeSetNativeAllocationLimit(limitBytes);
+    }
+
+    /** Returns the bytes currently held against the native allocation budget. */
+    public static long getNativeAllocationBytes() {
+        return nativeGetNativeAllocationBytes();
+    }
+
     public static native void nativeDestroy(long nativeRef);
+
+    private static native void nativeSetNativeAllocationLimit(long limitBytes);
+
+    private static native long nativeGetNativeAllocationBytes();
 }

@@ -19,6 +19,8 @@
 
 - (nonnull NSData *)dataFromStr;
 
+- (nonnull NSData *)generateDataPreferNative:(int32_t)len;
+
 - (nonnull NSData *)sendDataView:(nonnull NSData *)data;
 
 - (nonnull NSData *)recvDataView;

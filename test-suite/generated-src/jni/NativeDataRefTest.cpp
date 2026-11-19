@@ -72,6 +72,15 @@ CJNIEXPORT ::djinni::NativeDataRef::JniType JNICALL Java_com_dropbox_djinni_test
     } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
 }
 
+CJNIEXPORT ::djinni::NativeDataRef::JniType JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1generateDataPreferNative(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, jint j_len)
+{
+    try {
+        const auto& ref = ::djinni::objectFromHandleAddress<::testsuite::DataRefTest>(nativeRef);
+        auto r = ref->generateDataPreferNative(::djinni::I32::toCpp(jniEnv, j_len));
+        return ::djinni::release(::djinni::NativeDataRef::fromCpp(jniEnv, r));
+    } JNI_TRANSLATE_EXCEPTIONS_RETURN(jniEnv, 0 /* value doesn't matter */)
+}
+
 CJNIEXPORT jbyteArray JNICALL Java_com_dropbox_djinni_test_DataRefTest_00024CppProxy_native_1sendDataView(JNIEnv* jniEnv, jobject /*this*/, jlong nativeRef, ::djinni::NativeDataView::JniType j_data)
 {
     try {

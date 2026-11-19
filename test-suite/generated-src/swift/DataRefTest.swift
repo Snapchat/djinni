@@ -12,6 +12,7 @@ public protocol DataRefTest: AnyObject {
     func generateData() throws -> DjinniSupport.DJDataRef
     func dataFromVec() throws -> DjinniSupport.DJDataRef
     func dataFromStr() throws -> DjinniSupport.DJDataRef
+    func generateDataPreferNative(_ len: Int32) throws -> DjinniSupport.DJDataRef
     func sendDataView(_ data: Swift.UnsafeRawBufferPointer) throws -> Data
     func recvDataView() throws -> Swift.UnsafeRawBufferPointer
 }

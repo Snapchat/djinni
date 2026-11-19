@@ -56,6 +56,15 @@ djinni::swift::AnyValue DataRefTest_dataFromStr(const djinni::swift::ParameterLi
 catch (const std::exception& e) {
     return {djinni::swift::ErrorValue{ e.what(), std::current_exception()}};
 }
+djinni::swift::AnyValue DataRefTest_generateDataPreferNative(const djinni::swift::ParameterList* params) try {
+    auto inst = NativeDataRefTest::toCpp(params->getValue(0));
+    auto _len = ::djinni::swift::I32::toCpp(params->getValue(1));
+    auto ret = inst->generateDataPreferNative(std::move(_len));
+    return ::djinni::swift::DataRefAdaptor::fromCpp(ret);
+}
+catch (const std::exception& e) {
+    return {djinni::swift::ErrorValue{ e.what(), std::current_exception()}};
+}
 djinni::swift::AnyValue DataRefTest_sendDataView(const djinni::swift::ParameterList* params) try {
     auto inst = NativeDataRefTest::toCpp(params->getValue(0));
     auto _data = ::djinni::swift::DataViewAdaptor::toCpp(params->getValue(1));

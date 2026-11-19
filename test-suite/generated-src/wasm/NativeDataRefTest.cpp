@@ -15,6 +15,7 @@ em::val NativeDataRefTest::cppProxyMethods() {
         "generateData",
         "dataFromVec",
         "dataFromStr",
+        "generateDataPreferNative",
         "sendDataView",
         "recvDataView",
     });
@@ -73,6 +74,15 @@ em::val NativeDataRefTest::dataFromStr(const CppType& self) {
         return ::djinni::ExceptionHandlingTraits<::djinni::NativeDataRef>::handleNativeException(e);
     }
 }
+em::val NativeDataRefTest::generateDataPreferNative(const CppType& self, int32_t w_len) {
+    try {
+        auto r = self->generateDataPreferNative(::djinni::I32::toCpp(w_len));
+        return ::djinni::NativeDataRef::fromCpp(r);
+    }
+    catch(const std::exception& e) {
+        return ::djinni::ExceptionHandlingTraits<::djinni::NativeDataRef>::handleNativeException(e);
+    }
+}
 em::val NativeDataRefTest::sendDataView(const CppType& self, const em::val& w_data) {
     try {
         auto r = self->sendDataView(::djinni::NativeDataView::toCpp(w_data));
@@ -111,6 +121,7 @@ EMSCRIPTEN_BINDINGS(testsuite_DataRefTest) {
         .function("generateData", NativeDataRefTest::generateData)
         .function("dataFromVec", NativeDataRefTest::dataFromVec)
         .function("dataFromStr", NativeDataRefTest::dataFromStr)
+        .function("generateDataPreferNative", NativeDataRefTest::generateDataPreferNative)
         .function("sendDataView", NativeDataRefTest::sendDataView)
         .function("recvDataView", NativeDataRefTest::recvDataView)
         .class_function("create", NativeDataRefTest::create)
