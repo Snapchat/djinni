@@ -436,28 +436,6 @@ def _validate_type_lists(ctx):
                 fail("Declaration %s appears more than once (as %s and %s)" % (name, owner_by_name[name], category))
             owner_by_name[name] = category
 
-_TYPE_CATEGORIES = ["enums", "records", "interfaces"]
-_TYPE_FLAGS = {
-    "enums": "--expected-enum",
-    "records": "--expected-record",
-    "interfaces": "--expected-interface",
-}
-
-def _normalized_types(types):
-    return {category: types.get(category, []) for category in _TYPE_CATEGORIES}
-
-def _validate_type_lists(ctx):
-    for category in ctx.attr.types:
-        if category not in _TYPE_CATEGORIES:
-            fail("Unknown type category %r; expected one of: %s" % (category, ", ".join(_TYPE_CATEGORIES)))
-
-    owner_by_name = {}
-    for category in _TYPE_CATEGORIES:
-        for name in ctx.attr.types.get(category, []):
-            if name in owner_by_name:
-                fail("Declaration %s appears more than once (as %s and %s)" % (name, owner_by_name[name], category))
-            owner_by_name[name] = category
-
 def _djinni_library_impl(ctx):
     _validate_type_lists(ctx)
     types = _normalized_types(ctx.attr.types)
@@ -671,10 +649,46 @@ def _generated_tree(name, codegen_name, language, testonly):
         srcs = [":" + codegen_name],
         output_group = language + "_tree",
         testonly = testonly,
+        visibility = ["//visibility:private"],
     )
     return ":" + tree_name
 
 def _objc_headers_tree_impl(ctx):
+    djinni = ctx.attr.djinni[DjinniInfo]
+    if djinni.types_provided:
+        source = ctx.file.src
+        manifest = ctx.file.owned_manifest
+        output = ctx.actions.declare_directory(ctx.label.name + ".headers")
+        ctx.actions.run_shell(
+            inputs = [source, manifest],
+            outputs = [output],
+            arguments = [source.path, manifest.path, output.path, ctx.attr.header_mode],
+            command = """set -euo pipefail
+source="$1"
+manifest="$2"
+output="$3"
+header_mode="$4"
+mkdir -p "$output"
+while IFS="$(printf '\\t')" read -r backend row_role row_kind row_name file; do
+    if [ "$row_role" != "header" ]; then
+        continue
+    fi
+    case "$file" in
+        "$source"/*) ;;
+        *) continue ;;
+    esac
+    if [ "$header_mode" = "private" ]; then
+        case "$file" in *+Private.h) ;; *) continue ;; esac
+    fi
+    relative=$(printf '%s\\n' "$file" | sed "s#^$source/##")
+    mkdir -p "$output/$(dirname "$relative")"
+    cp "$file" "$output/$relative"
+done < "$manifest"
+""",
+            mnemonic = "DjinniGeneratedHeaders",
+        )
+        return [DefaultInfo(files = depset([output]))]
+
     source = ctx.file.src
     output = ctx.actions.declare_directory(ctx.label.name + ".headers")
     ctx.actions.run_shell(
@@ -704,7 +718,9 @@ done
 _objc_headers_tree = rule(
     implementation = _objc_headers_tree_impl,
     attrs = {
+        "djinni": attr.label(mandatory = True, providers = [DjinniInfo]),
         "header_mode": attr.string(default = "all", values = ["all", "private"]),
+        "owned_manifest": attr.label(allow_single_file = True),
         "src": attr.label(allow_single_file = True, mandatory = True),
     },
 )
@@ -731,6 +747,7 @@ def _generated_manifest(codegen_name, testonly):
         srcs = [":" + codegen_name],
         output_group = "manifest",
         testonly = testonly,
+        visibility = ["//visibility:private"],
     )
 
 def _source_slots(language, djinni):
@@ -893,6 +910,7 @@ def _generated_owned_manifest(name, codegen_name, testonly):
         srcs = [":" + codegen_name],
         output_group = "outputs_by_declaration",
         testonly = testonly,
+        visibility = ["//visibility:private"],
     )
 
 def _generated_sources(name, tree, owned_manifest, language, djinni, testonly):
@@ -904,6 +922,7 @@ def _generated_sources(name, tree, owned_manifest, language, djinni, testonly):
         owned_manifest = owned_manifest,
         source_tree = tree,
         testonly = testonly,
+        visibility = ["//visibility:private"],
     )
     return ":" + sources_name
 
@@ -914,6 +933,7 @@ def _generated_owned_headers(name, tree, owned_manifest, testonly):
         owned_manifest = owned_manifest,
         source_tree = tree,
         testonly = testonly,
+        visibility = ["//visibility:private"],
     )
     return ":" + headers_name, headers_name + ".headers"
 
@@ -1098,9 +1118,12 @@ def objc_djinni_library(
     generated_headers = name + "__objc_headers"
     _objc_headers_tree(
         name = generated_headers,
+        djinni = deps[0],
+        owned_manifest = ":" + owned_manifest,
         src = tree,
         header_mode = generated_header_mode,
         testonly = testonly,
+        visibility = ["//visibility:private"],
     )
     generated_includes = [generated_headers + ".headers"]
     objc_prefix = kwargs.get("objc_include_prefix", "").rstrip("/")
@@ -1207,6 +1230,7 @@ def wasm_djinni_cc_binary(
         copts = copts,
         linkopts = linkopts,
         testonly = testonly,
+        visibility = ["//visibility:private"],
     )
     cc_binary(
         name = name,

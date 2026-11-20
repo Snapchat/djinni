@@ -157,6 +157,26 @@ _source_outputs_test = analysistest.make(_source_outputs_test_impl, attrs = {
     "expected_mnemonic": attr.string(),
 })
 
+def _typed_source_contract_test_impl(ctx):
+    env = analysistest.begin(ctx)
+    target = analysistest.target_under_test(env)
+    files = target[DefaultInfo].files.to_list()
+    actions = analysistest.target_actions(env)
+
+    asserts.equals(env, ctx.attr.expected_files, sorted([file.basename for file in files]))
+    asserts.equals(env, len(ctx.attr.expected_files), len(actions))
+    for action in actions:
+        asserts.equals(env, "DjinniTypedSource", action.mnemonic)
+        inputs = action.inputs.to_list()
+        asserts.true(env, any([file.is_directory for file in inputs]), "Missing declared generated tree input")
+        asserts.true(env, any([file.basename.endswith(".outputs_by_declaration.tsv") for file in inputs]), "Missing declared ownership manifest input")
+        asserts.false(env, any([file.is_directory for file in action.outputs.to_list()]), "Typed source output must be an individual file")
+    return analysistest.end(env)
+
+_typed_source_contract_test = analysistest.make(_typed_source_contract_test_impl, attrs = {
+    "expected_files": attr.string_list(),
+})
+
 def rule_tests(name):
     """Creates rule contract tests without executing the Scala compiler.
 
@@ -294,6 +314,16 @@ def rule_tests(name):
         expected_files = [],
         expected_mnemonic = "DjinniTypedSource",
         expected_action_count = 0,
+    )
+    _typed_source_contract_test(
+        name = "typed_objc_sources_test",
+        target_under_test = ":objc_typed_probe__generated_sources",
+        expected_files = ["shared__objc.mm", "shared__objcpp.mm"],
+    )
+    _typed_source_contract_test(
+        name = "typed_wasm_sources_test",
+        target_under_test = ":wasm_typed_probe__generated_sources",
+        expected_files = ["shared__wasm.cpp", "status__wasm.cpp"],
     )
     _provider_test(name = "provider_test", target_under_test = ":typed-schema")
     _types_presence_test(
@@ -433,5 +463,5 @@ def rule_tests(name):
     )
     native.test_suite(
         name = name,
-        tests = [":provider_test", ":omitted_types_test", ":partial_types_test", ":explicit_empty_types_test", ":duplicate_type_list_test", ":invalid_type_category_test", ":typed_cpp_sources_test", ":tree_fallback_sources_test", ":explicit_empty_types_sources_test", ":cpp_inventory_consumer_test", ":c_inventory_consumer_test", ":java_inventory_consumer_test", ":jni_inventory_consumer_test", ":objc_inventory_consumer_test", ":wasm_inventory_consumer_test", ":ts_inventory_consumer_test", "//bzl/tests:typed_cpp_probe_consumer", "//bzl/tests:tree_fallback_consumer", "//bzl/tests:java_tree_probe_test", "//bzl/tests:ts_outputs_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":swift_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":wasm_additional_compiler_inputs_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":project_name_mismatch_test"],
+        tests = [":provider_test", ":omitted_types_test", ":partial_types_test", ":explicit_empty_types_test", ":duplicate_type_list_test", ":invalid_type_category_test", ":typed_cpp_sources_test", ":tree_fallback_sources_test", ":explicit_empty_types_sources_test", ":typed_objc_sources_test", ":typed_wasm_sources_test", ":cpp_inventory_consumer_test", ":c_inventory_consumer_test", ":java_inventory_consumer_test", ":jni_inventory_consumer_test", ":objc_inventory_consumer_test", ":wasm_inventory_consumer_test", ":ts_inventory_consumer_test", "//bzl/tests:typed_cpp_probe_consumer", "//bzl/tests:tree_fallback_consumer", "//bzl/tests:java_tree_probe_test", "//bzl/tests:ts_outputs_test", ":cpp_action_test", ":cpp_override_test", ":java_action_test", ":swift_action_test", ":c_library_action_test", ":objc_library_action_test", ":jni_library_action_test", ":wasm_library_action_test", ":wasm_naming_action_test", ":wasm_additional_compiler_inputs_test", ":ts_library_action_test", ":ts_filegroup_test", ":ambiguous_input_test", ":invalid_include_test", ":project_name_mismatch_test"],
     )
