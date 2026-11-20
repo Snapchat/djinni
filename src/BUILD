@@ -1,4 +1,10 @@
-load("@rules_scala//scala:scala.bzl", "scala_binary")
+load("@rules_scala//scala:scala.bzl", "scala_binary", "setup_scala_toolchain")
+
+setup_scala_toolchain(
+    name = "djinni_scala_toolchain",
+    enable_stats_file = False,
+    use_argument_file_in_runner = True,
+)
 
 scala_binary(
     name = "djinni",
