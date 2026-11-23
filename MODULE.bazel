@@ -18,7 +18,20 @@ scala_config.settings(scala_version = "2.11.12")
 
 scala_deps = use_extension("@rules_scala//scala/extensions:deps.bzl", "scala_deps")
 scala_deps.scala()
-use_repo(scala_deps, "io_bazel_rules_scala_scala_compiler", "io_bazel_rules_scala_scala_library", "io_bazel_rules_scala_scala_reflect")
+use_repo(
+    scala_deps,
+    "io_bazel_rules_scala_scala_compiler",
+    "io_bazel_rules_scala_scala_compiler_2_11_12",
+    "io_bazel_rules_scala_scala_library",
+    "io_bazel_rules_scala_scala_library_2_11_12",
+    "io_bazel_rules_scala_scala_parser_combinators_2_11_12",
+    "io_bazel_rules_scala_scala_reflect",
+    "io_bazel_rules_scala_scala_reflect_2_11_12",
+    "io_bazel_rules_scala_scala_xml_2_11_12",
+)
+
+# Use the stats-free toolchain for Djinni's Scala binary.
+register_toolchains("//src:djinni_scala_toolchain")
 
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 maven.install(
