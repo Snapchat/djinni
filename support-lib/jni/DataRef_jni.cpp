@@ -21,10 +21,80 @@
 
 #include "djinni_support.hpp"
 
+#include <atomic>
 #include <cassert>
+#include <cstdlib>
+#include <utility>
 #include <variant>
 
 namespace djinni {
+
+namespace {
+
+std::atomic<size_t> gNativeAllocationLimitBytes{0};
+std::atomic<size_t> gNativeAllocationBytes{0};
+
+bool reserveNativeAllocation(size_t bytes) {
+    const auto limit = gNativeAllocationLimitBytes.load(std::memory_order_relaxed);
+    if (bytes > limit) {
+        return false;
+    }
+    auto current = gNativeAllocationBytes.load(std::memory_order_relaxed);
+    while (current <= limit - bytes) {
+        if (gNativeAllocationBytes.compare_exchange_weak(
+                current, current + bytes, std::memory_order_relaxed)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Zeroed malloc memory that holds its share of the native allocation budget until freed.
+class NativeBuffer {
+public:
+    // Empty when the budget is full or calloc fails, so the caller can fall back to allocateDirect.
+    static NativeBuffer tryAllocate(size_t len) {
+        if (!reserveNativeAllocation(len)) {
+            return {};
+        }
+        // calloc commits pages only as they are written; a value-initialized vector touches them all.
+        auto* data = static_cast<uint8_t*>(std::calloc(len, 1));
+        if (data == nullptr) {
+            gNativeAllocationBytes.fetch_sub(len, std::memory_order_relaxed);
+            return {};
+        }
+        return NativeBuffer(data, len);
+    }
+
+    NativeBuffer() = default;
+    NativeBuffer(NativeBuffer&& other) noexcept
+        : _data(std::exchange(other._data, nullptr)), _size(std::exchange(other._size, 0)) {}
+    NativeBuffer(const NativeBuffer&) = delete;
+    NativeBuffer& operator=(const NativeBuffer&) = delete;
+    NativeBuffer& operator=(NativeBuffer&&) = delete;
+
+    ~NativeBuffer() {
+        if (_data != nullptr) {
+            std::free(_data);
+            gNativeAllocationBytes.fetch_sub(_size, std::memory_order_relaxed);
+        }
+    }
+
+    uint8_t* data() const {
+        return _data;
+    }
+    size_t size() const {
+        return _size;
+    }
+
+private:
+    NativeBuffer(uint8_t* data, size_t size) : _data(data), _size(size) {}
+
+    uint8_t* _data = nullptr;
+    size_t _size = 0;
+};
+
+} // namespace
 
 class DataRefJNI : public DataRef::Impl {
     struct ByteBufferClassInfo {
@@ -71,10 +141,21 @@ class DataRefJNI : public DataRef::Impl {
     };
 
 public:
-    using DataObj = std::variant<std::vector<uint8_t>, std::string>;
+    using DataObj = std::variant<std::vector<uint8_t>, std::string, NativeBuffer>;
 
     // create an empty buffer from c++
     explicit DataRefJNI(size_t len) {
+        allocate(len);
+    }
+    // create an empty buffer from c++, in native memory when the budget allows
+    DataRefJNI(size_t len, DataRef::PreferNativeMemory /*unused*/) {
+        if (len >= kNativeAllocationMinBytes) {
+            auto buffer = NativeBuffer::tryAllocate(len);
+            if (buffer.data() != nullptr) {
+                takeOver(std::move(buffer));
+                return;
+            }
+        }
         allocate(len);
     }
     // wrap a ByteBuffer object from java
@@ -128,6 +209,9 @@ public:
     }
 
 private:
+    // Small buffers stay on allocateDirect: they barely move the Java heap.
+    static constexpr size_t kNativeAllocationMinBytes = 1024 * 1024;
+
     GlobalRef<jobject> _data;
     bool _readonly;
     size_t _len;
@@ -186,6 +270,10 @@ DataRef::DataRef(size_t len) {
     _impl = std::make_shared<DataRefJNI>(len);
 }
 
+DataRef::DataRef(size_t len, PreferNativeMemory tag) {
+    _impl = std::make_shared<DataRefJNI>(len, tag);
+}
+
 // copy data into the new buffer object
 DataRef::DataRef(const void* data, size_t len) {
     _impl = std::make_shared<DataRefJNI>(len);
@@ -209,11 +297,36 @@ static void DataRefHelper_nativeDestroy(JNIEnv* /*unused*/, jclass /*unused*/, j
     delete reinterpret_cast<DataRefJNI::DataObj*>(nativeRef);
 }
 
-static const JNINativeMethod kNativeMethods[] = {{
-    const_cast<char*>("nativeDestroy"),
-    const_cast<char*>("(J)V"),
-    reinterpret_cast<void*>(&DataRefHelper_nativeDestroy),
-}};
+// NOLINTNEXTLINE
+static void DataRefHelper_nativeSetNativeAllocationLimit(JNIEnv* /*unused*/,
+                                                         jclass /*unused*/,
+                                                         jlong limitBytes) {
+    gNativeAllocationLimitBytes.store(limitBytes > 0 ? static_cast<size_t>(limitBytes) : 0,
+                                      std::memory_order_relaxed);
+}
+
+// NOLINTNEXTLINE
+static jlong DataRefHelper_nativeGetNativeAllocationBytes(JNIEnv* /*unused*/, jclass /*unused*/) {
+    return static_cast<jlong>(gNativeAllocationBytes.load(std::memory_order_relaxed));
+}
+
+static const JNINativeMethod kNativeMethods[] = {
+    {
+        const_cast<char*>("nativeDestroy"),
+        const_cast<char*>("(J)V"),
+        reinterpret_cast<void*>(&DataRefHelper_nativeDestroy),
+    },
+    {
+        const_cast<char*>("nativeSetNativeAllocationLimit"),
+        const_cast<char*>("(J)V"),
+        reinterpret_cast<void*>(&DataRefHelper_nativeSetNativeAllocationLimit),
+    },
+    {
+        const_cast<char*>("nativeGetNativeAllocationBytes"),
+        const_cast<char*>("()J"),
+        reinterpret_cast<void*>(&DataRefHelper_nativeGetNativeAllocationBytes),
+    },
+};
 
 // NOLINTNEXTLINE
 static auto sRegisterMethods =

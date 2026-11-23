@@ -1,9 +1,12 @@
 package com.dropbox.djinni.test;
 import junit.framework.TestCase;
 import static org.junit.Assert.*;
+import com.snapchat.djinni.DataRefHelper;
 import java.nio.ByteBuffer;
 
 public class DataTest extends TestCase {
+    private static final int TWO_MB = 2 * 1024 * 1024;
+
     DataRefTest test;
 
     @Override
@@ -50,6 +53,44 @@ public class DataTest extends TestCase {
         byte[] output = new byte[4];
         buf.get(output);
         assertArrayEquals(new byte[]{'a', 'b', 'c', 'd'}, output);
+    }
+
+    public void testPreferNativeMemoryIsOffByDefault() {
+        long before = DataRefHelper.getNativeAllocationBytes();
+        ByteBuffer buf = test.generateDataPreferNative(TWO_MB);
+        assertEquals(TWO_MB, buf.capacity());
+        assertEquals(before, DataRefHelper.getNativeAllocationBytes());
+    }
+
+    public void testPreferNativeMemoryStaysWithinLimit() {
+        long before = DataRefHelper.getNativeAllocationBytes();
+        DataRefHelper.setNativeAllocationLimit(before + 3 * 1024 * 1024);
+        try {
+            ByteBuffer first = test.generateDataPreferNative(TWO_MB);
+            assertEquals(before + TWO_MB, DataRefHelper.getNativeAllocationBytes());
+            assertTrue(first.isDirect());
+            assertEquals(0, first.get(TWO_MB - 1));
+            first.put(TWO_MB - 1, (byte) 7);
+            assertEquals(7, first.get(TWO_MB - 1));
+
+            ByteBuffer second = test.generateDataPreferNative(TWO_MB);
+            assertEquals(TWO_MB, second.capacity());
+            assertEquals(before + TWO_MB, DataRefHelper.getNativeAllocationBytes());
+
+            ByteBuffer small = test.generateDataPreferNative(1024);
+            assertEquals(1024, small.capacity());
+            assertEquals(before + TWO_MB, DataRefHelper.getNativeAllocationBytes());
+        } finally {
+            DataRefHelper.setNativeAllocationLimit(0);
+        }
+    }
+
+    public void testNegativeNativeAllocationLimitThrows() {
+        try {
+            DataRefHelper.setNativeAllocationLimit(-1);
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
     }
 
     public void testSendDataView() {
