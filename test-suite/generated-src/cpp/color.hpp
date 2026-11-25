@@ -37,6 +37,18 @@ constexpr const char* to_string(color e) noexcept {
 
 } // namespace testsuite
 
+namespace djinni {
+
+template<typename T>
+inline constexpr T max_enum_value();
+
+template<>
+inline constexpr ::testsuite::color max_enum_value<::testsuite::color>() {
+    return ::testsuite::color::VIOLET;
+}
+
+} // namespace djinni
+
 namespace std {
 
 template <>
